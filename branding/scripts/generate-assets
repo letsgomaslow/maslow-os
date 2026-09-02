@@ -69,6 +69,9 @@ render_lockup "$MARK_GRADIENT" "#FFFFFF" "$ROOT/themes/maslow-dark/unlock.png"
 render_lockup "$MARK_GRADIENT" "#121D35" "$ROOT/themes/maslow-light/unlock.png"
 render_lockup "$MARK_GRADIENT" "#FFFFFF" "$ROOT/default/plymouth/logo.png"
 cp "$ROOT/default/plymouth/logo.png" "$ROOT/default/sddm/omarchy/logo.png"
+"$ROOT/bin/omarchy-transcode-ascii" \
+  "$ROOT/default/plymouth/logo.png" "$ROOT/logo.txt" \
+  --width 80 --height 12 --mode block --threshold 50 >/dev/null
 
 "$MAGICK" -size 1200x675 xc:"#121D35" "$ROOT/themes/maslow-dark/unlock.png" -gravity center -composite "$ROOT/themes/maslow-dark/preview-unlock.png"
 "$MAGICK" -size 1200x675 xc:"#FFFFFF" "$ROOT/themes/maslow-light/unlock.png" -gravity center -composite "$ROOT/themes/maslow-light/preview-unlock.png"

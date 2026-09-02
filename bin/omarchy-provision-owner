@@ -44,9 +44,12 @@ source "$OMARCHY_PATH/install/provisioning/setup-form.sh"
 omarchy_username_taken() { getent passwd "$1" >/dev/null; }
 
 LOGO_PATH="$OMARCHY_PATH/logo.txt"
-LOGO_WIDTH=$(awk '{ if (length > max) max = length } END { print max+0 }' "$LOGO_PATH" 2>/dev/null || echo 0)
+LOGO_WIDTH=0
+while IFS= read -r logo_line || [[ -n $logo_line ]]; do
+  ((${#logo_line} > LOGO_WIDTH)) && LOGO_WIDTH=${#logo_line}
+done <"$LOGO_PATH" 2>/dev/null || true
 LOGO_HEIGHT=$(wc -l <"$LOGO_PATH" 2>/dev/null || echo 0)
-(( LOGO_WIDTH > 0 )) || LOGO_WIDTH=81
+(( LOGO_WIDTH > 0 )) || LOGO_WIDTH=80
 (( LOGO_HEIGHT > 0 )) || LOGO_HEIGHT=1
 
 export GUM_CONFIRM_PROMPT_FOREGROUND="6"
@@ -62,7 +65,7 @@ export GUM_CONFIRM_UNSELECTED_BACKGROUND="0"
 # first-boot provisioning looked far smaller than the installer it continues.
 #
 # Pick the kbd console font whose row count lands closest to that installer feel
-# (~48 rows), but never one wide enough to wrap the 81-column logo. On a console
+# (~48 rows), but never one wide enough to wrap the branded logo. On a console
 # that is already installer-sized (low resolution) this lands on the default
 # font, i.e. a no-op. All three fonts ship with kbd, so there's no dependency.
 scale_console_font() {
@@ -70,7 +73,7 @@ scale_console_font() {
 
   # Pick the console font empirically: apply each candidate, read the columns
   # fbcon actually hands back, and keep the one whose row count lands nearest a
-  # ~48-row target while still leaving room for the 81-column logo. Measuring
+  # ~48-row target while still leaving room for the branded logo. Measuring
   # the real result beats computing from /sys/class/graphics/fb0/virtual_size,
   # which under virgl can report a size the text console never actually reaches —
   # that mismatch is what wrapped the logo into the top-left corner.
@@ -81,7 +84,7 @@ scale_console_font() {
     setfont "$name" 2>/dev/null || continue
     read -r rows cols < <(stty size </dev/tty 2>/dev/null || printf '0 0\n')
     [[ $rows =~ ^[0-9]+$ && $cols =~ ^[0-9]+$ ]] || continue
-    (( cols > LOGO_WIDTH )) || continue      # must clear the 81-col logo
+    (( cols > LOGO_WIDTH )) || continue      # must clear the branded logo
     diff=$(( rows > target_rows ? rows - target_rows : target_rows - rows ))
     (( diff < best_diff )) && { best_diff=$diff; best="$name"; }
   done
@@ -454,7 +457,7 @@ greeter_screen() {
 
     printf '%s%s' "$HIDE_CURSOR" "$CLEAR"
 
-    # Console still too narrow for the 81-column logo (a transient small mode):
+    # Console still too narrow for the branded logo (a transient small mode):
     # skip the logo and animation rather than wrap them into mush — just center
     # the words. The redraw loop repaints the full splash once the VT widens.
     if (( cols <= LOGO_WIDTH )); then
@@ -491,8 +494,8 @@ greeter_screen() {
     # ColorShift the logo: a green base (indexed color 2) with a cyan accent (6)
     # drifting through, settling on green. Indexed ANSI colors, not hex — the
     # framebuffer console can't render ttfx's truecolor faithfully (it crushes the
-    # palette to a muddy lavender), but the 16 indexed colors map to the Tokyo
-    # Night palette and render true. One long-running invocation (many cycles) so
+    # palette to a muddy lavender), but the 16 indexed colors map to the Maslow
+    # Dark console palette and render true. One long-running invocation (many cycles) so
     # it never restarts — a restart is what flashed. The effect reads from
     # /dev/null so it never swallows the Return the foreground read waits on;
     # --reuse-canvas paints upward from the saved cursor, anchored one row below
