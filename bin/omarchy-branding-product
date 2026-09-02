@@ -1,0 +1,25 @@
+#!/bin/bash
+
+# omarchy:summary=Read canonical Maslow OS product metadata
+# omarchy:args=[--json|jq-path]
+# omarchy:hidden=true
+
+set -euo pipefail
+
+product_file="${MASLOW_PRODUCT_FILE:-/usr/share/maslow-os/product.json}"
+if [[ ! -r $product_file && -r ${OMARCHY_PATH:-/usr/share/omarchy}/branding/product.json ]]; then
+  product_file="${OMARCHY_PATH:-/usr/share/omarchy}/branding/product.json"
+fi
+
+if [[ ! -r $product_file ]]; then
+  echo "Maslow OS product metadata is unavailable: $product_file" >&2
+  exit 1
+fi
+
+if [[ ${1:-} == "--json" ]]; then
+  cat "$product_file"
+else
+  key=${1:-.product.name}
+  [[ $key == .* ]] || key=".$key"
+  jq -er "$key | select(type == \"string\" or type == \"number\" or type == \"boolean\")" "$product_file"
+fi

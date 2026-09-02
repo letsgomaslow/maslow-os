@@ -74,11 +74,10 @@ fi
 pass "the logo descriptor can only be opened by an unprivileged caller"
 
 # Style > Unlock picks a theme by name and hands the answer to
-# omarchy-launch-floating-terminal-with-presentation, which joins its arguments
-# into a script and runs that with `bash -c`. So the name is shell source
-# unless the action quotes it -- and the name is a directory name under
-# ~/.config/omarchy/themes, which a theme installed from a git repo gets from
-# the repo URL. `a';id;'b` is a legal directory name.
+# omarchy-launch-floating-terminal-with-presentation, which shell-quotes every
+# argument before running the final script with `bash -c`. The action must pass
+# the selected name as its own argument; a theme installed from a git repo can
+# legally have a directory name such as `a';id;'b`.
 require_command node
 
 unlock_action=$(node -e '
@@ -143,7 +142,7 @@ cat >"$stub_dir/omarchy-plymouth-reset" <<'STUB'
 printf 'ran\n' >"$OMARCHY_TEST_RESET_MARKER"
 STUB
 
-for command in omarchy-show-logo omarchy-show-done; do
+for command in omarchy-show-logo omarchy-show-result; do
   printf '#!/bin/bash\nexit 0\n' >"$stub_dir/$command"
 done
 
