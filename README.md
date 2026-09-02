@@ -9,8 +9,9 @@ Maslow OS is based on [Omarchy](https://omarchy.org/) and [Arch Linux](https://a
 ## Product branches
 
 - `quattro` is a clean, fast-forward-only mirror of upstream Omarchy.
-- `maslow` is the default downstream product branch.
-- Upstream updates are merged from `quattro` into `maslow` through reviewed pull requests. Public product history is never rebased or force-pushed.
+- `maslow` is the downstream integration branch.
+- `main` is the default public product branch.
+- Upstream updates flow from `quattro` into `maslow`, then into `main` through reviewed pull requests. Public product history is never rebased or force-pushed.
 
 The maintained downstream patch inventory and sync procedure live in [`DOWNSTREAM.md`](DOWNSTREAM.md).
 

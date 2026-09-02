@@ -6,8 +6,9 @@ Maslow OS is a downstream distribution based on Omarchy. This file is the mainta
 
 - `upstream/quattro` is the source of upstream truth.
 - `origin/quattro` is kept identical to `upstream/quattro` with fast-forward-only updates.
-- `origin/maslow` is the public product branch and the repository default.
-- Sync upstream by fast-forwarding `quattro`, then merge `quattro` into `maslow` through a pull request. Never rebase or force-push `maslow`.
+- `origin/maslow` is the downstream integration branch.
+- `origin/main` is the public product branch and the repository default.
+- Sync upstream by fast-forwarding `quattro`, merge `quattro` into `maslow`, then merge `maslow` into `main` through a reviewed pull request. Never rebase or force-push `maslow` or `main`.
 
 ## Compatibility boundary
 

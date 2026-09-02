@@ -2,9 +2,9 @@ name: Maslow OS downstream checks
 
 on:
   push:
-    branches: [maslow]
+    branches: [main]
   pull_request:
-    branches: [maslow]
+    branches: [main]
 
 permissions:
   contents: read
