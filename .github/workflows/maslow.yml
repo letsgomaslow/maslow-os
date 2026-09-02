@@ -21,8 +21,6 @@ jobs:
     runs-on: ubuntu-latest
     env:
       OMARCHY_PATH: ${{ github.workspace }}
-      OMARCHY_PKGS_PATH: ${{ runner.temp }}/maslow-os-pkgs
-      OMARCHY_ISO_PATH: ${{ runner.temp }}/maslow-os-iso
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -38,8 +36,12 @@ jobs:
       - name: Check out downstream package and installer fixtures
         run: |
           git clone --depth 1 --branch maslow \
-            https://github.com/letsgomaslow/maslow-os-pkgs.git "$OMARCHY_PKGS_PATH"
+            https://github.com/letsgomaslow/maslow-os-pkgs.git "$RUNNER_TEMP/maslow-os-pkgs"
           git clone --depth 1 --branch maslow \
-            https://github.com/letsgomaslow/maslow-os-iso.git "$OMARCHY_ISO_PATH"
+            https://github.com/letsgomaslow/maslow-os-iso.git "$RUNNER_TEMP/maslow-os-iso"
       - name: Run source tests with Linux Bash 5
-        run: PATH="$GITHUB_WORKSPACE/bin:$PATH" ./test/all
+        run: |
+          OMARCHY_PKGS_PATH="$RUNNER_TEMP/maslow-os-pkgs" \
+          OMARCHY_ISO_PATH="$RUNNER_TEMP/maslow-os-iso" \
+          PATH="$GITHUB_WORKSPACE/bin:$PATH" \
+            ./test/all
