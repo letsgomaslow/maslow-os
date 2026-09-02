@@ -19,12 +19,27 @@ jobs:
 
   source:
     runs-on: ubuntu-latest
+    env:
+      OMARCHY_PATH: ${{ github.workspace }}
+      OMARCHY_PKGS_PATH: ${{ runner.temp }}/maslow-os-pkgs
+      OMARCHY_ISO_PATH: ${{ runner.temp }}/maslow-os-iso
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 22
       - name: Install test tools
-        run: sudo apt-get update && sudo apt-get install --yes jq moreutils
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes \
+            bc desktop-file-utils file fonts-jetbrains-mono imagemagick jq \
+            libxkbcommon-tools lua5.4 moreutils openssh-client procps python3 \
+            ripgrep rsync util-linux
+      - name: Check out downstream package and installer fixtures
+        run: |
+          git clone --depth 1 --branch maslow \
+            https://github.com/letsgomaslow/maslow-os-pkgs.git "$OMARCHY_PKGS_PATH"
+          git clone --depth 1 --branch maslow \
+            https://github.com/letsgomaslow/maslow-os-iso.git "$OMARCHY_ISO_PATH"
       - name: Run source tests with Linux Bash 5
-        run: ./test/all
+        run: PATH="$GITHUB_WORKSPACE/bin:$PATH" ./test/all
