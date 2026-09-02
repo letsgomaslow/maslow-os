@@ -57,7 +57,7 @@ render_wallpapers() {
     cp "$dark_output/$name" "$light_output/$name"
   done
 
-  "$MAGICK" "$dark_output/${names[0]}" -resize 1200x675^ -gravity center -extent 1200x675 "$ROOT/themes/maslow-dark/preview.png"
+  "$MAGICK" "$dark_output/${names[0]}" -resize 1200x675^ -gravity center -extent 1200x675 -strip "$ROOT/themes/maslow-dark/preview.png"
   cp "$ROOT/themes/maslow-dark/preview.png" "$ROOT/themes/maslow-light/preview.png"
 }
 
