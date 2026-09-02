@@ -26,6 +26,7 @@ assert_contains() {
 for file in \
   maslow-version NOTICE DOWNSTREAM.md branding/design-tokens.json \
   branding/logos/maslow-mark-gradient.svg branding/fonts/manrope/OFL.txt \
+  branding/wallpapers/maslow-wallpaper-collage.png \
   themes/maslow-dark/colors.toml themes/maslow-dark/hyprland.lua \
   themes/maslow-light/colors.toml themes/maslow-light/hyprland.lua \
   default/hypr/toggles/reduced-motion.lua; do
@@ -67,12 +68,21 @@ assert_contains bin/omarchy-theme-set 'background setInstant' "Reduced Motion us
 assert_contains etc/fastfetch/config.jsonc 'Maslow OS $maslow · Omarchy engine $engine' "About displays product and engine versions"
 assert_contains DOWNSTREAM.md '/usr/bin/omarchy*' "Omarchy command compatibility is documented"
 
+wallpaper_names=(01-mountain-sunrise.webp 02-canyon-storm.webp 03-aurora-lake.webp 04-spiral-galaxy.webp)
 for theme in maslow-dark maslow-light; do
-  for file in backgrounds/bridge.webp backgrounds/pathways.webp preview.png preview-unlock.png unlock.png icons.theme; do
+  for file in "${wallpaper_names[@]}"; do
+    require_file "themes/$theme/backgrounds/$file"
+  done
+  for file in preview.png preview-unlock.png unlock.png icons.theme; do
     require_file "themes/$theme/$file"
   done
+  background_count=$(find "$ROOT/themes/$theme/backgrounds" -maxdepth 1 -type f -name '*.webp' | wc -l)
+  (( background_count == 4 )) || fail "$theme does not contain exactly four WebP wallpapers"
 done
-pass "both themes include complete generated artwork"
+for file in "${wallpaper_names[@]}"; do
+  cmp -s "$ROOT/themes/maslow-dark/backgrounds/$file" "$ROOT/themes/maslow-light/backgrounds/$file" || fail "$file differs between Maslow Dark and Maslow Light"
+done
+pass "both themes include the same four curated wallpapers"
 
 python3 - "$ROOT" <<'PY'
 import pathlib
@@ -199,8 +209,17 @@ def webp_size(path):
         return (bits & 0x3FFF) + 1, ((bits >> 14) & 0x3FFF) + 1
     fail(f"unsupported WebP chunk in {path.relative_to(root)}")
 
+if png_info(root / "branding/wallpapers/maslow-wallpaper-collage.png")[:2] != (2752, 1536):
+    fail("wallpaper collage source is not 2752x1536")
+
+wallpapers = (
+    "01-mountain-sunrise.webp",
+    "02-canyon-storm.webp",
+    "03-aurora-lake.webp",
+    "04-spiral-galaxy.webp",
+)
 for theme in ("maslow-dark", "maslow-light"):
-    for name in ("bridge.webp", "pathways.webp"):
+    for name in wallpapers:
         size = webp_size(root / "themes" / theme / "backgrounds" / name)
         if size != (3840, 2160):
             fail(f"{theme}/{name} is {size}, expected 3840x2160")

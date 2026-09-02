@@ -7,6 +7,7 @@ MAGICK=${MAGICK:-magick}
 MARK_GRADIENT="$ROOT/branding/logos/maslow-mark-gradient.svg"
 MARK_DARK="$ROOT/branding/logos/maslow-mark-dark.svg"
 FONT="$ROOT/branding/fonts/manrope/Manrope-VariableFont_wght.ttf"
+WALLPAPER_COLLAGE="$ROOT/branding/wallpapers/maslow-wallpaper-collage.png"
 TERMINAL_ART_DIR=$(mktemp -d)
 
 export LC_ALL=C.UTF-8
@@ -17,42 +18,47 @@ command -v "$MAGICK" >/dev/null || {
   exit 1
 }
 
-for source in "$MARK_GRADIENT" "$MARK_DARK" "$FONT"; do
+for source in "$MARK_GRADIENT" "$MARK_DARK" "$FONT" "$WALLPAPER_COLLAGE"; do
   [[ -f $source ]] || {
     echo "Missing brand source: $source" >&2
     exit 1
   }
 done
 
-grid_args=()
-for ((x = 0; x <= 3840; x += 240)); do
-  grid_args+=(-draw "line $x,0 $x,2160")
-done
-for ((y = 0; y <= 2160; y += 240)); do
-  grid_args+=(-draw "line 0,$y 3840,$y")
-done
-
 render_wallpapers() {
-  local theme=$1 background=$2 grid=$3 path=$4 mark=$5
-  local output="$ROOT/themes/$theme/backgrounds"
+  local dark_output="$ROOT/themes/maslow-dark/backgrounds"
+  local light_output="$ROOT/themes/maslow-light/backgrounds"
+  local index name crop
+  local -a names=(
+    01-mountain-sunrise.webp
+    02-canyon-storm.webp
+    03-aurora-lake.webp
+    04-spiral-galaxy.webp
+  )
+  local -a crops=(
+    1371x763+0+0
+    1371x763+1381+0
+    1371x763+0+773
+    1371x763+1381+773
+  )
 
-  mkdir -p "$output"
+  mkdir -p "$dark_output" "$light_output"
+  rm -f \
+    "$dark_output/bridge.webp" "$dark_output/pathways.webp" \
+    "$light_output/bridge.webp" "$light_output/pathways.webp"
 
-  "$MAGICK" -size 3840x2160 "xc:$background" \
-    -stroke "$grid" -strokewidth 1 -fill none "${grid_args[@]}" \
-    -stroke "$path" -strokewidth 12 \
-    -draw "path 'M 180,1720 C 900,1720 960,480 1760,480 S 2740,1540 3660,440'" \
-    \( -background none "$mark" -resize 900x600 \) -gravity southeast -geometry +220+180 -composite \
-    -quality 92 "$output/bridge.webp"
+  for index in "${!names[@]}"; do
+    name=${names[$index]}
+    crop=${crops[$index]}
+    "$MAGICK" "$WALLPAPER_COLLAGE" \
+      -crop "$crop" +repage \
+      -filter Lanczos -resize '3840x2160^' -gravity center -extent 3840x2160 \
+      -strip -quality 94 "$dark_output/$name"
+    cp "$dark_output/$name" "$light_output/$name"
+  done
 
-  "$MAGICK" -size 3840x2160 "xc:$background" \
-    -stroke "$grid" -strokewidth 1 -fill none "${grid_args[@]}" \
-    -stroke "$path" -strokewidth 8 \
-    -draw "path 'M 200,420 L 980,420 L 1460,900 L 2220,900 L 2860,1540 L 3660,1540'" \
-    \( -background none "$mark" -resize 760x510 \) -gravity northwest -geometry +220+220 -composite \
-    -quality 92 "$output/pathways.webp"
-
-  "$MAGICK" "$output/bridge.webp" -resize 1200x675^ -gravity center -extent 1200x675 "$ROOT/themes/$theme/preview.png"
+  "$MAGICK" "$dark_output/${names[0]}" -resize 1200x675^ -gravity center -extent 1200x675 -strip "$ROOT/themes/maslow-dark/preview.png"
+  cp "$ROOT/themes/maslow-dark/preview.png" "$ROOT/themes/maslow-light/preview.png"
 }
 
 render_lockup() {
@@ -102,8 +108,7 @@ render_terminal_logo() {
   } >"$ROOT/logo.txt"
 }
 
-render_wallpapers maslow-dark "#121D35" "#24324D" "#6DC4AD" "$MARK_GRADIENT"
-render_wallpapers maslow-light "#FFFFFF" "#EDEFF3" "#247967" "$MARK_GRADIENT"
+render_wallpapers
 
 render_lockup "$MARK_GRADIENT" "#FFFFFF" "$ROOT/themes/maslow-dark/unlock.png"
 render_lockup "$MARK_GRADIENT" "#121D35" "$ROOT/themes/maslow-light/unlock.png"
