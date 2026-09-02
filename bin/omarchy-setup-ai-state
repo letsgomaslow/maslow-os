@@ -1,0 +1,79 @@
+#!/bin/bash
+
+# omarchy:summary=Read or update Maslow OS AI onboarding state
+# omarchy:hidden=true
+
+set -euo pipefail
+
+schema_version=1
+state_dir="$HOME/.local/state/maslow-os"
+state_file="$state_dir/onboarding.json"
+action=${1:-show}
+
+default_state() {
+  jq -n '{schemaVersion: 1, currentStep: 1, firstDisplayedAt: null, completedAt: null, deferred: false, selectedAgent: null}'
+}
+
+read_state() {
+  if [[ ! -f $state_file ]]; then
+    default_state
+    return
+  fi
+  local stored_schema
+  stored_schema=$(jq -r '.schemaVersion // 0' "$state_file" 2>/dev/null) || {
+    echo "Maslow OS AI setup state needs attention: invalid JSON." >&2
+    exit 2
+  }
+  if (( stored_schema != schema_version )); then
+    echo "Maslow OS AI setup state uses unsupported schema $stored_schema and was left unchanged." >&2
+    exit 2
+  fi
+  cat "$state_file"
+}
+
+write_state() {
+  local json="$1" tmp
+  mkdir -p "$state_dir"
+  chmod 0700 "$state_dir"
+  tmp=$(mktemp "$state_dir/.onboarding.XXXXXX")
+  printf '%s\n' "$json" >"$tmp"
+  chmod 0600 "$tmp"
+  mv "$tmp" "$state_file"
+}
+
+state=$(read_state)
+case "$action" in
+show)
+  printf '%s\n' "$state"
+  ;;
+open)
+  state=$(jq 'if .firstDisplayedAt == null then .firstDisplayedAt = (now | todateiso8601) else . end' <<<"$state")
+  write_state "$state"
+  printf '%s\n' "$state"
+  ;;
+step)
+  step=${2:?step number required}
+  [[ $step =~ ^[1-4]$ ]] || { echo "Step must be between 1 and 4." >&2; exit 1; }
+  state=$(jq --argjson step "$step" '.currentStep = $step' <<<"$state")
+  write_state "$state"
+  ;;
+select)
+  agent=${2:?agent required}
+  source "$OMARCHY_PATH/install/helpers/agent.sh"
+  omarchy_agent_resolve "$agent" || { echo "Unsupported agent: $agent" >&2; exit 1; }
+  state=$(jq --arg agent "$OMARCHY_AGENT_ID" '.selectedAgent = $agent | .currentStep = 3' <<<"$state")
+  write_state "$state"
+  ;;
+defer)
+  state=$(jq '.deferred = true' <<<"$state")
+  write_state "$state"
+  ;;
+complete)
+  state=$(jq '.completedAt = (now | todateiso8601) | .currentStep = 4 | .deferred = false' <<<"$state")
+  write_state "$state"
+  ;;
+*)
+  echo "Usage: omarchy-setup-ai-state <show|open|step|select|defer|complete> [value]" >&2
+  exit 1
+  ;;
+esac

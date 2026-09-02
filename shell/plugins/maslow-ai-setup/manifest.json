@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "id": "maslow.ai-setup",
+  "name": "Maslow OS AI Setup",
+  "version": "1.0.0",
+  "author": "Maslow AI",
+  "license": "MIT",
+  "description": "Guided, resumable setup for AI agents in Maslow OS.",
+  "kinds": ["panel"],
+  "activation": "on-demand",
+  "entryPoints": {
+    "panel": "Panel.qml"
+  }
+}

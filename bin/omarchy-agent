@@ -1,11 +1,12 @@
 #!/bin/bash
 
 # omarchy:summary=Launch the default coding agent in a terminal
-# omarchy:args=[--inline] [--pick]
+# omarchy:args=[--inline] [--pick] [--agent NAME]
 # omarchy:examples=omarchy agent | omarchy agent --inline
 
 inline=false
 pick=false
+requested_agent=""
 
 # Flags only. A bare prompt would shadow the subcommands under this group, so
 # prompts go through omarchy-agent-prompt, which passes one here as --prompt.
@@ -18,6 +19,10 @@ while (($#)); do
     --pick)
       pick=true
       shift
+      ;;
+    --agent)
+      requested_agent=${2:?--agent needs a value}
+      shift 2
       ;;
     --prompt)
       prompt=${2:?--prompt needs a value}
@@ -35,7 +40,18 @@ done
 # menu start in the work directory instead of re-asking on every session.
 [[ $PWD == "$HOME" && -d $HOME/Work ]] && cd "$HOME/Work"
 
-agent=$(omarchy-default-agent)
+source "$OMARCHY_PATH/install/helpers/agent.sh"
+
+agent=${requested_agent:-$(omarchy-default-agent)}
+if [[ -n $requested_agent ]]; then
+  if ! omarchy_agent_resolve "$agent"; then
+    echo "Unsupported agent: $agent" >&2
+    exit 1
+  fi
+  agent=$OMARCHY_AGENT_ID
+elif [[ -n $agent ]] && omarchy_agent_resolve "$agent"; then
+  agent=$OMARCHY_AGENT_ID
+fi
 
 # Omarchy ships without a default, so there is nothing to launch until one is
 # picked. --pick offers the choice instead of the error, which is what the
@@ -49,6 +65,23 @@ fi
 if omarchy-cmd-missing "$agent"; then
   echo "$agent is not installed. Choose an installed agent with: omarchy default agent <name>" >&2
   exit 1
+fi
+
+launch_mode=$(omarchy_agent_launch_mode "$agent")
+trust_status=0
+omarchy-agent-trust status "$agent" "$launch_mode" >/dev/null 2>&1 || trust_status=$?
+if (( trust_status != 0 )); then
+  if (( trust_status == 2 )); then
+    echo "The $agent permission confirmation was created by a newer Maslow OS version and was left unchanged." >&2
+    exit 2
+  fi
+  if [[ $inline == "true" ]]; then
+    omarchy-agent-trust confirm "$agent" "$launch_mode" || exit $?
+  else
+    terminal_command=(omarchy-agent --inline --agent "$agent")
+    [[ -n ${prompt:-} ]] && terminal_command+=(--prompt "$prompt")
+    exec omarchy-launch-floating-terminal-with-presentation "${terminal_command[@]}"
+  fi
 fi
 
 # Agents launched from the keybinding or menu run unattended, so each one starts
