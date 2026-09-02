@@ -700,21 +700,36 @@ user_groups() {
 # Community ARM images can carry the runtime config tree without the matching
 # skeleton, though, which otherwise drops the new owner into raw Hyprland.
 seed_missing_user_config() {
-  local home primary_group
+  local home primary_group branding_dir
   home=$(getent passwd "$username" | cut -d: -f6)
   [[ -n $home ]] || return 1
-  [[ -f $home/.config/hypr/hyprland.lua ]] && return 0
+  primary_group=$(id -gn "$username")
 
-  if [[ ! -d $OMARCHY_PATH/config ]]; then
-    log_step "cannot seed user config: $OMARCHY_PATH/config is missing"
-    return 1
+  if [[ ! -f $home/.config/hypr/hyprland.lua ]]; then
+    if [[ ! -d $OMARCHY_PATH/config ]]; then
+      log_step "cannot seed user config: $OMARCHY_PATH/config is missing"
+      return 1
+    fi
+
+    install -d -m0755 "$home/.config"
+    cp -a "$OMARCHY_PATH/config/." "$home/.config/"
+    chown -R "$username:$primary_group" "$home/.config"
+    log_step "seeded missing user config from $OMARCHY_PATH/config"
   fi
 
-  install -d -m0755 "$home/.config"
-  cp -a "$OMARCHY_PATH/config/." "$home/.config/"
-  primary_group=$(id -gn "$username")
-  chown -R "$username:$primary_group" "$home/.config"
-  log_step "seeded missing user config from $OMARCHY_PATH/config"
+  # The packaged skeleton also carries the two user-editable text-art files,
+  # but community ARM images may omit them even when Hyprland config exists.
+  # Seed only absent files so retries never overwrite the owner's branding.
+  branding_dir="$home/.config/omarchy/branding"
+  install -d -m0755 -o "$username" -g "$primary_group" "$branding_dir"
+  if [[ ! -e $branding_dir/screensaver.txt && ! -L $branding_dir/screensaver.txt && -f $OMARCHY_PATH/logo.txt ]]; then
+    install -m0644 -o "$username" -g "$primary_group" "$OMARCHY_PATH/logo.txt" "$branding_dir/screensaver.txt"
+    log_step "seeded missing screensaver branding from $OMARCHY_PATH/logo.txt"
+  fi
+  if [[ ! -e $branding_dir/about.txt && ! -L $branding_dir/about.txt && -f $OMARCHY_PATH/icon.txt ]]; then
+    install -m0644 -o "$username" -g "$primary_group" "$OMARCHY_PATH/icon.txt" "$branding_dir/about.txt"
+    log_step "seeded missing About branding from $OMARCHY_PATH/icon.txt"
+  fi
 }
 
 # Resolve the crypto_LUKS partition backing the root, or return non-zero if

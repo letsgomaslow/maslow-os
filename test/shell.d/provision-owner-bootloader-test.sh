@@ -50,6 +50,8 @@ config_root="$test_tmp/source"
 test_home="$test_tmp/home"
 mkdir -p "$config_root/config/hypr" "$test_home" "$stub_bin"
 printf '%s\n' 'dofile("bootstrap.lua")' >"$config_root/config/hypr/hyprland.lua"
+printf '%s\n' 'MASLOW SCREENSAVER' >"$config_root/logo.txt"
+printf '%s\n' 'MASLOW ABOUT' >"$config_root/icon.txt"
 
 cat >"$stub_bin/getent" <<STUB
 #!/bin/bash
@@ -63,7 +65,24 @@ cat >"$stub_bin/chown" <<'STUB'
 #!/bin/bash
 exit 0
 STUB
-chmod +x "$stub_bin/getent" "$stub_bin/id" "$stub_bin/chown"
+cat >"$stub_bin/install" <<'STUB'
+#!/bin/bash
+args=()
+while (($#)); do
+  case $1 in
+    -d) directory=1; shift ;;
+    -m|-o|-g) shift 2 ;;
+    -m*|-o*|-g*) shift ;;
+    *) args+=("$1"); shift ;;
+  esac
+done
+if [[ ${directory:-0} == 1 ]]; then
+  mkdir -p "${args[@]}"
+else
+  cp "${args[@]}"
+fi
+STUB
+chmod +x "$stub_bin/getent" "$stub_bin/id" "$stub_bin/chown" "$stub_bin/install"
 
 username=testuser
 OMARCHY_PATH="$config_root"
@@ -73,9 +92,21 @@ PATH="$stub_bin:/usr/bin:/bin" seed_missing_user_config
 grep -Fq 'bootstrap.lua' "$test_home/.config/hypr/hyprland.lua" ||
   fail "missing user config is copied from the runtime tree"
 pass "first-boot setup seeds config when the image lacks /etc/skel defaults"
+grep -Fxq 'MASLOW SCREENSAVER' "$test_home/.config/omarchy/branding/screensaver.txt" ||
+  fail "missing screensaver branding is copied from the runtime tree"
+grep -Fxq 'MASLOW ABOUT' "$test_home/.config/omarchy/branding/about.txt" ||
+  fail "missing About branding is copied from the runtime tree"
+pass "first-boot setup seeds branding when the image lacks /etc/skel defaults"
 
 printf '%s\n' preserved >"$test_home/.config/hypr/hyprland.lua"
+printf '%s\n' 'CUSTOM SCREENSAVER' >"$test_home/.config/omarchy/branding/screensaver.txt"
+printf '%s\n' 'CUSTOM ABOUT' >"$test_home/.config/omarchy/branding/about.txt"
 PATH="$stub_bin:/usr/bin:/bin" seed_missing_user_config
 grep -Fxq preserved "$test_home/.config/hypr/hyprland.lua" ||
   fail "an existing user config is left untouched"
 pass "first-boot setup preserves an existing Hyprland config"
+grep -Fxq 'CUSTOM SCREENSAVER' "$test_home/.config/omarchy/branding/screensaver.txt" ||
+  fail "existing screensaver branding is left untouched"
+grep -Fxq 'CUSTOM ABOUT' "$test_home/.config/omarchy/branding/about.txt" ||
+  fail "existing About branding is left untouched"
+pass "first-boot setup preserves existing user branding"
