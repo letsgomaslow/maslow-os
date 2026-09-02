@@ -59,7 +59,7 @@ BarWidget {
     text: "\uf021"
     slotSize: Style.bar.statusSlot
     fontSize: Style.font.caption
-    tooltipText: "Pending Omarchy Updates"
+    tooltipText: "Pending Maslow OS Updates"
     onPressed: root.runUpdate()
   }
 }

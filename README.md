@@ -1,79 +1,52 @@
-# Omarchy
+# Maslow OS
 
-Omarchy is a beautiful, fun & agentic Linux distribution by DHH.
+Maslow OS is an opinionated Linux environment for AI builders and operators. It combines a focused desktop, practical developer tooling, and a coherent Maslow interface so teams can move from an AI roadmap to working systems without losing clarity or control.
 
-Read more at [omarchy.org](https://omarchy.org).
+Maslow OS is based on [Omarchy](https://omarchy.org/) and [Arch Linux](https://archlinux.org/). The Omarchy command line, configuration paths, package names, and extension contracts remain intact for compatibility.
 
-## The Omarchy Manual
+> **Preview status:** `0.1.0-preview.1`. The current Apple Silicon image is a development preview, not a supported public ARM release. The first supported installer target is x86_64.
 
-The manual lives in [`manual/`](manual/), which is its authoritative source. It's
-mirrored to [learn.omacom.io](https://learn.omacom.io/2/the-omarchy-manual), where
-its screenshots are also hosted.
+## Product branches
 
-- [Welcome to Omarchy!](manual/01-welcome-to-omarchy.md)
+- `quattro` is a clean, fast-forward-only mirror of upstream Omarchy.
+- `maslow` is the downstream integration branch.
+- `main` is the default public product branch.
+- Upstream updates flow from `quattro` into `maslow`, then into `main` through reviewed pull requests. Public product history is never rebased or force-pushed.
 
-**The Basics**
+The maintained downstream patch inventory and sync procedure live in [`DOWNSTREAM.md`](DOWNSTREAM.md).
+
+## Maslow themes
+
+Maslow OS includes two first-party themes:
+
+- `maslow-dark` — the installation default, built on Maslow dark navy.
+- `maslow-light` — an accessible light companion using Maslow's approved text accents.
+
+Both themes generate native Omarchy configurations for Hyprland, the shell, terminals, browsers, btop, Neovim, Helix, VS Code, Obsidian, and related applications. The **Reduced Motion** toggle disables Hyprland animation and applies theme backgrounds without a transition.
+
+## Documentation
+
+The inherited Omarchy manual remains the authoritative reference for engine behavior and the compatible `omarchy` commands. Maslow-specific branding, release, and downstream maintenance guidance lives in this repository.
 
 - [Getting Started](manual/02-getting-started.md)
-- [Coming From Mac or Windows](manual/03-coming-from-mac-or-windows.md)
-- [Navigation](manual/04-navigation.md)
-- [The top bar](manual/05-the-top-bar.md)
+- [Omarchy CLI compatibility](manual/14-omarchy-cli.md)
 - [Themes](manual/06-themes.md)
-- [Hotkeys](manual/07-hotkeys.md)
-- [Unified Clipboard & History](manual/08-unified-clipboard-history.md)
-- [Reminders](manual/09-reminders.md)
-- [Notices](manual/10-notices.md)
-- [Text Extraction & Dictation](manual/11-text-extraction-dictation.md)
-- [Screenshots & Recording](manual/12-screenshots-recording.md)
-- [Toggles, idle & screensaver](manual/13-toggles-idle-screensaver.md)
-- [Omarchy CLI](manual/14-omarchy-cli.md)
-
-**The Applications**
-
-- [Terminal](manual/15-terminal.md)
-- [Neovim](manual/16-neovim.md)
-- [AI](manual/17-ai.md)
-- [Development Tools](manual/18-development-tools.md)
-- [Shell Tools](manual/19-shell-tools.md)
-- [Shell Functions](manual/20-shell-functions.md)
-- [TUIs](manual/21-tuis.md)
-- [GUIs](manual/22-guis.md)
-- [Browsers](manual/23-browsers.md)
-- [Commercial apps/services](manual/24-commercial-apps-services.md)
-- [Web Apps](manual/25-web-apps.md)
-- [Gaming](manual/26-gaming.md)
-- [Filling out PDFs](manual/27-filling-out-pdfs.md)
-- [Windows VM](manual/28-windows-vm.md)
-- [Other Packages](manual/29-other-packages.md)
-
-**Configuration**
-
-- [Updates](manual/30-updates.md)
-- [Dotfiles](manual/31-dotfiles.md)
-- [Shell plugins](manual/32-shell-plugins.md)
-- [Monitors](manual/33-monitors.md)
-- [Keyboard, Mouse, Trackpad](manual/34-keyboard-mouse-trackpad.md)
-- [Networking](manual/35-networking.md)
-- [System sleep](manual/36-system-sleep.md)
-- [Hardware authentication](manual/37-hardware-authentication.md)
-- [Fonts](manual/38-fonts.md)
-- [Backgrounds](manual/39-backgrounds.md)
-- [Prompt](manual/40-prompt.md)
 - [Branding](manual/41-branding.md)
-- [Common tweaks](manual/42-common-tweaks.md)
-- [Making your own theme](manual/43-making-your-own-theme.md)
+- [Making a theme](manual/43-making-your-own-theme.md)
 
-**The Rest**
+## Verification
 
-- [Mac support](manual/44-mac-support.md)
-- [Troubleshooting](manual/45-troubleshooting.md)
-- [FAQ](manual/46-faq.md)
-- [System snapshots](manual/47-system-snapshots.md)
-- [Security](manual/48-security.md)
-- [Omarchy on...](manual/49-omarchy-on.md)
-- [Dual Boot Install](manual/50-dual-boot-install.md)
-- [Unattended Installs](manual/51-unattended-installs.md)
+Run brand and source checks inside Linux with Bash 5:
 
-## License
+```bash
+./test/maslow-brand
+./test/cli
+./test/shell
+./test/all
+```
 
-Omarchy is released under the [MIT License](https://opensource.org/licenses/MIT).
+Graphical acceptance tests must run in a disposable VM through the sibling ISO repository. See [`agents/skills/acceptance-tests.md`](agents/skills/acceptance-tests.md).
+
+## License and attribution
+
+The software remains available under the upstream [MIT License](LICENSE). See [`NOTICE`](NOTICE) for upstream attribution and the separate treatment of Maslow names, logos, and brand assets.

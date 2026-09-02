@@ -1,0 +1,47 @@
+name: Maslow OS downstream checks
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  brand:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate Maslow OS brand and assets
+        run: ./test/maslow-brand
+
+  source:
+    runs-on: ubuntu-latest
+    env:
+      OMARCHY_PATH: ${{ github.workspace }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install test tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes \
+            bc desktop-file-utils file fonts-jetbrains-mono imagemagick jq \
+            libxkbcommon-tools lua5.4 moreutils openssh-client procps python3 \
+            ripgrep rsync util-linux
+      - name: Check out downstream package and installer fixtures
+        run: |
+          git clone --depth 1 --branch maslow \
+            https://github.com/letsgomaslow/maslow-os-pkgs.git "$RUNNER_TEMP/maslow-os-pkgs"
+          git clone --depth 1 --branch maslow \
+            https://github.com/letsgomaslow/maslow-os-iso.git "$RUNNER_TEMP/maslow-os-iso"
+      - name: Run source tests with Linux Bash 5
+        run: |
+          OMARCHY_PKGS_PATH="$RUNNER_TEMP/maslow-os-pkgs" \
+          OMARCHY_ISO_PATH="$RUNNER_TEMP/maslow-os-iso" \
+          PATH="$GITHUB_WORKSPACE/bin:$PATH" \
+            ./test/all

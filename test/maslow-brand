@@ -1,0 +1,226 @@
+#!/bin/bash
+
+set -euo pipefail
+
+ROOT=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)
+
+fail() {
+  echo "not ok - $1" >&2
+  exit 1
+}
+
+pass() {
+  echo "ok - $1"
+}
+
+require_file() {
+  [[ -f $ROOT/$1 ]] || fail "missing $1"
+}
+
+assert_contains() {
+  local file=$1 pattern=$2 description=$3
+  grep -Fq "$pattern" "$ROOT/$file" || fail "$description"
+  pass "$description"
+}
+
+for file in \
+  maslow-version NOTICE DOWNSTREAM.md branding/design-tokens.json \
+  branding/logos/maslow-mark-gradient.svg branding/fonts/manrope/OFL.txt \
+  themes/maslow-dark/colors.toml themes/maslow-dark/hyprland.lua \
+  themes/maslow-light/colors.toml themes/maslow-light/hyprland.lua \
+  default/hypr/toggles/reduced-motion.lua; do
+  require_file "$file"
+done
+pass "required Maslow OS sources exist"
+
+[[ $(<"$ROOT/maslow-version") == "0.1.0-preview.1" ]] || fail "unexpected Maslow OS version"
+pass "Maslow OS version is pinned"
+
+assert_contains README.md "Maslow OS is based on" "README preserves Omarchy attribution"
+assert_contains install/provisioning/setup-form.sh "OMARCHY_HOSTNAME_DEFAULT='maslow-os'" "setup defaults to a Maslow OS hostname"
+assert_contains install/provisioning/setup-form.sh "return for 'maslow-os'" "setup hostname hint uses Maslow OS"
+assert_contains branding/scripts/generate-assets '"MASLOW | OS"' "login artwork uses the Maslow OS lockup"
+assert_contains migrations/1788337736.sh "maslow-login-branding.hook" "updates preserve the Maslow login default"
+assert_contains bin/omarchy-migrate-notify "Pending Maslow OS Migrations" "migration notice uses Maslow OS"
+assert_contains default/hypr/bindings/utilities.lua '"Maslow OS menu"' "keybinding hint uses Maslow OS"
+assert_contains shell/plugins/menu/manifest.json '"name": "Maslow OS menu"' "shell menu metadata uses Maslow OS"
+assert_contains shell/plugins/bar/widgets/SystemUpdate.manifest.json '"name": "Maslow OS update"' "update widget metadata uses Maslow OS"
+
+logo_dimensions=$(python3 - "$ROOT/logo.txt" <<'PY'
+from pathlib import Path
+import sys
+
+lines = Path(sys.argv[1]).read_text(encoding="utf-8").splitlines()
+print(max((len(line) for line in lines), default=0), len(lines))
+PY
+)
+read -r logo_width logo_height <<<"$logo_dimensions"
+(( logo_width <= 80 )) || fail "setup logo exceeds the 80-column console contract"
+(( logo_height >= 6 && logo_height <= 12 )) || fail "setup logo height is outside its console contract"
+grep -q '[█▀▄]' "$ROOT/logo.txt" || fail "setup logo is not block artwork"
+pass "setup uses a terminal-safe Maslow Gradient Bridge lockup"
+assert_contains install/user/theme.sh 'omarchy-theme-set "Maslow Dark"' "Maslow Dark is the installation default"
+assert_contains default/omarchy/omarchy-menu.jsonc '"label":"Reduced Motion"' "Reduced Motion is visible in the menu"
+assert_contains default/omarchy/omarchy-menu.jsonc 'omarchy-hyprland-toggle reduced-motion' "Reduced Motion uses the persistent Hyprland toggle"
+assert_contains bin/omarchy-theme-set 'background setInstant' "Reduced Motion uses instant background application"
+assert_contains etc/fastfetch/config.jsonc 'Maslow OS $maslow · Omarchy engine $engine' "About displays product and engine versions"
+assert_contains DOWNSTREAM.md '/usr/bin/omarchy*' "Omarchy command compatibility is documented"
+
+for theme in maslow-dark maslow-light; do
+  for file in backgrounds/bridge.webp backgrounds/pathways.webp preview.png preview-unlock.png unlock.png icons.theme; do
+    require_file "themes/$theme/$file"
+  done
+done
+pass "both themes include complete generated artwork"
+
+python3 - "$ROOT" <<'PY'
+import pathlib
+import re
+import struct
+import sys
+import zlib
+
+root = pathlib.Path(sys.argv[1])
+
+def fail(message):
+    raise SystemExit(f"not ok - {message}")
+
+def palette(path):
+    values = {}
+    for line in path.read_text().splitlines():
+        match = re.match(r'^([a-z_]+)\s*=\s*"(#[0-9A-Fa-f]{6})"$', line)
+        if match:
+            values[match.group(1)] = match.group(2)
+    return values
+
+def channel(value):
+    value /= 255
+    return value / 12.92 if value <= 0.04045 else ((value + 0.055) / 1.055) ** 2.4
+
+def luminance(color):
+    raw = bytes.fromhex(color[1:])
+    return 0.2126 * channel(raw[0]) + 0.7152 * channel(raw[1]) + 0.0722 * channel(raw[2])
+
+def contrast(a, b):
+    high, low = sorted((luminance(a), luminance(b)), reverse=True)
+    return (high + 0.05) / (low + 0.05)
+
+dark = palette(root / "themes/maslow-dark/colors.toml")
+light = palette(root / "themes/maslow-light/colors.toml")
+expected = [
+    (dark, "foreground", "background"),
+    (dark, "muted", "background"),
+    (dark, "accent", "background"),
+    (dark, "magenta", "background"),
+    (light, "foreground", "background"),
+    (light, "muted", "background"),
+    (light, "accent", "background"),
+    (light, "magenta", "background"),
+    (light, "orange", "background"),
+]
+for values, foreground, background in expected:
+    ratio = contrast(values[foreground], values[background])
+    if ratio < 4.5:
+        fail(f"contrast {foreground}/{background} is {ratio:.2f}:1")
+print("ok - theme text colors meet WCAG AA contrast")
+
+def png_info(path):
+    data = path.read_bytes()
+    if data[:8] != b"\x89PNG\r\n\x1a\n":
+        fail(f"{path.relative_to(root)} is not a PNG")
+    length = struct.unpack(">I", data[8:12])[0]
+    if data[12:16] != b"IHDR" or length != 13:
+        fail(f"{path.relative_to(root)} has no valid IHDR")
+    width, height, depth, color_type = struct.unpack(">IIBB", data[16:26])
+    return width, height, depth, color_type
+
+def png_has_transparent_pixel(path):
+    data = path.read_bytes()
+    width, height, depth, color_type = png_info(path)
+    if depth != 8 or color_type != 6:
+        return False
+    chunks = []
+    offset = 8
+    while offset < len(data):
+        length = struct.unpack(">I", data[offset:offset + 4])[0]
+        kind = data[offset + 4:offset + 8]
+        payload = data[offset + 8:offset + 8 + length]
+        if kind == b"IDAT":
+            chunks.append(payload)
+        offset += 12 + length
+        if kind == b"IEND":
+            break
+    raw = zlib.decompress(b"".join(chunks))
+    stride = width * 4
+    previous = bytearray(stride)
+    cursor = 0
+    has_clear = False
+    has_visible = False
+    for _ in range(height):
+        filter_type = raw[cursor]
+        cursor += 1
+        row = bytearray(raw[cursor:cursor + stride])
+        cursor += stride
+        for index in range(stride):
+            left = row[index - 4] if index >= 4 else 0
+            up = previous[index]
+            upper_left = previous[index - 4] if index >= 4 else 0
+            if filter_type == 1:
+                row[index] = (row[index] + left) & 0xFF
+            elif filter_type == 2:
+                row[index] = (row[index] + up) & 0xFF
+            elif filter_type == 3:
+                row[index] = (row[index] + ((left + up) // 2)) & 0xFF
+            elif filter_type == 4:
+                estimate = left + up - upper_left
+                pa, pb, pc = abs(estimate - left), abs(estimate - up), abs(estimate - upper_left)
+                predictor = left if pa <= pb and pa <= pc else up if pb <= pc else upper_left
+                row[index] = (row[index] + predictor) & 0xFF
+            elif filter_type != 0:
+                fail(f"unsupported PNG filter in {path.relative_to(root)}")
+        alphas = row[3::4]
+        has_clear = has_clear or any(alpha < 255 for alpha in alphas)
+        has_visible = has_visible or any(alpha > 0 for alpha in alphas)
+        previous = row
+    return has_clear and has_visible
+
+def webp_size(path):
+    data = path.read_bytes()
+    if data[:4] != b"RIFF" or data[8:12] != b"WEBP":
+        fail(f"{path.relative_to(root)} is not WebP")
+    kind = data[12:16]
+    if kind == b"VP8X":
+        return 1 + int.from_bytes(data[24:27], "little"), 1 + int.from_bytes(data[27:30], "little")
+    if kind == b"VP8 ":
+        return struct.unpack("<H", data[26:28])[0] & 0x3FFF, struct.unpack("<H", data[28:30])[0] & 0x3FFF
+    if kind == b"VP8L":
+        bits = int.from_bytes(data[21:25], "little")
+        return (bits & 0x3FFF) + 1, ((bits >> 14) & 0x3FFF) + 1
+    fail(f"unsupported WebP chunk in {path.relative_to(root)}")
+
+for theme in ("maslow-dark", "maslow-light"):
+    for name in ("bridge.webp", "pathways.webp"):
+        size = webp_size(root / "themes" / theme / "backgrounds" / name)
+        if size != (3840, 2160):
+            fail(f"{theme}/{name} is {size}, expected 3840x2160")
+    for name in ("preview.png", "preview-unlock.png"):
+        size = png_info(root / "themes" / theme / name)[:2]
+        if size != (1200, 675):
+            fail(f"{theme}/{name} is {size}, expected 1200x675")
+    unlock = png_info(root / "themes" / theme / "unlock.png")
+    if unlock[3] not in (4, 6):
+        fail(f"{theme}/unlock.png has no alpha channel")
+    if not png_has_transparent_pixel(root / "themes" / theme / "unlock.png"):
+        fail(f"{theme}/unlock.png does not contain both transparent and visible pixels")
+print("ok - generated theme assets meet dimensions and alpha contracts")
+
+for relative in ("icon.png", "default/plymouth/logo.png", "default/sddm/omarchy/logo.png"):
+    info = png_info(root / relative)
+    if info[3] not in (4, 6):
+        fail(f"{relative} has no alpha channel")
+    if not png_has_transparent_pixel(root / relative):
+        fail(f"{relative} does not contain both transparent and visible pixels")
+print("ok - visible logo PNGs carry real alpha channels")
+PY
+
+pass "Maslow OS brand validation passed"

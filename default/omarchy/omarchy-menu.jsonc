@@ -1,5 +1,5 @@
 {
-  // Omarchy menu definition.
+  // Maslow OS menu definition, powered by the compatible Omarchy menu engine.
   // JSONC is used for Neovim-friendly highlighting, comments, and trailing commas.
   // IDs are object keys. Dotted IDs imply hierarchy: trigger.share.file belongs
   // under trigger.share.
@@ -43,7 +43,7 @@
 
   // Learn
   "learn.keybindings": {"icon":"","label":"Keybindings","action":"omarchy-menu-keybindings"},
-  "learn.omarchy": {"icon":"","label":"Omarchy","action":"omarchy-launch-webapp 'https://omarchy.org/manual/'"},
+  "learn.omarchy": {"icon":"","label":"Maslow OS","action":"omarchy-launch-webapp 'https://github.com/letsgomaslow/maslow-os/tree/maslow/manual'"},
   "learn.hyprland": {"icon":"","label":"Hyprland","action":"omarchy-launch-webapp 'https://wiki.hypr.land/'"},
   "learn.arch": {"icon":"󰣇","label":"Arch","action":"omarchy-launch-webapp 'https://wiki.archlinux.org/title/Main_page'"},
   "learn.neovim": {"icon":"","label":"Neovim","action":"omarchy-launch-webapp 'https://www.lazyvim.org/keymaps'"},
@@ -92,6 +92,7 @@
   "trigger.toggle.crash-capture": {"icon":"󱚡","label":"Crash Capture","action":"omarchy-toggle-crash-capture"},
   "trigger.toggle.screensaver": {"icon":"󱄄","label":"Screensaver","action":"omarchy-toggle-screensaver"},
   "trigger.toggle.nightlight": {"icon":"󰔎","label":"Nightlight","action":"omarchy-toggle-nightlight"},
+  "trigger.toggle.reduced-motion": {"icon":"󰏤","label":"Reduced Motion","checked":"omarchy-hyprland-toggle-enabled reduced-motion","action":"omarchy-hyprland-toggle reduced-motion"},
   "trigger.toggle.top-bar": {"icon":"󰍜","label":"Menu Bar","action":"omarchy-toggle-bar"},
   "trigger.toggle.battery-percentage": {"icon":"󰁹","label":"Battery Percentage","when":"omarchy-hw-laptop","action":"omarchy-shell omarchy.power togglePercentage"},
   "trigger.toggle.workspace-layout": {"icon":"󱂬","label":"Workspace Layout","action":"omarchy-hyprland-workspace-layout-toggle"},
@@ -341,7 +342,7 @@
   "remove.development.elixir.phoenix": {"icon":"","label":"Phoenix","when":"[[ -d $HOME/.local/share/mise/installs/elixir ]]","action":"omarchy-launch-floating-terminal-with-presentation 'omarchy-remove-dev-env phoenix'"},
 
   // Update
-  "update.omarchy": {"icon":"","iconFont":"omarchy","label":"Omarchy","action":"omarchy-launch-floating-terminal-with-presentation omarchy-update"},
+  "update.omarchy": {"icon":"","iconFont":"omarchy","label":"Maslow OS","action":"omarchy-launch-floating-terminal-with-presentation omarchy-update"},
   "update.channel": {"icon":"󰔫","label":"Channel"},
   "update.config": {"icon":"","label":"Config","title":"Reset to default"},
   "update.themes": {"icon":"󰸌","label":"Extra Themes","when":"omarchy-theme-extras","action":"omarchy-launch-floating-terminal-with-presentation omarchy-theme-update"},
