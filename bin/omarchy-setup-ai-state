@@ -72,8 +72,12 @@ complete)
   state=$(jq '.completedAt = (now | todateiso8601) | .currentStep = 4 | .deferred = false' <<<"$state")
   write_state "$state"
   ;;
+reset)
+  state=$(jq '.currentStep = 1 | .completedAt = null | .deferred = false | .selectedAgent = null' <<<"$state")
+  write_state "$state"
+  ;;
 *)
-  echo "Usage: omarchy-setup-ai-state <show|open|step|select|defer|complete> [value]" >&2
+  echo "Usage: omarchy-setup-ai-state <show|open|step|select|defer|complete|reset> [value]" >&2
   exit 1
   ;;
 esac

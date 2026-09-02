@@ -25,6 +25,18 @@ Item {
   readonly property color urgent: Color.urgent
   readonly property string fontFamily: "Manrope"
 
+  function focusCurrentStep() {
+    Qt.callLater(function() {
+      if (!window.visible) return
+      switch (root.step) {
+        case 1: continueButton.forceActiveFocus(); break
+        case 2: codexButton.forceActiveFocus(); break
+        case 3: installButton.forceActiveFocus(); break
+        case 4: defaultButton.forceActiveFocus(); break
+      }
+    })
+  }
+
   function launchMode(agent) {
     switch (agent) {
       case "codex": return "codex:--approve-for-me"
@@ -41,7 +53,6 @@ Item {
     stateProc.running = true
     productProc.running = true
     hermesDesktopProc.running = true
-    Qt.callLater(function() { window.requestActivate() })
   }
 
   function close() {
@@ -147,6 +158,7 @@ Item {
         var state = JSON.parse(stateOutput.text)
         step = Number(state.currentStep || 1)
         selectedAgent = String(state.selectedAgent || "")
+        root.focusCurrentStep()
       } catch (e) {
         statusText = "AI setup state could not be read."
       }
@@ -308,6 +320,7 @@ Item {
             }
             Item { width: 1; height: Style.space(12) }
             Button {
+              id: continueButton
               text: "Continue"
               focusable: true
               Accessible.name: "Continue to choose an AI agent"
@@ -344,7 +357,7 @@ Item {
               font.family: root.fontFamily
               font.pixelSize: 15
             }
-            Button { text: "Codex — OpenAI"; focusable: true; Accessible.name: "Choose Codex command-line agent"; onClicked: root.chooseAgent("codex") }
+            Button { id: codexButton; text: "Codex — OpenAI"; focusable: true; Accessible.name: "Choose Codex command-line agent"; onClicked: root.chooseAgent("codex") }
             Button { text: "Claude Code — Anthropic"; focusable: true; Accessible.name: "Choose Claude Code command-line agent"; onClicked: root.chooseAgent("claude") }
             Button { text: "Hermes — Nous Research"; focusable: true; Accessible.name: "Choose Hermes command-line agent"; onClicked: root.chooseAgent("hermes") }
             Button {
@@ -396,6 +409,7 @@ Item {
               font.pixelSize: 14
             }
             Button {
+              id: installButton
               text: root.busy ? "Working…" : "I understand — install and continue"
               focusable: true
               enabled: !root.busy
@@ -424,6 +438,7 @@ Item {
               font.pixelSize: 16
             }
             Button {
+              id: defaultButton
               text: root.busy ? "Opening…" : "Make default and open"
               focusable: true
               enabled: !root.busy

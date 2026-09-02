@@ -56,6 +56,16 @@ mapfile -d '' -t shell_args <"$MASLOW_TEST_SHELL_LOG"
 [[ ${shell_args[*]} == "shell summon maslow.ai-setup {}" ]] || fail "public AI setup route opens the first-party panel"
 pass "AI onboarding defers automatic opening but remains manually available"
 
+omarchy-setup-ai-state complete
+: >"$MASLOW_TEST_SHELL_LOG"
+omarchy-setup-ai --first-login
+[[ ! -s $MASLOW_TEST_SHELL_LOG ]] || fail "completed AI onboarding reopens automatically"
+omarchy-setup-ai
+state=$(omarchy-setup-ai-state show)
+[[ $(jq -r '.currentStep' <<<"$state") == 1 ]] || fail "manual AI setup did not return to agent selection after completion"
+[[ $(jq -r '.completedAt == null and .selectedAgent == null' <<<"$state") == true ]] || fail "manual AI setup kept stale completion state"
+pass "manual AI setup restarts a completed flow without reopening it automatically"
+
 printf '{"schemaVersion":2,"future":true}\n' >"$HOME/.local/state/maslow-os/onboarding.json"
 if omarchy-setup-ai-state step 2 >"$test_tmp/future.out" 2>&1; then
   fail "future onboarding state is not overwritten"
@@ -112,4 +122,8 @@ grep -Fq "alias cx='omarchy-agent --inline --agent claude'" "$ROOT/default/bash/
 grep -Fq "alias cy='omarchy-agent --inline --agent codex'" "$ROOT/default/bash/aliases" || fail "Codex alias bypasses the trust gate"
 grep -Fq 'It may run commands, modify or delete files, install software' "$ROOT/shell/plugins/maslow-ai-setup/Panel.qml" || fail "AI panel omits the permission disclosure"
 grep -Fq 'Finish without an agent' "$ROOT/shell/plugins/maslow-ai-setup/Panel.qml" || fail "AI panel omits a no-agent completion path"
+grep -Fq 'root.focusCurrentStep()' "$ROOT/shell/plugins/maslow-ai-setup/Panel.qml" || fail "AI panel does not focus its current step after opening"
+if grep -Fq 'requestActivate()' "$ROOT/shell/plugins/maslow-ai-setup/Panel.qml"; then
+  fail "AI panel calls an unsupported FloatingWindow focus method"
+fi
 pass "Maslow-managed agent entry points use the shared trust gate"
