@@ -37,6 +37,8 @@ pass "required Maslow OS sources exist"
 pass "Maslow OS version is pinned"
 
 assert_contains README.md "Maslow OS is based on" "README preserves Omarchy attribution"
+assert_contains install/provisioning/setup-form.sh "OMARCHY_HOSTNAME_DEFAULT='maslow-os'" "setup defaults to a Maslow OS hostname"
+assert_contains install/provisioning/setup-form.sh "return for 'maslow-os'" "setup hostname hint uses Maslow OS"
 
 logo_dimensions=$(python3 - "$ROOT/logo.txt" <<'PY'
 from pathlib import Path

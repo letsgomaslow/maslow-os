@@ -947,6 +947,12 @@ esp_path() {
 # identity would linger and go hash-stale on the first UKI rebuild.
 limine_entries_stale() {
   local esp machine_id
+
+  # The community ARM image boots with systemd-boot and deliberately does not
+  # ship Limine tooling. A leftover limine.conf on its ESP is not an active boot
+  # entry and must not turn an otherwise-complete first boot into a failure.
+  command -v limine-update >/dev/null 2>&1 || return 1
+
   esp=$(esp_path)
   machine_id=$(cat /etc/machine-id 2>/dev/null || true)
   [[ -f $esp/limine.conf && -n $machine_id ]] || return 1
