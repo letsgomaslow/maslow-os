@@ -155,7 +155,7 @@ def png_info(path):
     width, height, depth, color_type = struct.unpack(">IIBB", data[16:26])
     return width, height, depth, color_type
 
-def png_has_transparent_pixel(path):
+def png_alpha_bounds(path):
     data = path.read_bytes()
     width, height, depth, color_type = png_info(path)
     if depth != 8 or color_type != 6:
@@ -177,7 +177,11 @@ def png_has_transparent_pixel(path):
     cursor = 0
     has_clear = False
     has_visible = False
-    for _ in range(height):
+    min_x = width
+    min_y = height
+    max_x = 0
+    max_y = 0
+    for y in range(height):
         filter_type = raw[cursor]
         cursor += 1
         row = bytearray(raw[cursor:cursor + stride])
@@ -202,7 +206,17 @@ def png_has_transparent_pixel(path):
         alphas = row[3::4]
         has_clear = has_clear or any(alpha < 255 for alpha in alphas)
         has_visible = has_visible or any(alpha > 0 for alpha in alphas)
+        for x, alpha in enumerate(alphas):
+            if alpha > 0:
+                min_x = min(min_x, x)
+                min_y = min(min_y, y)
+                max_x = max(max_x, x + 1)
+                max_y = max(max_y, y + 1)
         previous = row
+    return has_clear, has_visible, (min_x, min_y, max_x, max_y)
+
+def png_has_transparent_pixel(path):
+    has_clear, has_visible, _ = png_alpha_bounds(path)
     return has_clear and has_visible
 
 def webp_size(path):
@@ -251,6 +265,19 @@ for relative in ("icon.png", "default/plymouth/logo.png", "default/sddm/omarchy/
     if not png_has_transparent_pixel(root / relative):
         fail(f"{relative} does not contain both transparent and visible pixels")
 print("ok - visible logo PNGs carry real alpha channels")
+
+for relative in (
+    "themes/maslow-dark/unlock.png",
+    "themes/maslow-light/unlock.png",
+    "default/plymouth/logo.png",
+    "default/sddm/omarchy/logo.png",
+):
+    width, height, _, _ = png_info(root / relative)
+    _, _, bounds = png_alpha_bounds(root / relative)
+    content_center_x = (bounds[0] + bounds[2]) / 2
+    if abs(content_center_x - width / 2) > 1:
+        fail(f"{relative} visible lockup is {content_center_x - width / 2:.1f}px off center")
+print("ok - graphical lockups center their visible content")
 PY
 
 pass "Maslow OS brand validation passed"
