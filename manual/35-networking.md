@@ -1,6 +1,6 @@
 # Networking
 
-Networking in Omarchy is handled by NetworkManager, and you drive it from the network icon in the [top bar](05-the-top-bar.md) or with `Super + Ctrl + W`.
+Networking in Maslow OS is handled by NetworkManager. Use the network icon in the [top bar](05-the-top-bar.md) or press `Super + Ctrl + W`.
 
 That panel scans for Wi-Fi networks, shows signal strength, and connects. Ethernet needs nothing at all — plug it in and it works. If you'd rather stay in the terminal, `nmtui` gives you the same controls, and there's an `omarchy network` command group too.
 
@@ -12,7 +12,7 @@ If you actually need the password itself, `omarchy network password <interface>`
 
 ## DNS
 
-Omarchy uses whatever DNS your network hands out over DHCP. You can override that for the whole machine under _Setup > Network > DNS_, where Cloudflare and Google are one click away. Pick _Custom_ to type in your own servers.
+Maslow OS uses the DNS servers supplied by your network over DHCP. Override them for the whole machine under _Setup > Network > DNS_, where Cloudflare and Google are available, or choose _Custom_ to enter your own servers.
 
 From the terminal, `omarchy dns` prints the current provider and `omarchy dns Cloudflare` sets one.
 

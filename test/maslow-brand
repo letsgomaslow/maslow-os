@@ -24,7 +24,7 @@ assert_contains() {
 }
 
 for file in \
-  maslow-version NOTICE DOWNSTREAM.md branding/design-tokens.json \
+  maslow-version NOTICE DOWNSTREAM.md branding/design-tokens.json branding/product.json \
   branding/logos/maslow-mark-gradient.svg branding/fonts/manrope/OFL.txt \
   branding/wallpapers/maslow-wallpaper-collage.png \
   themes/maslow-dark/colors.toml themes/maslow-dark/hyprland.lua \
@@ -34,14 +34,17 @@ for file in \
 done
 pass "required Maslow OS sources exist"
 
-[[ $(<"$ROOT/maslow-version") == "0.1.0-preview.1" ]] || fail "unexpected Maslow OS version"
+manifest_version=$(jq -r '.product.version' "$ROOT/branding/product.json")
+[[ $(<"$ROOT/maslow-version") == "$manifest_version" ]] || fail "Maslow OS version differs from the product manifest"
 pass "Maslow OS version is pinned"
 
 assert_contains README.md "Maslow OS is based on" "README preserves Omarchy attribution"
 assert_contains install/provisioning/setup-form.sh "OMARCHY_HOSTNAME_DEFAULT='maslow-os'" "setup defaults to a Maslow OS hostname"
 assert_contains install/provisioning/setup-form.sh "return for 'maslow-os'" "setup hostname hint uses Maslow OS"
-assert_contains branding/scripts/generate-assets '"MASLOW | OS"' "login artwork uses the Maslow OS lockup"
+assert_contains branding/scripts/generate-assets "'.product.name'" "login artwork consumes the canonical Maslow OS product name"
 assert_contains migrations/1788337736.sh "maslow-login-branding.hook" "updates preserve the Maslow login default"
+assert_contains migrations/1788365928.sh "maslow-login-branding.hook" "existing installations immediately register branding repair"
+assert_contains install/user/maslow-login-branding.sh "omarchy-hook-install post-update" "fresh installations register branding repair"
 assert_contains bin/omarchy-migrate-notify "Pending Maslow OS Migrations" "migration notice uses Maslow OS"
 assert_contains default/hypr/bindings/utilities.lua '"Maslow OS menu"' "keybinding hint uses Maslow OS"
 assert_contains shell/plugins/menu/manifest.json '"name": "Maslow OS menu"' "shell menu metadata uses Maslow OS"
@@ -65,7 +68,14 @@ assert_contains install/user/theme.sh 'omarchy-theme-set "Maslow Dark"' "Maslow 
 assert_contains default/omarchy/omarchy-menu.jsonc '"label":"Reduced Motion"' "Reduced Motion is visible in the menu"
 assert_contains default/omarchy/omarchy-menu.jsonc 'omarchy-hyprland-toggle reduced-motion' "Reduced Motion uses the persistent Hyprland toggle"
 assert_contains bin/omarchy-theme-set 'background setInstant' "Reduced Motion uses instant background application"
-assert_contains etc/fastfetch/config.jsonc 'Maslow OS $maslow · Omarchy engine $engine' "About displays product and engine versions"
+assert_contains etc/fastfetch/config.jsonc 'omarchy-branding-product product.name' "About consumes canonical product metadata"
+assert_contains default/fonts/omarchy/README.md 'U+E90B` — Maslow OS' "Maslow mark uses additive private glyph U+E90B"
+assert_contains default/fonts/omarchy/README.md 'U+E900` — Omarchy' "Omarchy compatibility glyph remains U+E900"
+assert_contains default/sddm/omarchy/Main.qml 'Accessible.name' "login screen provides accessible names"
+assert_contains default/sddm/omarchy/Main.qml 'Accessible.AlertMessage' "login screen exposes live status alerts"
+assert_contains default/sddm/omarchy/Main.qml 'Qt.Key_F5' "login screen provides spoken-login toggle"
+assert_contains shell/plugins/maslow-ai-setup/manifest.json '"id": "maslow.ai-setup"' "guided AI setup uses stable first-party plugin ID"
+assert_contains bin/omarchy-agent-trust 'disclosure_version=1' "agent permission disclosure is versioned"
 assert_contains DOWNSTREAM.md '/usr/bin/omarchy*' "Omarchy command compatibility is documented"
 
 wallpaper_names=(01-mountain-sunrise.webp 02-canyon-storm.webp 03-aurora-lake.webp 04-spiral-galaxy.webp)

@@ -2,7 +2,7 @@
 
 ## Alternative Editors
 
-Omarchy ships with [Neovim](https://neovim.io/) by default, but if you'd like something a bit more mainstream and familiar, you can run the Omarchy Menu (`Super + Space`) and see the options under _Install > Editor_. We have VSCode, Cursor, Zed, Sublime Text, Helix, Vim, and Emacs listed there. If you don't find what you're looking for, checkout _Install > Package_, and see if it isn't in an Arch package (and if not, try _Install > AUR_ to check the AUR).
+Maslow OS ships with [Neovim](https://neovim.io/) by default. For a different editor, open the Maslow OS menu (`Super + Space`) and browse _Install > Editor_. VS Code, Cursor, Zed, Sublime Text, Helix, Vim, and Emacs are listed there. If your editor is not listed, try _Install > Package_ and then _Install > AUR_.
 
 Theme matching is offered for `VSCode`, `Cursor`, `VSCodium`, and `Helix`.
 
@@ -10,7 +10,7 @@ You can set the system-wide default editor under `Setup > Defaults > Editor`.
 
 ## Environment
 
-Omarchy supports setting up a whole host of development environments through the _Install > Development_ section of the Omarchy Menu (`Super + Space`). You'll of course find _Ruby on Rails_, but also all three major runtimes for JavaScript (Node.js, Bun, Deno), as well as popular PHP frameworks like Laravel and Symfony. Oh, and there's Go, Rust, Python, Java, Elixir (with Phoenix), .NET, OCaml, Zig, Clojure, and Scala too. It's a very broad selection!
+Maslow OS supports a broad set of development environments through _Install > Development_ in the Maslow OS menu (`Super + Space`). Options include Ruby on Rails; Node.js, Bun, and Deno; Laravel and Symfony; Go, Rust, Python, Java, Elixir with Phoenix, .NET, OCaml, Zig, Clojure, and Scala.
 
 The majority of these environments are managed by [Mise](https://mise.jdx.dev/). It's a tool that lets you install and run multiple versions of a programming language on the same machine. It's like rbenv or rvm for Ruby or virtualenv for Python, but it works for a bunch of different environments.
 
@@ -24,7 +24,7 @@ By default your user is *not* in the `docker` group. That group is effectively p
 
 Remember to checkout the Lazydocker command to manage your containers in a cool TUI using `Super + Shift + D`; it asks for authorization the first time unless you have enabled sudoless Docker.
 
-You can setup the common databases for local development in Docker using _Install > Development > Docker DB_ in the Omarchy menu.
+You can setup the common databases for local development in Docker using _Install > Development > Docker DB_ in the Maslow OS menu.
 
 ## GitHub CLI
 
