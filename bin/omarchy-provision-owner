@@ -90,16 +90,16 @@ scale_console_font() {
   setfont "${best:-default8x16}" 2>/dev/null || true
 }
 
-# Same Tokyo Night VT palette the ISO configurator sets, so the first-boot
+# Same Maslow Dark VT palette the ISO configurator sets, so the first-boot
 # form looks like a continuation of the install.
-set_tokyo_night_colors() {
+set_maslow_colors() {
   [[ $(tty 2>/dev/null) == /dev/tty* ]] || return 0
-  echo -en "\e]P01a1b26"; echo -en "\e]P1f7768e"; echo -en "\e]P29ece6a"
-  echo -en "\e]P3e0af68"; echo -en "\e]P47aa2f7"; echo -en "\e]P5bb9af7"
-  echo -en "\e]P67dcfff"; echo -en "\e]P7a9b1d6"; echo -en "\e]P8414868"
-  echo -en "\e]P9f7768e"; echo -en "\e]PA9ece6a"; echo -en "\e]PBe0af68"
-  echo -en "\e]PC7aa2f7"; echo -en "\e]PDbb9af7"; echo -en "\e]PE7dcfff"
-  echo -en "\e]PFc0caf5"
+  echo -en "\e]P0121d35"; echo -en "\e]P1ff7a90"; echo -en "\e]P26dc4ad"
+  echo -en "\e]P3f6c85f"; echo -en "\e]P48fb4ff"; echo -en "\e]P5ee7bb3"
+  echo -en "\e]P679d4c3"; echo -en "\e]P7d9dee8"; echo -en "\e]P88c95a8"
+  echo -en "\e]P9ff9bad"; echo -en "\e]PA8ad7c1"; echo -en "\e]PBffd982"
+  echo -en "\e]PCadc8ff"; echo -en "\e]PDf5a1cb"; echo -en "\e]PE9be4d5"
+  echo -en "\e]PFffffff"
   echo -en "\033[0m"
   clear
 }
@@ -179,7 +179,7 @@ DYNAMIC_ROW=$((LOGO_HEIGHT + 3))
 LAST_SETUP_SIZE=""
 
 tips=(
-  "Super + Space opens the Omarchy menu for apps, settings, and more"
+  "Super + Space opens the Maslow OS menu for apps, settings, and more"
   "Super + K shows all the key bindings"
   "Super is the Windows or command key on your keyboard"
   "Use Xournal++ to sign PDFs"
@@ -190,13 +190,13 @@ tips=(
   "Super + Ctrl + Print grabs text off the screen with OCR"
   "Print takes a screenshot, Alt + Print records the screen"
   "Set a reminder with Super + Ctrl + R"
-  "Switch themes from Style > Theme in the Omarchy menu"
+  "Switch themes from Style > Theme in the Maslow OS menu"
   "Double-click the menu bar to make it transparent"
   "Run a full Windows VM via Install > Windows in the menu"
   "Super + Ctrl + V opens the clipboard manager"
   "Super + 1 through 0 switches workspaces, add Shift to bring the window"
   "Super + Print picks a color from anywhere on screen"
-  "Keep the system fresh with Update in the Omarchy menu"
+  "Keep the system fresh with Update in the Maslow OS menu"
 )
 
 term_cols() {
@@ -430,7 +430,7 @@ render_setup_dynamic() {
 
 # The first thing a new owner sees, shown once before the keyboard step:
 # the logo (vertically centered like the boot logo) running a looping ColorShift,
-# the Omarchy tagline, and a hint. Return skips ahead into setup at any time.
+# the Maslow OS tagline, and a hint. Return skips ahead into setup at any time.
 greeter_screen() {
   local anim="" drawn_sig cur_sig resized=0
 
@@ -449,7 +449,7 @@ greeter_screen() {
     rows=$(stty size 2>/dev/null </dev/tty | awk '{print $1}')
     [[ $rows =~ ^[0-9]+$ ]] || rows=${LINES:-24}
 
-    tagline="Beautiful, Fun & Agentic Linux by DHH"
+    tagline="AI transformation, built with purpose."
     hint="Press Return to Start Setup"
 
     printf '%s%s' "$HIDE_CURSOR" "$CLEAR"
@@ -1117,7 +1117,7 @@ main() {
   # Font sizing waits for the console to settle, so it lives inside
   # greeter_screen (which owns that settle) rather than running here on a VT
   # that may still be in a transitional mode this early in first boot.
-  set_tokyo_night_colors
+  set_maslow_colors
   greeter_screen
 
   while ! "$0" --attempt; do

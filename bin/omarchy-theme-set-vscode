@@ -74,15 +74,15 @@ install_generated_extension() {
   cat > "$ext_dir/package.json" <<EOF
 {
     "name": "$GENERATED_EXTENSION_NAME",
-    "displayName": "Omarchy",
-    "description": "Omarchy color theme",
+    "displayName": "Maslow OS",
+    "description": "Maslow OS generated color theme",
     "publisher": "local",
     "version": "$GENERATED_EXTENSION_VERSION",
     "engines": { "vscode": "^1.70.0" },
     "categories": ["Themes"],
     "contributes": {
         "themes": [{
-            "label": "Omarchy",
+            "label": "Maslow OS",
             "uiTheme": "$ui_theme",
             "path": "./themes/omarchy-color-theme.json"
         }]
@@ -122,7 +122,7 @@ set_theme() {
   elif [[ -f "$GENERATED_THEME" ]]; then
     # VS Code only discovers local color themes through an extension package.
     install_generated_extension "$ext_base/$GENERATED_EXTENSION_NAME"
-    theme_name="Omarchy"
+    theme_name="Maslow OS"
   fi
 
   if [[ -n "$theme_name" ]]; then

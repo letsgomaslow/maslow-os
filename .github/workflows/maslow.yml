@@ -1,0 +1,30 @@
+name: Maslow OS downstream checks
+
+on:
+  push:
+    branches: [maslow]
+  pull_request:
+    branches: [maslow]
+
+permissions:
+  contents: read
+
+jobs:
+  brand:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate Maslow OS brand and assets
+        run: ./test/maslow-brand
+
+  source:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install test tools
+        run: sudo apt-get update && sudo apt-get install --yes jq moreutils
+      - name: Run source tests with Linux Bash 5
+        run: ./test/all

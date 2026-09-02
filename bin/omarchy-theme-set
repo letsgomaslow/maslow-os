@@ -13,6 +13,7 @@ CURRENT_THEME_PATH="$HOME/.local/state/omarchy/current/theme"
 NEXT_THEME_PATH="$HOME/.local/state/omarchy/current/next-theme"
 CURRENT_BACKGROUND_LINK="$HOME/.local/state/omarchy/current/background"
 BACKGROUND_TRANSITION_CACHE="$HOME/.cache/omarchy/background-transitions"
+REDUCED_MOTION_FILE="$HOME/.local/state/omarchy/toggles/hypr/reduced-motion.lua"
 THEME_SET_LOCK="${XDG_RUNTIME_DIR:-/tmp}/omarchy-theme-set.lock"
 USER_THEMES_PATH="$HOME/.config/omarchy/themes"
 OMARCHY_THEMES_PATH="$OMARCHY_PATH/themes"
@@ -133,6 +134,21 @@ set_theme_background() {
   fi
 
   ln -nsf "$new_background" "$CURRENT_BACKGROUND_LINK"
+}
+
+set_theme_background_instant() {
+  local new_background
+
+  if ! choose_theme_background; then
+    omarchy-notification-send "No background was found for theme" -t 2000
+    shell_ipc shell applyTheme "$colors_payload" "$shell_payload" || true
+    return
+  fi
+
+  new_background="$CHOSEN_THEME_BACKGROUND"
+  ln -nsf "$new_background" "$CURRENT_BACKGROUND_LINK"
+  shell_ipc shell applyTheme "$colors_payload" "$shell_payload" || true
+  shell_ipc background setInstant "$new_background" || true
 }
 
 is_denied_installed_file() {
@@ -284,7 +300,7 @@ fi
 omarchy-theme-set-templates
 
 OLD_BACKGROUND_SNAPSHOT=""
-if [[ $THEME_HEADLESS != "1" && $OMARCHY_THEME_SKIP_BACKGROUND != "1" ]]; then
+if [[ $THEME_HEADLESS != "1" && $OMARCHY_THEME_SKIP_BACKGROUND != "1" && ! -f $REDUCED_MOTION_FILE ]]; then
   OLD_BACKGROUND_SNAPSHOT=$(snapshot_current_background)
 fi
 
@@ -306,6 +322,8 @@ if [[ $THEME_HEADLESS == "1" ]]; then
   [[ $OMARCHY_THEME_SKIP_BACKGROUND == "1" ]] || set_theme_background_link || true
 elif [[ $OMARCHY_THEME_SKIP_BACKGROUND == "1" ]]; then
   shell_ipc shell applyTheme "$colors_payload" "$shell_payload" || true
+elif [[ -f $REDUCED_MOTION_FILE ]]; then
+  set_theme_background_instant
 else
   set_theme_background
 fi
