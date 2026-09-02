@@ -41,6 +41,7 @@ assert_contains install/user/theme.sh 'omarchy-theme-set "Maslow Dark"' "Maslow 
 assert_contains default/omarchy/omarchy-menu.jsonc '"label":"Reduced Motion"' "Reduced Motion is visible in the menu"
 assert_contains default/omarchy/omarchy-menu.jsonc 'omarchy-hyprland-toggle reduced-motion' "Reduced Motion uses the persistent Hyprland toggle"
 assert_contains bin/omarchy-theme-set 'background setInstant' "Reduced Motion uses instant background application"
+assert_contains etc/fastfetch/config.jsonc 'Maslow OS $maslow · Omarchy engine $engine' "About displays product and engine versions"
 assert_contains DOWNSTREAM.md '/usr/bin/omarchy*' "Omarchy command compatibility is documented"
 
 for theme in maslow-dark maslow-light; do
