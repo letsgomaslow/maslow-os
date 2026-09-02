@@ -38,14 +38,14 @@ render_wallpapers() {
     -stroke "$grid" -strokewidth 1 -fill none "${grid_args[@]}" \
     -stroke "$path" -strokewidth 12 \
     -draw "path 'M 180,1720 C 900,1720 960,480 1760,480 S 2740,1540 3660,440'" \
-    "$mark" -resize 900x600 -gravity southeast -geometry +220+180 -composite \
+    \( -background none "$mark" -resize 900x600 \) -gravity southeast -geometry +220+180 -composite \
     -quality 92 "$output/bridge.webp"
 
   "$MAGICK" -size 3840x2160 "xc:$background" \
     -stroke "$grid" -strokewidth 1 -fill none "${grid_args[@]}" \
     -stroke "$path" -strokewidth 8 \
     -draw "path 'M 200,420 L 980,420 L 1460,900 L 2220,900 L 2860,1540 L 3660,1540'" \
-    "$mark" -resize 760x510 -gravity northwest -geometry +220+220 -composite \
+    \( -background none "$mark" -resize 760x510 \) -gravity northwest -geometry +220+220 -composite \
     -quality 92 "$output/pathways.webp"
 
   "$MAGICK" "$output/bridge.webp" -resize 1200x675^ -gravity center -extent 1200x675 "$ROOT/themes/$theme/preview.png"
@@ -57,9 +57,9 @@ render_lockup() {
   local font_size=$((height * 30 / 100))
 
   "$MAGICK" -size "${width}x${height}" xc:none \
-    "$mark" -resize "${mark_width}x${height}" -gravity west -geometry +24+0 -composite \
+    \( -background none "$mark" -resize "${mark_width}x${height}" \) -gravity west -geometry +24+0 -composite \
     -font "$FONT" -weight 600 -pointsize "$font_size" -fill "$text_color" \
-    -gravity west -annotate +230+0 "MASLOW OS" "$output"
+    -gravity west -annotate +230+0 "MASLOW | OS" -depth 8 "$output"
 }
 
 render_wallpapers maslow-dark "#121D35" "#24324D" "#6DC4AD" "$MARK_GRADIENT"
@@ -73,27 +73,27 @@ cp "$ROOT/default/plymouth/logo.png" "$ROOT/default/sddm/omarchy/logo.png"
   "$ROOT/default/plymouth/logo.png" "$ROOT/logo.txt" \
   --width 80 --height 12 --mode block --threshold 50 >/dev/null
 
-"$MAGICK" -size 1200x675 xc:"#121D35" "$ROOT/themes/maslow-dark/unlock.png" -gravity center -composite "$ROOT/themes/maslow-dark/preview-unlock.png"
-"$MAGICK" -size 1200x675 xc:"#FFFFFF" "$ROOT/themes/maslow-light/unlock.png" -gravity center -composite "$ROOT/themes/maslow-light/preview-unlock.png"
-"$MAGICK" -size 1920x1080 xc:"#121D35" "$ROOT/default/plymouth/logo.png" -gravity center -composite "$ROOT/default/plymouth/preview-unlock.png"
+"$MAGICK" -size 1200x675 xc:"#121D35" "$ROOT/themes/maslow-dark/unlock.png" -gravity center -composite -depth 8 "$ROOT/themes/maslow-dark/preview-unlock.png"
+"$MAGICK" -size 1200x675 xc:"#FFFFFF" "$ROOT/themes/maslow-light/unlock.png" -gravity center -composite -depth 8 "$ROOT/themes/maslow-light/preview-unlock.png"
+"$MAGICK" -size 1920x1080 xc:"#121D35" "$ROOT/default/plymouth/logo.png" -gravity center -composite -depth 8 "$ROOT/default/plymouth/preview-unlock.png"
 
-"$MAGICK" -size 300x300 xc:none "$MARK_GRADIENT" -resize 270x190 -gravity center -composite "$ROOT/icon.png"
-"$MAGICK" -size 800x378 xc:none "$MARK_GRADIENT" -resize 520x346 -gravity center -composite "$ROOT/default/plymouth/logos/oma.png"
+"$MAGICK" -size 300x300 xc:none \( -background none "$MARK_GRADIENT" -resize 270x190 \) -gravity center -composite -depth 8 "$ROOT/icon.png"
+"$MAGICK" -size 800x378 xc:none \( -background none "$MARK_GRADIENT" -resize 520x346 \) -gravity center -composite -depth 8 "$ROOT/default/plymouth/logos/oma.png"
 
-"$MAGICK" -size 286x48 xc:none -fill "#1A2948" -stroke "#6DC4AD" -strokewidth 2 -draw "roundrectangle 1,1 284,46 8,8" "$ROOT/default/plymouth/entry.png"
-"$MAGICK" -size 286x48 xc:none -fill "#1A2948" -stroke "#FF7A90" -strokewidth 2 -draw "roundrectangle 1,1 284,46 8,8" "$ROOT/default/sddm/omarchy/entry-failed.png"
+"$MAGICK" -size 286x48 xc:none -fill "#1A2948" -stroke "#6DC4AD" -strokewidth 2 -draw "roundrectangle 1,1 284,46 8,8" -depth 8 "$ROOT/default/plymouth/entry.png"
+"$MAGICK" -size 286x48 xc:none -fill "#1A2948" -stroke "#FF7A90" -strokewidth 2 -draw "roundrectangle 1,1 284,46 8,8" -depth 8 "$ROOT/default/sddm/omarchy/entry-failed.png"
 cp "$ROOT/default/plymouth/entry.png" "$ROOT/default/sddm/omarchy/entry.png"
 
-"$MAGICK" -size 14x14 xc:none -fill "#6DC4AD" -draw "circle 7,7 7,1" "$ROOT/default/plymouth/bullet.png"
+"$MAGICK" -size 14x14 xc:none -fill "#6DC4AD" -draw "circle 7,7 7,1" -depth 8 "$ROOT/default/plymouth/bullet.png"
 cp "$ROOT/default/plymouth/bullet.png" "$ROOT/default/sddm/omarchy/bullet.png"
 
 "$MAGICK" -size 84x96 xc:none -fill none -stroke "#D9DEE8" -strokewidth 7 \
-  -draw "roundrectangle 18,40 66,86 7,7" -draw "path 'M 28,40 L 28,30 C 28,12 56,12 56,30 L 56,40'" "$ROOT/default/plymouth/lock.png"
+  -draw "roundrectangle 18,40 66,86 7,7" -draw "path 'M 28,40 L 28,30 C 28,12 56,12 56,30 L 56,40'" -depth 8 "$ROOT/default/plymouth/lock.png"
 "$MAGICK" -size 84x96 xc:none -fill none -stroke "#FF7A90" -strokewidth 7 \
-  -draw "roundrectangle 18,40 66,86 7,7" -draw "path 'M 28,40 L 28,30 C 28,12 56,12 56,30 L 56,40'" "$ROOT/default/sddm/omarchy/lock-failed.png"
+  -draw "roundrectangle 18,40 66,86 7,7" -draw "path 'M 28,40 L 28,30 C 28,12 56,12 56,30 L 56,40'" -depth 8 "$ROOT/default/sddm/omarchy/lock-failed.png"
 cp "$ROOT/default/plymouth/lock.png" "$ROOT/default/sddm/omarchy/lock.png"
 
-"$MAGICK" -size 300x10 xc:"#24324D" "$ROOT/default/plymouth/progress_box.png"
-"$MAGICK" -size 300x10 xc:"#6DC4AD" "$ROOT/default/plymouth/progress_bar.png"
+"$MAGICK" -size 300x10 xc:"#24324D" -depth 8 "$ROOT/default/plymouth/progress_box.png"
+"$MAGICK" -size 300x10 xc:"#6DC4AD" -depth 8 "$ROOT/default/plymouth/progress_bar.png"
 
 echo "Maslow OS assets generated."

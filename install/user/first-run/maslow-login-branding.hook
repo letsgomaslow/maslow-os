@@ -1,0 +1,18 @@
+#!/bin/bash
+
+set -euo pipefail
+
+# The ARM development preview intentionally keeps using upstream Omarchy
+# packages. A package update therefore restores upstream's SDDM and Plymouth
+# artwork even though the running source tree is the Maslow fork. Repair only
+# that exact package-owned reset; never replace a login theme the owner chose.
+source_logo="${MASLOW_SOURCE_SDDM_LOGO:-${OMARCHY_PATH:-/usr/share/omarchy}/default/sddm/omarchy/logo.png}"
+packaged_logo="${MASLOW_PACKAGED_SDDM_LOGO:-/usr/share/omarchy/default/sddm/omarchy/logo.png}"
+installed_logo="${MASLOW_INSTALLED_SDDM_LOGO:-/usr/share/sddm/themes/omarchy/logo.png}"
+
+[[ -f $source_logo && -f $packaged_logo && -f $installed_logo ]] || exit 0
+cmp -s "$installed_logo" "$source_logo" && exit 0
+cmp -s "$installed_logo" "$packaged_logo" || exit 0
+cmp -s "$source_logo" "$packaged_logo" && exit 0
+
+omarchy-plymouth-set-by-theme maslow-dark
