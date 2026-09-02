@@ -38,11 +38,15 @@ pass "Maslow OS version is pinned"
 
 assert_contains README.md "Maslow OS is based on" "README preserves Omarchy attribution"
 
-logo_width=0
-while IFS= read -r logo_line || [[ -n $logo_line ]]; do
-  ((${#logo_line} > logo_width)) && logo_width=${#logo_line}
-done <"$ROOT/logo.txt"
-logo_height=$(wc -l <"$ROOT/logo.txt")
+logo_dimensions=$(python3 - "$ROOT/logo.txt" <<'PY'
+from pathlib import Path
+import sys
+
+lines = Path(sys.argv[1]).read_text(encoding="utf-8").splitlines()
+print(max((len(line) for line in lines), default=0), len(lines))
+PY
+)
+read -r logo_width logo_height <<<"$logo_dimensions"
 (( logo_width <= 80 )) || fail "setup logo exceeds the 80-column console contract"
 (( logo_height >= 6 && logo_height <= 12 )) || fail "setup logo height is outside its console contract"
 grep -q '[█▀▄]' "$ROOT/logo.txt" || fail "setup logo is not block artwork"
