@@ -16,6 +16,14 @@ stub_bin="$test_tmp/bin"
 mkdir -p "$test_esp" "$stub_bin"
 printf 'machine-id=00000000000000000000000000000000\n' >"$test_esp/limine.conf"
 
+cat >"$stub_bin/omarchy-cmd-present" <<'STUB'
+#!/bin/bash
+for cmd in "$@"; do
+  [[ -x ${0%/*}/$cmd ]] || exit 1
+done
+STUB
+chmod +x "$stub_bin/omarchy-cmd-present"
+
 esp_path() { printf '%s\n' "$test_esp"; }
 
 if PATH="$stub_bin" limine_entries_stale; then
