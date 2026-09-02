@@ -90,6 +90,21 @@ encrypted_install() {
   luks_device >/dev/null 2>&1
 }
 
+# Resolve the source syntax fstab accepts into the corresponding device path.
+# Community ARM images commonly use LABEL= for the ESP, while archinstall
+# usually emits UUID=. Both are valid and factory reset must handle either.
+resolve_fstab_device() {
+  local spec="$1"
+  case $spec in
+    UUID=*) echo "/dev/disk/by-uuid/${spec#UUID=}" ;;
+    LABEL=*) echo "/dev/disk/by-label/${spec#LABEL=}" ;;
+    PARTUUID=*) echo "/dev/disk/by-partuuid/${spec#PARTUUID=}" ;;
+    PARTLABEL=*) echo "/dev/disk/by-partlabel/${spec#PARTLABEL=}" ;;
+    /dev/*) echo "$spec" ;;
+    *) return 1 ;;
+  esac
+}
+
 # No trailing `| head` stage: under pipefail an infinite tr killed by
 # SIGPIPE fails the substitution and errexit aborts the whole reset.
 generate_passphrase() {
@@ -240,10 +255,9 @@ rebuild_next_boot() {
   esp_source=$(awk '$3 == "vfat" && $2 ~ /^\/(boot|efi)/ { print $1; exit }' "$next/etc/fstab")
   [[ -n $esp_mount && -n $esp_source ]] || fail "could not find the ESP in $next/etc/fstab"
 
-  local esp_device=$esp_source
-  if [[ $esp_source == UUID=* ]]; then
-    esp_device="/dev/disk/by-uuid/${esp_source#UUID=}"
-  fi
+  local esp_device
+  esp_device=$(resolve_fstab_device "$esp_source") ||
+    fail "unsupported ESP source $esp_source in $next/etc/fstab"
   [[ -e $esp_device ]] || fail "ESP device $esp_device not found"
 
   mount "$esp_device" "$next$esp_mount"

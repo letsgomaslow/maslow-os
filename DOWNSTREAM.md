@@ -29,6 +29,7 @@ Only curated user-visible product identity is changed. Documentation should desc
 4. Persistent Reduced Motion toggle and instant theme-background application.
 5. Brand, accessibility, compatibility, and generated-asset validation.
 6. Downstream package metadata and x86_64 installer wiring in sibling repositories.
+7. Factory-reset ESP resolution for UUID, label, partition UUID, and partition label sources.
 
 ## Release policy
 
