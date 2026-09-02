@@ -7,6 +7,10 @@ MAGICK=${MAGICK:-magick}
 MARK_GRADIENT="$ROOT/branding/logos/maslow-mark-gradient.svg"
 MARK_DARK="$ROOT/branding/logos/maslow-mark-dark.svg"
 FONT="$ROOT/branding/fonts/manrope/Manrope-VariableFont_wght.ttf"
+TERMINAL_ART_DIR=$(mktemp -d)
+
+export LC_ALL=C.UTF-8
+trap 'rm -rf "$TERMINAL_ART_DIR"' EXIT
 
 command -v "$MAGICK" >/dev/null || {
   echo "ImageMagick is required (expected the 'magick' command)." >&2
@@ -62,6 +66,42 @@ render_lockup() {
     -gravity west -annotate +230+0 "MASLOW | OS" -depth 8 "$output"
 }
 
+center_terminal_line() {
+  local line=$1 padding
+
+  padding=$(((80 - ${#line}) / 2))
+  if (( padding < 0 )); then
+    padding=0
+  fi
+
+  printf '%*s%s\n' "$padding" "" "$line"
+}
+
+render_terminal_logo() {
+  local line
+
+  "$MAGICK" -size 1200x220 xc:none \
+    -font "$FONT" -weight 900 -pointsize 128 -fill "#FFFFFF" \
+    -stroke "#FFFFFF" -strokewidth 4 -gravity center \
+    -annotate +0+0 "MASLOW OS" -depth 8 "$TERMINAL_ART_DIR/wordmark.png"
+
+  "$ROOT/bin/omarchy-transcode-ascii" \
+    "$MARK_GRADIENT" "$TERMINAL_ART_DIR/mark.txt" \
+    --width 24 --height 4 --mode block --threshold 50 >/dev/null
+  "$ROOT/bin/omarchy-transcode-ascii" \
+    "$TERMINAL_ART_DIR/wordmark.png" "$TERMINAL_ART_DIR/wordmark.txt" \
+    --width 80 --height 6 --mode block --threshold 35 >/dev/null
+
+  {
+    while IFS= read -r line; do
+      center_terminal_line "$line"
+    done <"$TERMINAL_ART_DIR/mark.txt"
+    printf '\n'
+    cat "$TERMINAL_ART_DIR/wordmark.txt"
+    center_terminal_line "MASLOW OS"
+  } >"$ROOT/logo.txt"
+}
+
 render_wallpapers maslow-dark "#121D35" "#24324D" "#6DC4AD" "$MARK_GRADIENT"
 render_wallpapers maslow-light "#FFFFFF" "#EDEFF3" "#247967" "$MARK_GRADIENT"
 
@@ -69,9 +109,7 @@ render_lockup "$MARK_GRADIENT" "#FFFFFF" "$ROOT/themes/maslow-dark/unlock.png"
 render_lockup "$MARK_GRADIENT" "#121D35" "$ROOT/themes/maslow-light/unlock.png"
 render_lockup "$MARK_GRADIENT" "#FFFFFF" "$ROOT/default/plymouth/logo.png"
 cp "$ROOT/default/plymouth/logo.png" "$ROOT/default/sddm/omarchy/logo.png"
-"$ROOT/bin/omarchy-transcode-ascii" \
-  "$ROOT/default/plymouth/logo.png" "$ROOT/logo.txt" \
-  --width 80 --height 12 --mode block --threshold 50 >/dev/null
+render_terminal_logo
 
 "$MAGICK" -size 1200x675 xc:"#121D35" "$ROOT/themes/maslow-dark/unlock.png" -gravity center -composite -depth 8 "$ROOT/themes/maslow-dark/preview-unlock.png"
 "$MAGICK" -size 1200x675 xc:"#FFFFFF" "$ROOT/themes/maslow-light/unlock.png" -gravity center -composite -depth 8 "$ROOT/themes/maslow-light/preview-unlock.png"
