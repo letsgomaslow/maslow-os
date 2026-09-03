@@ -107,9 +107,42 @@ center_terminal_line() {
   printf '%*s%s\n' "$padding" "" "$line"
 }
 
-render_terminal_logo() {
-  local line
+compose_terminal_lockup() {
+  local mark_path=$1 wordmark_path=$2
+  local mark_column_width=16 gap=3 row row_count mark_offset wordmark_offset padding
+  local mark_line wordmark_line
+  local -a mark_lines=() wordmark_lines=()
 
+  mapfile -t mark_lines <"$mark_path"
+  mapfile -t wordmark_lines <"$wordmark_path"
+
+  row_count=${#mark_lines[@]}
+  if (( ${#wordmark_lines[@]} > row_count )); then
+    row_count=${#wordmark_lines[@]}
+  fi
+
+  mark_offset=$(((row_count - ${#mark_lines[@]}) / 2))
+  wordmark_offset=$(((row_count - ${#wordmark_lines[@]}) / 2))
+
+  for ((row = 0; row < row_count; row++)); do
+    mark_line=""
+    wordmark_line=""
+
+    if (( row >= mark_offset && row < mark_offset + ${#mark_lines[@]} )); then
+      mark_line=${mark_lines[$((row - mark_offset))]}
+    fi
+    if (( row >= wordmark_offset && row < wordmark_offset + ${#wordmark_lines[@]} )); then
+      wordmark_line=${wordmark_lines[$((row - wordmark_offset))]}
+    fi
+
+    padding=$((mark_column_width - ${#mark_line} + gap))
+    printf '%s%*s%s\n' "$mark_line" "$padding" "" "$wordmark_line"
+  done
+
+  center_terminal_line "$PRODUCT_NAME_UPPER"
+}
+
+render_terminal_logo() {
   "$MAGICK" -size 1200x220 xc:none \
     -font "$FONT" -weight 900 -pointsize 128 -fill "#FFFFFF" \
     -stroke "#FFFFFF" -strokewidth 4 -gravity center \
@@ -117,19 +150,14 @@ render_terminal_logo() {
 
   "$ROOT/bin/omarchy-transcode-ascii" \
     "$MARK_GRADIENT" "$TERMINAL_ART_DIR/mark.txt" \
-    --width 24 --height 4 --mode block --threshold 50 >/dev/null
+    --width 20 --height 5 --mode block --threshold 40 >/dev/null
   "$ROOT/bin/omarchy-transcode-ascii" \
     "$TERMINAL_ART_DIR/wordmark.png" "$TERMINAL_ART_DIR/wordmark.txt" \
-    --width 80 --height 6 --mode block --threshold 35 >/dev/null
+    --width 60 --height 6 --mode block --threshold 35 >/dev/null
 
-  {
-    while IFS= read -r line; do
-      center_terminal_line "$line"
-    done <"$TERMINAL_ART_DIR/mark.txt"
-    printf '\n'
-    cat "$TERMINAL_ART_DIR/wordmark.txt"
-    center_terminal_line "$PRODUCT_NAME_UPPER"
-  } >"$ROOT/logo.txt"
+  compose_terminal_lockup \
+    "$TERMINAL_ART_DIR/mark.txt" \
+    "$TERMINAL_ART_DIR/wordmark.txt" >"$ROOT/logo.txt"
 }
 
 if [[ $render_wallpaper_assets == "true" ]]; then
