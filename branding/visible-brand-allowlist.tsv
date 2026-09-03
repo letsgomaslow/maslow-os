@@ -1,0 +1,13 @@
+# path|literal pattern|technical reason|owner
+default/omarchy/omarchy-menu.jsonc|Omarchy Community — engine support|Explicit upstream ecosystem link required for engine support|Maslow OS downstream maintainer
+shell/plugins/dev-gallery/GalleryPanel.qml|Omarchy shell – dev gallery|Developer-only engine component gallery, not an end-user product surface|Omarchy upstream
+shell/plugins/dev-gallery/GalleryPanel.qml|Omarchy shell · dev gallery|Developer-only engine component gallery, not an end-user product surface|Omarchy upstream
+manual/17-ai.md|Maslow OS and Omarchy engine skills|Explicitly distinguishes the product identity skill from the unchanged engine operations skill|Maslow OS product
+manual/22-guis.md|is Omarchy's own|Accurate attribution for upstream Omawrite, Omacalc, and Omacut applications|Maslow OS documentation
+manual/23-browsers.md|Omarchy's hotkeys|Technical description of engine-owned XDG handler integration|Maslow OS documentation
+manual/25-web-apps.md|Omarchy's own|Explicit link to the upstream engine community|Maslow OS documentation
+manual/32-shell-plugins.md|Omarchy's source|Technical source-code ownership reference for the compatible engine|Maslow OS documentation
+manual/43-making-your-own-theme.md|Theming apps Omarchy doesn't cover|Technical boundary of the engine theming system|Maslow OS documentation
+manual/49-omarchy-on.md|Unsupported Omarchy engine ports|Dedicated page labels unsupported upstream engine experiments|Maslow OS documentation
+manual/49-omarchy-on.md|Omarchy has been setup|Historical upstream community experiment description|Maslow OS documentation
+manual/49-omarchy-on.md|Omarchy is really Arch + Hyprland|Historical upstream port description quoted as engine context|Maslow OS documentation

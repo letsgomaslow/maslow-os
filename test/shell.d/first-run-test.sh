@@ -31,6 +31,8 @@ fi
 if grep -F 'skip-first-run-update-notification' "$ROOT/install/user/first-run/wifi.sh" >/dev/null; then
   fail "first-run does not track update notifications separately"
 fi
+grep -F '"Maslow OS Update" "Click to update Maslow OS."' "$ROOT/install/user/first-run/wifi.sh" >/dev/null ||
+  fail "first-run update notification does not identify Maslow OS"
 
 pass "first-run uses one lifecycle completion marker"
 

@@ -1,0 +1,84 @@
+#!/bin/bash
+
+# omarchy:summary=Manage versioned AI agent permission confirmations
+# omarchy:hidden=true
+
+set -euo pipefail
+
+schema_version=1
+disclosure_version=1
+state_dir="$HOME/.local/state/maslow-os/agent-trust"
+action=${1:-}
+agent=${2:-}
+mode=${3:-}
+
+source "$OMARCHY_PATH/install/helpers/agent.sh"
+if [[ $action == "status" || $action == "confirm" || $action == "reset" ]]; then
+  if ! omarchy_agent_resolve "$agent"; then
+    echo "Unsupported agent: $agent" >&2
+    exit 1
+  fi
+  agent=$OMARCHY_AGENT_ID
+fi
+
+state_file="$state_dir/$agent.json"
+
+case "$action" in
+status)
+  expected_mode=$(omarchy_agent_launch_mode "$agent")
+  [[ $mode == "$expected_mode" ]] || exit 1
+  [[ -f $state_file ]] || exit 1
+  stored_schema=$(jq -r '.schemaVersion // 0' "$state_file" 2>/dev/null) || {
+    echo "The $agent permission confirmation is invalid and was left unchanged." >&2
+    exit 2
+  }
+  if (( stored_schema != schema_version )); then
+    echo "The $agent permission confirmation uses unsupported schema $stored_schema and was left unchanged." >&2
+    exit 2
+  fi
+  jq -e --arg agent "$agent" --arg mode "$mode" --argjson disclosure "$disclosure_version" \
+    '.agent == $agent and .launchMode == $mode and .disclosureVersion == $disclosure' "$state_file" >/dev/null
+  ;;
+confirm)
+  [[ -n $agent && -n $mode ]] || { echo "Usage: omarchy-agent-trust confirm <agent> <launch-mode> [--yes]" >&2; exit 1; }
+  expected_mode=$(omarchy_agent_launch_mode "$agent")
+  if [[ $mode != "$expected_mode" ]]; then
+    echo "Permission mode mismatch for $OMARCHY_AGENT_NAME: expected $expected_mode." >&2
+    exit 1
+  fi
+  if [[ -f $state_file ]]; then
+    stored_schema=$(jq -r '.schemaVersion // 0' "$state_file" 2>/dev/null) || {
+      echo "The $OMARCHY_AGENT_NAME permission confirmation is invalid. Reset it before confirming again." >&2
+      exit 2
+    }
+    if (( stored_schema != schema_version )); then
+      echo "This agent confirmation uses unsupported schema $stored_schema and was left unchanged." >&2
+      exit 2
+    fi
+  fi
+  if [[ ${4:-} != "--yes" ]]; then
+    printf '\n%s\n\n' "Before $OMARCHY_AGENT_NAME starts in its autonomous mode ($mode):"
+    printf '%s\n' \
+      "It may run commands, modify or delete files, install software, and access data available to your account." \
+      "Maslow OS does not read or store your provider credentials. Authentication stays with the provider."
+    echo
+    gum confirm --affirmative "I understand — continue" --negative "Cancel" "Allow this launch mode?" || exit 130
+  fi
+  mkdir -p "$state_dir"
+  chmod 0700 "$HOME/.local/state/maslow-os" "$state_dir" 2>/dev/null || true
+  tmp=$(mktemp "$state_dir/.$agent.XXXXXX")
+  jq -n --arg agent "$agent" --arg mode "$mode" --argjson disclosure "$disclosure_version" \
+    '{schemaVersion: 1, agent: $agent, launchMode: $mode, disclosureVersion: $disclosure, confirmedAt: (now | todateiso8601)}' >"$tmp"
+  chmod 0600 "$tmp"
+  mv "$tmp" "$state_file"
+  ;;
+reset)
+  [[ -n $agent ]] || { echo "Usage: omarchy-agent-trust reset <agent>" >&2; exit 1; }
+  [[ -e $state_file ]] || exit 0
+  rm "$state_file"
+  ;;
+*)
+  echo "Usage: omarchy-agent-trust <status|confirm|reset> <agent> [launch-mode]" >&2
+  exit 1
+  ;;
+esac

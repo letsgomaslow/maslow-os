@@ -1,6 +1,6 @@
 # System sleep
 
-Omarchy enables suspend and hibernation by default, but if you're having issues with either on your machine, you can toggle them off.
+Maslow OS enables suspend and hibernation by default. If either causes problems on your hardware, you can turn it off.
 
 ### Power profiles
 

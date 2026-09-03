@@ -1,10 +1,10 @@
 # Toggles, Idle & the Screensaver
 
-A lot of what you change day to day isn't really a setting. It's a mode you flip on for an hour and off again: night light while you're working late, do not disturb while you're presenting, stay awake while you're watching something. Omarchy calls those toggles, and they all work the same way — a hotkey, a menu entry, and a command, all hitting the same switch.
+A lot of what you change day to day isn't really a setting. It's a mode you flip on for an hour and off again: night light while you're working late, do not disturb while you're presenting, or stay awake while you're watching something. Maslow OS calls these toggles, and each one uses the same underlying switch whether you choose a hotkey, menu entry, or command.
 
 ### The toggle menu
 
-`Super + Ctrl + O` opens _Trigger > Toggle_ directly, or you can walk there from the Omarchy menu (`Super + Space`). Everything in that list is a switch you can flip without thinking about where the state lives.
+`Super + Ctrl + O` opens _Trigger > Toggle_ directly, or you can walk there from the Maslow OS menu (`Super + Space`). Everything in that list is a switch you can flip without thinking about where the state lives.
 
 From the terminal, the same switches are `omarchy toggle <thing>`. Run `omarchy toggle` on its own to see the whole group.
 
@@ -60,7 +60,7 @@ Then start hyprsunset at login by adding `o.launch_on_start("hyprsunset")` to `~
 
 Nothing is lost, though. A silenced notification is written straight into your notification history, which is exactly the record you want when you come back and wonder what you missed. Open it with `Super + Shift + Alt + ,`. See [notices](10-notices.md) for the rest of the notification story.
 
-Two kinds of message still get through: Omarchy's own confirmation toasts for something you just did ("Theme changed", "Screenshot saved"), and critical alerts sent from the command line. Chat apps that mark everything critical to force their way in front of you don't qualify.
+Two kinds of message still get through: Maslow OS confirmation toasts for something you just did ("Theme changed", "Screenshot saved"), and critical alerts sent from the command line. Chat apps that mark everything critical to force their way in front of you don't qualify.
 
 ### Idle
 
@@ -86,7 +86,7 @@ This is about locking and the screensaver, not power. Suspend and hibernation ha
 
 ### The screensaver
 
-Omarchy's screensaver is ASCII art running through random text effects, one instance per monitor. Any key or mouse movement exits it.
+The Maslow OS screensaver is ASCII art running through random text effects, one instance per monitor. Any key or mouse movement exits it.
 
 You can start it on demand from _System > Screensaver_ (`Super + Esc`), which forces it up even if you've turned the idle screensaver off. There's no hotkey bound to it by default.
 

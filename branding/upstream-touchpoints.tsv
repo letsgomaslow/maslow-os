@@ -1,0 +1,19 @@
+# path|surface|upstream collision risk|owner
+branding/product.json|Canonical product metadata|Low, additive downstream namespace|Maslow OS downstream maintainer
+branding/scripts/generate-assets|Generated visual identity|Low, downstream-owned generator|Maslow OS design systems
+default/fonts/omarchy/omarchy.ttf|Private glyph U+E90B|High, upstream font updates can replace or reindex glyphs|Maslow OS design systems
+default/plymouth|Boot and unlock presentation|High, settings-package updates own these files|Maslow OS downstream maintainer
+default/sddm/omarchy|Login presentation and accessibility|High, settings-package updates own this compatible theme ID|Maslow OS downstream maintainer
+default/wayland-sessions/omarchy.desktop|Session display name|Medium, compatible desktop filename remains upstream-owned|Maslow OS downstream maintainer
+default/omarchy/omarchy-menu.jsonc|Menu labels, support, About, AI route|High, upstream regularly edits package-owned defaults|Maslow OS product
+shell/plugins/maslow-ai-setup|First-login AI onboarding|Low, additive first-party plugin ID|Maslow OS product
+shell/plugins/bar/widgets/SystemUpdate*|Visible update status|Medium, upstream widget behavior changes can replace labels|Maslow OS product
+install/provisioning|Installer and owner-setup presentation|High, setup flow changes frequently upstream|Maslow OS product
+install/user/first-run/maslow-login-branding.hook|Post-update branding and SDDM repair|Medium, additive hook depends on update lifecycle|Maslow OS downstream maintainer
+migrations/1788365928.sh|Existing-install repair registration|Low, additive idempotent migration|Maslow OS downstream maintainer
+bin/omarchy-agent*|AI install, trust, selection, and launch|High, upstream agent launch modes change often|Maslow OS product
+bin/omarchy-update*|Visible update experience|High, upstream sequencing must remain unchanged|Maslow OS downstream maintainer
+default/themed/claude.json.tpl|Claude theme display name|Medium, upstream template changes can restore product label|Maslow OS design systems
+bin/omarchy-theme-set-obsidian|Obsidian theme metadata|Medium, compatible install path must remain unchanged|Maslow OS design systems
+etc/fastfetch/config.jsonc|About product and engine identity|Medium, upstream adds and changes modules|Maslow OS product
+manual|End-user product language|High, upstream documentation updates use Omarchy as product name|Maslow OS product

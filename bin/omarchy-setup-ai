@@ -1,0 +1,24 @@
+#!/bin/bash
+
+# omarchy:summary=Open guided Maslow OS AI setup
+# omarchy:args=[--first-login]
+# omarchy:examples=omarchy setup ai
+
+first_login=false
+if [[ ${1:-} == "--first-login" ]]; then
+  first_login=true
+  shift
+fi
+(($# == 0)) || { echo "Usage: omarchy-setup-ai [--first-login]" >&2; exit 1; }
+
+if [[ $first_login == "true" ]]; then
+  state=$(omarchy-setup-ai-state show) || exit $?
+  [[ $(jq -r '.completedAt != null or .deferred' <<<"$state") == "false" ]] || exit 0
+else
+  state=$(omarchy-setup-ai-state show) || exit $?
+  if [[ $(jq -r '.completedAt != null' <<<"$state") == "true" ]]; then
+    omarchy-setup-ai-state reset
+  fi
+fi
+
+exec omarchy-shell shell summon maslow.ai-setup '{}'

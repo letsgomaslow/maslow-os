@@ -1,8 +1,8 @@
 # Browsers
 
-Omarchy ships with [Chromium](https://www.chromium.org/) as the default browser. It's the plain open-source build, themed to match the rest of your system, and it's what `Super + Shift + Return` opens and what every [web app](25-web-apps.md) runs inside.
+Maslow OS ships with [Chromium](https://www.chromium.org/) as the default browser. It is the plain open-source build, themed to match the rest of the system, and it opens with `Super + Shift + Return`. Every [web app](25-web-apps.md) also runs inside it.
 
-If Chromium isn't your taste, you're not stuck with it. Under _Install > Browser_ in the Omarchy menu you'll find Chrome, Edge, Brave, Brave Origin, Firefox, and [Zen](https://zen-browser.app/). Pick one and Omarchy installs it, sets up its policy directory, and applies your current theme to it.
+If Chromium isn't your taste, you're not stuck with it. Under _Install > Browser_ in the Maslow OS menu you'll find Chrome, Edge, Brave, Brave Origin, Firefox, and [Zen](https://zen-browser.app/). Pick one and Omarchy installs it, sets up its policy directory, and applies your current theme to it.
 
 ## Making one the default
 
