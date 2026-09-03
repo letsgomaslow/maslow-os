@@ -74,6 +74,8 @@ assert_contains default/fonts/omarchy/README.md 'U+E900` — Omarchy' "Omarchy c
 assert_contains default/sddm/omarchy/Main.qml 'Accessible.name' "login screen provides accessible names"
 assert_contains default/sddm/omarchy/Main.qml 'Accessible.AlertMessage' "login screen exposes live status alerts"
 assert_contains default/sddm/omarchy/Main.qml 'Qt.Key_F5' "login screen provides spoken-login toggle"
+assert_contains etc/limine-entry-tool.d/omarchy-defaults.conf 'TARGET_OS_NAME="Maslow OS"' "boot entries identify Maslow OS"
+assert_contains install/user/first-run/wifi.sh '"Maslow OS Update" "Click to update Maslow OS."' "first-login update notice identifies Maslow OS"
 assert_contains shell/plugins/maslow-ai-setup/manifest.json '"id": "maslow.ai-setup"' "guided AI setup uses stable first-party plugin ID"
 assert_contains bin/omarchy-agent-trust 'disclosure_version=1' "agent permission disclosure is versioned"
 assert_contains DOWNSTREAM.md '/usr/bin/omarchy*' "Omarchy command compatibility is documented"
