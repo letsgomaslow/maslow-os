@@ -68,6 +68,7 @@ Item {
 
   function saveStep(next) {
     step = next
+    root.focusCurrentStep()
     stateWriteProc.command = ["omarchy-setup-ai-state", "step", String(next)]
     stateWriteProc.running = true
   }
@@ -75,6 +76,7 @@ Item {
   function chooseAgent(agent) {
     selectedAgent = agent
     step = 3
+    root.focusCurrentStep()
     stateWriteProc.command = ["omarchy-setup-ai-state", "select", agent]
     stateWriteProc.running = true
   }

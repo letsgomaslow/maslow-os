@@ -123,6 +123,8 @@ grep -Fq "alias cy='omarchy-agent --inline --agent codex'" "$ROOT/default/bash/a
 grep -Fq 'It may run commands, modify or delete files, install software' "$ROOT/shell/plugins/maslow-ai-setup/Panel.qml" || fail "AI panel omits the permission disclosure"
 grep -Fq 'Finish without an agent' "$ROOT/shell/plugins/maslow-ai-setup/Panel.qml" || fail "AI panel omits a no-agent completion path"
 grep -Fq 'root.focusCurrentStep()' "$ROOT/shell/plugins/maslow-ai-setup/Panel.qml" || fail "AI panel does not focus its current step after opening"
+(( $(grep -Fc 'root.focusCurrentStep()' "$ROOT/shell/plugins/maslow-ai-setup/Panel.qml") >= 3 )) ||
+  fail "AI panel does not move focus when its current step changes"
 if grep -Fq 'requestActivate()' "$ROOT/shell/plugins/maslow-ai-setup/Panel.qml"; then
   fail "AI panel calls an unsupported FloatingWindow focus method"
 fi
