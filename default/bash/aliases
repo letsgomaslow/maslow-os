@@ -44,9 +44,9 @@ alias ....='cd ../../..'
 
 # Tools
 alias a='omarchy-agent --inline'
-alias c='opencode --auto'
-alias cx='printf "\033[2J\033[3J\033[H" && claude --permission-mode auto'
-alias cy='codex --approve-for-me'
+alias c='omarchy-agent --inline --agent opencode'
+alias cx='omarchy-agent --inline --agent claude'
+alias cy='omarchy-agent --inline --agent codex'
 alias d='docker'
 alias r='rails'
 alias t='tmux attach || tmux new -s Work'

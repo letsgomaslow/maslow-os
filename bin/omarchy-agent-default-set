@@ -1,0 +1,22 @@
+#!/bin/bash
+
+# omarchy:summary=Select an installed AI agent as the default
+# omarchy:hidden=true
+
+source "$OMARCHY_PATH/install/helpers/agent.sh"
+
+if ! omarchy_agent_resolve "${1:-}"; then
+  echo "Usage: omarchy-agent-default-set <agent>" >&2
+  exit 1
+fi
+if ! omarchy_agent_is_installed; then
+  echo "$OMARCHY_AGENT_NAME is not installed." >&2
+  exit 1
+fi
+
+agent_file="$HOME/.config/omarchy/defaults/agent"
+mkdir -p "$(dirname "$agent_file")"
+tmp=$(mktemp "$(dirname "$agent_file")/.agent.XXXXXX")
+printf '%s\n' "$OMARCHY_AGENT_ID" >"$tmp"
+chmod 0600 "$tmp"
+mv "$tmp" "$agent_file"

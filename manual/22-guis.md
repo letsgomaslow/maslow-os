@@ -40,7 +40,7 @@ You start Aether via the application launcher (`Super + Space`).
 
 [LocalSend](https://localsend.org/) lets you send files to other devices on the same network running the app, like Apple's AirDrop. It's cross-platform, though, so you can send files to and from Windows, macOS, Android, iOS, and of course Linux.
 
-You can open the Share menu on `Super + Ctrl + S` or under _Trigger > Share_ in the Omarchy menu. It gives you four options:
+You can open the Share menu on `Super + Ctrl + S` or under _Trigger > Share_ in the Maslow OS menu. It gives you four options:
 
 - **Clipboard** sends whatever you've copied as a text file. Great for getting a link or a snippet onto your phone without emailing yourself.
 - **File** opens a file picker where you can select several at once.
@@ -51,7 +51,7 @@ The same thing works from the terminal with `omarchy share clipboard`, `omarchy 
 
 You can also send straight from the file manager: right-click any selection in Nautilus and pick _Send via LocalSend_.
 
-Omarchy's firewall is closed by default except for LocalSend's port, so this works out of the box on a fresh install. See [security](48-security.md).
+The Maslow OS firewall is closed by default except for LocalSend's port, so this works on a fresh install. See [security](48-security.md).
 
 ## LibreOffice
 
@@ -69,7 +69,7 @@ You start Omacalc with `Super + Ctrl + Q` (or the calculator key, if your keyboa
 
 [Signal](https://signal.org/) is the pioneer of E2E encrypted messaging, and a great communication option for anyone who'd prefer not to go through one of the big tech conglomerates.
 
-You start Signal with `Super + Shift + G`. It's not part of the base install, so the first time you hit that, Omarchy will offer to install it for you (it's also under _Install > Service_ in the Omarchy menu).
+You start Signal with `Super + Shift + G`. It's not part of the base install, so the first time you hit that, Omarchy will offer to install it for you (it's also under _Install > Service_ in the Maslow OS menu).
 
 ## mpv
 

@@ -24,7 +24,7 @@ assert_contains() {
 }
 
 for file in \
-  maslow-version NOTICE DOWNSTREAM.md branding/design-tokens.json \
+  maslow-version NOTICE DOWNSTREAM.md branding/design-tokens.json branding/product.json \
   branding/logos/maslow-mark-gradient.svg branding/fonts/manrope/OFL.txt \
   branding/wallpapers/maslow-wallpaper-collage.png \
   themes/maslow-dark/colors.toml themes/maslow-dark/hyprland.lua \
@@ -34,14 +34,18 @@ for file in \
 done
 pass "required Maslow OS sources exist"
 
-[[ $(<"$ROOT/maslow-version") == "0.1.0-preview.1" ]] || fail "unexpected Maslow OS version"
+manifest_version=$(jq -r '.product.version' "$ROOT/branding/product.json")
+[[ $(<"$ROOT/maslow-version") == "$manifest_version" ]] || fail "Maslow OS version differs from the product manifest"
 pass "Maslow OS version is pinned"
 
 assert_contains README.md "Maslow OS is based on" "README preserves Omarchy attribution"
 assert_contains install/provisioning/setup-form.sh "OMARCHY_HOSTNAME_DEFAULT='maslow-os'" "setup defaults to a Maslow OS hostname"
 assert_contains install/provisioning/setup-form.sh "return for 'maslow-os'" "setup hostname hint uses Maslow OS"
-assert_contains branding/scripts/generate-assets '"MASLOW | OS"' "login artwork uses the Maslow OS lockup"
+assert_contains branding/scripts/generate-assets "'.product.name'" "login artwork consumes the canonical Maslow OS product name"
 assert_contains migrations/1788337736.sh "maslow-login-branding.hook" "updates preserve the Maslow login default"
+assert_contains migrations/1788365928.sh "maslow-login-branding.hook" "existing installations immediately register branding repair"
+assert_contains migrations/1788395901.sh "Label existing Limine boot entries as Maslow OS" "existing installations repair their visible boot entry"
+assert_contains install/user/maslow-login-branding.sh "omarchy-hook-install post-update" "fresh installations register branding repair"
 assert_contains bin/omarchy-migrate-notify "Pending Maslow OS Migrations" "migration notice uses Maslow OS"
 assert_contains default/hypr/bindings/utilities.lua '"Maslow OS menu"' "keybinding hint uses Maslow OS"
 assert_contains shell/plugins/menu/manifest.json '"name": "Maslow OS menu"' "shell menu metadata uses Maslow OS"
@@ -65,7 +69,18 @@ assert_contains install/user/theme.sh 'omarchy-theme-set "Maslow Dark"' "Maslow 
 assert_contains default/omarchy/omarchy-menu.jsonc '"label":"Reduced Motion"' "Reduced Motion is visible in the menu"
 assert_contains default/omarchy/omarchy-menu.jsonc 'omarchy-hyprland-toggle reduced-motion' "Reduced Motion uses the persistent Hyprland toggle"
 assert_contains bin/omarchy-theme-set 'background setInstant' "Reduced Motion uses instant background application"
-assert_contains etc/fastfetch/config.jsonc 'Maslow OS $maslow · Omarchy engine $engine' "About displays product and engine versions"
+assert_contains etc/fastfetch/config.jsonc 'omarchy-branding-product product.name' "About consumes canonical product metadata"
+assert_contains default/fonts/omarchy/README.md 'U+E90B` — Maslow OS' "Maslow mark uses additive private glyph U+E90B"
+assert_contains default/fonts/omarchy/README.md 'U+E900` — Omarchy' "Omarchy compatibility glyph remains U+E900"
+assert_contains default/sddm/omarchy/Main.qml 'Accessible.name' "login screen provides accessible names"
+assert_contains default/sddm/omarchy/Main.qml 'Accessible.AlertMessage' "login screen exposes live status alerts"
+assert_contains default/sddm/omarchy/Main.qml 'Qt.Key_F5' "login screen provides spoken-login toggle"
+assert_contains default/sddm/omarchy/Main.qml 'import QtQuick.Controls as QQC2' "login screen isolates Qt Quick Controls from SDDM component names"
+assert_contains default/sddm/omarchy/Main.qml 'QQC2.Button {' "login button uses the Qt Quick Controls implementation"
+assert_contains etc/limine-entry-tool.d/omarchy-defaults.conf 'TARGET_OS_NAME="Maslow OS"' "boot entries identify Maslow OS"
+assert_contains install/user/first-run/wifi.sh '"Maslow OS Update" "Click to update Maslow OS."' "first-login update notice identifies Maslow OS"
+assert_contains shell/plugins/maslow-ai-setup/manifest.json '"id": "maslow.ai-setup"' "guided AI setup uses stable first-party plugin ID"
+assert_contains bin/omarchy-agent-trust 'disclosure_version=1' "agent permission disclosure is versioned"
 assert_contains DOWNSTREAM.md '/usr/bin/omarchy*' "Omarchy command compatibility is documented"
 
 wallpaper_names=(01-mountain-sunrise.webp 02-canyon-storm.webp 03-aurora-lake.webp 04-spiral-galaxy.webp)
@@ -145,7 +160,7 @@ def png_info(path):
     width, height, depth, color_type = struct.unpack(">IIBB", data[16:26])
     return width, height, depth, color_type
 
-def png_has_transparent_pixel(path):
+def png_alpha_bounds(path):
     data = path.read_bytes()
     width, height, depth, color_type = png_info(path)
     if depth != 8 or color_type != 6:
@@ -167,7 +182,11 @@ def png_has_transparent_pixel(path):
     cursor = 0
     has_clear = False
     has_visible = False
-    for _ in range(height):
+    min_x = width
+    min_y = height
+    max_x = 0
+    max_y = 0
+    for y in range(height):
         filter_type = raw[cursor]
         cursor += 1
         row = bytearray(raw[cursor:cursor + stride])
@@ -192,7 +211,17 @@ def png_has_transparent_pixel(path):
         alphas = row[3::4]
         has_clear = has_clear or any(alpha < 255 for alpha in alphas)
         has_visible = has_visible or any(alpha > 0 for alpha in alphas)
+        for x, alpha in enumerate(alphas):
+            if alpha > 0:
+                min_x = min(min_x, x)
+                min_y = min(min_y, y)
+                max_x = max(max_x, x + 1)
+                max_y = max(max_y, y + 1)
         previous = row
+    return has_clear, has_visible, (min_x, min_y, max_x, max_y)
+
+def png_has_transparent_pixel(path):
+    has_clear, has_visible, _ = png_alpha_bounds(path)
     return has_clear and has_visible
 
 def webp_size(path):
@@ -241,6 +270,19 @@ for relative in ("icon.png", "default/plymouth/logo.png", "default/sddm/omarchy/
     if not png_has_transparent_pixel(root / relative):
         fail(f"{relative} does not contain both transparent and visible pixels")
 print("ok - visible logo PNGs carry real alpha channels")
+
+for relative in (
+    "themes/maslow-dark/unlock.png",
+    "themes/maslow-light/unlock.png",
+    "default/plymouth/logo.png",
+    "default/sddm/omarchy/logo.png",
+):
+    width, height, _, _ = png_info(root / relative)
+    _, _, bounds = png_alpha_bounds(root / relative)
+    content_center_x = (bounds[0] + bounds[2]) / 2
+    if abs(content_center_x - width / 2) > 1:
+        fail(f"{relative} visible lockup is {content_center_x - width / 2:.1f}px off center")
+print("ok - graphical lockups center their visible content")
 PY
 
 pass "Maslow OS brand validation passed"

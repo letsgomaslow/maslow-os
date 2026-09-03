@@ -1,4 +1,6 @@
-# Omarchy on...
+# Unsupported Omarchy engine ports
+
+Maslow OS releases target x86_64. The links below are community experiments for running or adapting the upstream Omarchy engine on other hardware and virtualization platforms; they are not Maslow OS installers, support commitments, or release targets.
 
 ### Apple M1/M2 chips
 

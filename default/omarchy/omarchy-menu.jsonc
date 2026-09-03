@@ -29,7 +29,7 @@
   "install": {"icon":"󰉉","label":"Install"},
   "remove": {"icon":"󰭌","label":"Remove","aliases":["uninstall"]},
   "update": {"icon":"","label":"Update","aliases":["restart","refresh"]},
-  "about": {"icon":"","label":"About","action":"omarchy-launch-about"},
+  "about": {"icon":"","iconFont":"omarchy","label":"About Maslow OS","action":"omarchy-launch-about"},
   "system": {"icon":"","label":"System","aliases":["power-menu"]},
 
   // System
@@ -43,14 +43,15 @@
 
   // Learn
   "learn.keybindings": {"icon":"","label":"Keybindings","action":"omarchy-menu-keybindings"},
-  "learn.omarchy": {"icon":"","label":"Maslow OS","action":"omarchy-launch-webapp 'https://github.com/letsgomaslow/maslow-os/tree/maslow/manual'"},
+  "learn.omarchy": {"icon":"","iconFont":"omarchy","label":"Maslow OS Guide","action":"omarchy-launch-webapp 'https://github.com/letsgomaslow/maslow-os/tree/main/manual'"},
   "learn.hyprland": {"icon":"","label":"Hyprland","action":"omarchy-launch-webapp 'https://wiki.hypr.land/'"},
   "learn.arch": {"icon":"󰣇","label":"Arch","action":"omarchy-launch-webapp 'https://wiki.archlinux.org/title/Main_page'"},
   "learn.neovim": {"icon":"","label":"Neovim","action":"omarchy-launch-webapp 'https://www.lazyvim.org/keymaps'"},
   "learn.bash": {"icon":"󱆃","label":"Bash","action":"omarchy-launch-webapp 'https://devhints.io/bash'"},
   "learn.tmux-keybindings": {"icon":"","label":"Tmux","action":"omarchy-menu-tmux-keybindings"},
   "learn.herdr-keybindings": {"icon":"","label":"Herdr","action":"omarchy-menu-herdr-keybindings"},
-  "learn.community": {"icon":"󰙯","label":"Community","action":"omarchy-launch-discord-community"},
+  "learn.community": {"icon":"󰙯","label":"Omarchy Community — engine support","action":"omarchy-launch-discord-community"},
+  "learn.support": {"icon":"","label":"Maslow OS Support","action":"omarchy-launch-webapp 'https://github.com/letsgomaslow/maslow-os/issues'"},
 
   // Trigger
   "trigger.emoji": {"icon":"","label":"Emoji","aliases":["emoji","emojis"],"action":"omarchy-menu-emoji"},
@@ -104,7 +105,7 @@
   // Style
   "style.theme": {"icon":"󰸌","label":"Theme","aliases":["theme","themes"],"action":"theme=$(omarchy-theme-switcher); [[ -n $theme ]] && omarchy-theme-set \"$theme\""},
   "style.background": {"icon":"","label":"Background","aliases":["background","wallpaper"],"action":"background=$(omarchy-theme-bg-switcher); [[ -n $background ]] && omarchy-theme-bg-set \"$background\""},
-  "style.unlock": {"icon":"󰟵","label":"Unlock","aliases":["unlock"],"action":"unlock=$(omarchy-plymouth-switcher); if [[ $unlock == default ]]; then omarchy-launch-floating-terminal-with-presentation omarchy-plymouth-reset; elif [[ -n $unlock ]]; then omarchy-launch-floating-terminal-with-presentation \"omarchy-plymouth-set-by-theme $(printf %q \"$unlock\")\"; fi"},
+  "style.unlock": {"icon":"󰟵","label":"Unlock","aliases":["unlock"],"action":"unlock=$(omarchy-plymouth-switcher); if [[ $unlock == default ]]; then omarchy-launch-floating-terminal-with-presentation omarchy-plymouth-reset; elif [[ -n $unlock ]]; then omarchy-launch-floating-terminal-with-presentation omarchy-plymouth-set-by-theme \"$unlock\"; fi"},
   "style.font": {"icon":"","label":"Font","provider":"fonts"},
   "style.bar": {"icon":"󰍜","label":"Menu Bar"},
   "style.bar.position": {"icon":"","label":"Position"},
@@ -125,6 +126,7 @@
 
   // Setup
   "setup.monitors": {"icon":"󰍹","label":"Monitors","action":"omarchy-launch-config-editor \"$HOME/.config/hypr/monitors.lua\""},
+  "setup.ai": {"icon":"󰚩","label":"AI","title":"Maslow OS AI Setup","action":"omarchy-setup-ai"},
   "setup.keybindings": {"icon":"","label":"Keybindings","when":"[[ -f ~/.config/hypr/bindings.lua ]]","action":"omarchy-launch-config-editor \"$HOME/.config/hypr/bindings.lua\""},
   "setup.input": {"icon":"","label":"Input","when":"[[ -f ~/.config/hypr/input.lua ]]","action":"omarchy-launch-config-editor \"$HOME/.config/hypr/input.lua\""},
   "setup.network": {"icon":"󰛳","label":"Network","aliases":["network"]},
@@ -241,7 +243,7 @@
   "install.ai.chatgpt": {"icon":"","iconFont":"omarchy","label":"ChatGPT Desktop","disabled":"omarchy-pkg-present openai-codex-desktop","action":"omarchy-launch-floating-terminal-with-presentation omarchy-install-ai-chatgpt"},
   "install.ai.dictation": {"icon":"","label":"Dictation","disabled":"omarchy-pkg-present voxtype-bin","action":"omarchy-launch-floating-terminal-with-presentation omarchy-voxtype-install"},
   "install.ai.grok-bot": {"icon":"","iconFont":"omarchy","label":"Grok Bot","disabled":"omarchy-pkg-present grok-bot","action":"omarchy-install-and-launch 'Grok Bot' grok-bot grok-bot"},
-  "install.ai.hermes": {"icon":"","iconFont":"omarchy","label":"Hermes Desktop","disabled":"omarchy-pkg-present hermes-desktop","action":"omarchy-launch-floating-terminal-with-presentation omarchy-install-ai-hermes"},
+  "install.ai.hermes": {"icon":"","iconFont":"omarchy","label":"Hermes Desktop","when":"omarchy-pkg-available hermes-desktop","disabled":"omarchy-pkg-present hermes-desktop","action":"omarchy-launch-floating-terminal-with-presentation omarchy-install-ai-hermes"},
   "install.ai.lm-studio": {"icon":"","iconFont":"omarchy","label":"LM Studio","disabled":"omarchy-pkg-present lmstudio-bin","action":"omarchy-install-app 'LM Studio' lmstudio-bin"},
   "install.ai.ollama": {"icon":"","iconFont":"omarchy","label":"Ollama","disabled":"omarchy-cmd-present ollama","action":"if omarchy-cmd-present nvidia-smi; then ollama_pkg=ollama-cuda; elif omarchy-cmd-present rocminfo; then ollama_pkg=ollama-rocm; else ollama_pkg=ollama; fi; omarchy-install-app Ollama \"$ollama_pkg\""},
   "install.ai.t3-code": {"icon":"","iconFont":"omarchy","label":"T3 Code","disabled":"omarchy-pkg-present t3code-bin","action":"omarchy-install-and-launch 'T3 Code' t3code-bin t3code"},

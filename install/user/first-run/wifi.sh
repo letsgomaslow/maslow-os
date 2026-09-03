@@ -1,5 +1,5 @@
 notify_update() {
-  omarchy-notification-send -u critical -g  "Update System" "Click to update the system." \
+  omarchy-notification-send -u critical -g  "Maslow OS Update" "Click to update Maslow OS." \
     --exec omarchy-launch-floating-terminal-with-presentation omarchy-update
 }
 

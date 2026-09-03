@@ -24,6 +24,12 @@
 OMARCHY_FORM_BACK=1
 OMARCHY_FORM_SIGNAL=130
 
+omarchy_form_speak() {
+  if declare -F maslow_console_speak >/dev/null; then
+    maslow_console_speak "$*"
+  fi
+}
+
 # The English layouts lead, then everything else alphabetically. gum choose
 # paginates in --height-sized pages and jumps to the page holding --selected,
 # so an alphabetical English (US) landed deep enough to sit alone at the edge
@@ -93,6 +99,7 @@ omarchy_username_taken() { return 1; }
 
 omarchy_prompt_keyboard() {
   local choice status
+  omarchy_form_speak "Select keyboard layout."
   choice=$(printf '%s\n' "$OMARCHY_KEYBOARD_LAYOUTS" | cut -d'|' -f1 |
     gum choose --height 10 --selected "English (US)" --header "Select keyboard layout") && status=0 || status=$?
   ((status == 0)) || return $status
@@ -104,7 +111,8 @@ omarchy_prompt_keyboard() {
 omarchy_prompt_username() {
   local status
   while true; do
-    username=$(gum input --placeholder "Alphanumeric without spaces (like dhh)" --prompt.foreground="#845DF9" --prompt "Username> ") && status=0 || status=$?
+    omarchy_form_speak "Choose a username."
+    username=$(gum input --placeholder "Lowercase letters and numbers without spaces" --prompt.foreground="${MASLOW_GUM_PROMPT_FOREGROUND:-2}" --prompt "Username> ") && status=0 || status=$?
     ((status == 0)) || return $status
 
     if [[ "$username" =~ $OMARCHY_USERNAME_PATTERN ]]; then
@@ -124,9 +132,11 @@ omarchy_prompt_username() {
 omarchy_prompt_password() {
   local status
   while true; do
-    password=$(gum input --placeholder "Used for user + root, and disk encryption when enabled" --prompt.foreground="#845DF9" --password --prompt "Password> ") && status=0 || status=$?
+    omarchy_form_speak "Enter your password. The password itself will never be spoken."
+    password=$(gum input --placeholder "Used for user + root, and disk encryption when enabled" --prompt.foreground="${MASLOW_GUM_PROMPT_FOREGROUND:-2}" --password --prompt "Password> ") && status=0 || status=$?
     ((status == 0)) || return $status
-    password_confirmation=$(gum input --placeholder "Must match the password you just typed" --prompt.foreground="#845DF9" --password --prompt "Confirm> ") && status=0 || status=$?
+    omarchy_form_speak "Confirm your password."
+    password_confirmation=$(gum input --placeholder "Must match the password you just typed" --prompt.foreground="${MASLOW_GUM_PROMPT_FOREGROUND:-2}" --password --prompt "Confirm> ") && status=0 || status=$?
     ((status == 0)) || return $status
 
     if [[ -n "$password" && "$password" == "$password_confirmation" ]]; then
@@ -143,16 +153,19 @@ omarchy_prompt_password() {
 # only Esc/Ctrl+C end the prompt early.
 omarchy_prompt_identity() {
   local status
-  full_name=$(gum input --placeholder "Used for git authentication (hit return to skip)" --prompt.foreground="#845DF9" --prompt "Full name> ") && status=0 || status=$?
+  omarchy_form_speak "Enter the name used to attribute your Git commits, or press Enter to skip."
+  full_name=$(gum input --placeholder "Used to attribute git commits (press return to skip)" --prompt.foreground="${MASLOW_GUM_PROMPT_FOREGROUND:-2}" --prompt "Full name> ") && status=0 || status=$?
   ((status == 0)) || return $status
-  email_address=$(gum input --placeholder "Used for git authentication (hit return to skip)" --prompt.foreground="#845DF9" --prompt "Email address> ") && status=0 || status=$?
+  omarchy_form_speak "Enter the email used to attribute your Git commits, or press Enter to skip."
+  email_address=$(gum input --placeholder "Used to attribute git commits (press return to skip)" --prompt.foreground="${MASLOW_GUM_PROMPT_FOREGROUND:-2}" --prompt "Email address> ") && status=0 || status=$?
   return $status
 }
 
 omarchy_prompt_hostname() {
   local status
   while true; do
-    hostname=$(gum input --placeholder "Letters, digits, and dashes (or return for 'maslow-os')" --prompt.foreground="#845DF9" --prompt "Hostname> ") && status=0 || status=$?
+    omarchy_form_speak "Choose a computer name, or press Enter for Maslow OS."
+    hostname=$(gum input --placeholder "Letters, digits, and dashes (or return for 'maslow-os')" --prompt.foreground="${MASLOW_GUM_PROMPT_FOREGROUND:-2}" --prompt "Hostname> ") && status=0 || status=$?
     ((status == 0)) || return $status
 
     if [[ -z $hostname ]]; then
@@ -170,6 +183,7 @@ omarchy_prompt_hostname() {
 # often; guard it or a `set -e` caller dies before the filter fallback.
 omarchy_prompt_timezone() {
   local guess status
+  omarchy_form_speak "Select your timezone."
   guess=$(tzupdate -p 2>/dev/null) || guess=""
 
   if [[ -n $guess ]]; then

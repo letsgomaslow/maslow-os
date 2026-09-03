@@ -1,18 +1,23 @@
 #!/bin/bash
 
-# omarchy:summary=Prompt for confirmation before starting an update
+# omarchy:summary=Confirm a Maslow OS update
+
+maslow_releases=$(omarchy-branding-product links.releases)
+engine_releases=$(omarchy-branding-product links.engineReleases)
 
 gum style --border normal --padding "1 2" \
-  "Ready to update?" \
+  "Maslow OS Update" \
   "" \
-  "• You cannot stop the update once you start!" \
+  "This can include Maslow presentation, the Omarchy engine, and system packages." \
+  "• Do not stop the update once it starts" \
   "• Make sure you're connected to power or have a full battery" \
   "" \
-  "What's new: https://github.com/basecamp/omarchy/releases/latest"
+  "Maslow OS release notes: $maslow_releases" \
+  "Omarchy engine notes: $engine_releases"
 
 echo
 
-if ! gum confirm "Continue with update?"; then
-  echo "Update cancelled"
+if ! gum confirm "Continue with Maslow OS Update?"; then
+  echo "Maslow OS Update canceled"
   exit 1
 fi

@@ -129,7 +129,7 @@ pass "disk-space threshold includes the exact boundary"
 
 rm -f "$snapshot_marker" "$gum_marker"
 GUM_STATUS=0 TEST_AVAILABLE_BYTES=$((10 * 1024 * 1024 * 1024)) run_update >/dev/null
-grep -q "confirm Continue with update?" "$gum_marker" ||
+grep -q "confirm Continue with Maslow OS Update?" "$gum_marker" ||
   fail "interactive update with enough space uses the normal confirmation prompt"
 [[ -f $snapshot_marker ]] || fail "accepting the normal confirmation starts the update"
 pass "interactive update keeps the normal confirmation prompt when space is sufficient"

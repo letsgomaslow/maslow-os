@@ -31,5 +31,23 @@ fi
 if grep -F 'skip-first-run-update-notification' "$ROOT/install/user/first-run/wifi.sh" >/dev/null; then
   fail "first-run does not track update notifications separately"
 fi
+grep -F '"Maslow OS Update" "Click to update Maslow OS."' "$ROOT/install/user/first-run/wifi.sh" >/dev/null ||
+  fail "first-run update notification does not identify Maslow OS"
 
 pass "first-run uses one lifecycle completion marker"
+
+optional_marker="$test_tmp/optional-failures"
+if ! (
+  export HOME="$test_tmp/home"
+  export OMARCHY_INSTALL="$ROOT/install"
+  export MASLOW_OPTIONAL_FAILURE_FILE="$optional_marker"
+  run_logged() {
+    [[ $1 != *"fix-audio-mixer.sh" ]]
+  }
+  source "$ROOT/install/user/all.sh"
+); then
+  fail "optional user setup failures do not block core finalization"
+fi
+grep -Fq 'fix-audio-mixer.sh' "$optional_marker" || fail "optional user setup failures are not recorded for retry"
+[[ $(stat -c %a "$optional_marker" 2>/dev/null || stat -f %Lp "$optional_marker") == 600 ]] || fail "optional failure state is not private"
+pass "optional user setup failures remain retryable without blocking the desktop"
