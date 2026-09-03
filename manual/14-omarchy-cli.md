@@ -1,6 +1,6 @@
-# Omarchy CLI
+# Maslow OS CLI
 
-Omarchy is usually controlled through the hotkeys and the Omarchy menu (`Super + Space`). But you can also control it through the `omarchy` CLI. This is particularly helpful when you're having an AI agent work with you on customization or configuration.
+Maslow OS is usually controlled through the hotkeys and the Maslow OS menu (`Super + Space`). The compatible engine retains the literal `omarchy` CLI, package names, and paths so upstream tools and extensions continue to work. The CLI is particularly helpful when you're having an AI agent work with you on customization or configuration.
 
 The CLI has access to all the internal tooling that is used both via the menu and otherwise. You can see everything that's available by running `omarchy` in the terminal.
 
@@ -8,7 +8,7 @@ It looks something like this:
 
 ```
 ~ ❯ omarchy
-Omarchy command center
+Maslow OS command center
 
 Usage:
   omarchy <command> [args...]
@@ -17,7 +17,7 @@ Usage:
   omarchy <group> <command> --help
 
 Common commands:
-  omarchy update              Update Omarchy and system packages
+  omarchy update              Update Maslow OS and system packages
   omarchy theme list          List available themes
   omarchy theme set <name>    Apply a theme
   omarchy font list           List available fonts
@@ -27,7 +27,7 @@ Common commands:
 Groups:
   agent          AI coding agent usage data
   audio          Audio input and output controls
-  bar            Omarchy shell bar layout and settings
+  bar            Maslow OS bar layout and settings
   battery        Battery status helpers
   bluetooth      Bluetooth device controls
   branch         Omarchy git branch management
@@ -59,4 +59,4 @@ Every command takes `--help` too, whether you ask a whole group (`omarchy captur
 
 ### Opening the menu from the terminal
 
-The Omarchy menu is scriptable as well, which is handy for your own keybindings. `omarchy menu` opens it at the root, and you can jump straight to any point in the tree by naming it: `omarchy menu summon style.theme` goes right to the theme picker, `omarchy menu toggle system` opens the system menu and closes it again if it's already up, and `omarchy menu close` puts it away.
+The Maslow OS menu is scriptable as well, which is handy for your own keybindings. `omarchy menu` opens it at the root, and you can jump straight to any point in the tree by naming it: `omarchy menu summon style.theme` goes right to the theme picker, `omarchy menu toggle system` opens the system menu and closes it again if it's already up, and `omarchy menu close` puts it away.

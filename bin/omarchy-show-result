@@ -1,0 +1,33 @@
+#!/bin/bash
+
+# omarchy:summary=Display the real result of a terminal workflow
+# omarchy:args=<exit-status>
+# omarchy:hidden=true
+
+set -euo pipefail
+
+status=${1:?Usage: omarchy-show-result <exit-status>}
+if [[ ! $status =~ ^[0-9]+$ ]]; then
+  echo "Exit status must be numeric: $status" >&2
+  exit 2
+fi
+
+(( status == 130 )) && exit 130
+
+# Opening the terminal is the only reliable proof that a visible terminal is
+# available. Non-interactive callers still receive the original status.
+if ! : 2>/dev/null <>/dev/tty; then
+  exit "$status"
+fi
+
+while read -rsn 1 -t 0.1 _ </dev/tty; do :; done
+
+if (( status == 0 )); then
+  printf '\n\033[32m● \033[0mDone. Press any key to close...' >/dev/tty
+else
+  printf '\n\033[31m● \033[0mNeeds attention. Command exited with status %d. Press any key to close...' "$status" >/dev/tty
+fi
+
+read -rsn 1 </dev/tty
+echo >/dev/tty
+exit "$status"

@@ -1,13 +1,25 @@
 #!/bin/bash
 
-# omarchy:summary=Launch a floating terminal with the Omarchy presentation wrapper
+# omarchy:summary=Launch a floating terminal with the Maslow OS presentation wrapper
 # omarchy:args=<command>
 
 # Export the current theme's gum styling so gum widgets match the active theme
 # even after a theme switch (the inherited environment is captured at login).
 source omarchy-restart-gum
 
-cmd="$*"
-presentation_script="omarchy-show-logo; $cmd; if (( \$? != 130 )); then omarchy-show-done; fi"
+if (( $# == 0 )); then
+  echo "Usage: omarchy-launch-floating-terminal-with-presentation <command>" >&2
+  exit 2
+fi
 
-exec setsid uwsm-app -- xdg-terminal-exec --app-id=org.omarchy.terminal --title=Omarchy -e bash -c "$presentation_script"
+# Existing menu/plugin integrations sometimes pass one already-quoted shell
+# command. Preserve that compatibility shape; new callers pass argv elements,
+# which are escaped here and never reparsed as source.
+if (( $# == 1 )); then
+  command="$1"
+else
+  printf -v command '%q ' "$@"
+fi
+presentation_script="omarchy-show-logo; $command; status=\$?; omarchy-show-result \"\$status\"; exit \"\$status\""
+
+exec setsid uwsm-app -- xdg-terminal-exec --app-id=org.omarchy.terminal --title="Maslow OS" -e bash -c "$presentation_script"

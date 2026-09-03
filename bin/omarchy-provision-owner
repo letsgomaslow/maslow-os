@@ -33,10 +33,9 @@ fi
 
 export PATH="$OMARCHY_PATH/bin:$PATH"
 
-# The shared setup form — the same questions, prompts, and validation the ISO
-# configurator's user step asks. The ISO vendors this very file out of the
-# runtime package it bundles, so an install and the first boot that finishes it
-# can never offer different layouts or accept different usernames.
+# The shared presentation and setup form keep the ISO and first-boot owner flow
+# on the same Maslow identity, accessibility settings, prompts, and validation.
+source "$OMARCHY_PATH/install/provisioning/maslow-console-brand.sh"
 source "$OMARCHY_PATH/install/provisioning/setup-form.sh"
 
 # Unlike a fresh install target, this machine already has accounts; a pinned
@@ -96,15 +95,7 @@ scale_console_font() {
 # Same Maslow Dark VT palette the ISO configurator sets, so the first-boot
 # form looks like a continuation of the install.
 set_maslow_colors() {
-  [[ $(tty 2>/dev/null) == /dev/tty* ]] || return 0
-  echo -en "\e]P0121d35"; echo -en "\e]P1ff7a90"; echo -en "\e]P26dc4ad"
-  echo -en "\e]P3f6c85f"; echo -en "\e]P48fb4ff"; echo -en "\e]P5ee7bb3"
-  echo -en "\e]P679d4c3"; echo -en "\e]P7d9dee8"; echo -en "\e]P88c95a8"
-  echo -en "\e]P9ff9bad"; echo -en "\e]PA8ad7c1"; echo -en "\e]PBffd982"
-  echo -en "\e]PCadc8ff"; echo -en "\e]PDf5a1cb"; echo -en "\e]PE9be4d5"
-  echo -en "\e]PFffffff"
-  echo -en "\033[0m"
-  clear
+  maslow_console_apply_palette
 }
 
 measure_terminal() {
@@ -134,6 +125,7 @@ step() {
   clear_logo
   echo
   gum style --padding "0 0 0 $PADDING_LEFT" "$1"
+  maslow_console_speak "$1"
   echo
 }
 
@@ -145,6 +137,7 @@ notice() {
   clear_logo
   echo
   printf '%*s\033[32m● \033[0m%s\n' "$PADDING_LEFT" '' "$1"
+  maslow_console_speak "$1"
   sleep "${2:-2}"
   echo
 }
@@ -356,7 +349,7 @@ phase_band() {
 }
 
 setup_progress() {
-  local phase lo hi tau t span floor work completed
+  local phase lo hi tau t span floor work completed spoken_phase
   phase=$(cat "$STATE_FILE" 2>/dev/null || true)
   [[ -n $phase ]] || phase=account
 
@@ -364,6 +357,15 @@ setup_progress() {
     SETUP_PHASE=$phase
     SETUP_PHASE_T0=$NOW
     FINALIZE_BASE=-1
+    case $phase in
+      account) spoken_phase="Creating your account" ;;
+      finalize) spoken_phase="Applying Maslow OS settings" ;;
+      rekey) spoken_phase="Securing disk encryption" ;;
+      boot) spoken_phase="Finalizing boot configuration" ;;
+      done) spoken_phase="Maslow OS setup complete" ;;
+      *) spoken_phase="$phase" ;;
+    esac
+    maslow_console_speak "$spoken_phase"
   fi
 
   read -r lo hi tau <<<"$(phase_band "$phase")"
@@ -437,6 +439,8 @@ render_setup_dynamic() {
 greeter_screen() {
   local anim="" drawn_sig cur_sig resized=0
 
+  maslow_console_speak "$MASLOW_PRODUCT_NAME. $MASLOW_PRODUCT_TAGLINE. Press Return to start setup, or F5 for accessibility."
+
   # Paint the whole splash for the console's *current* geometry. Kept in a
   # nested function so the wait loop below can repaint it verbatim if the VT
   # resizes out from under us: a late resize (virtio-gpu KMS handoff, or the SDL
@@ -452,8 +456,8 @@ greeter_screen() {
     rows=$(stty size 2>/dev/null </dev/tty | awk '{print $1}')
     [[ $rows =~ ^[0-9]+$ ]] || rows=${LINES:-24}
 
-    tagline="AI transformation, built with purpose."
-    hint="Press Return to Start Setup"
+    tagline="$MASLOW_PRODUCT_TAGLINE"
+    hint="Press Return to Start Setup  •  F5 Accessibility"
 
     printf '%s%s' "$HIDE_CURSOR" "$CLEAR"
 
@@ -508,6 +512,11 @@ greeter_screen() {
     # above. --canvas-width is cols-2, not cols-1: ttfx centres its text two
     # columns right of plain centering, so cols-1 lands the animated logo a
     # column off the static one and it jumps when the effect starts.
+    if [[ $MASLOW_REDUCED_MOTION == "true" ]]; then
+      anim=""
+      return 0
+    fi
+
     printf '%s%d;1H\0337' "$CSI" "$((logo_row + LOGO_HEIGHT))"
     # Run ttfx directly (not inside a `while` subshell) so $anim is ttfx's own
     # PID: killing a wrapping subshell would orphan ttfx, which then keeps
@@ -548,13 +557,21 @@ greeter_screen() {
   _greeter_draw
   drawn_sig=$(console_signature 2>/dev/null || true)
 
-  # Wait for Return, but keep watching the geometry. On any resize (SIGWINCH or
+  # Wait for Return or F5, but keep watching the geometry. On any resize (SIGWINCH or
   # a changed signature) tear the animation down, settle, re-fit the font, and
   # repaint — so a resize arriving five seconds in looks the same as one that
   # never happened.
   while true; do
-    if IFS= read -r -t 0.2 _ </dev/tty; then
-      break
+    if IFS= read -rsn1 -t 0.2 key </dev/tty; then
+      if maslow_console_key_is_f5 "$key"; then
+        _greeter_kill_anim
+        stty sane </dev/tty 2>/dev/null || true
+        maslow_console_accessibility_menu || true
+        _greeter_draw
+        drawn_sig=$(console_signature 2>/dev/null || true)
+      elif [[ -z $key || $key == $'\n' || $key == $'\r' ]]; then
+        break
+      fi
     fi
     cur_sig=$(console_signature 2>/dev/null || true)
     if (( resized )) || [[ -n $cur_sig && $cur_sig != "$drawn_sig" ]]; then
@@ -587,7 +604,7 @@ keyboard_form() {
   local status
 
   while true; do
-    step "Let's setup your keyboard..."
+    step "Let's set up your keyboard..."
     omarchy_prompt_keyboard && status=0 || status=$?
     ((status == 0)) && break
 
@@ -632,7 +649,7 @@ apply_keyboard() {
 
 # The same username/password/name/email form as the ISO configurator's Step 2.
 user_form() {
-  step "Let's setup your user account..."
+  step "Let’s set up your account"
 
   # A prior attempt that already created the account pins the username, so a
   # retry cannot strand that account by choosing a different name.
@@ -1046,6 +1063,8 @@ cleanup_oem_state() {
 # The provisioning work, backgrounded under the progress screen. Phase writes
 # to STATE_FILE drive the bar; all output lands in the log.
 run_provisioning() {
+  local finalize_failed=0
+
   log_step "creating user $username"
   create_user
   install_authorized_keys
@@ -1060,8 +1079,8 @@ run_provisioning() {
   log_step "finalizing user"
   echo finalize >"$STATE_FILE"
   if ! finalize_user; then
-    log_step "finalize-user failed (continuing; user can retry after login)"
-    touch "$FINALIZE_WARNING_FLAG"
+    log_step "finalize-user failed; completing security work before retry"
+    finalize_failed=1
   fi
 
   if [[ -f $PROVISIONING_DIR/luks-key ]]; then
@@ -1079,6 +1098,11 @@ run_provisioning() {
     echo boot >"$STATE_FILE"
     reset_limine_config
     limine-update
+  fi
+
+  if (( finalize_failed )); then
+    log_step "required user finalization remains incomplete"
+    return 1
   fi
 
   log_step "cleaning up provisioning state"
@@ -1134,21 +1158,12 @@ run_setup() {
   render_setup_dynamic
   sleep 1
 
-  if [[ -f $FINALIZE_WARNING_FLAG ]]; then
-    rm -f "$FINALIZE_WARNING_FLAG"
-    clear_logo
-    echo
-    say --foreground 1 "User finalization reported errors (see $LOG_FILE)."
-    say --foreground 1 "Run 'omarchy-provision-user --force' after login to retry."
-    sleep 3
-  fi
-
   # Deferred first boot hands straight off to the display manager: SDDM starts
   # the moment this oneshot exits (Before=display-manager.service) and autologs
   # in on encrypted installs. No timed celebration screen and no "start" button
   # here — that send-off belongs to a direct install, not first-boot setup. The
-  # finished progress bar is the last frame; clearing it for a "Starting
-  # Omarchy..." card would only add a flash of screen before the handoff.
+  # finished progress bar is the last frame; clearing it for another card would
+  # only add a flash of screen before the handoff.
 }
 
 # A failed first-boot setup must not strand the machine at a user-less login
@@ -1165,9 +1180,11 @@ main() {
   # greeter_screen (which owns that settle) rather than running here on a VT
   # that may still be in a transitional mode this early in first boot.
   set_maslow_colors
+  maslow_console_start_speech
   greeter_screen
 
   while ! "$0" --attempt; do
+    maslow_console_speak "Maslow OS setup needs attention. You can retry or open a recovery console."
     clear_logo
     echo
     say --foreground 1 "Setup hit an error (details in $LOG_FILE)."

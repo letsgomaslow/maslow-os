@@ -7,8 +7,17 @@ MAGICK=${MAGICK:-magick}
 MARK_GRADIENT="$ROOT/branding/logos/maslow-mark-gradient.svg"
 MARK_DARK="$ROOT/branding/logos/maslow-mark-dark.svg"
 FONT="$ROOT/branding/fonts/manrope/Manrope-VariableFont_wght.ttf"
+PRODUCT_MANIFEST="$ROOT/branding/product.json"
 WALLPAPER_COLLAGE="$ROOT/branding/wallpapers/maslow-wallpaper-collage.png"
 TERMINAL_ART_DIR=$(mktemp -d)
+render_wallpaper_assets=false
+
+if [[ ${1:-} == "--wallpapers" ]]; then
+  render_wallpaper_assets=true
+elif (( $# > 0 )); then
+  echo "Usage: branding/scripts/generate-assets [--wallpapers]" >&2
+  exit 2
+fi
 
 export LC_ALL=C.UTF-8
 trap 'rm -rf "$TERMINAL_ART_DIR"' EXIT
@@ -18,12 +27,20 @@ command -v "$MAGICK" >/dev/null || {
   exit 1
 }
 
-for source in "$MARK_GRADIENT" "$MARK_DARK" "$FONT" "$WALLPAPER_COLLAGE"; do
+for source in "$MARK_GRADIENT" "$MARK_DARK" "$FONT" "$PRODUCT_MANIFEST"; do
   [[ -f $source ]] || {
     echo "Missing brand source: $source" >&2
     exit 1
   }
 done
+
+PRODUCT_NAME=$(jq -er '.product.name' "$PRODUCT_MANIFEST")
+PRODUCT_NAME_UPPER=${PRODUCT_NAME^^}
+
+if [[ $render_wallpaper_assets == "true" && ! -f $WALLPAPER_COLLAGE ]]; then
+  echo "Missing brand source: $WALLPAPER_COLLAGE" >&2
+  exit 1
+fi
 
 render_wallpapers() {
   local dark_output="$ROOT/themes/maslow-dark/backgrounds"
@@ -65,11 +82,18 @@ render_lockup() {
   local mark=$1 text_color=$2 output=$3 width=${4:-800} height=${5:-188}
   local mark_width=$((width * 22 / 100))
   local font_size=$((height * 30 / 100))
+  local staged="$TERMINAL_ART_DIR/lockup.png"
 
   "$MAGICK" -size "${width}x${height}" xc:none \
     \( -background none "$mark" -resize "${mark_width}x${height}" \) -gravity west -geometry +24+0 -composite \
     -font "$FONT" -weight 600 -pointsize "$font_size" -fill "$text_color" \
-    -gravity west -annotate +230+0 "MASLOW | OS" -depth 8 "$output"
+    -gravity west -annotate +230+0 "$PRODUCT_NAME" -depth 8 "$staged"
+
+  # Plymouth and SDDM center the full image canvas. Trim the asymmetric empty
+  # area created by the west-anchored composition before restoring that canvas,
+  # so the visible lockup—not its transparent pixels—lands on screen center.
+  "$MAGICK" "$staged" -trim +repage -gravity center -background none \
+    -extent "${width}x${height}" -depth 8 "$output"
 }
 
 center_terminal_line() {
@@ -89,7 +113,7 @@ render_terminal_logo() {
   "$MAGICK" -size 1200x220 xc:none \
     -font "$FONT" -weight 900 -pointsize 128 -fill "#FFFFFF" \
     -stroke "#FFFFFF" -strokewidth 4 -gravity center \
-    -annotate +0+0 "MASLOW OS" -depth 8 "$TERMINAL_ART_DIR/wordmark.png"
+    -annotate +0+0 "$PRODUCT_NAME_UPPER" -depth 8 "$TERMINAL_ART_DIR/wordmark.png"
 
   "$ROOT/bin/omarchy-transcode-ascii" \
     "$MARK_GRADIENT" "$TERMINAL_ART_DIR/mark.txt" \
@@ -104,11 +128,13 @@ render_terminal_logo() {
     done <"$TERMINAL_ART_DIR/mark.txt"
     printf '\n'
     cat "$TERMINAL_ART_DIR/wordmark.txt"
-    center_terminal_line "MASLOW OS"
+    center_terminal_line "$PRODUCT_NAME_UPPER"
   } >"$ROOT/logo.txt"
 }
 
-render_wallpapers
+if [[ $render_wallpaper_assets == "true" ]]; then
+  render_wallpapers
+fi
 
 render_lockup "$MARK_GRADIENT" "#FFFFFF" "$ROOT/themes/maslow-dark/unlock.png"
 render_lockup "$MARK_GRADIENT" "#121D35" "$ROOT/themes/maslow-light/unlock.png"

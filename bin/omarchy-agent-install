@@ -1,0 +1,14 @@
+#!/bin/bash
+
+# omarchy:summary=Install one AI agent without selecting or launching it
+# omarchy:hidden=true
+
+source "$OMARCHY_PATH/install/helpers/agent.sh"
+
+if ! omarchy_agent_resolve "${1:-}"; then
+  echo "Usage: omarchy-agent-install <pi|omp|opencode|ori|claude|codex|grok|agy|hermes|copilot|crush>" >&2
+  exit 1
+fi
+
+omarchy_agent_is_installed && exit 0
+omarchy_agent_install_only

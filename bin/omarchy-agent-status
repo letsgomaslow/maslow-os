@@ -1,0 +1,44 @@
+#!/bin/bash
+
+# omarchy:summary=Report machine-readable AI agent setup state
+# omarchy:hidden=true
+
+source "$OMARCHY_PATH/install/helpers/agent.sh"
+
+agent=${1:-}
+[[ $agent == "--json" ]] && agent=""
+if [[ -z $agent ]]; then
+  current=$(omarchy-default-agent)
+  jq -n --arg default "$current" '{schemaVersion: 1, default: $default}'
+  exit 0
+fi
+
+if ! omarchy_agent_resolve "$agent"; then
+  echo "Unsupported agent: $agent" >&2
+  exit 1
+fi
+
+installed=false
+omarchy_agent_is_installed && installed=true
+current=$(omarchy-default-agent)
+mode=$(omarchy_agent_launch_mode "$OMARCHY_AGENT_ID")
+trusted=false
+trust_status=1
+omarchy-agent-trust status "$OMARCHY_AGENT_ID" "$mode" >/dev/null 2>&1 && trust_status=0 || trust_status=$?
+(( trust_status == 0 )) && trusted=true
+case $trust_status in
+  0) trust_state="trusted" ;;
+  2) trust_state="needs-attention" ;;
+  *) trust_state="unconfirmed" ;;
+esac
+
+jq -n \
+  --arg agent "$OMARCHY_AGENT_ID" \
+  --arg name "$OMARCHY_AGENT_NAME" \
+  --arg mode "$mode" \
+  --argjson installed "$installed" \
+  --argjson selected "$([[ $current == "$OMARCHY_AGENT_ID" ]] && echo true || echo false)" \
+  --argjson trusted "$trusted" \
+  --arg trustState "$trust_state" \
+  --argjson disclosureVersion 1 \
+  '{schemaVersion: 1, agent: $agent, name: $name, available: true, installed: $installed, default: $selected, launchMode: $mode, disclosureVersion: $disclosureVersion, trusted: $trusted, trustState: $trustState}'

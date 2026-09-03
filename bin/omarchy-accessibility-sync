@@ -1,0 +1,40 @@
+#!/bin/bash
+
+# omarchy:summary=Synchronize Maslow OS system accessibility with the login screen
+# omarchy:requires-sudo=true
+# omarchy:hidden=true
+
+set -euo pipefail
+
+if (( EUID != 0 )); then
+  exec sudo "$0" "$@"
+fi
+
+config_file=/etc/maslow-os/accessibility.conf
+theme_dir=/usr/share/sddm/themes/omarchy
+theme_override="$theme_dir/theme.conf.user"
+
+read_setting() {
+  local key="$1" value=false
+  if [[ -r $config_file ]]; then
+    value=$(sed -n "s/^${key}=//p" "$config_file" | tail -1)
+  fi
+  [[ $value == "true" ]] || value=false
+  printf '%s' "$value"
+}
+
+if [[ ! -d $theme_dir ]]; then
+  echo "Maslow OS SDDM theme is unavailable: $theme_dir" >&2
+  exit 1
+fi
+
+tmp=$(mktemp "$theme_dir/.theme.conf.user.XXXXXX")
+chmod 0644 "$tmp"
+{
+  printf '[General]\n'
+  printf 'SpeechEnabled=%s\n' "$(read_setting speech)"
+  printf 'LargeText=%s\n' "$(read_setting large_text)"
+  printf 'HighContrast=%s\n' "$(read_setting high_contrast)"
+  printf 'ReducedMotion=%s\n' "$(read_setting reduced_motion)"
+} >"$tmp"
+mv "$tmp" "$theme_override"

@@ -1,0 +1,7 @@
+#!/bin/bash
+
+# omarchy:summary=Retry incomplete Maslow OS setup
+
+set -euo pipefail
+
+exec omarchy-provision-first-run --force

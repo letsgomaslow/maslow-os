@@ -28,7 +28,7 @@ This will display Sunday 10:55 AM.
 
 ### How do I change my timezone?
 
-Run _Update > Timezone_ in the Omarchy menu and pick from the list. If the timezone is right but the clock itself has drifted, _Update > Time_ restarts the time synchronization for you.
+Run _Update > Timezone_ in the Maslow OS menu and pick from the list. If the timezone is right but the clock itself has drifted, _Update > Time_ restarts the time synchronization for you.
 
 ### How do I change my DNS, share my Wi-Fi, or check my connection speed?
 
@@ -40,7 +40,7 @@ _Trigger > Speed Test > Disk Speed Test_ measures live read and write speed on y
 
 ### Why can't I sign into my Google account in Chromium?
 
-The plain open source Chromium build doesn't ship with the OAuth credentials that Google requires for account sign-in. Run _Install > Service > Chromium Account_ in the Omarchy menu to add them, restart the browser, and the sign-in will go through.
+The plain open source Chromium build doesn't ship with the OAuth credentials that Google requires for account sign-in. Run _Install > Service > Chromium Account_ in the Maslow OS menu to add them, restart the browser, and the sign-in will go through.
 
 ### How do I add a printer?
 
@@ -76,7 +76,7 @@ If you don't want programs like Obsidian or LibreOffice or any of the other prei
 
 Run _Remove > Package_ to see every package that's installed. Then you can select any package you'd like to remove with tab, and start removing everything you've selected with return.
 
-And you can use _Remove > Web App_ from the Omarchy menu to remove any of the preinstalled web apps you don't want.
+And you can use _Remove > Web App_ from the Maslow OS menu to remove any of the preinstalled web apps you don't want.
 
 Or run _Remove > Preinstalls_ to sweep out all the preinstalled extras — web apps, TUIs, and optional applications — in one go. The hotkeys that launched them go away with them, so you're left with a clean slate of bindings to fill with your own in `~/.config/hypr/bindings.lua`.
 

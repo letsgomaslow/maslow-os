@@ -23,7 +23,11 @@ cat >"$stub_bin/omarchy-hook-install" <<'STUB'
 #!/bin/bash
 printf '%s\n' "$*" >>"$MASLOW_TEST_HOOK_INSTALL_LOG"
 STUB
-chmod +x "$stub_bin/omarchy-plymouth-set-by-theme" "$stub_bin/omarchy-hook-install"
+cat >"$stub_bin/omarchy-accessibility-sync" <<'STUB'
+#!/bin/bash
+exit 0
+STUB
+chmod +x "$stub_bin/omarchy-plymouth-set-by-theme" "$stub_bin/omarchy-hook-install" "$stub_bin/omarchy-accessibility-sync"
 
 run_hook() {
   PATH="$stub_bin:$PATH" \

@@ -1,0 +1,15 @@
+#!/bin/bash
+
+# omarchy:summary=Check whether a package is installed or available for this system
+# omarchy:args=<package>
+# omarchy:hidden=true
+
+set -euo pipefail
+
+package=${1:?Usage: omarchy-pkg-available <package>}
+
+if pacman -Qq -- "$package" >/dev/null 2>&1; then
+  exit 0
+else
+  pacman -Si -- "$package" >/dev/null 2>&1
+fi

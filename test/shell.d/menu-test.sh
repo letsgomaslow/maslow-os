@@ -264,14 +264,19 @@ assert(
 assert(!defaultById['install.ai.crush'], 'menu removes Crush from Install > AI')
 // Software you already have keeps its place in Install, dimmed rather than
 // dropped, so the list reads as a catalog of what Omarchy can install.
-// Chromium Account is the sole Install row with anything left to hide for, so
-// any other `when:` here is a row that went back to vanishing once installed.
+// Chromium Account depends on Chromium configuration; Hermes Desktop only
+// appears when its package exists for the current architecture.
 assertDeepEqual(
   defaultItems
     .filter(item => item.id.startsWith('install.') && item.action && item.when)
     .map(item => item.id),
-  ['install.service.chromium-account'],
-  'menu never hides an Install row because the software is already there'
+  ['install.service.chromium-account', 'install.ai.hermes'],
+  'menu only hides Install rows for real capability prerequisites'
+)
+assertEqual(
+  defaultById['install.ai.hermes'].when,
+  'omarchy-pkg-available hermes-desktop',
+  'menu checks the local package database before offering Hermes Desktop'
 )
 assert(
   ['install.browser.zen', 'install.editor.vscode', 'install.gaming.steam', 'install.development.rust', 'install.windows'].every(
@@ -637,5 +642,5 @@ assert(
 JS
 
 font_charset=$(fc-query --format='%{charset}' "$ROOT/default/fonts/omarchy/omarchy.ttf")
-[[ $font_charset == *"e900-e90a"* ]] || fail "Omarchy icon font includes every custom menu glyph"
-pass "Omarchy icon font includes the official agent marks"
+[[ $font_charset == *"e900-e90b"* ]] || fail "Omarchy icon font includes every custom menu glyph"
+pass "Omarchy icon font includes the official agent and Maslow OS marks"

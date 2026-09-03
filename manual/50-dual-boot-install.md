@@ -1,6 +1,6 @@
 # Dual Boot Install
 
-You're able to install Omarchy to a single partition alongside Windows or other installations.
+You can install Maslow OS to free space alongside Windows or another operating system on supported x86_64 hardware.
 
 This installation method still comes with LUKS encryption for the partition by default so it's effectively no different than full drive and simply requires free space to be available on the disk.
 
@@ -14,17 +14,17 @@ Find the appropriate partition, right click, and choose **Shrink Volume**.
 
 ![dual-boot-2](images/dual-boot-2.webp)
 
- Input the amount you'd like to shrink the volume by. Note that this will be the size of your future Omarchy install inclusive of the boot partition.
+Input the amount you'd like to shrink the volume by. This becomes the total space for Maslow OS, including its boot partition.
 
  ![dual-boot-3](images/dual-boot-3.webp)
 
-When you're finished, you should see something like this where the 50GB section is where we'll install Omarchy in this example.
+When you're finished, you should see something like this, where the 50GB section is where we'll install Maslow OS in this example.
 
  ![dual-boot-4](images/dual-boot-4.webp)
 
-## Installing Omarchy
+## Installing Maslow OS
 
-The install process for Omarchy is effectively the same as normal. After you select your disk, you'll be given the option of **Free space install**. Select that option to prevent wiping the full disk.
+The Maslow OS install process is otherwise the same as normal. After you select your disk, you'll be given the option of **Free space install**. Select that option to prevent wiping the full disk.
 
  ![dual-boot-5](images/dual-boot-5.webp)
 
@@ -33,9 +33,9 @@ Confirm that everything looks good and wait for the install to finish like norma
 
 ## Adding Other Installs to the Bootloader
 
-When you finish your Omarchy install, you'll notice that the Limine bootloader is the default now. With this, you can also add options to Limine for your other installs such as Windows.
+When the Maslow OS installation finishes, Limine is the default bootloader. You can also add Limine entries for other installations such as Windows.
 
-In order to do that, run `limine-scan` and follow the prompts to add whichever items you'd like to your limine config. Then when you boot, you'll see your normal options for Omarchy, as well as Windows Boot Manager or others.
+To do that, run `limine-scan` and follow the prompts to add the items you want to the Limine configuration. When you boot, you'll see the Maslow OS entry as well as Windows Boot Manager or other detected systems.
 
 ## Bitlocker
 

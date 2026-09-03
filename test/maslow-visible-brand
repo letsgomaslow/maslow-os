@@ -1,0 +1,73 @@
+#!/bin/bash
+
+set -euo pipefail
+
+ROOT=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)
+allowlist="$ROOT/branding/visible-brand-allowlist.tsv"
+failures=()
+
+fail() {
+  printf 'not ok - %s\n' "$1" >&2
+  exit 1
+}
+
+[[ -s $allowlist ]] || fail "visible-brand allowlist is missing"
+[[ -s $ROOT/branding/upstream-touchpoints.tsv ]] || fail "upstream touchpoint inventory is missing"
+
+while IFS='|' read -r path pattern reason owner; do
+  [[ -n $path && ${path:0:1} != "#" ]] || continue
+  [[ -n $pattern && -n $reason && -n $owner ]] || fail "malformed allowlist row for $path"
+  [[ -e $ROOT/$path ]] || fail "allowlist path does not exist: $path"
+done <"$allowlist"
+
+allowed_hit() {
+  local path="$1" text="$2" allow_path pattern reason owner
+  while IFS='|' read -r allow_path pattern reason owner; do
+    [[ -n $allow_path && ${allow_path:0:1} != "#" ]] || continue
+    [[ $path == "$allow_path" && $text == *"$pattern"* ]] && return 0
+  done <"$allowlist"
+  return 1
+}
+
+while IFS=: read -r path line text; do
+  [[ -n $path ]] || continue
+  path=${path#"$ROOT/"}
+  allowed_hit "$path" "$text" || failures+=("$path:$line:$text")
+done < <(
+  rg -n --no-heading \
+    '(^|[[:space:]])(text|title|Accessible\.(name|description)):[[:space:]]*"[^"]*Omarchy|"(name|displayName|description|label)"[[:space:]]*:[[:space:]]*"[^"]*Omarchy' \
+    "$ROOT/shell" "$ROOT/default" "$ROOT/config" "$ROOT/applications" \
+    -g '*.qml' -g '*.json' -g '*.jsonc' -g '*.desktop' || true
+)
+
+while IFS=: read -r path line text; do
+  [[ -n $path ]] || continue
+  path=${path#"$ROOT/"}
+  allowed_hit "$path" "$text" || failures+=("$path:$line:$text")
+done < <(
+  rg -n --no-heading \
+    '^(#{1,6} .*Omarchy|[^`]*\bOmarchy (is|has|comes|ships|offers|calls|uses|runs|supports|provides|enables|recommends|watches|tackles|assumes|allows)\b|[^`]*\bOmarchy.s\b)' \
+    "$ROOT/manual" -g '*.md' || true
+)
+
+((${#failures[@]} == 0)) || {
+  printf 'not ok - bare Omarchy product branding found outside reviewed technical exceptions in UI or documentation:\n' >&2
+  printf '  %s\n' "${failures[@]}" >&2
+  exit 1
+}
+
+if rg -n 'tree/maslow|/blob/maslow' "$ROOT" -g '*.md' -g '*.json' -g '*.jsonc'; then
+  fail "stale Maslow branch link found"
+fi
+
+(( $(grep -o 'U+E900' "$ROOT/default/fonts/omarchy/README.md" | wc -l) == 1 )) || fail "Omarchy compatibility glyph mapping drifted"
+(( $(grep -o 'U+E90B' "$ROOT/default/fonts/omarchy/README.md" | wc -l) == 1 )) || fail "Maslow glyph mapping drifted"
+grep -Fq '"label":"Omarchy Community — engine support"' "$ROOT/default/omarchy/omarchy-menu.jsonc" || fail "engine community label is ambiguous"
+grep -Fq '"label":"Maslow OS Support"' "$ROOT/default/omarchy/omarchy-menu.jsonc" || fail "Maslow support route is missing"
+grep -Fq 'Maslow OS command center' "$ROOT/bin/omarchy" || fail "top-level CLI identity is not Maslow OS"
+grep -Fq 'GROUP_DESCRIPTIONS[update]="Maslow OS, engine, and system updates"' "$ROOT/bin/omarchy" || fail "CLI update group does not distinguish the compatible engine"
+
+duplicate_taglines=$(rg -l 'AI transformation, built with purpose\.' "$ROOT" -g '!branding/product.json' -g '!default/fonts/omarchy/omarchy.ttf' || true)
+[[ -z $duplicate_taglines ]] || fail "canonical tagline duplicated outside product manifest: $duplicate_taglines"
+
+printf 'Maslow OS visible-brand audit passed.\n'

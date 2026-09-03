@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "product": {
+    "id": "maslow-os",
+    "name": "Maslow OS",
+    "shortName": "Maslow",
+    "tagline": "AI transformation, built with purpose.",
+    "version": "0.1.0-preview.1",
+    "versionFile": "/usr/share/omarchy/maslow-version"
+  },
+  "engine": {
+    "id": "omarchy",
+    "name": "Omarchy",
+    "displayName": "Omarchy engine",
+    "versionFile": "/usr/share/omarchy/version",
+    "website": "https://omarchy.org/",
+    "repository": "https://github.com/omacom/omarchy"
+  },
+  "foundation": {
+    "name": "Arch Linux",
+    "website": "https://archlinux.org/"
+  },
+  "links": {
+    "home": "https://maslow.ai/",
+    "documentation": "https://github.com/letsgomaslow/maslow-os/tree/main/manual",
+    "releases": "https://github.com/letsgomaslow/maslow-os/releases",
+    "support": "https://github.com/letsgomaslow/maslow-os/issues",
+    "engineReleases": "https://github.com/omacom/omarchy/releases",
+    "engineCommunity": "https://discord.gg/tXFUdasqhY"
+  },
+  "attribution": {
+    "short": "Powered by the Omarchy engine",
+    "technical": "Maslow OS uses the Omarchy engine on an Arch Linux foundation."
+  }
+}

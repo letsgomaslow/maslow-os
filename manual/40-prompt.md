@@ -1,6 +1,6 @@
 # Prompt
 
-Omarchy ships with a minimal [Starship](https://starship.rs/) prompt by default. That's how I like to keep my prompt. I don't need to know the user, because it's always me, and I don't need to know the time, because it's always at the top.
+Maslow OS ships with a minimal [Starship](https://starship.rs/) prompt by default. It avoids repeating the current user and time because those are already visible elsewhere in the desktop.
 
  ![prompt](images/prompt.webp)
 

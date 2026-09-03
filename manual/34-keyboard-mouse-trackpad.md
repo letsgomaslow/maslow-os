@@ -1,6 +1,6 @@
 # Keyboard, Mouse, Trackpad
 
-Hyprland lets you configure all your inputs in great detail. You can change the keyboard repeat to be supersonically fast or make the trackpad use natural scrolling. You change all of it in `~/.config/hypr/input.lua`, which you can also reach via _Setup > Input_ in the Omarchy menu (`Super + Space`). Anything you set there replaces Omarchy's defaults.
+Hyprland lets you configure all your inputs in great detail. You can change the keyboard repeat to be supersonically fast or make the trackpad use natural scrolling. You change all of it in `~/.config/hypr/input.lua`, which you can also reach via _Setup > Input_ in the Maslow OS menu (`Super + Space`). Anything you set there replaces Omarchy's defaults.
 
 Here's an example:
 
@@ -37,7 +37,7 @@ o.window("(Alacritty|kitty|foot)", { scroll_touchpad = 1.5 })
 
 You can [see all the input options](https://wiki.hypr.land/Configuring/Basics/Variables/#input) on the Hyprland wiki for inputs.
 
-By default, Omarchy uses CapsLock as the compose key for [quick emojis](07-hotkeys.md#quick-emojis) and [other completions](07-hotkeys.md#quick-completions). If you'd rather use CapsLock as Caps Lock, move the compose key elsewhere by changing `compose:caps` in `kb_options`. For example, this moves the compose key to Right Alt:
+By default, Maslow OS uses Caps Lock as the compose key for [quick emojis](07-hotkeys.md#quick-emojis) and [other completions](07-hotkeys.md#quick-completions). To use Caps Lock normally, move the compose key elsewhere by changing `compose:caps` in `kb_options`. For example, this moves the compose key to Right Alt:
 
 ```lua
 hl.config({
@@ -59,7 +59,7 @@ On Dell XPS laptops with a haptic touchpad, you can also set the click strength 
 
 ### Typing in Chinese, Japanese, and other languages
 
-Omarchy runs the [fcitx5](https://fcitx-im.org/) input method framework as part of every session — it's what powers the CapsLock compose sequences. That means the plumbing for non-Latin input is already in place: install an input engine like `fcitx5-mozc` (Japanese) or `fcitx5-chinese-addons` (Chinese) with `omarchy pkg add`, plus `fcitx5-configtool` to add the engine to your input methods and set the key that switches between them.
+Maslow OS runs the [fcitx5](https://fcitx-im.org/) input method framework in every session; it powers the Caps Lock compose sequences. The foundation for non-Latin input is therefore already present. Install an input engine such as `fcitx5-mozc` for Japanese or `fcitx5-chinese-addons` for Chinese with `omarchy pkg add`, plus `fcitx5-configtool` to add the engine and configure its switching key.
 
 ### Use ALT as SUPER
 

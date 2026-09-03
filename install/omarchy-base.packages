@@ -30,6 +30,8 @@ evince
 exfatprogs
 expac
 eza
+espeak-ng
+espeakup
 fakeroot
 fastfetch
 fcitx5
@@ -95,6 +97,7 @@ omacalc
 omacut
 omawrite
 omarchy-nvim
+orca
 pacman-contrib
 pamixer
 pinta
@@ -108,6 +111,7 @@ ttfx
 qemu-user-static-binfmt
 qrencode
 qt6-imageformats
+qt6-speech
 quickshell
 ripgrep
 ruby
@@ -115,6 +119,7 @@ tensaku
 sddm
 slurp
 socat
+speech-dispatcher
 starship
 sushi
 system-config-printer

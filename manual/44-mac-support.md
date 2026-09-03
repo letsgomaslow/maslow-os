@@ -1,16 +1,16 @@
 # Mac support
 
-Omarchy has built-in support for **Intel Macs**. There are a couple of known limitations at the moment, but as long as you're aware and OK with those; you can breathe some new life into your old Macs by loading Omarchy.
+Maslow OS supports compatible **Intel Macs** as part of its x86_64 release target. There are a couple of known limitations, but a supported Intel Mac can gain a useful second life with Maslow OS. Apple Silicon ARM64 builds remain a development preview and are not a supported release target.
 
 Please note that installing on an M-series Mac is not directly supported at this time. You can find out more about the state of this in #omarchy-on-other in our [Discord](https://discord.gg/tXFUdasqhY).
 
-In a simple test, we were able to achieve 36% performance gains on a 2019 MacBook Pro just by installing Omarchy.
+In a simple upstream test, a 2019 MacBook Pro showed a 36% performance gain after installing the Omarchy engine. Treat that as a historical device-specific result, not a guarantee for Maslow OS or other hardware.
 
  ![macbook-omarchy](images/macbook-omarchy.webp)
 
-### Installing Omarchy on Mac
+### Installing Maslow OS on Mac
 
-Omarchy only supports being the **only** OS installed at the moment. During the installation, the drive will be wiped and MacOS will no longer be bootable.
+Maslow OS only supports being the **only** OS on this hardware at the moment. During a full-disk installation, the drive is wiped and macOS will no longer be bootable.
 
 You can still restore it later via Internet Recovery if you'd like.
 

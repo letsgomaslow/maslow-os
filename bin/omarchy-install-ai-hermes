@@ -5,6 +5,12 @@
 
 set -e
 
+if ! omarchy-pkg-available hermes-desktop; then
+  echo "Hermes Desktop is not available for this system." >&2
+  echo "You can use Hermes as a coding agent from Setup → AI." >&2
+  exit 1
+fi
+
 # No CLI is installed here on purpose. Hermes Desktop only runs against a
 # runtime built from its own commit, so it provisions one itself under
 # ~/.hermes on first launch, which takes a few minutes and shows its own

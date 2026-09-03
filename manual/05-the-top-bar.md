@@ -1,14 +1,14 @@
 # The Top Bar
 
-The strip along the top of your screen is the Omarchy bar. It's not a bolted-on status bar but part of the Omarchy shell, the single long-running Quickshell process that also draws the menu, the notifications, the OSD popups, and the lock screen. That's why it themes perfectly with everything else and why a panel opens instantly instead of spawning a new app.
+The strip along the top of your screen is the Maslow OS bar. It is drawn by the compatible Omarchy shell engine, the single long-running Quickshell process that also draws the menu, notifications, OSD popups, and lock screen. That's why it themes perfectly with everything else and why a panel opens instantly instead of spawning a new app.
 
 It's also the one piece of the desktop that's always on screen, so it's worth knowing what all those little glyphs do.
 
 ## What's on it by default
 
-The bar has three sections. On the left sits the Omarchy logo (the menu launcher) and the workspace indicators. In the center you get the status indicators, the clock, the keyboard layout, the weather, and an Omarchy update badge. On the right: the system tray, agents, bluetooth, network, audio, display, and power.
+The bar has three sections. On the left sits the Maslow mark (the menu launcher) and the workspace indicators. In the center you get the status indicators, the clock, the keyboard layout, the weather, and a Maslow OS update badge. On the right: the system tray, agents, bluetooth, network, audio, display, and power.
 
-A few of those only show up when they have something to say. The keyboard layout appears only if you've configured more than one layout. The update badge appears only when there's an Omarchy update waiting. And the agents icon appears the first time Omarchy finds AI coding usage on the machine (see [AI](17-ai.md)).
+A few of those only show up when they have something to say. The keyboard layout appears only if you've configured more than one layout. The update badge appears only when there's a Maslow OS update waiting. And the agents icon appears the first time the shell finds AI coding usage on the machine (see [AI](17-ai.md)).
 
 ## Clicking around
 
@@ -16,7 +16,7 @@ Nearly every widget does something on left, right, and middle click, and several
 
 | Widget | Left | Right | Middle / scroll |
 | --- | --- | --- | --- |
-| Menu | Omarchy menu | New terminal | — |
+| Menu | Maslow OS menu | New terminal | — |
 | Workspaces | Focus that workspace | — | — |
 | Clock | Calendar popup | Cycle the label format | Middle: timezone picker |
 | Weather | Forecast popup | Full weather as a notification | Middle: refresh |
@@ -29,7 +29,7 @@ Nearly every widget does something on left, right, and middle click, and several
 | Media | Play/pause | Cover-art popup | Middle: next · scroll: prev/next |
 | Agents | Agents panel | Launch your agent | Middle: next subscription |
 | Tray | Hover to reveal the drawer | Right on the chevron to manage | — |
-| Omarchy update | Run the update | — | — |
+| Maslow OS update | Run the update | — | — |
 
 Not everything in that table is on your bar out of the box. The media widget (MPRIS now-playing, with a scrolling track and artist) and the microphone widget are both built in but off by default — add them if you want them, as described below.
 

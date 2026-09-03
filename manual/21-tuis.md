@@ -20,7 +20,7 @@ You stop a container using `s` or start/restart it using `r`. See all commands u
 
 [Btop](https://github.com/aristocratos/btop) is a beautiful resource manager that shows memory, CPU, disk, and network usage. It also lists all active processes, and allows you to manage them.
 
-Omarchy calls it Activity, and you start it by hitting `Super + Ctrl + T`. It opens as a floating window, which you can tile with `Super + T`.
+Maslow OS calls it Activity. Start it with `Super + Ctrl + T`; it opens as a floating window that you can tile with `Super + T`.
 
 ## Herdr
 
@@ -32,7 +32,7 @@ You start it (or reattach to your existing session) with `Super + Ctrl + Return`
 
 [Fastfetch](https://github.com/fastfetch-cli/fastfetch) shows system information, like kernel version, uptime, theme, CPU, memory, and more. It's a successor to the popular neofetch tool.
 
-Omarchy has packaged this as _About_ in the Omarchy menu (`Super + Space`).
+Maslow OS presents this as _About_ in the Maslow OS menu (`Super + Space`), with product, engine, foundation, release, and support details alongside the system summary.
 
 ## Disk Usage
 
@@ -40,7 +40,7 @@ When the drive fills up and you have no idea what's eating it, launch _Disk Usag
 
 ## Cliamp
 
-[Cliamp](https://www.cliamp.stream/) is a retro terminal music player inspired by Winamp 2.x, complete with built-in radio stations for lo-fi beats. Launch it with `Super + Shift + Alt + M`, or from the Omarchy menu under _Apps_. Press `?` for the full keybinding list.
+[Cliamp](https://www.cliamp.stream/) is a retro terminal music player inspired by Winamp 2.x, complete with built-in radio stations for lo-fi beats. Launch it with `Super + Shift + Alt + M`, or from the Maslow OS menu under _Apps_. Press `?` for the full keybinding list.
 
 ## What about Wi-Fi and Bluetooth?
 
@@ -48,4 +48,4 @@ You won't find TUIs for Wi-Fi and Bluetooth — those jobs belong to the Omarchy
 
 ## Adding your own
 
-Any terminal program can get the full app treatment. Go to _Install > TUI_ in the Omarchy menu (`Super + Space`), give it a name, a launch command, a window style, and an icon, and it'll show up in the app launcher like any other application. You can remove it again under _Remove > TUI_.
+Any terminal program can get the full app treatment. Go to _Install > TUI_ in the Maslow OS menu (`Super + Space`), give it a name, a launch command, a window style, and an icon, and it'll show up in the app launcher like any other application. You can remove it again under _Remove > TUI_.

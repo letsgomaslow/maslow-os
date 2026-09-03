@@ -2,6 +2,10 @@
 
 set -euo pipefail
 
+# Regenerate the non-secret SDDM accessibility override on every update, even
+# when the installed logo is already current.
+omarchy-accessibility-sync
+
 # The ARM development preview intentionally keeps using upstream Omarchy
 # packages. A package update therefore restores upstream's SDDM and Plymouth
 # artwork even though the running source tree is the Maslow fork. Repair only
