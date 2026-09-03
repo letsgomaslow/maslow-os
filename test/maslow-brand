@@ -44,6 +44,7 @@ assert_contains install/provisioning/setup-form.sh "return for 'maslow-os'" "set
 assert_contains branding/scripts/generate-assets "'.product.name'" "login artwork consumes the canonical Maslow OS product name"
 assert_contains migrations/1788337736.sh "maslow-login-branding.hook" "updates preserve the Maslow login default"
 assert_contains migrations/1788365928.sh "maslow-login-branding.hook" "existing installations immediately register branding repair"
+assert_contains migrations/1788395901.sh "Label existing Limine boot entries as Maslow OS" "existing installations repair their visible boot entry"
 assert_contains install/user/maslow-login-branding.sh "omarchy-hook-install post-update" "fresh installations register branding repair"
 assert_contains bin/omarchy-migrate-notify "Pending Maslow OS Migrations" "migration notice uses Maslow OS"
 assert_contains default/hypr/bindings/utilities.lua '"Maslow OS menu"' "keybinding hint uses Maslow OS"
