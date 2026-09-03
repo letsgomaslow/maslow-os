@@ -52,7 +52,7 @@ cleanup() {
 trap cleanup EXIT
 
 output=$("$CLI" --help)
-assert_output_contains "main help renders" "$output" "Omarchy command center"
+assert_output_contains "main help renders" "$output" "Maslow OS command center"
 assert_output_contains "main help includes hardware group" "$output" "hw"
 assert_output_contains "main help includes package group" "$output" "pkg"
 if grep -Eq '^  [a-z0-9-]+[[:space:]].*\([0-9]+\)$' <<<"$output"; then
@@ -494,7 +494,7 @@ HOME="$PI_TMPDIR" "$ROOT/bin/omarchy-theme-set-pi" --activate
 jq -e '.theme == "omarchy-system" and .model == "keep-me"' "$PI_TMPDIR/.pi/agent/settings.json" >/dev/null
 pass "pi theme activation preserves existing settings"
 
-jq -e '.name == "Omarchy" and .base == "light" and .overrides.text == "#ffffff"' "$NEXT_THEME/claude.json" >/dev/null
+jq -e '.name == "Maslow OS" and .base == "light" and .overrides.text == "#ffffff"' "$NEXT_THEME/claude.json" >/dev/null
 pass "claude theme template is generated from standard themed templates"
 cp "$NEXT_THEME/claude.json" "$CURRENT_THEME/claude.json"
 

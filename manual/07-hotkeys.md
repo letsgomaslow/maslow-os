@@ -6,7 +6,7 @@ You can see all the main keyboard bindings with `Super + K` (Tmux bindings with 
 
 | Hotkey                  | Function              |
 | ----------------------- | --------------------- |
-| `Super + Space`           | Omarchy menu (apps and everything else)    |
+| `Super + Space`           | Maslow OS menu (apps and everything else)    |
 | `Super + Alt + Space` | Apps menu |
 | `Super + Escape` | System menu (suspend, restart, etc)  |
 | `Super + Ctrl + L` | Lock computer |
@@ -155,7 +155,7 @@ Usually on Linux, you need `Ctrl + Shift + C/V` to copy'n'paste in the terminal 
 
 With screenrecordings, the hotkey first asks which audio you want, then starts recording. Hit it again to stop. See [screenshots and recording](12-screenshots-recording.md) for the details.
 
-All capture options are also accessible under _Trigger > Capture_ in the Omarchy menu (`Super + Space`).
+All capture options are also accessible under _Trigger > Capture_ in the Maslow OS menu (`Super + Space`).
 
 ## Notifications
 
@@ -176,9 +176,9 @@ All capture options are also accessible under _Trigger > Capture_ in the Omarchy
 | `Super + Backspace` | Toggle transparency on a window |
 | `Super + Ctrl + Backspace` | Toggle single-window square aspect |
 
-Extra background images live in `~/.config/omarchy/backgrounds/<theme name>`. Also available via _Install > Style > Background_ in the Omarchy menu.
+Extra background images live in `~/.config/omarchy/backgrounds/<theme name>`. Also available via _Install > Style > Background_ in the Maslow OS menu.
 
-All style options are also accessible under _Style_ in the Omarchy menu (`Super + Space`).
+All style options are also accessible under _Style_ in the Maslow OS menu (`Super + Space`).
 
 ## Toggles
 
@@ -279,7 +279,7 @@ These functions must be run inside a Tmux session.
 
 ## Ghostty Terminal
 
-Ghostty terminal is installed using _Install > Terminal_ via the Omarchy menu.
+Ghostty terminal is installed using _Install > Terminal_ via the Maslow OS menu.
 
 | Hotkey                  | Function              |
 | ----------------------- | --------------------- |

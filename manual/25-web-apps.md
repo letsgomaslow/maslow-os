@@ -1,10 +1,10 @@
 # Web Apps
 
-You can add your own web apps using _Install > Web App_ in the Omarchy menu (`Super + Space`). It'll ask you for the app name, app URL, and the icon URL, if it can't retrieve it via favicon. You can get great PNG icons for many popular web apps on [Dashboard Icons](https://dashboardicons.com).
+You can add your own web apps using _Install > Web App_ in the Maslow OS menu (`Super + Space`). It'll ask you for the app name, app URL, and the icon URL, if it can't retrieve it via favicon. You can get great PNG icons for many popular web apps on [Dashboard Icons](https://dashboardicons.com).
 
 They'll then be accessible through the app launcher (`Super + Space`), and use the beautiful frameless web-app window.
 
-If you wish to remove a web app, just go to _Remove > Web App_ in the Omarchy menu.
+If you wish to remove a web app, just go to _Remove > Web App_ in the Maslow OS menu.
 
 It's best if you log into all your accounts using a regular browser before using the web app shortcuts. The thin wrapper frame doesn't work well with 1password, so just easier to be logged in directly first.
 

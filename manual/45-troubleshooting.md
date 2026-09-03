@@ -6,7 +6,7 @@ First try to [rollback your system](47-system-snapshots.md) the version before y
 
 ### Why are some apps so large on my display?
 
-Omarchy assumes a 2x high-resolution display, which requires setting `GDK_SCALE` to 2 in `~/.config/hypr/monitors.lua`. But if you're on a 1x display, you can change `local omarchy_gdk_scale = 2` to 1 (and then restart any app that's oversized). See [the manual on monitors](33-monitors.md).
+Maslow OS defaults to 2x scaling for high-resolution displays, which sets `GDK_SCALE` to 2 in `~/.config/hypr/monitors.lua`. On a 1x display, change `local omarchy_gdk_scale = 2` to 1 and restart any oversized app. See [the manual on monitors](33-monitors.md).
 
 For Spotify, you can use `Ctrl + Minus` to shrink the UI (and `Ctrl + Plus` to make it bigger).
 
@@ -24,7 +24,7 @@ hl.config({
 
 ### My Wi-Fi, Bluetooth, audio, or trackpad just stopped working
 
-Before you reboot, try restarting the offending subsystem on its own. _Update > Hardware_ in the Omarchy menu has Wi-Fi, Bluetooth, Audio, and Trackpad, and reloading one of those clears up the majority of "it worked five minutes ago" situations — a Bluetooth headset that won't reconnect, a trackpad that went dead after a suspend, sound that vanished when you unplugged a monitor.
+Before you reboot, try restarting the offending subsystem on its own. _Update > Hardware_ in the Maslow OS menu has Wi-Fi, Bluetooth, Audio, and Trackpad, and reloading one of those clears up the majority of "it worked five minutes ago" situations — a Bluetooth headset that won't reconnect, a trackpad that went dead after a suspend, sound that vanished when you unplugged a monitor.
 
 ### Why are my external speakers not playing?
 

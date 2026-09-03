@@ -18,9 +18,9 @@ pass "Windows VM does not restart automatically at boot"
 
 # Tolerate either shell quoting of the argument -- what must not drift is the
 # title itself, since the Hyprland rule below matches on it.
-rg -q 'title:"?Windows VM - Omarchy"' "$windows_vm_command" ||
+rg -q 'title:"?Windows VM - Maslow OS"' "$windows_vm_command" ||
   fail "Windows VM launches FreeRDP with its expected title"
-rg -q 'class = "\^xfreerdp\$", title = "\^Windows VM - Omarchy\$"' "$windows_vm_rules" ||
+rg -q 'class = "\^xfreerdp\$", title = "\^Windows VM - Maslow OS\$"' "$windows_vm_rules" ||
   fail "Windows VM opacity rule targets its FreeRDP window"
 rg -q 'tag = "-default-opacity"' "$windows_vm_rules" ||
   fail "Windows VM opts out of default opacity"

@@ -14,6 +14,11 @@ fi
 if [[ $first_login == "true" ]]; then
   state=$(omarchy-setup-ai-state show) || exit $?
   [[ $(jq -r '.completedAt != null or .deferred' <<<"$state") == "false" ]] || exit 0
+else
+  state=$(omarchy-setup-ai-state show) || exit $?
+  if [[ $(jq -r '.completedAt != null' <<<"$state") == "true" ]]; then
+    omarchy-setup-ai-state reset
+  fi
 fi
 
 exec omarchy-shell shell summon maslow.ai-setup '{}'

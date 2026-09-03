@@ -82,11 +82,18 @@ render_lockup() {
   local mark=$1 text_color=$2 output=$3 width=${4:-800} height=${5:-188}
   local mark_width=$((width * 22 / 100))
   local font_size=$((height * 30 / 100))
+  local staged="$TERMINAL_ART_DIR/lockup.png"
 
   "$MAGICK" -size "${width}x${height}" xc:none \
     \( -background none "$mark" -resize "${mark_width}x${height}" \) -gravity west -geometry +24+0 -composite \
     -font "$FONT" -weight 600 -pointsize "$font_size" -fill "$text_color" \
-    -gravity west -annotate +230+0 "$PRODUCT_NAME" -depth 8 "$output"
+    -gravity west -annotate +230+0 "$PRODUCT_NAME" -depth 8 "$staged"
+
+  # Plymouth and SDDM center the full image canvas. Trim the asymmetric empty
+  # area created by the west-anchored composition before restoring that canvas,
+  # so the visible lockup—not its transparent pixels—lands on screen center.
+  "$MAGICK" "$staged" -trim +repage -gravity center -background none \
+    -extent "${width}x${height}" -depth 8 "$output"
 }
 
 center_terminal_line() {
