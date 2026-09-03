@@ -11,6 +11,32 @@ matching guide before starting:
 - [`agents/skills/visual-verification.md`](agents/skills/visual-verification.md) - verifying any change with a visual effect in the running UI
 - [`agents/skills/migrations.md`](agents/skills/migrations.md) - creating or changing migrations under `migrations/`
 
+# Repository Topology
+
+Maslow OS is maintained as three coordinated downstream repositories. They are related stages of one product pipeline, not interchangeable copies:
+
+- `letsgomaslow/maslow-os` (this repository) owns the installed runtime, desktop, commands, themes, product metadata, migrations, and end-user documentation. Its public product branch and default branch is `main`.
+- `letsgomaslow/maslow-os-pkgs` owns Arch `PKGBUILD` recipes, package metadata, dependencies, file ownership, and package publication infrastructure. Its downstream product branch is `maslow`.
+- `letsgomaslow/maslow-os-iso` owns the bootable x86_64 installer, live environment, installation orchestrator, offline package mirror assembly, and VM acceptance harness. Its downstream product branch is `maslow`.
+
+The build flow is `maslow-os source` -> `maslow-os-pkgs package recipes` -> `maslow-os-iso installation media`. The ISO repository consumes explicit checkouts of both preceding repositories for local-source builds; it does not replace either one.
+
+## Change Routing
+
+- Put installed desktop behavior, visible runtime branding, commands, defaults, migrations, and user documentation in `maslow-os`.
+- Put package dependencies, package metadata, package file ownership, install hooks, and repository publication behavior in `maslow-os-pkgs`.
+- Put boot-menu behavior, live-ISO packages, installer screens, disk orchestration, offline-mirror assembly, and ISO/VM harness behavior in `maslow-os-iso`.
+- When a feature crosses boundaries, use separate coordinated commits and pull requests in every affected repository. Do not copy runtime source into the ISO repository or installer logic into the package repository.
+
+## Cross-Repository Release Rules
+
+- Never infer that the three repositories use the same default branch. Inspect each downstream remote before branching, opening a pull request, or merging.
+- Package recipes that fetch the released Maslow OS source must track `letsgomaslow/maslow-os` branch `main`. A local-source ISO build may use explicit feature-branch checkouts for pre-merge testing, but release evidence must record the exact commit from every checkout.
+- Validate coordinated work in dependency order: runtime source first, package recipes second, ISO assembly and end-to-end installation last.
+- Before declaring a release candidate, confirm all three working trees are clean, record their exact commits, run each repository's focused tests, and build the ISO from those exact local checkouts.
+- Preserve Omarchy-compatible package names, commands, paths, service identifiers, plugin contracts, and update sequencing across repository boundaries.
+- Do not publish or describe a stable Maslow package channel until Maslow-owned signing, repository publication, update, and rollback infrastructure is operational and explicitly approved.
+
 # Documentation Layout
 
 Three documentation trees, split by genre and audience:
