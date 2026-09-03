@@ -6,6 +6,18 @@ Maslow OS is based on [Omarchy](https://omarchy.org/) and [Arch Linux](https://a
 
 > **Preview status:** `0.1.0-preview.1`. The current Apple Silicon image is a development preview, not a supported public ARM release. The first supported installer target is x86_64.
 
+## Experience preview
+
+These screenshots show the current Maslow OS preview experience. Visual details may evolve before the first public release.
+
+### Start of setup
+
+![Maslow OS setup welcome screen with the product name, tagline, and prompt to begin](docs/images/maslow-os-setup-preview.png)
+
+### Desktop
+
+![Maslow OS desktop with the system bar and a mountain sunrise background](docs/images/maslow-os-desktop.png)
+
 ## Install on a Mac with UTM
 
 There is no public Maslow OS binary installer yet. The source is public, but the current x86_64 ISO is a local-build preview and the Apple Silicon VM is an internal development artifact. Do not redistribute either preview as a Maslow OS release. Published installers will appear on the [Maslow OS releases page](https://github.com/letsgomaslow/maslow-os/releases) only after the release gates below are complete.
