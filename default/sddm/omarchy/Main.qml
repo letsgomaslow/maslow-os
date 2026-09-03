@@ -1,5 +1,5 @@
 import QtQuick
-import QtQuick.Controls
+import QtQuick.Controls as QQC2
 import QtTextToSpeech
 import SddmComponents 2.0
 
@@ -154,7 +154,7 @@ Rectangle {
       width: parent.width
       spacing: 8
 
-      Label {
+      QQC2.Label {
         text: "Username"
         color: root.secondary
         font.family: "Manrope"
@@ -162,7 +162,7 @@ Rectangle {
         font.weight: Font.DemiBold
       }
 
-      TextField {
+      QQC2.TextField {
         id: username
         width: parent.width
         height: 52 * root.textScale
@@ -201,7 +201,7 @@ Rectangle {
       width: parent.width
       spacing: 8
 
-      Label {
+      QQC2.Label {
         text: "Password"
         color: root.secondary
         font.family: "Manrope"
@@ -209,7 +209,7 @@ Rectangle {
         font.weight: Font.DemiBold
       }
 
-      TextField {
+      QQC2.TextField {
         id: password
         width: parent.width
         height: 52 * root.textScale
@@ -255,7 +255,7 @@ Rectangle {
       }
     }
 
-    Button {
+    QQC2.Button {
       id: signInButton
       width: parent.width
       height: 52 * root.textScale
