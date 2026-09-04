@@ -56,12 +56,21 @@ from pathlib import Path
 import sys
 
 lines = Path(sys.argv[1]).read_text(encoding="utf-8").splitlines()
-print(max((len(line) for line in lines), default=0), len(lines))
+blocks = "█▀▄"
+art_lines = lines[:-1]
+horizontal = bool(art_lines) and all(
+    any(char in blocks for char in line[:16])
+    and line[16:19] == "   "
+    and line[19] in blocks
+    for line in art_lines
+)
+print(max((len(line) for line in lines), default=0), len(lines), int(horizontal))
 PY
 )
-read -r logo_width logo_height <<<"$logo_dimensions"
+read -r logo_width logo_height logo_is_horizontal <<<"$logo_dimensions"
 (( logo_width <= 80 )) || fail "setup logo exceeds the 80-column console contract"
-(( logo_height >= 6 && logo_height <= 12 )) || fail "setup logo height is outside its console contract"
+(( logo_height >= 5 && logo_height <= 8 )) || fail "setup logo height is outside its compact console contract"
+(( logo_is_horizontal == 1 )) || fail "setup logo does not use the compact horizontal lockup"
 grep -q '[█▀▄]' "$ROOT/logo.txt" || fail "setup logo is not block artwork"
 grep -Eq '^[[:space:]]*MASLOW OS$' "$ROOT/logo.txt" || fail "setup logo does not identify Maslow OS in text"
 pass "setup uses a terminal-safe Maslow Gradient Bridge lockup"
