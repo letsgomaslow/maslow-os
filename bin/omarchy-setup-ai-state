@@ -5,13 +5,58 @@
 
 set -euo pipefail
 
-schema_version=1
+schema_version=2
 state_dir="$HOME/.local/state/maslow-os"
 state_file="$state_dir/onboarding.json"
 action=${1:-show}
+tool_ids=(bitwarden codex claude hermes memory-builtin honcho hindsight mcp speech)
+supported_tool_ids=(bitwarden codex claude hermes memory-builtin honcho hindsight mcp)
+tool_statuses=(not-started selected in-progress action-required ready needs-attention skipped)
+
+is_known_tool() {
+  local candidate=$1 known
+  for known in "${tool_ids[@]}"; do
+    [[ $candidate == "$known" ]] && return 0
+  done
+  return 1
+}
+
+is_known_status() {
+  local candidate=$1 known
+  for known in "${tool_statuses[@]}"; do
+    [[ $candidate == "$known" ]] && return 0
+  done
+  return 1
+}
+
+is_supported_tool() {
+  local candidate=$1 supported
+  for supported in "${supported_tool_ids[@]}"; do
+    [[ $candidate == "$supported" ]] && return 0
+  done
+  return 1
+}
+
+default_tools() {
+  local json='{}' tool
+  for tool in "${tool_ids[@]}"; do
+    json=$(jq --arg tool "$tool" '. + {($tool): {selected: false, status: "not-started", updatedAt: null}}' <<<"$json")
+  done
+  printf '%s\n' "$json"
+}
 
 default_state() {
-  jq -n '{schemaVersion: 1, currentStep: 1, firstDisplayedAt: null, completedAt: null, deferred: false, selectedAgent: null}'
+  jq -n --argjson tools "$(default_tools)" '{schemaVersion: 2, currentStep: 1, firstDisplayedAt: null, completedAt: null, deferred: false, selectedAgent: null, tools: $tools}'
+}
+
+migrate_v1() {
+  local old_state=$1 tools selected_agent
+  tools=$(default_tools)
+  selected_agent=$(jq -r '.selectedAgent // empty' <<<"$old_state")
+  if [[ -n $selected_agent ]] && is_known_tool "$selected_agent"; then
+    tools=$(jq --arg tool "$selected_agent" '.[$tool].selected = true | .[$tool].status = "selected"' <<<"$tools")
+  fi
+  jq --argjson tools "$tools" '.schemaVersion = 2 | .tools = $tools' <<<"$old_state"
 }
 
 read_state() {
@@ -19,20 +64,30 @@ read_state() {
     default_state
     return
   fi
-  local stored_schema
-  stored_schema=$(jq -r '.schemaVersion // 0' "$state_file" 2>/dev/null) || {
+  local stored_schema state
+  state=$(cat "$state_file")
+  stored_schema=$(jq -r '.schemaVersion // 0' <<<"$state" 2>/dev/null) || {
     echo "Maslow OS AI setup state needs attention: invalid JSON." >&2
     exit 2
   }
-  if (( stored_schema != schema_version )); then
+  case "$stored_schema" in
+  1) migrate_v1 "$state" ;;
+  "$schema_version")
+    jq -e '.tools | type == "object"' <<<"$state" >/dev/null 2>&1 || {
+      echo "Maslow OS AI setup state needs attention: invalid schema 2 state." >&2
+      exit 2
+    }
+    printf '%s\n' "$state"
+    ;;
+  *)
     echo "Maslow OS AI setup state uses unsupported schema $stored_schema and was left unchanged." >&2
     exit 2
-  fi
-  cat "$state_file"
+    ;;
+  esac
 }
 
 write_state() {
-  local json="$1" tmp
+  local json=$1 tmp
   mkdir -p "$state_dir"
   chmod 0700 "$state_dir"
   tmp=$(mktemp "$state_dir/.onboarding.XXXXXX")
@@ -41,11 +96,28 @@ write_state() {
   mv "$tmp" "$state_file"
 }
 
+catalog() {
+  jq -n '{schemaVersion: 1, tools: [
+    {id: "bitwarden", name: "Bitwarden", kind: "readiness"},
+    {id: "codex", name: "Codex", kind: "agent"},
+    {id: "claude", name: "Claude Code", kind: "agent"},
+    {id: "hermes", name: "Hermes", kind: "agent"},
+    {id: "memory-builtin", name: "Hermes built-in memory", kind: "memory"},
+    {id: "honcho", name: "Honcho", kind: "memory"},
+    {id: "hindsight", name: "Hindsight", kind: "memory"},
+    {id: "mcp", name: "MCP connections", kind: "integration"},
+    {id: "speech", name: "Desktop speech", kind: "accessibility"}
+  ]}'
+}
+
+if [[ $action == "catalog" ]]; then
+  catalog
+  exit 0
+fi
+
 state=$(read_state)
 case "$action" in
-show)
-  printf '%s\n' "$state"
-  ;;
+show) printf '%s\n' "$state" ;;
 open)
   state=$(jq 'if .firstDisplayedAt == null then .firstDisplayedAt = (now | todateiso8601) else . end' <<<"$state")
   write_state "$state"
@@ -61,7 +133,32 @@ select)
   agent=${2:?agent required}
   source "$OMARCHY_PATH/install/helpers/agent.sh"
   omarchy_agent_resolve "$agent" || { echo "Unsupported agent: $agent" >&2; exit 1; }
-  state=$(jq --arg agent "$OMARCHY_AGENT_ID" '.selectedAgent = $agent | .currentStep = 3' <<<"$state")
+  is_known_tool "$OMARCHY_AGENT_ID" || { echo "Unsupported onboarding tool: $OMARCHY_AGENT_ID" >&2; exit 1; }
+  state=$(jq --arg agent "$OMARCHY_AGENT_ID" '.selectedAgent = $agent | .currentStep = 3 | .tools[$agent].selected = true | .tools[$agent].status = "selected" | .tools[$agent].updatedAt = (now | todateiso8601)' <<<"$state")
+  write_state "$state"
+  ;;
+tool-select)
+  tool=${2:?tool ID required}
+  selected=${3:?true or false required}
+  is_known_tool "$tool" || { echo "Unsupported onboarding tool: $tool" >&2; exit 1; }
+  [[ $selected == "true" || $selected == "false" ]] || { echo "Selection must be true or false." >&2; exit 1; }
+  state=$(jq --arg tool "$tool" --argjson selected "$selected" '.tools[$tool].selected = $selected | .tools[$tool].status = (if $selected then (if .tools[$tool].status == "not-started" or .tools[$tool].status == "skipped" then "selected" else .tools[$tool].status end) else "not-started" end) | .tools[$tool].updatedAt = (now | todateiso8601)' <<<"$state")
+  if [[ $selected == "true" && ($tool == "honcho" || $tool == "hindsight") ]]; then
+    other_provider=$([[ $tool == "honcho" ]] && printf '%s' hindsight || printf '%s' honcho)
+    state=$(jq --arg other "$other_provider" '.tools[$other].selected = false | .tools[$other].status = "not-started" | .tools[$other].updatedAt = (now | todateiso8601)' <<<"$state")
+  fi
+  write_state "$state"
+  ;;
+tool-status)
+  tool=${2:?tool ID required}
+  status=${3:?status required}
+  is_known_tool "$tool" || { echo "Unsupported onboarding tool: $tool" >&2; exit 1; }
+  is_known_status "$status" || { echo "Unsupported onboarding status: $status" >&2; exit 1; }
+  state=$(jq --arg tool "$tool" --arg status "$status" '.tools[$tool].status = $status | .tools[$tool].selected = ($status != "not-started" and $status != "skipped") | .tools[$tool].updatedAt = (now | todateiso8601)' <<<"$state")
+  if [[ $status != "not-started" && $status != "skipped" && ($tool == "honcho" || $tool == "hindsight") ]]; then
+    other_provider=$([[ $tool == "honcho" ]] && printf '%s' hindsight || printf '%s' honcho)
+    state=$(jq --arg other "$other_provider" '.tools[$other].selected = false | .tools[$other].status = "not-started" | .tools[$other].updatedAt = (now | todateiso8601)' <<<"$state")
+  fi
   write_state "$state"
   ;;
 defer)
@@ -69,15 +166,20 @@ defer)
   write_state "$state"
   ;;
 complete)
+  supported_json=$(printf '%s\n' "${supported_tool_ids[@]}" | jq -Rsc 'split("\n") | map(select(length > 0))')
+  if jq -e --argjson supported "$supported_json" '[.tools | to_entries[] | select(.key as $key | $supported | index($key))] | any(.value.selected == true and .value.status != "ready")' <<<"$state" >/dev/null; then
+    echo "Selected supported tools must be marked ready before setup can be completed." >&2
+    exit 1
+  fi
   state=$(jq '.completedAt = (now | todateiso8601) | .currentStep = 4 | .deferred = false' <<<"$state")
   write_state "$state"
   ;;
 reset)
-  state=$(jq '.currentStep = 1 | .completedAt = null | .deferred = false | .selectedAgent = null' <<<"$state")
+  state=$(jq --argjson tools "$(default_tools)" '.currentStep = 1 | .completedAt = null | .deferred = false | .selectedAgent = null | .tools = $tools' <<<"$state")
   write_state "$state"
   ;;
 *)
-  echo "Usage: omarchy-setup-ai-state <show|open|step|select|defer|complete|reset> [value]" >&2
+  echo "Usage: omarchy-setup-ai-state <catalog|show|open|step|select|tool-select|tool-status|defer|complete|reset> [value]" >&2
   exit 1
   ;;
 esac

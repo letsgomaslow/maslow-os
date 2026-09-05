@@ -1,0 +1,232 @@
+#!/bin/bash
+
+# omarchy:summary=Manage safe tool actions for Maslow OS AI setup
+# omarchy:hidden=true
+
+set -euo pipefail
+
+action=${1:-}
+tool=${2:-}
+
+fail() {
+  echo "omarchy-setup-ai-tool: $*" >&2
+  exit 1
+}
+
+tool_name() {
+  case "$1" in
+  bitwarden) printf '%s' "Bitwarden" ;;
+  codex) printf '%s' "Codex" ;;
+  claude) printf '%s' "Claude Code" ;;
+  hermes) printf '%s' "Hermes" ;;
+  memory-builtin) printf '%s' "Hermes built-in memory" ;;
+  honcho) printf '%s' "Honcho" ;;
+  hindsight) printf '%s' "Hindsight" ;;
+  mcp) printf '%s' "Hermes MCP setup" ;;
+  speech) printf '%s' "Desktop speech" ;;
+  *) return 1 ;;
+  esac
+}
+
+tool_supported() {
+  [[ $1 == "bitwarden" || $1 == "codex" || $1 == "claude" || $1 == "hermes" ||
+    $1 == "memory-builtin" || $1 == "honcho" || $1 == "hindsight" || $1 == "mcp" ]]
+}
+
+tool_planned_reason() {
+  case "$1" in
+  speech) printf '%s' "Planned: desktop speech setup is not available in this version." ;;
+  *) return 1 ;;
+  esac
+}
+
+require_known_tool() {
+  [[ -n $tool ]] || fail "a tool id is required"
+  tool_name "$tool" >/dev/null || fail "unknown tool id '$tool'"
+}
+
+installed() {
+  case "$tool" in
+  bitwarden) omarchy-pkg-present bitwarden ;;
+  codex | claude | hermes | memory-builtin)
+    source "$OMARCHY_PATH/install/helpers/agent.sh"
+    if [[ $tool == "codex" || $tool == "claude" || $tool == "hermes" ]]; then
+      omarchy_agent_resolve "$tool"
+    else
+      omarchy_agent_resolve hermes
+    fi
+    omarchy_agent_is_installed
+    ;;
+  # The official setup wizard installs the selected external provider's
+  # dependencies. Without reading provider configuration, Maslow cannot prove
+  # that either provider has completed setup.
+  honcho | hindsight | mcp) return 1 ;;
+  *) return 1 ;;
+  esac
+}
+
+available() {
+  case "$tool" in
+  bitwarden) omarchy-pkg-available bitwarden ;;
+  codex | claude | hermes | memory-builtin | honcho | hindsight | mcp) return 0 ;;
+  *) return 1 ;;
+  esac
+}
+
+catalog() {
+  jq -n '{
+    schemaVersion: 1,
+    tools: [
+      {id: "bitwarden", name: "Bitwarden", supported: true},
+      {id: "codex", name: "Codex", supported: true},
+      {id: "claude", name: "Claude Code", supported: true},
+      {id: "hermes", name: "Hermes", supported: true},
+      {id: "memory-builtin", name: "Hermes built-in memory", supported: true},
+      {id: "honcho", name: "Honcho", supported: true, setupOnly: true, userConfirmable: true},
+      {id: "hindsight", name: "Hindsight", supported: true, setupOnly: true, userConfirmable: true},
+      {id: "mcp", name: "Hermes MCP setup", supported: true, setupOnly: true, userConfirmable: true},
+      {id: "speech", name: "Desktop speech", supported: false, planned: true}
+    ]
+  }'
+}
+
+status() {
+  local name is_supported=false is_planned=false is_available=false is_installed=false prerequisite_installed=false
+  local setup_only=false user_confirmable=false reason="" reason_code=""
+  name=$(tool_name "$tool")
+  if tool_supported "$tool"; then
+    is_supported=true
+    available && is_available=true
+    installed && is_installed=true
+    if [[ $tool == "codex" || $tool == "claude" || $tool == "hermes" ]] && [[ $is_installed == "false" ]]; then
+      source "$OMARCHY_PATH/install/helpers/agent.sh"
+      omarchy_agent_resolve "$tool"
+      if omarchy_agent_is_packaged && ! omarchy_agent_package_on_path; then
+        reason_code="path-shadow"
+      else
+        reason_code="missing-core"
+      fi
+    elif [[ $tool == "bitwarden" ]] && [[ $is_installed == "false" ]]; then
+      reason_code="missing-core"
+    fi
+    if [[ $tool == "honcho" || $tool == "hindsight" || $tool == "mcp" ]]; then
+      setup_only=true
+      user_confirmable=true
+      source "$OMARCHY_PATH/install/helpers/agent.sh"
+      omarchy_agent_resolve hermes
+      omarchy_agent_is_installed && prerequisite_installed=true
+    else
+      prerequisite_installed=$is_installed
+    fi
+  else
+    is_planned=true
+    reason=$(tool_planned_reason "$tool")
+  fi
+
+  jq -n \
+    --arg id "$tool" \
+    --arg name "$name" \
+    --arg authentication "unknown" \
+    --arg reason "$reason" \
+    --arg reasonCode "$reason_code" \
+    --argjson supported "$is_supported" \
+    --argjson planned "$is_planned" \
+    --argjson available "$is_available" \
+    --argjson installed "$is_installed" \
+    --argjson prerequisiteInstalled "$prerequisite_installed" \
+    --argjson setupOnly "$setup_only" \
+    --argjson userConfirmable "$user_confirmable" \
+    '{schemaVersion: 1, id: $id, name: $name, supported: $supported, planned: $planned, available: $available, installed: $installed, prerequisiteInstalled: $prerequisiteInstalled, setupOnly: $setupOnly, userConfirmable: $userConfirmable, authentication: $authentication}
+      + (if $reason == "" then {} else {reason: $reason} end)
+      + (if $reasonCode == "" then {} else {reasonCode: $reasonCode} end)'
+}
+
+install_tool() {
+  tool_supported "$tool" || fail "$(tool_planned_reason "$tool")"
+  available || fail "$(tool_name "$tool") is not available for this system"
+
+  case "$tool" in
+  bitwarden)
+    exec omarchy-install-and-launch Bitwarden bitwarden bitwarden
+    ;;
+  codex | claude | hermes)
+    exec omarchy-launch-floating-terminal-with-presentation omarchy-agent-install "$tool"
+    ;;
+  memory-builtin)
+    installed || fail "Hermes is not installed"
+    echo "Hermes built-in memory is active by default."
+    ;;
+  honcho)
+    open_tool
+    ;;
+  hindsight)
+    open_tool
+    ;;
+  mcp)
+    open_tool
+    ;;
+  esac
+}
+
+open_tool() {
+  tool_supported "$tool" || fail "$(tool_planned_reason "$tool")"
+  if [[ $tool == "honcho" || $tool == "hindsight" || $tool == "mcp" ]]; then
+    source "$OMARCHY_PATH/install/helpers/agent.sh"
+    omarchy_agent_resolve hermes
+    omarchy_agent_is_installed || fail "Hermes is not installed"
+  else
+    installed || fail "$(tool_name "$tool") is not installed"
+  fi
+
+  case "$tool" in
+  bitwarden)
+    exec setsid uwsm-app -- gtk-launch bitwarden
+    ;;
+  codex)
+    exec omarchy-launch-floating-terminal-with-presentation codex login
+    ;;
+  claude)
+    exec omarchy-launch-floating-terminal-with-presentation claude auth login
+    ;;
+  hermes)
+    exec omarchy-launch-floating-terminal-with-presentation hermes
+    ;;
+  memory-builtin)
+    exec omarchy-launch-floating-terminal-with-presentation hermes memory status
+    ;;
+  honcho)
+    exec omarchy-launch-floating-terminal-with-presentation hermes memory setup honcho
+    ;;
+  hindsight)
+    exec omarchy-launch-floating-terminal-with-presentation hermes memory setup hindsight
+    ;;
+  mcp)
+    exec omarchy-launch-floating-terminal-with-presentation hermes mcp
+    ;;
+  esac
+}
+
+case "$action" in
+catalog)
+  (($# == 1)) || fail "usage: omarchy-setup-ai-tool catalog"
+  catalog
+  ;;
+status)
+  (($# == 2)) || fail "usage: omarchy-setup-ai-tool status TOOL_ID"
+  require_known_tool
+  status
+  ;;
+install)
+  (($# == 2)) || fail "usage: omarchy-setup-ai-tool install TOOL_ID"
+  require_known_tool
+  install_tool
+  ;;
+open)
+  (($# == 2)) || fail "usage: omarchy-setup-ai-tool open TOOL_ID"
+  require_known_tool
+  open_tool
+  ;;
+*)
+  fail "usage: omarchy-setup-ai-tool <catalog|status|install|open> [TOOL_ID]"
+  ;;
+esac

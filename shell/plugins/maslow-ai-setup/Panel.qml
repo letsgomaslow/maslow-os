@@ -12,12 +12,23 @@ Item {
   property var shell: null
   property bool closingFromHost: false
   property int step: 1
-  property string selectedAgent: ""
   property string statusText: ""
+  property string activeTool: ""
+  property string activeAction: ""
+  property string statusTool: ""
   property bool busy: false
+  property bool canFinish: false
+  property bool stateCatalogLoaded: false
+  property bool stateLoaded: false
+  property bool adapterCatalogLoaded: false
+  property bool statusChecksComplete: false
+  property bool statusChecksFailed: false
+  property bool closingQueued: false
+  property var statusQueue: []
+  property var stateWriteQueue: []
+  property var stateWriteCurrent: null
   property string productName: ""
   property string productTagline: ""
-  property bool hermesDesktopAvailable: false
 
   readonly property color foreground: Color.foreground
   readonly property color background: Color.background
@@ -25,34 +36,50 @@ Item {
   readonly property color urgent: Color.urgent
   readonly property string fontFamily: "Manrope"
 
+  ListModel { id: toolModel }
+
   function focusCurrentStep() {
     Qt.callLater(function() {
       if (!window.visible) return
       switch (root.step) {
         case 1: continueButton.forceActiveFocus(); break
-        case 2: codexButton.forceActiveFocus(); break
-        case 3: installButton.forceActiveFocus(); break
-        case 4: defaultButton.forceActiveFocus(); break
+        case 2: toolsView.forceActiveFocus(); break
+        case 3: finishButton.forceActiveFocus(); break
       }
     })
   }
 
-  function launchMode(agent) {
-    switch (agent) {
-      case "codex": return "codex:--approve-for-me"
-      case "claude": return "claude:--permission-mode=auto"
-      case "hermes": return "hermes:--yolo"
-    }
-    return ""
+  function ensureToolVisible(card) {
+    Qt.callLater(function() {
+      var viewport = toolsView.contentItem
+      if (!viewport || !card) return
+      var top = card.mapToItem(viewport.contentItem, 0, 0).y
+      var bottom = top + card.height
+      var nextY = viewport.contentY
+      if (top < nextY) nextY = top
+      else if (bottom > nextY + viewport.height) nextY = bottom - viewport.height
+      viewport.contentY = Math.max(0, Math.min(nextY, Math.max(0, viewport.contentHeight - viewport.height)))
+    })
   }
 
   function open(payloadJson) {
     closingFromHost = false
+    closingQueued = false
+    canFinish = false
+    stateCatalogLoaded = false
+    stateLoaded = false
+    adapterCatalogLoaded = false
+    statusChecksComplete = false
+    statusChecksFailed = false
+    statusQueue = []
+    statusText = ""
     window.visible = true
+    root.focusCurrentStep()
+    stateCatalogProc.running = true
+    adapterCatalogProc.running = true
     stateProc.command = ["omarchy-setup-ai-state", "open"]
     stateProc.running = true
     productProc.running = true
-    hermesDesktopProc.running = true
   }
 
   function close() {
@@ -67,59 +94,235 @@ Item {
   }
 
   function saveStep(next) {
+    if (closingQueued) return
     step = next
     root.focusCurrentStep()
-    stateWriteProc.command = ["omarchy-setup-ai-state", "step", String(next)]
-    stateWriteProc.running = true
+    queueStateWrite(["omarchy-setup-ai-state", "step", String(next)])
   }
 
-  function chooseAgent(agent) {
-    selectedAgent = agent
-    step = 3
+  function findTool(toolId) {
+    for (var index = 0; index < toolModel.count; index++) {
+      if (toolModel.get(index).toolId === toolId) return index
+    }
+    return -1
+  }
+
+  function applyState(state) {
+    step = Math.max(1, Math.min(3, Number(state.currentStep || 1)))
+    var tools = state.tools || {}
+    for (var toolId in tools) {
+      var index = findTool(toolId)
+      if (index < 0) continue
+      toolModel.setProperty(index, "selected", tools[toolId].selected === true)
+      toolModel.setProperty(index, "toolStatus", String(tools[toolId].status || "not-started"))
+    }
+    updateCompletionState()
     root.focusCurrentStep()
-    stateWriteProc.command = ["omarchy-setup-ai-state", "select", agent]
-    stateWriteProc.running = true
   }
 
-  function beginInstall() {
+  function applyAdapterCatalog(catalog) {
+    if (toolModel.count === 0) return
+    statusChecksComplete = false
+    statusChecksFailed = false
+    var tools = catalog.tools || []
+    var queue = []
+    for (var i = 0; i < tools.length; i++) {
+      var entry = tools[i]
+      var index = findTool(String(entry.id || ""))
+      if (index < 0) continue
+      toolModel.setProperty(index, "adapterSupported", entry.supported === true)
+      toolModel.setProperty(index, "planned", entry.planned === true)
+      toolModel.setProperty(index, "setupOnly", entry.setupOnly === true)
+      toolModel.setProperty(index, "userConfirmable", entry.userConfirmable === true)
+      if (entry.setupOnly === true || String(entry.id) === "memory-builtin") {
+        toolModel.setProperty(index, "prerequisiteInstalled", false)
+        toolModel.setProperty(index, "installSupported", false)
+        toolModel.setProperty(index, "openSupported", false)
+      }
+      if (entry.supported !== true) continue
+      if (entry.setupOnly === true || String(entry.id) === "memory-builtin") continue
+      queue.push(String(entry.id))
+    }
+    statusQueue = queue
+    checkNextToolStatus()
+  }
+
+  function checkNextToolStatus() {
+    if (statusProc.running) return
+    if (statusQueue.length === 0) {
+      statusChecksComplete = stateCatalogLoaded && adapterCatalogLoaded && !statusChecksFailed
+      updateCompletionState()
+      return
+    }
+    var queue = statusQueue.slice()
+    statusTool = String(queue.shift())
+    statusQueue = queue
+    statusProc.command = ["omarchy-setup-ai-tool", "status", statusTool]
+    statusProc.running = true
+  }
+
+  function toggleTool(toolId, selected) {
+    var index = findTool(toolId)
+    if (index < 0 || busy || closingQueued) return
+    toolModel.setProperty(index, "selected", selected)
+    var nextStatus = selected ? (toolModel.get(index).openSupported ? "action-required" : "selected") : "not-started"
+    toolModel.setProperty(index, "toolStatus", nextStatus)
+    if (selected && (toolId === "honcho" || toolId === "hindsight")) {
+      var otherProvider = toolId === "honcho" ? "hindsight" : "honcho"
+      var otherIndex = findTool(otherProvider)
+      if (otherIndex >= 0) {
+        toolModel.setProperty(otherIndex, "selected", false)
+        toolModel.setProperty(otherIndex, "toolStatus", "not-started")
+      }
+    }
+    updateCompletionState()
+    queueStateWrite(["omarchy-setup-ai-state", "tool-select", toolId, selected ? "true" : "false"])
+    if (nextStatus === "action-required") queueStateWrite(["omarchy-setup-ai-state", "tool-status", toolId, nextStatus])
+  }
+
+  function runToolAction(toolId, action) {
+    var index = findTool(toolId)
+    if (index < 0 || busy || closingQueued) return
+    var item = toolModel.get(index)
+    if ((action === "install" && !item.installSupported) || (action === "open" && !item.openSupported)) return
     busy = true
-    statusText = "Opening the installer…"
-    actionProc.actionKind = "install"
-    actionProc.command = ["omarchy-launch-floating-terminal-with-presentation", "omarchy-agent-install", selectedAgent]
-    actionProc.running = true
+    activeTool = toolId
+    activeAction = action
+    if (toolId === "hermes") updateHermesDependents(false)
+    statusText = action === "install" ? (isCoreTool(toolId) ? "Opening the repair flow…" : "Opening setup…") : "Opening the tool…"
+    toolModel.setProperty(index, "selected", true)
+    toolModel.setProperty(index, "toolStatus", "in-progress")
+    updateCompletionState()
+    queueStateWrite(["omarchy-setup-ai-state", "tool-status", toolId, "in-progress"], false, toolId, action)
   }
 
-  function completeWithoutAgent() {
-    stateWriteProc.closeAfterWrite = true
-    stateWriteProc.command = ["omarchy-setup-ai-state", "complete"]
+  function statusLabel(status) {
+    switch (status) {
+      case "selected": return "Selected"
+      case "in-progress": return "In progress"
+      case "action-required": return "Sign-in or setup may still be needed"
+      case "ready": return "Ready"
+      case "needs-attention": return "Needs attention — retry available"
+      case "skipped": return "Skipped"
+      default: return "Not selected"
+    }
+  }
+
+  function toolDescription(toolId) {
+    switch (toolId) {
+      case "bitwarden": return "Get your passwords and SSH keys ready before AI setup."
+      case "codex": return "Tested starter coding agent from OpenAI."
+      case "claude": return "Tested starter coding agent from Anthropic."
+      case "hermes": return "Tested starter agent harness with built-in memory."
+      case "memory-builtin": return "Hermes uses this by default. No extra provider is required."
+      case "honcho": return "Optional external memory provider. Choose this or Hindsight, not both."
+      case "hindsight": return "Optional external memory provider. Choose this or Honcho, not both."
+      case "mcp": return "MCP connections are set up separately for each agent."
+      case "speech": return "Optional desktop speech support will be guided in a later version."
+      default: return "Optional setup item."
+    }
+  }
+
+  function isCoreTool(toolId) {
+    return toolId === "bitwarden" || toolId === "codex" || toolId === "claude" || toolId === "hermes"
+  }
+
+  function primaryActionLabel(toolId, setupOnly, status) {
+    if (status === "needs-attention") return "Retry"
+    if (isCoreTool(toolId)) return "Repair"
+    if (setupOnly) return "Configure"
+    return "Check"
+  }
+
+  function openActionLabel(toolId, setupOnly, status) {
+    if (status === "in-progress" || status === "needs-attention") return "Retry"
+    if (setupOnly) return "Configure"
+    if (toolId === "codex" || toolId === "claude" || toolId === "hermes") return "Sign in"
+    if (toolId === "memory-builtin") return "Check"
+    return "Open"
+  }
+
+  function availabilityLabel(toolId, planned, setupOnly, prerequisiteInstalled, installSupported, openSupported, status, reasonCode) {
+    if (toolId === "memory-builtin") return openSupported ? "Included with Hermes" : "Set up Hermes first"
+    if (planned) return "Guided setup planned"
+    if (reasonCode === "path-shadow") return "Command override needs attention"
+    if (isCoreTool(toolId) && !openSupported) return "Core software missing — repair required"
+    if (setupOnly && !prerequisiteInstalled) return "Set up Hermes first"
+    if (!installSupported && !openSupported) return "Unavailable on this system"
+    if (!setupOnly && status === "ready" && !openSupported) return "Installation needs attention"
+    return statusLabel(status)
+  }
+
+  function updateHermesDependents(installed) {
+    for (var index = 0; index < toolModel.count; index++) {
+      var item = toolModel.get(index)
+      if (!item.setupOnly && item.toolId !== "memory-builtin") continue
+      toolModel.setProperty(index, "prerequisiteInstalled", installed)
+      toolModel.setProperty(index, "installSupported", item.setupOnly && installed)
+      toolModel.setProperty(index, "openSupported", installed)
+    }
+  }
+
+  function updateCompletionState() {
+    var complete = true
+    for (var index = 0; index < toolModel.count; index++) {
+      var item = toolModel.get(index)
+      if (item.adapterSupported && item.selected && (item.toolStatus !== "ready" || (item.setupOnly ? !item.prerequisiteInstalled : !item.openSupported))) complete = false
+    }
+    canFinish = stateCatalogLoaded && stateLoaded && adapterCatalogLoaded && statusChecksComplete && complete
+  }
+
+  function markReady(toolId) {
+    var index = findTool(toolId)
+    if (index < 0) return
+    var item = toolModel.get(index)
+    if (!item.adapterSupported || (item.setupOnly && !item.prerequisiteInstalled) || (!item.openSupported && !item.userConfirmable)) return
+    toolModel.setProperty(index, "selected", true)
+    toolModel.setProperty(index, "toolStatus", "ready")
+    updateCompletionState()
+    statusText = "Marked ready. Maslow OS saved only your confirmation, not any account details."
+    queueStateWrite(["omarchy-setup-ai-state", "tool-status", toolId, "ready"])
+  }
+
+  function queueStateWrite(command, closeAfterWrite, launchTool, launchAction) {
+    if (closingQueued && closeAfterWrite !== true) return
+    if (closeAfterWrite === true) closingQueued = true
+    var queue = stateWriteQueue.slice()
+    queue.push({
+      command: command,
+      closeAfterWrite: closeAfterWrite === true,
+      launchTool: String(launchTool || ""),
+      launchAction: String(launchAction || "")
+    })
+    stateWriteQueue = queue
+    startNextStateWrite()
+  }
+
+  function startNextStateWrite() {
+    if (stateWriteProc.running || stateWriteCurrent !== null || stateWriteQueue.length === 0) return
+    var queue = stateWriteQueue.slice()
+    stateWriteCurrent = queue.shift()
+    stateWriteQueue = queue
+    stateWriteProc.command = stateWriteCurrent.command
     stateWriteProc.running = true
   }
 
   function deferSetup() {
-    stateWriteProc.closeAfterWrite = true
-    stateWriteProc.command = ["omarchy-setup-ai-state", "defer"]
-    stateWriteProc.running = true
+    if (closingQueued) return
+    queueStateWrite(["omarchy-setup-ai-state", "defer"], true)
   }
 
-  function finishAndLaunch() {
-    busy = true
-    statusText = "Setting " + agentName(selectedAgent) + " as your default…"
-    actionProc.actionKind = "default"
-    actionProc.command = ["omarchy-agent-default-set", selectedAgent]
-    actionProc.running = true
+  function finishSetup() {
+    if (busy || closingQueued || !stateCatalogLoaded || !stateLoaded || !adapterCatalogLoaded || !statusChecksComplete) return
+    queueStateWrite(["omarchy-setup-ai-state", canFinish ? "complete" : "defer"], true)
   }
 
-  function finishOnly() {
-    stateWriteProc.closeAfterWrite = true
-    stateWriteProc.command = ["omarchy-setup-ai-state", "complete"]
-    stateWriteProc.running = true
-  }
-
-  function agentName(agent) {
-    if (agent === "codex") return "Codex"
-    if (agent === "claude") return "Claude Code"
-    if (agent === "hermes") return "Hermes"
-    return "AI agent"
+  function retryStatusChecks() {
+    if (busy || closingQueued || !adapterCatalogOutput.text) return
+    statusChecksFailed = false
+    statusText = "Checking tool status again…"
+    try { applyAdapterCatalog(JSON.parse(adapterCatalogOutput.text)) }
+    catch (e) { statusText = "Tool status could not be checked. You can retry." }
   }
 
   Process {
@@ -139,92 +342,171 @@ Item {
   }
 
   Process {
-    id: hermesDesktopProc
-    command: ["omarchy-pkg-available", "hermes-desktop"]
-    onExited: function(exitCode) { root.hermesDesktopAvailable = exitCode === 0 }
+    id: stateCatalogProc
+    command: ["omarchy-setup-ai-state", "catalog"]
+    stdout: StdioCollector { id: stateCatalogOutput; waitForEnd: true }
+    onExited: function(exitCode) {
+      if (exitCode !== 0) {
+        root.statusText = "The setup list could not be loaded."
+        return
+      }
+      try {
+        var catalog = JSON.parse(stateCatalogOutput.text)
+        toolModel.clear()
+        for (var i = 0; i < catalog.tools.length; i++) {
+          var item = catalog.tools[i]
+          toolModel.append({
+            toolId: String(item.id),
+            toolName: String(item.name),
+            toolKind: String(item.kind),
+            selected: false,
+            toolStatus: "not-started",
+            installSupported: false,
+            openSupported: false,
+            adapterSupported: false,
+            planned: true,
+            setupOnly: false,
+            userConfirmable: false,
+            prerequisiteInstalled: false,
+            reasonCode: "",
+            toolDescription: root.toolDescription(String(item.id))
+          })
+        }
+        root.stateCatalogLoaded = true
+        if (stateOutput.text) root.applyState(JSON.parse(stateOutput.text))
+        if (adapterCatalogOutput.text) root.applyAdapterCatalog(JSON.parse(adapterCatalogOutput.text))
+      } catch (e) {
+        root.statusText = "The setup list could not be read."
+      }
+    }
+  }
+
+  Process {
+    id: adapterCatalogProc
+    command: ["omarchy-setup-ai-tool", "catalog"]
+    stdout: StdioCollector { id: adapterCatalogOutput; waitForEnd: true }
+    onExited: function(exitCode) {
+      if (exitCode !== 0) return
+      try {
+        root.adapterCatalogLoaded = true
+        root.applyAdapterCatalog(JSON.parse(adapterCatalogOutput.text))
+      }
+      catch (e) { root.statusText = "Tool actions are unavailable right now." }
+    }
   }
 
   Process {
     id: stateProc
-    stdout: StdioCollector {
-      id: stateOutput
-      waitForEnd: true
-    }
-    stderr: StdioCollector { id: stateError; waitForEnd: true }
+    stdout: StdioCollector { id: stateOutput; waitForEnd: true }
     onExited: function(exitCode) {
       if (exitCode !== 0) {
-        statusText = stateError.text.trim() || "AI setup state needs attention."
+        root.statusText = "AI setup progress needs attention."
         return
       }
       try {
-        var state = JSON.parse(stateOutput.text)
-        step = Number(state.currentStep || 1)
-        selectedAgent = String(state.selectedAgent || "")
-        root.focusCurrentStep()
-      } catch (e) {
-        statusText = "AI setup state could not be read."
+        root.stateLoaded = true
+        root.applyState(JSON.parse(stateOutput.text))
       }
+      catch (e) { root.statusText = "AI setup progress could not be read." }
+    }
+  }
+
+  Process {
+    id: statusProc
+    stdout: StdioCollector { id: toolStatusOutput; waitForEnd: true }
+    onExited: function(exitCode) {
+      if (exitCode === 0) {
+        try {
+          var result = JSON.parse(toolStatusOutput.text)
+          if (result.id !== root.statusTool || result.supported !== true || typeof result.available !== "boolean" || typeof result.installed !== "boolean" || typeof result.prerequisiteInstalled !== "boolean") throw new Error("Invalid tool status")
+          var index = root.findTool(String(result.id || ""))
+          if (index >= 0 && result.supported === true) {
+            var setupOnly = result.setupOnly === true
+            var prerequisiteInstalled = result.prerequisiteInstalled === true
+            var reasonCode = String(result.reasonCode || "")
+            toolModel.setProperty(index, "prerequisiteInstalled", prerequisiteInstalled)
+            toolModel.setProperty(index, "reasonCode", reasonCode)
+            toolModel.setProperty(index, "installSupported", reasonCode !== "path-shadow" && result.available === true && result.installed !== true && (!setupOnly || prerequisiteInstalled))
+            toolModel.setProperty(index, "openSupported", result.installed === true || (setupOnly && prerequisiteInstalled))
+            if (result.installed === true) {
+              var previousStatus = String(toolModel.get(index).toolStatus)
+              if (toolModel.get(index).selected && (previousStatus === "not-started" || previousStatus === "selected")) {
+                toolModel.setProperty(index, "toolStatus", "action-required")
+                root.queueStateWrite(["omarchy-setup-ai-state", "tool-status", String(result.id), "action-required"])
+              }
+            }
+            if (String(result.id) === "hermes") root.updateHermesDependents(result.installed === true)
+            root.updateCompletionState()
+          }
+        } catch (e) {
+          if (root.statusTool === "hermes") root.updateHermesDependents(false)
+          root.statusChecksFailed = true
+          root.statusText = "One tool status could not be read. You can retry from its card."
+        }
+      } else {
+        if (root.statusTool === "hermes") root.updateHermesDependents(false)
+        root.statusChecksFailed = true
+        root.statusText = "One tool status could not be checked. You can retry."
+      }
+      root.checkNextToolStatus()
     }
   }
 
   Process {
     id: stateWriteProc
-    property bool closeAfterWrite: false
-    stderr: StdioCollector { id: stateWriteError; waitForEnd: true }
     onExited: function(exitCode) {
+      var completedWrite = root.stateWriteCurrent
+      root.stateWriteCurrent = null
       if (exitCode !== 0) {
-        statusText = stateWriteError.text.trim() || "Could not save AI setup progress."
-        closeAfterWrite = false
+        root.statusText = "Could not save AI setup progress. You can retry."
+        root.busy = false
+        root.stateWriteQueue = []
+        root.closingQueued = false
         return
       }
-      if (closeAfterWrite) {
-        closeAfterWrite = false
-        root.requestClose()
+      if (completedWrite && completedWrite.launchTool !== "") {
+        root.activeTool = completedWrite.launchTool
+        root.activeAction = completedWrite.launchAction
+        actionProc.command = ["omarchy-setup-ai-tool", root.activeAction, root.activeTool]
+        actionProc.running = true
       }
+      if (completedWrite && completedWrite.closeAfterWrite) {
+        root.stateWriteQueue = []
+        root.requestClose()
+        return
+      }
+      root.startNextStateWrite()
     }
   }
 
   Process {
     id: actionProc
-    property string actionKind: ""
-    stderr: StdioCollector { id: actionError; waitForEnd: true }
     onExited: function(exitCode) {
+      var index = root.findTool(root.activeTool)
+      root.busy = false
+      if (index < 0) return
       if (exitCode === 130) {
-        root.busy = false
-        root.statusText = "Canceled. Nothing was selected or launched."
-        return
+        toolModel.setProperty(index, "toolStatus", "selected")
+        root.statusText = "Canceled. Your selection was kept."
+        root.queueStateWrite(["omarchy-setup-ai-state", "tool-status", root.activeTool, "selected"])
+      } else if (exitCode !== 0) {
+        toolModel.setProperty(index, "toolStatus", "needs-attention")
+        root.statusText = "This step needs attention. You can retry safely."
+        root.queueStateWrite(["omarchy-setup-ai-state", "tool-status", root.activeTool, "needs-attention"])
+      } else {
+        var item = toolModel.get(index)
+        var nextStatus = item.setupOnly && item.userConfirmable ? "action-required" : "selected"
+        toolModel.setProperty(index, "toolStatus", nextStatus)
+        root.statusText = item.setupOnly && item.userConfirmable ? "The official setup was opened. Mark ready only after you finish it." : (root.activeAction === "install" ? (root.isCoreTool(root.activeTool) ? "The repair flow was opened. When it finishes, use Check again." : "Setup was opened. When it finishes, use Check again.") : "The tool was opened. Maslow OS does not assume sign-in succeeded.")
+        root.queueStateWrite(["omarchy-setup-ai-state", "tool-status", root.activeTool, nextStatus])
+        if (!item.setupOnly) {
+          root.statusChecksComplete = false
+          root.statusQueue = [root.activeTool]
+        }
       }
-      if (exitCode !== 0) {
-        root.busy = false
-        root.statusText = actionError.text.trim() || "This step needs attention. You can retry."
-        return
-      }
-      if (actionKind === "install") {
-        actionKind = "trust"
-        root.statusText = "Saving your permission choice…"
-        command = ["omarchy-agent-trust", "confirm", root.selectedAgent, root.launchMode(root.selectedAgent), "--yes"]
-        running = true
-      } else if (actionKind === "trust") {
-        root.busy = false
-        root.statusText = ""
-        root.saveStep(4)
-      } else if (actionKind === "default") {
-        root.statusText = "Opening the provider sign-in flow…"
-        actionKind = "launch"
-        stateWriteProc.command = ["omarchy-setup-ai-state", "complete"]
-        stateWriteProc.running = true
-        command = ["omarchy-agent", "--agent", root.selectedAgent]
-        running = true
-      } else if (actionKind === "launch") {
-        root.busy = false
-        root.requestClose()
-      }
+      root.updateCompletionState()
+      if (exitCode === 0 && !toolModel.get(index).setupOnly) root.checkNextToolStatus()
     }
-  }
-
-  Process {
-    id: utilityProc
-    onExited: root.requestClose()
   }
 
   FloatingWindow {
@@ -251,6 +533,7 @@ Item {
         spacing: Style.space(18)
 
         Row {
+          id: productHeader
           width: parent.width
           spacing: Style.space(12)
 
@@ -264,32 +547,20 @@ Item {
           }
           Column {
             anchors.verticalCenter: parent.verticalCenter
-            Text {
-              text: root.productName
-              textFormat: Text.PlainText
-              color: root.foreground
-              font.family: root.fontFamily
-              font.weight: Font.DemiBold
-              font.pixelSize: 24
-            }
-            Text {
-              text: root.productTagline
-              textFormat: Text.PlainText
-              color: Qt.darker(root.foreground, 1.3)
-              font.family: root.fontFamily
-              font.pixelSize: 14
-            }
+            Text { text: root.productName; textFormat: Text.PlainText; color: root.foreground; font.family: root.fontFamily; font.weight: Font.DemiBold; font.pixelSize: 24 }
+            Text { text: root.productTagline; textFormat: Text.PlainText; color: Qt.darker(root.foreground, 1.3); font.family: root.fontFamily; font.pixelSize: 14 }
           }
         }
 
         Row {
+          id: progressHeader
           width: parent.width
           spacing: Style.space(8)
           Repeater {
-            model: 4
+            model: 3
             Rectangle {
               required property int index
-              width: (parent.width - Style.space(24)) / 4
+              width: (parent.width - Style.space(16)) / 3
               height: 4
               radius: 2
               color: index + 1 <= root.step ? root.accent : Qt.rgba(root.foreground.r, root.foreground.g, root.foreground.b, 0.18)
@@ -298,188 +569,185 @@ Item {
         }
 
         StackLayout {
+          id: setupSteps
           width: parent.width
-          height: parent.height - 160
+          height: Math.max(0, parent.height - productHeader.height - progressHeader.height - parent.spacing * 2
+            - (feedbackText.visible ? feedbackText.height + parent.spacing : 0)
+            - (statusRefreshButton.visible ? statusRefreshButton.height + parent.spacing : 0))
           currentIndex: root.step - 1
 
           Column {
             spacing: Style.space(18)
-            Text {
-              text: "Welcome to " + root.productName
-              textFormat: Text.PlainText
-              color: root.foreground
-              font.family: root.fontFamily
-              font.weight: Font.DemiBold
-              font.pixelSize: 28
-            }
+            Text { text: "Welcome to " + root.productName; textFormat: Text.PlainText; color: root.foreground; font.family: root.fontFamily; font.weight: Font.DemiBold; font.pixelSize: 28 }
             Text {
               width: parent.width
               wrapMode: Text.WordWrap
-              text: "Choose one AI agent now, or finish setup without one. You can return anytime from Setup → AI."
+              text: "Core AI tools come with Maslow OS. Choose which ones you want to configure, then start working."
               color: root.foreground
               font.family: root.fontFamily
               font.pixelSize: 16
             }
             Item { width: 1; height: Style.space(12) }
-            Button {
-              id: continueButton
-              text: "Continue"
-              focusable: true
-              Accessible.name: "Continue to choose an AI agent"
-              onClicked: root.saveStep(2)
+            Button { id: continueButton; text: "Continue"; focusable: true; enabled: !root.closingQueued; Accessible.name: "Continue to AI tool setup"; onClicked: root.saveStep(2) }
+            Button { text: "Not now"; focusable: true; enabled: !root.closingQueued; Accessible.name: "Stop opening AI setup automatically"; onClicked: root.deferSetup() }
+          }
+
+          Column {
+            spacing: Style.space(12)
+            Text { text: "Set up your AI workspace"; color: root.foreground; font.family: root.fontFamily; font.weight: Font.DemiBold; font.pixelSize: 28 }
+            Text { width: parent.width; wrapMode: Text.WordWrap; text: "Start with Bitwarden, then choose Codex, Claude Code, or Hermes. You can choose more than one."; color: root.foreground; font.family: root.fontFamily; font.pixelSize: 15 }
+
+            ScrollView {
+              id: toolsView
+              width: parent.width
+              // Hidden step Columns use implicit height until laid out. Their
+              // child must measure the stack, not feed back into that height.
+              height: Math.max(0, setupSteps.height - 150)
+              focus: true
+              Accessible.name: "AI setup checklist"
+              clip: true
+
+              Column {
+                width: toolsView.availableWidth
+                spacing: Style.space(8)
+                Repeater {
+                  model: toolModel
+                  Rectangle {
+                    id: toolCard
+                    required property string toolId
+                    required property string toolName
+                    required property bool selected
+                    required property string toolStatus
+                    required property bool installSupported
+                    required property bool openSupported
+                    required property bool adapterSupported
+                    required property bool planned
+                    required property bool setupOnly
+                    required property bool userConfirmable
+                    required property bool prerequisiteInstalled
+                    required property string reasonCode
+                    required property string toolDescription
+                    width: parent.width
+                    height: 82
+                    radius: 8
+                    color: Qt.rgba(root.foreground.r, root.foreground.g, root.foreground.b, selected ? 0.11 : 0.06)
+                    border.color: selected ? root.accent : Qt.rgba(root.foreground.r, root.foreground.g, root.foreground.b, 0.16)
+
+                    RowLayout {
+                      anchors.fill: parent
+                      anchors.margins: Style.space(10)
+                      spacing: Style.space(10)
+                      CheckBox {
+                        checked: selected
+                        onActiveFocusChanged: if (activeFocus) root.ensureToolVisible(toolCard)
+                        enabled: !root.busy && !root.closingQueued && adapterSupported && (selected || installSupported || openSupported)
+                        Accessible.name: (checked ? "Remove " : "Select ") + toolName
+                        Accessible.description: toolDescription
+                        onClicked: root.toggleTool(toolId, checked)
+                      }
+                      ColumnLayout {
+                        Layout.fillWidth: true
+                        Text { text: toolName; textFormat: Text.PlainText; color: root.foreground; font.family: root.fontFamily; font.weight: Font.DemiBold; font.pixelSize: 15 }
+                        Text {
+                          text: root.availabilityLabel(toolId, planned, setupOnly, prerequisiteInstalled, installSupported, openSupported, toolStatus, reasonCode)
+                          textFormat: Text.PlainText
+                          color: toolStatus === "needs-attention" ? root.urgent : Qt.darker(root.foreground, 1.25)
+                          font.family: root.fontFamily
+                          font.pixelSize: 13
+                        }
+                      }
+                      Button {
+                        focusable: true
+                        onActiveFocusChanged: if (activeFocus) root.ensureToolVisible(toolCard)
+                        visible: toolCard.selected && installSupported && toolStatus !== "action-required" && (!setupOnly || toolStatus !== "ready")
+                        text: root.primaryActionLabel(toolId, setupOnly, toolStatus)
+                        enabled: !root.busy && !root.closingQueued
+                        Accessible.name: text + " " + toolName
+                        onClicked: root.runToolAction(toolId, "install")
+                      }
+                      Button {
+                        focusable: true
+                        onActiveFocusChanged: if (activeFocus) root.ensureToolVisible(toolCard)
+                        visible: toolCard.selected && openSupported && (toolStatus === "in-progress" || toolStatus === "action-required" || toolStatus === "ready" || toolStatus === "needs-attention")
+                        text: root.openActionLabel(toolId, setupOnly, toolStatus)
+                        enabled: !root.busy && !root.closingQueued
+                        Accessible.name: text + " " + toolName
+                        onClicked: root.runToolAction(toolId, "open")
+                      }
+                      Button {
+                        focusable: true
+                        onActiveFocusChanged: if (activeFocus) root.ensureToolVisible(toolCard)
+                        visible: toolCard.selected && (!setupOnly || prerequisiteInstalled) && (openSupported || userConfirmable) && toolStatus === "action-required"
+                        text: "Mark ready"
+                        enabled: !root.busy && !root.closingQueued
+                        Accessible.name: "Mark " + toolName + " ready after completing provider setup"
+                        onClicked: root.markReady(toolId)
+                      }
+                    }
+                  }
+                }
+              }
             }
-            Button {
-              text: "Not now"
-              focusable: true
-              Accessible.name: "Stop opening AI setup automatically"
-              onClicked: root.deferSetup()
-            }
-            Button {
-              text: "Finish without an agent"
-              focusable: true
-              Accessible.name: "Complete setup without installing an AI agent"
-              onClicked: root.completeWithoutAgent()
+
+            Row {
+              spacing: Style.space(10)
+              Button { text: "Back"; focusable: true; enabled: !root.busy && !root.closingQueued; onClicked: root.saveStep(1) }
+              Button { text: "Review"; focusable: true; enabled: !root.busy && !root.closingQueued; Accessible.name: "Review AI setup progress"; onClicked: root.saveStep(3) }
+              Button { text: "Finish later"; focusable: true; enabled: !root.busy && !root.closingQueued; Accessible.name: "Save progress and finish later"; onClicked: root.deferSetup() }
             }
           }
 
           Column {
             spacing: Style.space(14)
-            Text {
-              text: "Choose an AI agent"
-              color: root.foreground
-              font.family: root.fontFamily
-              font.weight: Font.DemiBold
-              font.pixelSize: 28
-            }
-            Text {
+            Text { text: "Your setup summary"; color: root.foreground; font.family: root.fontFamily; font.weight: Font.DemiBold; font.pixelSize: 28 }
+            Text { width: parent.width; wrapMode: Text.WordWrap; text: "Ready means you confirmed the provider sign-in. Hermes uses built-in memory unless you later choose Honcho or Hindsight. MCP connections stay with each agent."; color: root.foreground; font.family: root.fontFamily; font.pixelSize: 15 }
+            ScrollView {
               width: parent.width
-              wrapMode: Text.WordWrap
-              text: "These are command-line agents. They open in a terminal and use their provider’s own authentication flow."
-              color: root.foreground
-              font.family: root.fontFamily
-              font.pixelSize: 15
-            }
-            Button { id: codexButton; text: "Codex — OpenAI"; focusable: true; Accessible.name: "Choose Codex command-line agent"; onClicked: root.chooseAgent("codex") }
-            Button { text: "Claude Code — Anthropic"; focusable: true; Accessible.name: "Choose Claude Code command-line agent"; onClicked: root.chooseAgent("claude") }
-            Button { text: "Hermes — Nous Research"; focusable: true; Accessible.name: "Choose Hermes command-line agent"; onClicked: root.chooseAgent("hermes") }
-            Button {
-              visible: root.hermesDesktopAvailable
-              text: "Hermes Desktop — graphical app"
-              focusable: true
-              Accessible.name: "Install the Hermes Desktop graphical application"
-              onClicked: {
-                utilityProc.command = ["omarchy-launch-floating-terminal-with-presentation", "omarchy-install-ai-hermes"]
-                utilityProc.running = true
+              height: Math.max(0, setupSteps.height - 150)
+              clip: true
+              Column {
+                width: parent.width
+                spacing: Style.space(8)
+                Repeater {
+                  model: toolModel
+                  Text {
+                    required property string toolId
+                    required property string toolName
+                    required property bool selected
+                    required property string toolStatus
+                    required property bool planned
+                    required property bool setupOnly
+                    required property bool prerequisiteInstalled
+                    required property bool installSupported
+                    required property bool openSupported
+                    required property string reasonCode
+                    visible: selected || toolStatus === "skipped"
+                    text: toolName + " — " + root.availabilityLabel(toolId, planned, setupOnly, prerequisiteInstalled, installSupported, openSupported, toolStatus, reasonCode)
+                    textFormat: Text.PlainText
+                    color: toolStatus === "needs-attention" ? root.urgent : root.foreground
+                    font.family: root.fontFamily
+                    font.pixelSize: 15
+                  }
+                }
               }
-            }
-            Button {
-              text: "More agents"
-              focusable: true
-              Accessible.name: "Open the complete AI agent list"
-              onClicked: {
-                utilityProc.command = ["omarchy-menu", "setup.default.agent"]
-                utilityProc.running = true
-              }
-            }
-            Button { text: "Back"; focusable: true; onClicked: root.saveStep(1) }
-          }
-
-          Column {
-            spacing: Style.space(16)
-            Text {
-              text: "Review permissions"
-              color: root.foreground
-              font.family: root.fontFamily
-              font.weight: Font.DemiBold
-              font.pixelSize: 28
-            }
-            Text {
-              width: parent.width
-              wrapMode: Text.WordWrap
-              text: root.agentName(root.selectedAgent) + " will launch in autonomous mode (“" + root.launchMode(root.selectedAgent) + "”). It may run commands, modify or delete files, install software, and access data available to your account."
-              textFormat: Text.PlainText
-              color: root.foreground
-              font.family: root.fontFamily
-              font.pixelSize: 16
-            }
-            Text {
-              width: parent.width
-              wrapMode: Text.WordWrap
-              text: "Maslow OS never reads or stores provider credentials. After installation, authentication continues in the provider’s terminal or browser flow. Opening that flow does not mean authentication succeeded."
-              color: Qt.darker(root.foreground, 1.2)
-              font.family: root.fontFamily
-              font.pixelSize: 14
-            }
-            Button {
-              id: installButton
-              text: root.busy ? "Working…" : "I understand — install and continue"
-              focusable: true
-              enabled: !root.busy
-              Accessible.name: "Confirm permissions and install " + root.agentName(root.selectedAgent)
-              onClicked: root.beginInstall()
-            }
-            Button { text: "Back"; focusable: true; enabled: !root.busy; onClicked: root.saveStep(2) }
-          }
-
-          Column {
-            spacing: Style.space(16)
-            Text {
-              text: "Ready"
-              color: root.foreground
-              font.family: root.fontFamily
-              font.weight: Font.DemiBold
-              font.pixelSize: 28
-            }
-            Text {
-              width: parent.width
-              wrapMode: Text.WordWrap
-              text: root.agentName(root.selectedAgent) + " is installed. Make it your default and continue to the provider’s authentication flow, or finish here."
-              textFormat: Text.PlainText
-              color: root.foreground
-              font.family: root.fontFamily
-              font.pixelSize: 16
-            }
-            Button {
-              id: defaultButton
-              text: root.busy ? "Opening…" : "Make default and open"
-              focusable: true
-              enabled: !root.busy
-              Accessible.name: "Make " + root.agentName(root.selectedAgent) + " the default and open provider authentication"
-              onClicked: root.finishAndLaunch()
-            }
-            Button { text: "Finish for now"; focusable: true; enabled: !root.busy; onClicked: root.finishOnly() }
-            Text {
-              text: "Recommended setup"
-              color: root.foreground
-              font.family: root.fontFamily
-              font.weight: Font.DemiBold
-              font.pixelSize: 17
             }
             Row {
               spacing: Style.space(10)
+              Button { text: "Back"; focusable: true; enabled: !root.closingQueued; onClicked: root.saveStep(2) }
               Button {
-                text: "Fingerprint"
+                id: finishButton
+                text: root.canFinish ? "Finish" : "Finish later"
                 focusable: true
-                Accessible.name: "Set up fingerprint authentication"
-                onClicked: {
-                  utilityProc.command = ["omarchy-menu", "setup.security.fingerprint"]
-                  utilityProc.running = true
-                }
-              }
-              Button {
-                text: "Dictation"
-                focusable: true
-                Accessible.name: "Set up voice dictation"
-                onClicked: {
-                  utilityProc.command = ["omarchy-menu", "install.ai.dictation"]
-                  utilityProc.running = true
-                }
+                enabled: !root.busy && !root.closingQueued && root.stateCatalogLoaded && root.stateLoaded && root.adapterCatalogLoaded && root.statusChecksComplete
+                Accessible.name: root.canFinish ? "Finish AI setup" : "Save incomplete AI setup and finish later"
+                onClicked: root.finishSetup()
               }
             }
           }
         }
 
         Text {
+          id: feedbackText
           width: parent.width
           visible: root.statusText !== ""
           wrapMode: Text.WordWrap
@@ -490,6 +758,15 @@ Item {
           font.pixelSize: 14
           Accessible.role: Accessible.AlertMessage
           Accessible.name: root.statusText
+        }
+        Button {
+          id: statusRefreshButton
+          focusable: true
+          visible: root.stateCatalogLoaded && root.adapterCatalogLoaded && root.step > 1
+          text: root.statusChecksFailed ? "Retry checks" : "Check again"
+          enabled: !root.busy && !root.closingQueued
+          Accessible.name: "Retry AI tool status checks"
+          onClicked: root.retryStatusChecks()
         }
       }
     }

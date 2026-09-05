@@ -7,6 +7,7 @@ asdcontrol
 avahi
 bash-completion
 bat
+bitwarden
 bluez
 bluez-tools
 bluez-utils
@@ -15,6 +16,7 @@ brightnessctl
 btop
 chromium
 clang
+claude-code
 cliamp
 cups
 cups-filters
@@ -52,6 +54,7 @@ gvfs-mtp
 gvfs-nfs
 gvfs-smb
 herdr
+hermes-agent
 hyprland
 hyprland-guiutils
 hyprland-preview-share-picker
@@ -97,6 +100,7 @@ omacalc
 omacut
 omawrite
 omarchy-nvim
+openai-codex-bin
 orca
 pacman-contrib
 pamixer

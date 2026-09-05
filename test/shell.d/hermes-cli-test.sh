@@ -276,6 +276,7 @@ OMARCHY_TEST_DESKTOP_INSTALLED=1 \
 # Sourced exactly as run_logged does it.
 OMARCHY_TEST_DESKTOP_INSTALLED=1 \
   OMARCHY_TEST_MISE_LOG="$mise_log" \
+  OMARCHY_PATH="$ROOT" \
   HOME="$mise_sh_home" \
   PATH="$mock_bin:$ROOT/bin:$PATH" \
   bash -eE -c 'source "$1"' bash "$ROOT/install/user/mise.sh" >/dev/null 2>&1 ||
