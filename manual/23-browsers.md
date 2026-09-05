@@ -1,8 +1,8 @@
 # Browsers
 
-Maslow OS ships with [Chromium](https://www.chromium.org/) as the default browser. It is the plain open-source build, themed to match the rest of the system, and it opens with `Super + Shift + Return`. Every [web app](25-web-apps.md) also runs inside it.
+Maslow OS ships with [Google Chrome](https://www.google.com/chrome/) as the default browser. It is themed to match the rest of the system, includes the Maslow OS browser integrations, and opens with `Super + Shift + Return`. Every [web app](25-web-apps.md) also runs inside it.
 
-If Chromium isn't your taste, you're not stuck with it. Under _Install > Browser_ in the Maslow OS menu you'll find Chrome, Edge, Brave, Brave Origin, Firefox, and [Zen](https://zen-browser.app/). Pick one and Omarchy installs it, sets up its policy directory, and applies your current theme to it.
+If Chrome isn't your taste, you're not stuck with it. Under _Install > Browser_ in the Maslow OS menu you'll find Chromium, Edge, Brave, Brave Origin, Firefox, and [Zen](https://zen-browser.app/). Pick one and Omarchy installs it, sets up its policy directory, and applies your current theme to it.
 
 ## Making one the default
 
@@ -36,4 +36,4 @@ They don't get the Chromium extensions above, and they're not themed by Omarchy,
 
 ## Removing one again
 
-Anything you installed here can be taken back off under _Remove > Browser_. Chromium isn't in that list — it's part of the base system.
+Optional browsers can be taken back off under _Remove > Browser_. Chromium remains a supported optional browser and keeps its existing command and configuration compatibility.

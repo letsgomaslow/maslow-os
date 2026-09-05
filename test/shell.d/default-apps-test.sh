@@ -138,6 +138,19 @@ export OMARCHY_TEST_NOTIFICATION_LOG="$notification_log"
 export OMARCHY_TEST_SETUP_LOG="$setup_log"
 export OMARCHY_TEST_BROWSER_FILE="$browser_file"
 
+grep -qxF google-chrome "$ROOT/install/omarchy-base.packages" ||
+  fail "fresh install package manifest includes Google Chrome"
+if grep -qxF chromium "$ROOT/install/omarchy-base.packages"; then
+  fail "fresh install package manifest replaces Chromium with Google Chrome"
+fi
+grep -qxF 'text/html=google-chrome.desktop' "$ROOT/default/applications/mimeapps.list" ||
+  fail "system MIME defaults send HTML to Google Chrome"
+grep -qxF 'x-scheme-handler/http=google-chrome.desktop' "$ROOT/default/applications/mimeapps.list" ||
+  fail "system MIME defaults send HTTP links to Google Chrome"
+grep -qxF 'x-scheme-handler/https=google-chrome.desktop' "$ROOT/default/applications/mimeapps.list" ||
+  fail "system MIME defaults send HTTPS links to Google Chrome"
+pass "fresh install package and MIME defaults select Google Chrome"
+
 assert_missing_opens_installer() {
   local type=$1
   local selection=$2

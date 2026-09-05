@@ -10,9 +10,13 @@ trap 'rm -rf "$test_tmp"' EXIT
 mock_bin="$test_tmp/bin"
 mkdir -p "$mock_bin" "$test_tmp/home" "$test_tmp/home/.hermes/profiles/james"
 
-for command in xdg-user-dirs-update xdg-settings xdg-mime; do
+for command in xdg-user-dirs-update xdg-mime update-desktop-database; do
   printf '#!/bin/bash\nexit 0\n' >"$mock_bin/$command"
 done
+cat >"$mock_bin/xdg-settings" <<'SH'
+#!/bin/bash
+printf '%s\n' "$*" >>"$OMARCHY_TEST_XDG_SETTINGS_LOG"
+SH
 chmod +x "$mock_bin"/*
 
 # Provisioning prepends $OMARCHY_PATH/bin, which shadows a mock for anything
@@ -23,8 +27,13 @@ mkdir -p "$test_tmp/install/user"
 : >"$test_tmp/install/user/all.sh"
 
 HOME="$test_tmp/home" PATH="$mock_bin:$ROOT/bin:$PATH" OMARCHY_PATH="$ROOT" \
+  OMARCHY_TEST_XDG_SETTINGS_LOG="$test_tmp/xdg-settings.log" \
   OMARCHY_INSTALL="$test_tmp/install" bash "$ROOT/bin/omarchy-provision-user" >/dev/null ||
   fail "omarchy-provision-user finishes"
+
+grep -Fxq 'set default-web-browser google-chrome.desktop' "$test_tmp/xdg-settings.log" ||
+  fail "omarchy-provision-user selects Chrome for a fresh user"
+pass "omarchy-provision-user selects Chrome for a fresh user"
 
 for skill in omarchy diagnose-crash; do
   link="$test_tmp/home/.gemini/config/skills/$skill"

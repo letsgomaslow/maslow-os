@@ -71,9 +71,9 @@ jq -e --arg path "$ROOT/bin/omarchy-chromium-copy-url-host" '
 ' "$native_manifest" >/dev/null || fail "copy-url native host manifest uses Omarchy host path and extension id"
 pass "copy-url native host installer registers the stable extension id"
 
-# Chromium ships in the base packages, so fresh installs do not go through
+# Chrome ships in the base packages, so fresh installs do not go through
 # omarchy-install-browser, and they mark every migration as already applied.
-# The user install still has to register the host itself.
+# The user install still has to copy Chrome flags and register the host itself.
 grep -q 'user/chromium.sh' "$ROOT/install/user/all.sh" ||
   fail "user install runs the Chromium native messaging host setup"
 
@@ -84,6 +84,17 @@ HOME="$fresh_home" OMARCHY_PATH="$ROOT" PATH="$ROOT/bin:$PATH" \
 [[ -f $fresh_home/.config/chromium/NativeMessagingHosts/com.omarchy.copy_url.json ]] ||
   fail "fresh install registers the copy-url native messaging host"
 pass "fresh install registers the copy-url native messaging host"
+
+cmp -s "$ROOT/config/chromium-flags.conf" "$fresh_home/.config/chrome-flags.conf" ||
+  fail "fresh install configures Chrome with the Chromium-family flags"
+pass "fresh install configures Chrome with the Chromium-family flags"
+
+printf '%s\n' '# user Chrome flags' >"$fresh_home/.config/chrome-flags.conf"
+HOME="$fresh_home" OMARCHY_PATH="$ROOT" PATH="$ROOT/bin:$PATH" \
+  bash -euo pipefail -c 'source "$ROOT/install/user/chromium.sh"'
+[[ $(<"$fresh_home/.config/chrome-flags.conf") == "# user Chrome flags" ]] ||
+  fail "user finalization preserves existing Chrome flags"
+pass "user finalization preserves existing Chrome flags"
 
 copied_url=$(bash -c '
   source "$1"

@@ -50,7 +50,9 @@ OMARCHY_INSTALL_USER="" bash -eE "$ROOT/install/config/browser-policy.sh"
 [[ ! -f $TMPDIR/groupadd.calls ]] || ! grep -F omarchy-browser-policy "$TMPDIR/groupadd.calls" >/dev/null ||
   fail "browser-policy group is not created"
 grep -F -- '-d -m 0755 -o root -g root /etc/chromium/policies/managed' "$TMPDIR/install.calls" >/dev/null ||
-  fail "browser-policy directory is created root-owned"
+  fail "Chromium policy directory is created root-owned"
+grep -F -- '-d -m 0755 -o root -g root /etc/opt/chrome/policies/managed' "$TMPDIR/install.calls" >/dev/null ||
+  fail "Chrome policy directory is created root-owned"
 pass "deferred provisioning records no privileged groups"
 
 # The same remains true when an install user already exists.
