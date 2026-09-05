@@ -41,6 +41,8 @@ link_dev_checkout() {
 
 (( $# > 0 )) || { usage; exit 1; }
 
+omarchy-update-runtime-guard require-change
+
 dev_checkout=""
 channel="$1"
 leaving_dev=0

@@ -12,6 +12,8 @@ if (( EUID == 0 )); then
   exit 1
 fi
 
+omarchy-update-runtime-guard require-change
+
 prompt_reboot=1
 
 # sudo resolves a bare command name against secure_path, never the caller's

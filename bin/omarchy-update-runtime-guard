@@ -1,0 +1,75 @@
+#!/bin/bash
+
+# omarchy:summary=Protect the Maslow OS preview runtime during package updates
+# omarchy:hidden=true
+
+set -euo pipefail
+
+held_packages=(omarchy omarchy-settings omarchy-dev omarchy-settings-dev)
+product_file=${MASLOW_PRODUCT_FILE:-/usr/share/maslow-os/product.json}
+
+if [[ -z ${MASLOW_PRODUCT_FILE+x} && ! -r $product_file && -r ${OMARCHY_PATH:-/usr/share/omarchy}/branding/product.json ]]; then
+  product_file="${OMARCHY_PATH:-/usr/share/omarchy}/branding/product.json"
+fi
+
+is_maslow() {
+  [[ -e $product_file ]] || return 1
+
+  local product_id
+  product_id=$(jq -er '.product.id | strings' "$product_file" 2>/dev/null) || return 0
+  [[ $product_id == "maslow-os" ]]
+}
+
+explain_hold() {
+  cat >&2 <<'MESSAGE'
+Maslow OS preview runtime updates are temporarily held to protect the finalized desktop experience.
+Arch Linux dependencies will continue to update, but holding the runtime indefinitely can eventually cause incompatibilities.
+Runtime replacement requires the normal Omarchy package-transaction authorization plus MASLOW_ALLOW_RUNTIME_UPDATE=1, and should be used only for an exact reviewed Maslow OS package.
+MESSAGE
+}
+
+explain_switch_hold() {
+  cat >&2 <<'MESSAGE'
+Maslow OS preview channel and dev-link switching is disabled to protect the finalized desktop experience.
+Arch Linux dependency updates remain available through the normal Maslow OS update flow.
+MESSAGE
+}
+
+case "${1:-guard}" in
+active)
+  is_maslow
+  ;;
+pacman-args)
+  if is_maslow; then
+    printf '%s\n' --ignore "$(IFS=,; echo "${held_packages[*]}")"
+  fi
+  ;;
+filter-packages)
+  shift
+  for package in "$@"; do
+    skip=0
+    if is_maslow; then
+      for held in "${held_packages[@]}"; do
+        [[ $package == "$held" ]] && skip=1
+      done
+    fi
+    (( skip )) || printf '%s\n' "$package"
+  done
+  ;;
+require-change)
+  if is_maslow; then
+    explain_switch_hold
+    exit 1
+  fi
+  ;;
+guard)
+  if is_maslow && [[ ${MASLOW_ALLOW_RUNTIME_UPDATE:-} != 1 ]]; then
+    explain_hold
+    exit 1
+  fi
+  ;;
+*)
+  echo "Usage: omarchy-update-runtime-guard [active|pacman-args|filter-packages|require-change]" >&2
+  exit 1
+  ;;
+esac

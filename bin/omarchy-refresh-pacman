@@ -23,4 +23,8 @@ sudo cp -f "$OMARCHY_PATH/default/pacman/mirrorlist-$channel" /etc/pacman.d/mirr
 omarchy-hook pre-refresh-pacman
 
 # Reset all package DBs and then update
-sudo env OMARCHY_UPDATE_PACMAN=1 pacman -Syyuu --noconfirm
+runtime_hold_args=()
+while IFS= read -r arg; do
+  runtime_hold_args+=("$arg")
+done < <(omarchy-update-runtime-guard pacman-args)
+sudo env OMARCHY_UPDATE_PACMAN=1 pacman -Syyuu --noconfirm "${runtime_hold_args[@]}"

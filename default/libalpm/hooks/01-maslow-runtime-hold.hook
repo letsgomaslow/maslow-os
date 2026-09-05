@@ -1,0 +1,15 @@
+[Trigger]
+Operation = Install
+Operation = Upgrade
+Operation = Remove
+Type = Package
+Target = omarchy
+Target = omarchy-settings
+Target = omarchy-dev
+Target = omarchy-settings-dev
+
+[Action]
+Description = Protecting the Maslow OS preview runtime
+When = PreTransaction
+Exec = /usr/bin/omarchy-update-runtime-guard
+AbortOnFail

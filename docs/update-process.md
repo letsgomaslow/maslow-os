@@ -62,12 +62,18 @@ pending, it prints nothing and exits non-zero.
 
 ## Raw pacman guard
 
+Maslow OS preview builds temporarily hold `omarchy`, `omarchy-settings`, `omarchy-dev`, and `omarchy-settings-dev`. Normal system updates still upgrade Arch Linux dependencies, but skip those four runtime packages. An ALPM pre-transaction hook also rejects explicit installation, replacement, downgrade, or removal of them, and Maslow blocks channel and dev-link switches before mutation. This is a preview safeguard for the finalized desktop experience, not a stable Maslow package channel. Holding the runtime indefinitely while dependencies move forward can eventually cause incompatibilities.
+
+Fresh Maslow installations receive the safeguard with the runtime package. An existing preview must first install one reviewed Maslow runtime package containing the guard. For that narrow recovery, invoke pacman through `sudo env` with both `OMARCHY_UPDATE_PACMAN=1` and `MASLOW_ALLOW_RUNTIME_UPDATE=1`, naming the exact reviewed local package files. The override is only a deliberate bypass, not proof of provenance. It does not enable channel or dev-link switching and does not make upstream Omarchy packages safe to install over Maslow.
+
 The `omarchy` package installs an ALPM pre-transaction hook alongside its guard
 binary:
 
 ```text
 /usr/share/libalpm/hooks/00-omarchy-update-guard.hook
 /usr/bin/omarchy-update-pacman-guard
+/usr/share/libalpm/hooks/01-maslow-runtime-hold.hook
+/usr/bin/omarchy-update-runtime-guard
 ```
 
 It triggers on package upgrades and runs:

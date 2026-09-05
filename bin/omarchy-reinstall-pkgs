@@ -11,8 +11,17 @@ set -e
 omarchy-refresh-pacman
 
 # Downgrade any packages to the stable setup
-sudo env OMARCHY_UPDATE_PACMAN=1 pacman -Suu --noconfirm
+runtime_hold_args=()
+while IFS= read -r arg; do
+  runtime_hold_args+=("$arg")
+done < <(omarchy-update-runtime-guard pacman-args)
+sudo env OMARCHY_UPDATE_PACMAN=1 pacman -Suu --noconfirm "${runtime_hold_args[@]}"
 
 # Ensure all packages are installed
 mapfile -t packages < <(grep -v '^#' "$OMARCHY_PATH/install/omarchy-base.packages" | grep -v '^$')
-sudo env OMARCHY_UPDATE_PACMAN=1 pacman -Syu --noconfirm --needed "${packages[@]}"
+filtered_packages=()
+while IFS= read -r package; do
+  filtered_packages+=("$package")
+done < <(omarchy-update-runtime-guard filter-packages "${packages[@]}")
+packages=("${filtered_packages[@]}")
+sudo env OMARCHY_UPDATE_PACMAN=1 pacman -Syu --noconfirm --needed "${runtime_hold_args[@]}" "${packages[@]}"

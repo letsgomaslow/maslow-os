@@ -90,6 +90,7 @@ esac
 run_channel() {
   : >"$log_file"
   OMARCHY_CHANNEL_TEST_LOG="$log_file" \
+    MASLOW_PRODUCT_FILE="$test_tmp/upstream-product.json" \
     OMARCHY_PATH="${OMARCHY_TEST_PATH:-/usr/share/omarchy}" \
     HOME="$test_tmp/home" \
     PATH="$stub_bin:$ROOT/bin:$PATH" \
