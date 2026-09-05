@@ -66,6 +66,7 @@ omarchy-pkg-add|omarchy-pkg-aur-add)
   printf 'pkg:%s\n' "$package" >>"$OMARCHY_TEST_INSTALL_LOG"
   case $package in
   chromium) command=chromium ;;
+  google-chrome) command=google-chrome-stable ;;
   firefox) command=firefox ;;
   zen-browser-bin) command=zen-browser ;;
   cursor-bin) command=cursor ;;
@@ -226,6 +227,25 @@ grep -Fxq 'omarchy-install-chromium-ytdlp:' "$setup_log" ||
 grep -Fxq 'omarchy-theme-set-browser:' "$setup_log" ||
   fail "Chromium browser installer applies the current theme"
 pass "Chromium browser installer restores the complete Omarchy setup"
+
+: >"$install_log"
+: >"$setup_log"
+omarchy-default-browser zen
+rm -f "$installed_dir/google-chrome-stable"
+OMARCHY_TEST_REAL_BROWSER_INSTALL=true omarchy-install-browser chrome >/dev/null
+[[ $(<"$install_log") == "pkg:google-chrome" ]] || fail "Chrome browser installer uses the approved AUR package"
+[[ $(omarchy-default-browser) == "chrome" ]] || fail "Chrome becomes the default after its full installer succeeds"
+cmp -s "$ROOT/config/chromium-flags.conf" "$test_home/.config/chrome-flags.conf" ||
+  fail "Chrome browser installer copies the default flags"
+grep -Fxq 'sudo:install -d -m 0755 -o root -g root /etc/opt/chrome' "$setup_log" ||
+  fail "Chrome browser installer creates a root-owned Chrome policy parent"
+grep -Fxq 'sudo:install -d -m 0755 -o root -g root /etc/opt/chrome/policies' "$setup_log" ||
+  fail "Chrome browser installer creates a root-owned Chrome policies parent"
+grep -Fxq 'sudo:install -d -m 0755 -o root -g root /etc/opt/chrome/policies/managed' "$setup_log" ||
+  fail "Chrome browser installer creates a root-owned managed policy directory"
+grep -Fxq 'omarchy-theme-set-browser:' "$setup_log" ||
+  fail "Chrome browser installer applies the current theme"
+pass "Chrome browser installer uses the existing package route and selects Chrome by default"
 
 : >"$install_log"
 : >"$setup_log"
