@@ -6,6 +6,7 @@ o.bind("SUPER + ALT + SHIFT + F", "File manager (cwd)", { omarchy = "nautilus-cw
 o.bind("SUPER + SHIFT + B", "Browser", { omarchy = "browser" })
 o.bind("SUPER + SHIFT + ALT + B", "Browser (private)", { omarchy = "browser --private" })
 o.bind("SUPER + SHIFT + N", "Editor", { omarchy = "editor" })
+o.bind("SUPER + A", "App Launcher", "omarchy-shell shell toggle tyrsolution.app-launcher '{}'")
 
 if o.preinstalled_bindings_enabled() then
   -- Bindings for preinstalled Omarchy applications, TUIs, and web apps.

@@ -36,16 +36,41 @@ valid_plugin_id() {
   [[ $1 =~ ^[A-Za-z0-9][A-Za-z0-9._-]*$ && $1 != *..* ]]
 }
 
+maslow_managed_dock_parent() {
+  local id="$1" dir="$2" parent
+  local -a commit
+
+  [[ $id == "omadock" && -f $dir/.maslow-managed-branding.json ]] || return 1
+  grep -Fqx '  "id": "omadock",' "$dir/.maslow-managed-branding.json" &&
+    grep -Fqx '  "displayBranding": "maslow-dock-v1"' "$dir/.maslow-managed-branding.json" || return 1
+  [[ $(git -C "$dir" log -1 --format=%s) == "Apply Maslow dock display branding" ]] || return 1
+
+  commit=($(git -C "$dir" rev-list --parents -n 1 HEAD))
+  (( ${#commit[@]} == 2 )) || return 1
+  parent="${commit[1]}"
+  git -C "$dir" diff-tree --no-commit-id --name-only -r HEAD | grep -Fqx '.maslow-managed-branding.json' || return 1
+  git -C "$dir" diff-tree --no-commit-id --name-only -r HEAD | grep -Fqx 'Dock.qml' || return 1
+  (( $(git -C "$dir" diff-tree --no-commit-id --name-only -r HEAD | wc -l) == 2 )) || return 1
+
+  printf '%s\n' "$parent"
+}
+
 update_one() {
   local id="$1"
   local dir="$PLUGINS_DIR/$id"
+  local managed_parent="" rollback_head=""
 
   if ! git -C "$dir" fetch --quiet origin HEAD; then
     echo "omarchy-plugin-update: fetch failed for '$id'" >&2
     return 1
   fi
 
-  if [[ $(git -C "$dir" rev-parse HEAD) == $(git -C "$dir" rev-parse FETCH_HEAD) ]]; then
+  if managed_parent=$(maslow_managed_dock_parent "$id" "$dir"); then
+    if [[ $managed_parent == $(git -C "$dir" rev-parse FETCH_HEAD) ]]; then
+      echo "$id is up to date."
+      return 0
+    fi
+  elif [[ $(git -C "$dir" rev-parse HEAD) == $(git -C "$dir" rev-parse FETCH_HEAD) ]]; then
     echo "$id is up to date."
     return 0
   fi
@@ -64,13 +89,27 @@ update_one() {
     }
   fi
 
-  if ! git -C "$dir" merge --ff-only FETCH_HEAD >/dev/null 2>&1; then
-    echo "omarchy-plugin-update: cannot fast-forward '$id'; you have local changes in $dir" >&2
-    return 1
+  if [[ -n $managed_parent ]]; then
+    echo "Replaying Maslow dock display branding after the upstream update."
+    rollback_head=$(git -C "$dir" rev-parse HEAD)
+    if ! git -C "$dir" rebase FETCH_HEAD >/dev/null 2>&1; then
+      git -C "$dir" rebase --abort >/dev/null 2>&1 || true
+      echo "omarchy-plugin-update: could not replay Maslow dock display branding for '$id'; the existing checkout was restored" >&2
+      return 1
+    fi
+  else
+    if ! git -C "$dir" merge --ff-only FETCH_HEAD >/dev/null 2>&1; then
+      echo "omarchy-plugin-update: cannot fast-forward '$id'; you have local changes in $dir" >&2
+      return 1
+    fi
   fi
 
   if ! omarchy-plugin-validate "$dir"; then
-    git -C "$dir" reset --hard ORIG_HEAD >/dev/null
+    if [[ -n $rollback_head ]]; then
+      git -C "$dir" reset --hard "$rollback_head" >/dev/null
+    else
+      git -C "$dir" reset --hard ORIG_HEAD >/dev/null
+    fi
     echo "omarchy-plugin-update: update of '$id' failed validation; rolled back" >&2
     return 1
   fi

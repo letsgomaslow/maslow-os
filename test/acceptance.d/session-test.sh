@@ -23,6 +23,32 @@ for plugin in \
   pass "shell plugin is loaded: $plugin"
 done
 
+# Fresh users receive two reviewed third-party overlays. Confirm the installed
+# checkouts remain upstream-identifiable and enabled before exercising the UI.
+for plugin in omadock tyrsolution.app-launcher; do
+  plugin_dir="$HOME/.config/omarchy/plugins/$plugin"
+  [[ -d $plugin_dir/.git ]] || fail "curated plugin is an updateable Git checkout: $plugin"
+  [[ -z $(git -C "$plugin_dir" status --porcelain) ]] || fail "curated plugin checkout is clean: $plugin"
+  jq -e --arg plugin "$plugin" '.id == $plugin and .license == "MIT"' "$plugin_dir/manifest.json" >/dev/null ||
+    fail "curated plugin preserves its upstream identity: $plugin"
+  jq -e --arg plugin "$plugin" '.[] | select(.id == $plugin and .enabled == true)' <<< "$plugins" >/dev/null ||
+    fail "curated plugin is enabled: $plugin" "loaded plugins: $plugins"
+  pass "curated plugin is installed and enabled: $plugin"
+done
+
+grep -Fq 'glyph: "\ue90b"' "$HOME/.config/omarchy/plugins/omadock/Dock.qml" ||
+  fail "Omadock uses the approved Maslow launcher glyph"
+grep -Fq 'tooltip: "Maslow OS"' "$HOME/.config/omarchy/plugins/omadock/Dock.qml" ||
+  fail "Omadock uses the Maslow OS tooltip"
+pass "Omadock display branding is installed"
+
+wait_until "Omadock layer is loaded" 30 layer_present "omadock"
+omarchy-shell shell toggle tyrsolution.app-launcher '{}' >/dev/null
+wait_until "App Launcher opens" 15 layer_on_screen "omarchy-app-launcher"
+screenshot "success-curated-app-launcher"
+omarchy-shell shell hide tyrsolution.app-launcher >/dev/null
+wait_until "App Launcher closes" 15 layer_absent "omarchy-app-launcher"
+
 # The bar and background are actually on screen
 wait_until "bar layer is on screen" 30 layer_on_screen "omarchy-bar"
 wait_until "background layer is on screen" 30 layer_on_screen "omarchy-background"
