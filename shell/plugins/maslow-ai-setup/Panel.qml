@@ -200,7 +200,7 @@ Item {
     switch (status) {
       case "selected": return "Selected"
       case "in-progress": return "In progress"
-      case "action-required": return "Sign-in or setup may still be needed"
+      case "action-required": return "Complete the action shown, then confirm"
       case "ready": return "Ready"
       case "needs-attention": return "Needs attention — retry available"
       case "skipped": return "Skipped"
@@ -211,9 +211,9 @@ Item {
   function toolDescription(toolId) {
     switch (toolId) {
       case "bitwarden": return "Get your passwords and SSH keys ready before AI setup."
-      case "codex": return "Tested starter coding agent from OpenAI."
-      case "claude": return "Tested starter coding agent from Anthropic."
-      case "hermes": return "Tested starter agent harness with built-in memory."
+      case "codex": return "Tested starter coding agent from OpenAI. Sign-in happens in Codex; Maslow OS does not inspect authentication."
+      case "claude": return "Tested starter coding agent from Anthropic. Sign-in happens in Claude Code; Maslow OS does not inspect authentication."
+      case "hermes": return "Tested starter agent harness with built-in memory. Launch it to check the local tool."
       case "memory-builtin": return "Hermes uses this by default. No extra provider is required."
       case "honcho": return "Optional external memory provider. Choose this or Hindsight, not both."
       case "hindsight": return "Optional external memory provider. Choose this or Honcho, not both."
@@ -237,7 +237,8 @@ Item {
   function openActionLabel(toolId, setupOnly, status) {
     if (status === "in-progress" || status === "needs-attention") return "Retry"
     if (setupOnly) return "Configure"
-    if (toolId === "codex" || toolId === "claude" || toolId === "hermes") return "Sign in"
+    if (toolId === "codex" || toolId === "claude") return "Sign in"
+    if (toolId === "hermes") return "Launch & check"
     if (toolId === "memory-builtin") return "Check"
     return "Open"
   }
@@ -497,7 +498,7 @@ Item {
         var item = toolModel.get(index)
         var nextStatus = item.setupOnly && item.userConfirmable ? "action-required" : "selected"
         toolModel.setProperty(index, "toolStatus", nextStatus)
-        root.statusText = item.setupOnly && item.userConfirmable ? "The official setup was opened. Mark ready only after you finish it." : (root.activeAction === "install" ? (root.isCoreTool(root.activeTool) ? "The repair flow was opened. When it finishes, use Check again." : "Setup was opened. When it finishes, use Check again.") : "The tool was opened. Maslow OS does not assume sign-in succeeded.")
+        root.statusText = item.setupOnly && item.userConfirmable ? "The official setup was opened. Mark ready only after you finish it." : (root.activeAction === "install" ? (root.isCoreTool(root.activeTool) ? "The repair flow was opened. When it finishes, use Check again." : "Setup was opened. When it finishes, use Check again.") : "The tool was opened. Authentication is not inspected; complete the action shown, then mark ready.")
         root.queueStateWrite(["omarchy-setup-ai-state", "tool-status", root.activeTool, nextStatus])
         if (!item.setupOnly) {
           root.statusChecksComplete = false
@@ -582,7 +583,7 @@ Item {
             Text {
               width: parent.width
               wrapMode: Text.WordWrap
-              text: "Core AI tools come with Maslow OS. Choose which ones you want to configure, then start working."
+              text: "Core AI tools come with Maslow OS. Choose which ones you want to configure; sign-in happens separately in the supported tools."
               color: root.foreground
               font.family: root.fontFamily
               font.pixelSize: 16
@@ -595,7 +596,7 @@ Item {
           Column {
             spacing: Style.space(12)
             Text { text: "Set up your AI workspace"; color: root.foreground; font.family: root.fontFamily; font.weight: Font.DemiBold; font.pixelSize: 28 }
-            Text { width: parent.width; wrapMode: Text.WordWrap; text: "Start with Bitwarden, then choose Codex, Claude Code, or Hermes. You can choose more than one."; color: root.foreground; font.family: root.fontFamily; font.pixelSize: 15 }
+            Text { width: parent.width; wrapMode: Text.WordWrap; text: "Start with Bitwarden for secure readiness, then choose Codex, Claude Code, or Hermes. Sign-in stays in Codex and Claude Code; Maslow OS does not inspect authentication."; color: root.foreground; font.family: root.fontFamily; font.pixelSize: 15 }
 
             ScrollView {
               id: toolsView
@@ -680,7 +681,7 @@ Item {
                         visible: toolCard.selected && (!setupOnly || prerequisiteInstalled) && (openSupported || userConfirmable) && toolStatus === "action-required"
                         text: "Mark ready"
                         enabled: !root.busy && !root.closingQueued
-                        Accessible.name: "Mark " + toolName + " ready after completing provider setup"
+                        Accessible.name: "Mark " + toolName + " ready after completing the action shown"
                         onClicked: root.markReady(toolId)
                       }
                     }
@@ -700,7 +701,7 @@ Item {
           Column {
             spacing: Style.space(14)
             Text { text: "Your setup summary"; color: root.foreground; font.family: root.fontFamily; font.weight: Font.DemiBold; font.pixelSize: 28 }
-            Text { width: parent.width; wrapMode: Text.WordWrap; text: "Ready means you confirmed the provider sign-in. Hermes uses built-in memory unless you later choose Honcho or Hindsight. MCP connections stay with each agent."; color: root.foreground; font.family: root.fontFamily; font.pixelSize: 15 }
+            Text { width: parent.width; wrapMode: Text.WordWrap; text: "Ready means you completed the action shown and confirmed it; it does not prove provider authentication. Hermes uses built-in memory. External memory and MCP connections stay separate."; color: root.foreground; font.family: root.fontFamily; font.pixelSize: 15 }
             ScrollView {
               width: parent.width
               height: Math.max(0, setupSteps.height - 150)

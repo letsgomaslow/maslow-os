@@ -90,6 +90,25 @@ function panel(rows) {
 
 {
   const p = panel([])
+  assertEqual(p.openActionLabel('codex', false, 'action-required'), 'Sign in', 'Codex keeps its separate sign-in action')
+  assertEqual(p.openActionLabel('claude', false, 'action-required'), 'Sign in', 'Claude Code keeps its separate sign-in action')
+  assertEqual(p.openActionLabel('hermes', false, 'action-required'), 'Launch & check', 'Hermes action does not imply provider sign-in')
+  assertEqual(p.openActionLabel('hermes', false, 'needs-attention'), 'Retry', 'Hermes failures remain actionable')
+  assertEqual(p.statusLabel('action-required'), 'Complete the action shown, then confirm', 'readiness requires an explicit confirmation')
+  assertEqual(p.statusLabel('needs-attention'), 'Needs attention — retry available', 'failures remain explicit')
+}
+
+for (const copy of [
+  'Core AI tools come with Maslow OS. Choose which ones you want to configure; sign-in happens separately in the supported tools.',
+  'Start with Bitwarden for secure readiness, then choose Codex, Claude Code, or Hermes. Sign-in stays in Codex and Claude Code; Maslow OS does not inspect authentication.',
+  'Ready means you completed the action shown and confirmed it; it does not prove provider authentication. Hermes uses built-in memory. External memory and MCP connections stay separate.',
+  'Mark " + toolName + " ready after completing the action shown'
+]) {
+  assert(source.includes(copy), `onboarding copy preserves readiness and authentication boundaries: ${copy}`)
+}
+
+{
+  const p = panel([])
   p.Qt = {callLater: callback => callback()}
   const viewport = {contentItem: {}, contentHeight: 802, height: 180, contentY: 360}
   p.toolsView = {contentItem: viewport}
