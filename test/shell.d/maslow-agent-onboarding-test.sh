@@ -23,6 +23,9 @@ SH
 cat >"$mock_bin/omarchy-shell" <<'SH'
 #!/bin/bash
 printf '%s\0' "$@" >"$MASLOW_TEST_SHELL_LOG"
+printf '%s\n' "${OMARCHY_SHELL_IPC_TIMEOUT:-unset}" >"$MASLOW_TEST_TIMEOUT_LOG"
+printf 'call\n' >>"$MASLOW_TEST_CALL_LOG"
+exit "${MASLOW_TEST_SHELL_STATUS:-0}"
 SH
 cat >"$mock_bin/gum" <<'SH'
 #!/bin/bash
@@ -33,6 +36,8 @@ chmod +x "$mock_bin"/*
 export PATH="$mock_bin:$ROOT/bin:$PATH"
 export MASLOW_TEST_MISE_LOG="$test_tmp/mise.log"
 export MASLOW_TEST_SHELL_LOG="$test_tmp/shell.log"
+export MASLOW_TEST_TIMEOUT_LOG="$test_tmp/timeout.log"
+export MASLOW_TEST_CALL_LOG="$test_tmp/calls.log"
 
 file_mode() {
   stat -c %a "$1" 2>/dev/null || stat -f %Lp "$1"
@@ -85,6 +90,18 @@ while IFS= read -r -d '' arg; do
 done <"$MASLOW_TEST_SHELL_LOG"
 [[ ${shell_args[*]} == "shell summon maslow.ai-setup {}" ]] || fail "public AI setup route opens the first-party panel"
 pass "AI onboarding defers automatic opening but remains manually available"
+
+omarchy-setup-ai-state reset
+: >"$MASLOW_TEST_CALL_LOG"
+OMARCHY_SHELL_IPC_TIMEOUT=2s omarchy-setup-ai --first-login
+launch_calls=$(wc -l <"$MASLOW_TEST_CALL_LOG")
+[[ $(<"$MASLOW_TEST_TIMEOUT_LOG") == "60s" ]] && (( launch_calls == 1 )) || fail "first login must send one summon with its bounded cold-start budget"
+OMARCHY_SHELL_IPC_TIMEOUT=7s omarchy-setup-ai
+[[ $(<"$MASLOW_TEST_TIMEOUT_LOG") == "7s" ]] || fail "manual launch must preserve its caller timeout"
+if MASLOW_TEST_SHELL_STATUS=5 omarchy-setup-ai --first-login; then
+  fail "first-login launcher must preserve IPC failure"
+fi
+pass "first-login acknowledgement is bounded, single-shot, and does not mask failures"
 
 for supported_tool in bitwarden codex claude hermes memory-builtin honcho hindsight mcp; do
   omarchy-setup-ai-state reset

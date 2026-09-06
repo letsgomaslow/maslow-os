@@ -62,3 +62,7 @@ The shipped unavailable result exits nonzero without including raw output. No re
 ## Persistence boundary
 
 The adapter writes no state. `omarchy-setup-ai-state choice` may persist only the user's explicit progress choices: `account` as `codex|claude`, `hermes` as `recommended|deferred`, `memory` as `builtin|honcho|hindsight|deferred`, and `desktop` as `hermes-desktop|chatgpt-desktop|none`. Those values are navigation preferences and never proof of installation, authentication, ownership, configuration, or an operational response.
+
+## First-login launch acknowledgement
+
+`omarchy-setup-ai --first-login` gives its single shell summon a 60-second IPC acknowledgement budget after the existing completed/deferred skip gate. Cold native startup can accept the request before the shell replies; the ordinary two-second shell budget produced a false optional-setup failure in a clean automatic-only emulated installation even though the panel opened. The launcher does not retry or convert failures into success. Manual launch retains the caller/default shell timeout. This budget does not establish account readiness or guarantee a rendered panel; native window acceptance remains separate.
