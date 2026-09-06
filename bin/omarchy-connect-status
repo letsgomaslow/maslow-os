@@ -1,0 +1,14 @@
+#!/bin/bash
+
+# omarchy:summary=Show Maslow Connect device, app, and agent status
+# omarchy:args=[--json]
+
+set -euo pipefail
+
+if [[ ! -x /usr/bin/maslow-connect ]]; then
+  echo "Maslow Connect is not installed. Update Maslow OS or install the maslow-connect package." >&2
+  exit 127
+fi
+
+exec /usr/bin/maslow-connect status "$@"
+

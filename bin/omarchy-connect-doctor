@@ -1,0 +1,19 @@
+#!/bin/bash
+
+# omarchy:summary=Check Maslow Connect without using an external app
+# omarchy:args=[agent-id]
+
+set -euo pipefail
+
+if (( $# > 1 )); then
+  echo "Usage: omarchy connect doctor [agent-id]" >&2
+  exit 2
+fi
+
+if [[ ! -x /usr/bin/maslow-connect ]]; then
+  echo "Maslow Connect is not installed. Update Maslow OS or install the maslow-connect package." >&2
+  exit 127
+fi
+
+exec /usr/bin/maslow-connect doctor "$@"
+

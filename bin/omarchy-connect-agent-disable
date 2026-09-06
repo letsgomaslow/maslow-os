@@ -1,0 +1,19 @@
+#!/bin/bash
+
+# omarchy:summary=Disconnect one AI tool from Maslow Connect
+# omarchy:args=<agent-id>
+
+set -euo pipefail
+
+if (( $# != 1 )); then
+  echo "Usage: omarchy connect agent disable <agent-id>" >&2
+  exit 2
+fi
+
+if [[ ! -x /usr/bin/maslow-connect ]]; then
+  echo "Maslow Connect is not installed. Update Maslow OS or install the maslow-connect package." >&2
+  exit 127
+fi
+
+exec /usr/bin/maslow-connect agent disable "$1"
+

@@ -1,0 +1,6 @@
+#!/bin/bash
+
+# omarchy:summary=Open the Maslow Connect app
+
+exec omarchy-launch-webapp "https://connect.maslow.ai"
+

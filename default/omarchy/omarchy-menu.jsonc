@@ -127,6 +127,7 @@
   // Setup
   "setup.monitors": {"icon":"󰍹","label":"Monitors","action":"omarchy-launch-config-editor \"$HOME/.config/hypr/monitors.lua\""},
   "setup.ai": {"icon":"󰚩","label":"AI","title":"Maslow OS AI Setup","action":"omarchy-setup-ai"},
+  "setup.connect": {"icon":"󰌷","label":"Maslow Connect","title":"Apps and AI Tool Access","action":"omarchy connect open"},
   "setup.keybindings": {"icon":"","label":"Keybindings","when":"[[ -f ~/.config/hypr/bindings.lua ]]","action":"omarchy-launch-config-editor \"$HOME/.config/hypr/bindings.lua\""},
   "setup.input": {"icon":"","label":"Input","when":"[[ -f ~/.config/hypr/input.lua ]]","action":"omarchy-launch-config-editor \"$HOME/.config/hypr/input.lua\""},
   "setup.network": {"icon":"󰛳","label":"Network","aliases":["network"]},
