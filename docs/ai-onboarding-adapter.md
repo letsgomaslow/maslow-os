@@ -39,11 +39,13 @@ The desktop IDs report package/app state directly with `desktopInstalled`. `inst
 Hermes Desktop states are exact and sanitized:
 
 - Package absent: `desktopInstalled: false`, `runtimeOwner: "none"`, `runtimeState: "none"`.
-- Package and launcher present, bootstrap marker absent: `desktopInstalled: true`, `runtimeOwner: "desktop"`, `runtimeState: "preparing"`.
+- Package and launcher present, bootstrap marker and runtime command absent: `desktopInstalled: true`, `runtimeOwner: "desktop"`, `runtimeState: "attention"`, `reasonCode: "desktop-setup-required"`. Missing artifacts do not prove active preparation. The shipped desktop exposes no supported active-bootstrap status, so this adapter does not emit `preparing` based on their absence.
 - Bootstrap marker present and its Hermes command is the resolved runnable command with the pinned noninteractive capability: `desktopInstalled: true`, `runtimeOwner: "desktop"`, `runtimeState: "ready"`.
 - Package metadata, launcher, bootstrap marker, resolved command, or capability disagree: `desktopInstalled: true`, `runtimeOwner: "desktop"`, `runtimeState: "attention"`, with a sanitized reason code.
 
 ChatGPT Desktop has no separately managed terminal runtime. Package plus executable launcher reports `desktopInstalled: true`, `runtimeOwner: "desktop"`, and `runtimeState: "ready"`; a partial package/launcher state reports `runtimeState: "attention"`; absence reports `runtimeOwner: "none"` and `runtimeState: "none"`.
+
+`open hermes-desktop` remains available whenever the desktop package and its executable launcher exist, including `attention`, so the user can finish or retry setup. It invokes that fixed packaged launcher, never a foreign Hermes CLI. Bootstrap logs are not read: failed, retry, stale, unknown, and oversized log contents cannot establish active preparation or override a verified ready runtime. No bootstrap error text is returned.
 
 ## Hermes operational check
 

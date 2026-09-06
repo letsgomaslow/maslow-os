@@ -104,7 +104,7 @@ function makePanel(rows = []) {
     'findTool', 'tool', 'statusFor', 'accountProofSufficient', 'hermesProofSufficient',
     'memoryChoiceValid', 'desktopChoiceReady', 'legacyProgressIncomplete', 'completeEligible', 'choiceValue',
     'applyToolStatus', 'applyAdapterCatalog', 'applyState', 'invalidateStatus', 'canRunToolAction', 'queueStateWrite', 'startNextStateWrite', 'runToolAction',
-    'checkHermes', 'finishForNow', 'resetSetup', 'checkNextStatus'
+    'desktopStateLabel', 'desktopActionLabel', 'checkHermes', 'finishForNow', 'resetSetup', 'checkNextStatus'
   ]) vm.runInContext(panelFunction(name), context)
   context.requestClose = () => { context.closed++ }
   context.cancelReadOnlyChecks = () => { context.statusQueue = [] }
@@ -234,6 +234,14 @@ function makePanel(rows = []) {
   assertEqual(p.completeEligible(), true, 'ready optional desktop can complete with the connected account')
   p.invalidateStatus('chatgpt-desktop')
   assertEqual(p.completeEligible(), false, 'failed desktop refresh revokes stale readiness')
+}
+{
+  const desktop = row('hermes-desktop', {desktopInstalled: true, runtimeState: 'attention', runtimeOwner: 'foreign'})
+  const p = makePanel([desktop])
+  assertEqual(p.desktopStateLabel(desktop), 'Needs attention', 'unverified bootstrap never claims active preparation')
+  assertEqual(p.desktopActionLabel(desktop), 'Open setup', 'incomplete desktop directs users into app recovery')
+  assertEqual(p.canRunToolAction(desktop, 'open'), true, 'fixed packaged desktop remains a recovery path despite foreign CLI')
+  assertEqual(p.canRunToolAction(row('hermes', {runtimeOwner: 'foreign'}), 'launch'), false, 'foreign CLI is still blocked')
 }
 for (const requirement of [
   'Your AI.\\nReady to work.',

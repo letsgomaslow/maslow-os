@@ -115,7 +115,8 @@ omarchy_agent_runtime_state() {
     if [[ ! -x $(omarchy_agent_system_command_path hermes-desktop) ]]; then
       printf '%s' "attention"
     elif [[ ! -e $HOME/.hermes/hermes-agent/.hermes-bootstrap-complete && ! -e $runtime && ! -L $runtime ]]; then
-      printf '%s' "preparing"
+      # Missing bootstrap artifacts do not establish active preparation.
+      printf '%s' "attention"
     elif omarchy_agent_desktop_runtime_ready; then
       printf '%s' "ready"
     else

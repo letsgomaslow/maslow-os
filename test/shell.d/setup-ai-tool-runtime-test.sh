@@ -94,6 +94,7 @@ chmod +x "$package_bin/codex" "$package_bin/claude" "$package_bin/hermes"
 
 cat >"$system_bin/hermes-desktop" <<'SH'
 #!/bin/bash
+printf 'desktop opened\n' >>"$AUTH_LOG"
 exit 0
 SH
 cat >"$system_bin/chatgpt" <<'SH'
@@ -205,17 +206,59 @@ pass "runtime ownership guards missing and foreign PATH states without execution
 
 desktop_packages="$core_packages hermes-desktop openai-codex-desktop"
 status=$(TEST_PACKAGES="$desktop_packages" run_tool status hermes)
-[[ $(jq -r '.installed == false and .desktopInstalled == true and .runtimeOwner == "desktop" and .runtimeState == "preparing" and .reasonCode == "desktop-preparing" and .checkAvailable == false' <<<"$status") == true ]] ||
-  fail "Hermes Desktop bootstrap preparation is not exposed" "$status"
+[[ $(jq -r '.installed == false and .desktopInstalled == true and .runtimeOwner == "desktop" and .runtimeState == "attention" and .reasonCode == "desktop-setup-required" and .checkAvailable == false' <<<"$status") == true ]] ||
+  fail "missing Hermes runtime falsely establishes active preparation" "$status"
 status=$(TEST_PACKAGES="$desktop_packages" run_tool status hermes-desktop)
-[[ $(jq -r '.installed == true and .desktopInstalled == true and .runtimeOwner == "desktop" and .runtimeState == "preparing"' <<<"$status") == true ]] ||
-  fail "Hermes Desktop card does not distinguish app install from runtime preparation" "$status"
+[[ $(jq -r '.installed == true and .desktopInstalled == true and .runtimeOwner == "desktop" and .runtimeState == "attention" and .reasonCode == "desktop-setup-required"' <<<"$status") == true ]] ||
+  fail "Hermes Desktop card does not expose unfinished setup" "$status"
+
+# Logs are deliberately not an adapter input. Neither a failure nor a newer
+# retry message proves the current lifecycle state without supported IPC.
+mkdir -p "$home_dir/.hermes/logs"
+bootstrap_log="$home_dir/.hermes/logs/desktop.log"
+for log_case in failed retry unknown oversized; do
+  printf '%s\n' '[2026-09-05T12:00:00Z] [hermes] [bootstrap] {"type":"stage","name":"node-deps","state":"failed","error":"raw-secret"}' \
+    '[2026-09-05T12:00:01Z] [hermes] [bootstrap] {"type":"failed","stage":"node-deps","error":"raw-secret"}' >"$bootstrap_log"
+  case "$log_case" in
+  retry) printf '%s\n' '[2026-09-05T12:01:00Z] [hermes] [bootstrap] {"type":"stage","name":"node-deps","state":"running"}' >>"$bootstrap_log" ;;
+  unknown) printf '%s\n' '[hermes] [bootstrap] malformed raw-secret' >"$bootstrap_log" ;;
+  oversized) head -c 1048576 /dev/zero >"$bootstrap_log" ;;
+  esac
+  for target in hermes hermes-desktop; do
+    status=$(TEST_PACKAGES="$desktop_packages" run_tool status "$target")
+    [[ $(jq -r '.runtimeState == "attention" and .reasonCode == "desktop-setup-required"' <<<"$status") == true ]] ||
+      fail "$log_case bootstrap log changes conservative setup status" "$status"
+    [[ $status != *raw-secret* ]] || fail "bootstrap log text leaked" "$status"
+  done
+done
+
+cat >"$mock_bin/uwsm-app" <<'SH'
+#!/bin/bash
+[[ $1 == "--" ]] || exit 1
+shift
+exec "$@"
+SH
+chmod +x "$mock_bin/uwsm-app"
+: >"$auth_log"
+TEST_PACKAGES="$desktop_packages" TEST_AVAILABLE_PACKAGES="none" run_tool open hermes-desktop
+for _ in {1..30}; do
+  [[ -s $auth_log ]] && break
+  sleep 0.05
+done
+[[ $(<"$auth_log") == "desktop opened" ]] || fail "unfinished desktop setup cannot open its packaged launcher" "$(<"$auth_log")"
+mv "$system_bin/hermes-desktop" "$system_bin/hermes-desktop.saved"
+if TEST_PACKAGES="$desktop_packages" run_tool open hermes-desktop >/dev/null 2>&1; then
+  fail "desktop open accepts a missing packaged launcher"
+fi
+mv "$system_bin/hermes-desktop.saved" "$system_bin/hermes-desktop"
+pass "unfinished desktop setup requires attention, ignores logs, and permits guided packaged launch"
 
 mkdir -p "$home_dir/.hermes/hermes-agent"
 touch "$home_dir/.hermes/hermes-agent/.hermes-bootstrap-complete"
 cat >"$home_dir/.local/bin/hermes" <<SH
 #!/bin/bash
 # Runtime owned by $home_dir/.hermes
+printf 'desktop CLI invoked\n' >>"\$AUTH_LOG"
 if [[ \${1:-} == "--version" ]]; then exit 0; fi
 if [[ \${1:-} == "chat" && \${2:-} == "--help" ]]; then
   case "\${TEST_HERMES_MODE:-ready}" in
@@ -236,6 +279,7 @@ fi
 exit 1
 SH
 chmod +x "$home_dir/.local/bin/hermes"
+printf '%s\n' '[2026-09-05T12:00:01Z] [hermes] [bootstrap] {"type":"failed","stage":"node-deps","error":"raw-secret"}' >"$bootstrap_log"
 status=$(TEST_PACKAGES="$desktop_packages" run_tool_with_path "$home_dir/.local/bin:$package_bin:$mock_bin:/usr/bin:/bin" status hermes)
 [[ $(jq -r '.installed == true and .desktopInstalled == true and .runtimeOwner == "desktop" and .runtimeState == "ready" and .authentication == "unknown"' <<<"$status") == true ]] ||
   fail "Hermes Desktop takeover is not recognized as the owning ready runtime" "$status"
@@ -252,6 +296,15 @@ rm "$home_dir/.hermes/hermes-agent/.hermes-bootstrap-complete"
 status=$(TEST_PACKAGES="$desktop_packages" run_tool_with_path "$home_dir/.local/bin:$package_bin:$mock_bin:/usr/bin:/bin" status hermes)
 [[ $(jq -r '.installed == false and .runtimeOwner == "desktop" and .runtimeState == "attention" and .reasonCode == "desktop-runtime-attention"' <<<"$status") == true ]] ||
   fail "inconsistent Hermes Desktop ownership does not require attention" "$status"
+
+: >"$auth_log"
+TEST_PACKAGES="$desktop_packages" run_tool_with_path "$home_dir/.local/bin:$package_bin:$mock_bin:/usr/bin:/bin" open hermes-desktop
+for _ in {1..30}; do
+  [[ -s $auth_log ]] && break
+  sleep 0.05
+done
+[[ $(<"$auth_log") == "desktop opened" ]] || fail "broken runtime blocks guided desktop opening or executes a CLI" "$(<"$auth_log")"
+pass "desktop recovery opens its packaged app despite incomplete CLI ownership"
 
 status=$(TEST_PACKAGES="$desktop_packages" run_tool status chatgpt-desktop)
 [[ $(jq -r '.installed == true and .desktopInstalled == true and .runtimeOwner == "desktop" and .runtimeState == "ready" and .authentication == "unknown"' <<<"$status") == true ]] ||

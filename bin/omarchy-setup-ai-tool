@@ -301,7 +301,8 @@ agent_runtime_status() {
     if [[ ! -x $(omarchy_agent_system_command_path hermes-desktop) ]]; then
       RUNTIME_STATE="attention"
     elif [[ ! -e $HOME/.hermes/hermes-agent/.hermes-bootstrap-complete && ! -e $runtime && ! -L $runtime ]]; then
-      RUNTIME_STATE="preparing"
+      RUNTIME_STATE="attention"
+      REASON_CODE="desktop-setup-required"
     elif omarchy_agent_desktop_runtime_claimed && omarchy_agent_desktop_runtime_on_path && hermes_desktop_capable; then
       RUNTIME_STATE="ready"
     else
@@ -315,7 +316,7 @@ agent_runtime_status() {
   packaged:ready | desktop:ready) ;;
   packaged:attention) REASON_CODE="runtime-not-on-path" ;;
   desktop:preparing) REASON_CODE="desktop-preparing" ;;
-  desktop:attention) REASON_CODE="desktop-runtime-attention" ;;
+  desktop:attention) REASON_CODE=${REASON_CODE:-desktop-runtime-attention} ;;
   foreign:attention)
     if omarchy_agent_is_packaged; then
       REASON_CODE="path-shadow"
@@ -539,8 +540,10 @@ open_tool() {
     exec omarchy-launch-floating-terminal-with-presentation hermes
     ;;
   hermes-desktop | chatgpt-desktop)
-    desktop_status "$tool"
-    [[ $DESKTOP_INSTALLED == "true" && $RUNTIME_STATE != "attention" ]] || fail "$(tool_name "$tool") is not ready"
+    # Opening the packaged app is the guided recovery path even when its
+    # separately bootstrapped runtime is incomplete or a foreign CLI exists.
+    omarchy-pkg-present "$(desktop_package "$tool")" && [[ -f $(desktop_launcher "$tool") && -x $(desktop_launcher "$tool") ]] ||
+      fail "$(tool_name "$tool") is not installed"
     exec setsid uwsm-app -- "$(desktop_launcher "$tool")"
     ;;
   memory-builtin)

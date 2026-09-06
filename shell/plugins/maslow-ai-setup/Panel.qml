@@ -141,7 +141,6 @@ Item {
     if (item.runtimeState === "attention") return "Needs attention"
     if (item.desktopInstalled !== true) return "Ready to install"
     if (item.runtimeState === "preparing") return "Preparing desktop app"
-    if (item.runtimeState === "attention") return "Desktop app needs attention"
     if (item.runtimeState === "ready") return "Ready to open"
     return "Desktop status unavailable"
   }
@@ -149,12 +148,13 @@ Item {
   function desktopActionLabel(item) {
     if (item.desktopInstalled !== true) return "Install & open"
     if (item.runtimeState === "preparing") return "Open setup"
-    if (item.runtimeState === "attention") return "Repair desktop"
+    if (item.runtimeState === "attention") return "Open setup"
     if (item.runtimeState === "ready") return "Open " + item.toolName
     return "Check desktop"
   }
 
   function canRunToolAction(item, action) {
+    if (action === "open" && item.desktopInstalled === true && (item.toolId === "hermes-desktop" || item.toolId === "chatgpt-desktop")) return true
     if (item.runtimeOwner === "foreign") return false
     if (action === "install") return item.available === true
     return item.installed === true || item.available === true
@@ -863,7 +863,7 @@ Item {
                 EditorialButton { text: root.desktopChoice === "none" ? "No desktop app" : "Use no desktop app"; quiet: root.desktopChoice !== "none"; enabled: !root.busy; onClicked: root.selectDesktop("none") }
                 Item { Layout.fillWidth: true }
                 EditorialButton { text: "Refresh status"; quiet: true; enabled: !root.busy; onClicked: root.refreshStatus(["hermes-desktop", "chatgpt-desktop", "hermes"]) }
-                EditorialButton { visible: root.desktopChoice !== "none"; text: root.desktopActionLabel(root.statusFor(root.desktopChoice)); enabled: !root.busy && (root.statusFor(root.desktopChoice).desktopInstalled || root.statusFor(root.desktopChoice).available); onClicked: root.runToolAction(root.desktopChoice, root.statusFor(root.desktopChoice).desktopInstalled && root.statusFor(root.desktopChoice).runtimeState !== "attention" ? "open" : "install") }
+                EditorialButton { visible: root.desktopChoice !== "none"; text: root.desktopActionLabel(root.statusFor(root.desktopChoice)); enabled: !root.busy && (root.statusFor(root.desktopChoice).desktopInstalled || root.statusFor(root.desktopChoice).available); onClicked: root.runToolAction(root.desktopChoice, root.statusFor(root.desktopChoice).desktopInstalled ? "open" : "install") }
               }
               Rectangle { Layout.fillWidth: true; implicitHeight: 1; color: root.line }
               Text { textFormat: Text.PlainText; Layout.fillWidth: true; text: root.completionMessage(); wrapMode: Text.WordWrap; color: root.completeEligible() ? root.foreground : root.subdued; font.family: root.fontFamily; font.pixelSize: Math.max(Style.font.body, Math.round(14 * root.contentScale)) }
