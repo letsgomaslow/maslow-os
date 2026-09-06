@@ -6,6 +6,14 @@ Maslow OS is based on [Omarchy](https://omarchy.org/) and [Arch Linux](https://a
 
 > **Preview status:** `0.1.0-preview.1`. The current Apple Silicon image is a development preview, not a supported public ARM release. The first supported installer target is x86_64.
 
+## Native x86_64 preview checkpoint
+
+The September 5, 2026 internal ISO completed a fresh installation on a Lenovo ThinkPad. The tester confirmed that figlet, VS Code, Tailscale, and Zen Browser installed through the normal app-install flow **before any Omarchy update**, Chrome was the default browser, the dock used the Maslow icon, and Super+A opened App Launcher. The tester subsequently reported running the supported update. These are user-reported native results, not a public release or complete acceptance-suite pass.
+
+The exact built commits, ISO checksum, USB readback verification, and remaining checks are recorded in the [native acceptance checkpoint](docs/handoffs/2026-09-05-verified-usb-native-acceptance.md). Detailed post-update/reboot preservation, plugin updates, AI configuration/sign-in/permission flows, recovery, and measured idle performance remain to be evidenced. Prototype onboarding concepts are not part of this ISO.
+
+For normal maintenance, use `omarchy update`. Preview runtime packages are intentionally held to prevent replacement by upstream packages; do not bypass the hold or switch channels to test updates. Dependency updates continue, but this temporary hold is not a long-term signed Maslow update channel.
+
 ## Experience preview
 
 These screenshots show the current Maslow OS preview experience. Visual details may evolve before the first public release.
@@ -57,7 +65,7 @@ Maslow OS has no shared or published default password. Create your own user and 
 
 ### 3A. Intel Mac: install the x86_64 ISO
 
-The x86_64 preview ISO must currently be built on an x86_64 Linux host with Docker. Follow the [Maslow OS ISO build instructions](https://github.com/letsgomaslow/maslow-os-iso); the ISO builder does not run natively on macOS.
+The x86_64 preview ISO is assembled in an x86_64 Linux Docker container. A native x86_64 Linux host is preferred; the internal candidate was assembled through Docker Desktop emulation on Apple Silicon, which does not establish native boot or performance correctness. Follow the [Maslow OS ISO build instructions](https://github.com/letsgomaslow/maslow-os-iso); the builder itself does not run natively on macOS.
 
 After obtaining and verifying the ISO:
 

@@ -2,9 +2,9 @@
 
 ## Scope
 
-The next internal x86_64 candidate has been built, checksum-verified, written to USB, read back, and safely ejected. The user is taking time to complete the Lenovo installation. Native boot, fresh-install behavior, and visual acceptance remain pending. Do not restart implementation, add features or plugins, resume dictation troubleshooting, or rebuild unless acceptance reveals a blocker.
+The internal x86_64 candidate has been built, checksum-verified, written to USB, read back, and safely ejected. The user subsequently completed a fresh Lenovo ThinkPad installation and reported the native results below. Detailed remaining acceptance gates are still open. Do not restart implementation, add features or plugins, resume dictation troubleshooting, or rebuild unless acceptance reveals a blocker.
 
-This documentation-only checkpoint follows the exact source commits used for the ISO; it does not change that artifact. The earlier `2026-09-05-native-lenovo-next-iso.md` remains historical evidence, not the current candidate status. Implementation is committed locally in all three repositories. Nothing is being pushed or published by this checkpoint.
+This documentation-only checkpoint follows the exact source commits used for the ISO; it does not change that artifact. The earlier `2026-09-05-native-lenovo-next-iso.md` remains historical evidence, not the current candidate status. Implementation was committed locally in all three repositories. After native testing, the user authorized pushing coordinated source and documentation to the downstream product branches; this does not authorize binary publication or a stable release claim.
 
 ## Exact build inputs
 
@@ -35,9 +35,31 @@ Initial macOS privilege attempts failed before writing. The authenticated Termin
 
 Evidence files outside Git: `usb-write.log`, `usb-verification.log`, `usb-readback.sha256`, and `native-acceptance.md` in the evidence directory. Keep the ISO and large logs outside the source repositories.
 
-## Short native acceptance checklist
+## Tester-reported native results
 
-All items are pending. Record observed results and exact failures; do not convert source or USB evidence into native passes.
+Evidence is the user's reports in this task on September 5, 2026, not a remotely executed acceptance suite. The boot-menu photo showed `USB HDD: pny USB 2.0 FD` and a separate internal Limine entry. The user subsequently reported installation complete; the earlier photo of the installed snapshot menu was not evidence of an ISO boot defect.
+
+- Fresh installation completed and the desktop was usable.
+- Before any Omarchy update, figlet, VS Code, Tailscale, and Zen Browser installed successfully through the normal app-install flow. This supplies native behavioral acceptance evidence for the package-database handoff fix.
+- Chrome was confirmed as the fresh-install default browser.
+- The Maslow dock icon and App Launcher were confirmed; Super+A opened App Launcher. The user also reported seeing the core logo changes.
+- The user gave a general "everything works" report, then reported performing the supported update after being directed to `omarchy update`. No error was reported, but no update log or itemized post-update/reboot results were supplied.
+
+## Remaining native acceptance checklist
+
+The explicit fresh-install results above are accepted as tester reports. The following items need specific observations before complete acceptance is claimed:
+
+1. After the update, reboot from the internal disk with the installer USB removed and confirm login/desktop, Chrome default, Dock, Super+A, and Maslow branding persist. Capture any update or boot errors and check failed services; emulated assembly had systemd command crashes.
+2. Specifically verify both menu/dock logos, dock tooltip `Maslow OS`, no duplicate controls, and Super+Space, Super+Alt+Space, and Super+Shift+A. A broad smoke-test report is recorded but does not supply individual results.
+3. Exercise the supported plugin update path and confirm Dock/App Launcher configuration and downstream display branding survive. An OS update alone does not establish plugin update behavior.
+4. Exercise Codex, Claude Code, and Hermes configuration, readiness, failures, and provider sign-in with elevated permissions kept separate. Record completion/reopen behavior after reboot; never collect credentials.
+5. Record settled idle CPU/memory, conditions, duration, and basic responsiveness. No matched Omarchy comparison has been performed.
+
+Broader release gates remain separate: encrypted and unencrypted install coverage, recovery/rollback, reproducibility, and approved Maslow-owned signing/publication infrastructure. The encryption mode of this native run was not recorded.
+
+## Original native test sequence
+
+Retained as the repeatable sequence for the next fresh candidate; use the results above for this candidate's current status.
 
 1. Boot the Lenovo from USB. Confirm the live installer responds before installation; capture boot errors or failed services. Confirm the internal installation target before destructive disk operations.
 2. After a fresh installation, before any Omarchy update, install figlet and VS Code (a previously failing app) through the normal app-install menu. Do not manually refresh databases to hide a failure.
@@ -54,5 +76,7 @@ All items are pending. Record observed results and exact failures; do not conver
 Before the next build, restrict ownership changes to exact outputs from the current invocation, excluding old output directories and unrelated artifacts. Test with protected prior artifacts and preserve genuine failures affecting new outputs. This fix is recorded, not implemented. Do not rebuild the verified ISO solely for this cleanup defect.
 
 ## Local work preservation
+
+For the native-results documentation push, `git diff --check` passed in all three repositories. Runtime `test/maslow-brand`, packages `test/maslow-packaging`, and ISO `test/maslow-branding` passed in the cached Linux x86_64 preflight container. No feature code changed, no full aggregate suite was rerun, and no ISO was rebuilt. README and AGENTS updates describe the native results and preserve the remaining release gates.
 
 At this checkpoint the package and ISO working trees were clean. Runtime contained an untracked `concepts/` directory unrelated to the built candidate; it was left untouched and excluded from this acceptance-record commit. Inspect any new work before staging future commits. Local commits are not an off-machine backup.

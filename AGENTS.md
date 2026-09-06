@@ -37,6 +37,17 @@ The build flow is `maslow-os source` -> `maslow-os-pkgs package recipes` -> `mas
 - Preserve Omarchy-compatible package names, commands, paths, service identifiers, plugin contracts, and update sequencing across repository boundaries.
 - Do not publish or describe a stable Maslow package channel until Maslow-owned signing, repository publication, update, and rollback infrastructure is operational and explicitly approved.
 
+# Native acceptance and preview guardrails
+
+- Read `docs/handoffs/2026-09-05-verified-usb-native-acceptance.md` before continuing this candidate. Preserve its exact build inputs and ISO checksum; later documentation commits do not alter the tested artifact.
+- Separate source-test, build/artifact, USB readback, tester-reported native, and directly observed visual evidence. A general "everything works" report is not an itemized AI, recovery, performance, or post-update test log.
+- Test fresh app installation before the first `omarchy update`. A manual database repair or update on an existing installation cannot substitute for that gate. Never use standalone `pacman -Sy` to conceal a fresh-install failure.
+- Preserve the temporary Maslow runtime package hold and supported `omarchy update` path. Do not bypass the hold, switch channels, or claim a stable signed Maslow channel without separate approval and reviewed packages.
+- Keep bundled `omadock` and `tyrsolution.app-launcher` IDs, upstream credits, themes, Git metadata, and update compatibility. Preserve Super+A and existing shortcuts; keep approved Maslow display branding separate from upstream identity.
+- Keep Codex, Claude Code, and Hermes installation, configuration, readiness, provider sign-in, and elevated permission consent distinct. Do not treat a preinstalled binary or prototype UI as successful onboarding. Dictation and extra plugin scope remain deferred.
+- Treat the Lenovo as the native acceptance target, not a hand-configured product fork. Fix confirmed defects in the owning source repository; do not rebuild this verified ISO solely for the recorded output-ownership cleanup defect.
+- Leave unrelated `concepts/` work out of candidate commits unless explicitly scoped and reviewed. Source pushes do not authorize publishing ISOs, packages, credentials, or local build logs.
+
 # Documentation Layout
 
 Three documentation trees, split by genre and audience:
