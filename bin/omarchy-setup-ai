@@ -11,6 +11,15 @@ if [[ ${1:-} == "--first-login" ]]; then
 fi
 (($# == 0)) || { echo "Usage: omarchy-setup-ai [--first-login]" >&2; exit 1; }
 
+# Installed Hub owns presentation; progress remains in the existing state helper.
+if omarchy-cmd-present maslow-hubctl; then
+  if [[ $first_login == "true" ]]; then
+    state=$(omarchy-setup-ai-state show) || exit $?
+    [[ $(jq -r '.completedAt != null or .deferred' <<<"$state") == "false" ]] || exit 0
+  fi
+  exec omarchy-launch-hub setup
+fi
+
 if [[ $first_login == "true" ]]; then
   state=$(omarchy-setup-ai-state show) || exit $?
   [[ $(jq -r '.completedAt != null or .deferred' <<<"$state") == "false" ]] || exit 0

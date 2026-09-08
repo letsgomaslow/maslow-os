@@ -8,6 +8,7 @@ QtObject {
   id: registry
 
   property string home: Quickshell.env("HOME")
+  readonly property string packagedPluginsDir: "/usr/share/maslow/plugins"
   property string pluginsDir: home + "/.config/omarchy/plugins"
 
   // Set by shell.qml at startup so we can also scan bundled first-party plugins.
@@ -133,7 +134,7 @@ QtObject {
         return selectedBar === key
       }
       if (isDisabled(config, key)) return false
-      if (manifest.__isFirstParty) return true
+      if (manifest.__isFirstParty || manifest.__isPackaged) return true
     }
     return findEntryLocation(config, key).found
   }
@@ -493,7 +494,7 @@ QtObject {
         return
       }
 
-      var isFirstParty = manifest && manifest.__isFirstParty
+      var isFirstParty = manifest && (manifest.__isFirstParty || manifest.__isPackaged)
       var location = findEntryLocation(config, key)
 
       if (value) {
@@ -552,6 +553,8 @@ QtObject {
     var lines = String(text || "").split("\n")
     var firstParty = {}
     var thirdParty = {}
+    var packaged = {}
+    var duplicatePackages = {}
     var currentSource = null
     var currentKind = null
     var currentJson = []
@@ -563,10 +566,14 @@ QtObject {
         var manifest = JSON.parse(raw)
         manifest.__sourceDir = currentSource
         manifest.__isFirstParty = (currentKind === "firstparty")
+        manifest.__isPackaged = (currentKind === "packaged")
         var validated = validateManifest(manifest, currentSource + "/manifest.json")
         if (validated) {
           if (currentKind === "firstparty") firstParty[validated.id] = validated
-          else thirdParty[validated.id] = validated
+          else if (currentKind === "packaged") {
+            if (packaged[validated.id]) duplicatePackages[validated.id] = true
+            packaged[validated.id] = validated
+          } else if (currentKind === "thirdparty") thirdParty[validated.id] = validated
         }
       } catch (e) {
         console.warn("PluginRegistry: bad manifest at " + currentSource + ": " + e)
@@ -596,11 +603,18 @@ QtObject {
 
     var merged = {}
     for (var fk in firstParty) merged[fk] = firstParty[fk]
+    for (var pk in packaged) {
+      if (duplicatePackages[pk] || firstParty[pk] || String(pk).indexOf("maslow.") !== 0) {
+        console.warn("PluginRegistry: rejected duplicate or non-Maslow packaged id " + pk)
+        continue
+      }
+      merged[pk] = packaged[pk]
+    }
     // Third-party plugins never shadow first-party ids. The whole
     // `omarchy.*` namespace is reserved for built-ins, including bar widgets
     // registered outside the manifest-based plugin registry.
     for (var tk in thirdParty) {
-      if (firstParty[tk] || String(tk).indexOf("omarchy.") === 0) {
+      if (firstParty[tk] || String(tk).indexOf("omarchy.") === 0 || String(tk).indexOf("maslow.") === 0) {
         console.warn("PluginRegistry: plugin " + tk
           + " rejected: id is reserved for first-party Omarchy plugins")
         continue
@@ -689,7 +703,10 @@ QtObject {
       + "}; "
       + "scan_firstparty \"$0\"; "
       + "scan_thirdparty \"$1\""
-    scanProcess.command = ["bash", "-c", script, registry.firstPartyDir, registry.pluginsDir]
+    script += "; for sub in \"$2\"/*/; do "
+      + "[[ ! -L \"${sub%/}\" && -f \"$sub/manifest.json\" && ! -L \"$sub/manifest.json\" ]] || continue; "
+      + "emit_manifest packaged \"$sub/manifest.json\"; done"
+    scanProcess.command = ["bash", "-c", script, registry.firstPartyDir, registry.pluginsDir, registry.packagedPluginsDir]
     scanProcess.running = true
   }
 

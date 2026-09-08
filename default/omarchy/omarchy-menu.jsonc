@@ -21,6 +21,7 @@
   //                  installed instead of vanishing from the list.
 
   // Root Menu
+  "hub": {"icon":"󰚩","label":"Maslow Hub","when":"omarchy-cmd-present maslow-hubctl","action":"omarchy-launch-hub"},
   "apps": {"icon":"󰀻","label":"Apps","aliases":["app","applications"],"provider":"apps"},
   "learn": {"icon":"󰧑","label":"Learn"},
   "trigger": {"icon":"󱓞","label":"Trigger"},

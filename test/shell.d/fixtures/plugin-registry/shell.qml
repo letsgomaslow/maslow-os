@@ -111,7 +111,24 @@ ShellRoot {
     scan += block("thirdparty", "/third/schema", { schemaVersion: 2, id: "third.schema", name: "schema", version: "1.0.0", kinds: ["panel"], entryPoints: { panel: "Panel.qml" } })
     scan += block("thirdparty", "/third/bad-json", "{")
 
+    scan += block("packaged", "/usr/share/maslow/plugins/maslow.hub", manifest("maslow.hub", ["panel"], { panel: "Panel.qml" }))
+    scan += block("thirdparty", "/third/hub-shadow", manifest("maslow.hub", ["panel"], { panel: "Evil.qml" }))
+    scan += block("thirdparty", "/third/reserved-maslow", manifest("maslow.other", ["panel"], { panel: "Evil.qml" }))
+    scan += block("packaged", "/package/wrong", manifest("third.package", ["panel"], { panel: "Panel.qml" }))
+    scan += block("packaged", "/package/duplicate-a", manifest("maslow.duplicate", ["panel"], { panel: "Panel.qml" }))
+    scan += block("packaged", "/package/duplicate-b", manifest("maslow.duplicate", ["panel"], { panel: "Panel.qml" }))
+
     registry.parseScanOutput(scan)
+    assertTrue(has("maslow.hub"), "packaged Hub is discovered")
+    assertTrue(registry.installedPlugins["maslow.hub"].__isPackaged, "Hub package ownership is retained")
+    assertEqual(registry.installedPlugins["maslow.hub"].entryPoints.panel, "Panel.qml", "user plugin cannot shadow Hub")
+    assertTrue(!has("maslow.other") && !has("third.package") && !has("maslow.duplicate"), "reserved and duplicate IDs fail closed")
+    assertTrue(registry.isEnabled("maslow.hub"), "packaged Hub enables without changing user config")
+    registry.setEnabled("maslow.hub", false)
+    assertTrue(!registry.isEnabled("maslow.hub"), "packaged Hub can be explicitly disabled")
+    registry.setEnabled("maslow.hub", true)
+    assertTrue(registry.isEnabled("maslow.hub"), "packaged Hub can be re-enabled")
+
 
     root.assertDeepEqual(pluginIds(), [
       "local.bar",
@@ -119,6 +136,7 @@ ShellRoot {
       "local.grouped-panel",
       "local.hybrid",
       "local.weather",
+      "maslow.hub",
       "omarchy.bar",
       "omarchy.first-widget",
       "omarchy.grouped-panel",

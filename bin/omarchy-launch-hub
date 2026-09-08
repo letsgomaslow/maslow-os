@@ -1,0 +1,13 @@
+#!/bin/bash
+
+# omarchy:summary=Open Maslow Hub
+# omarchy:args=[setup|connections|featured|updates]
+
+set -euo pipefail
+page=${1:-setup}
+(( $# <= 1 )) || { echo "Usage: omarchy launch hub [setup|connections|featured|updates]" >&2; exit 1; }
+case "$page" in
+  setup|connections|featured|updates) ;;
+  *) echo "Unknown Hub page" >&2; exit 1 ;;
+esac
+omarchy-shell shell summon maslow.hub "$(jq -cn --arg page "$page" '{page:$page}')"

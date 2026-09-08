@@ -56,6 +56,10 @@ while (( $# > 0 )); do
   esac
 done
 
+if [[ $id == maslow.* && -e /usr/share/maslow/plugins/$id/manifest.json ]]; then
+  fail "'$id' is package-managed; use Maslow Hub Updates or the package manager"
+fi
+
 [[ -d $PLUGINS_DIR ]] || fail "no plugins installed"
 
 if [[ -z $id ]]; then

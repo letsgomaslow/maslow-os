@@ -50,6 +50,7 @@ ID=$(jq -r '.id // ""' "$MANIFEST")
 [[ -n $ID ]] || fail "manifest 'id' is empty"
 [[ $ID =~ ^[A-Za-z0-9][A-Za-z0-9._-]*$ ]] || fail "invalid plugin id '$ID'"
 [[ $ID != *".."* ]] || fail "invalid plugin id '$ID'"
+[[ $ID != maslow.* ]] || fail "plugin id uses the reserved maslow.* package namespace"
 [[ $ID != omarchy.* ]] || fail "plugin id '$ID' uses the reserved omarchy.* namespace"
 
 # kinds must be a non-empty array.
