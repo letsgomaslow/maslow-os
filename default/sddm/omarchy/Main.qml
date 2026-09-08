@@ -119,7 +119,7 @@ Rectangle {
     function onLoginSucceeded() {
       root.loginFailed = false
       root.signingIn = false
-      statusText.text = "Welcome to Maslow OS."
+      statusText.text = "Welcome to Maslow AI-OS."
       root.announce(statusText.text)
     }
   }
@@ -138,7 +138,7 @@ Rectangle {
       fillMode: Image.PreserveAspectFit
       anchors.horizontalCenter: parent.horizontalCenter
       Accessible.role: Accessible.Graphic
-      Accessible.name: "Maslow OS"
+      Accessible.name: "Maslow AI-OS"
     }
 
     Text {
@@ -191,7 +191,7 @@ Rectangle {
         onActiveFocusChanged: if (activeFocus) root.announce("Username.")
         Accessible.role: Accessible.EditableText
         Accessible.name: "Username"
-        Accessible.description: "Your Maslow OS account username"
+        Accessible.description: "Your Maslow AI-OS account username"
         Accessible.focusable: true
         Accessible.focused: activeFocus
       }
@@ -314,6 +314,6 @@ Rectangle {
       password.forceActiveFocus()
     else
       username.forceActiveFocus()
-    announce("Maslow OS login. Press F5 to toggle spoken login.")
+    announce("Maslow AI-OS login. Press F5 to toggle spoken login.")
   }
 }

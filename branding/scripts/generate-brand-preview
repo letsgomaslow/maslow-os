@@ -1,0 +1,252 @@
+#!/bin/bash
+
+set -euo pipefail
+
+ROOT=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/../.." && pwd)
+MAGICK=${MAGICK:-magick}
+MARK_GRADIENT=${MARK_GRADIENT:-"$ROOT/branding/logos/maslow-mark-gradient.svg"}
+FONT="$ROOT/branding/fonts/manrope/Manrope-VariableFont_wght.ttf"
+TRANSCODER="$ROOT/bin/omarchy-transcode-ascii"
+PRODUCT_LABEL="MASLOW | AI-OS"
+TERMINAL_LABEL="MASLOW AI-OS"
+TERMINAL_WIDTH=100
+TERMINAL_RASTER=${TERMINAL_RASTER:-}
+OUTPUT_DIR=""
+WORK_DIR=""
+
+usage() {
+  cat <<'EOF'
+Usage: branding/scripts/generate-brand-preview <output-directory>
+
+Generates non-shipping Maslow AI-OS branding candidates in an explicitly
+selected directory. Existing logo.txt, icon.txt, boot, login, and theme assets
+in the repository are not changed.
+
+Outputs:
+  logo.txt                 100-column terminal/startup candidate
+  icon.txt                 Compact About-dialog candidate
+  lockup-on-dark.png       Transparent graphical lockup for dark surfaces
+  lockup-on-light.png      Transparent graphical lockup for light surfaces
+  startup-dark.png         1920x1080 startup/login composition
+  startup-light.png        1920x1080 light composition
+  preview.html             Side-by-side visual review board
+EOF
+}
+
+if (( $# != 1 )); then
+  usage >&2
+  exit 2
+fi
+
+if [[ $1 == "--help" || $1 == "-h" ]]; then
+  usage
+  exit 0
+fi
+
+OUTPUT_DIR=$1
+mkdir -p "$OUTPUT_DIR"
+OUTPUT_DIR=$(cd -- "$OUTPUT_DIR" && pwd)
+
+case "$OUTPUT_DIR" in
+"$ROOT" | "$ROOT"/*)
+  echo "Refusing to write previews into a shipping asset directory: $OUTPUT_DIR" >&2
+  exit 2
+  ;;
+esac
+
+PREVIEW_MARKER="$OUTPUT_DIR/.maslow-brand-preview"
+if [[ ! -e $PREVIEW_MARKER ]] && [[ -n $(find "$OUTPUT_DIR" -mindepth 1 -maxdepth 1 -print -quit) ]]; then
+  echo "Refusing to overwrite an unmarked non-empty preview directory: $OUTPUT_DIR" >&2
+  exit 2
+fi
+: >"$PREVIEW_MARKER"
+
+command -v "$MAGICK" >/dev/null || {
+  echo "ImageMagick is required (expected the 'magick' command)." >&2
+  exit 1
+}
+
+for source in "$MARK_GRADIENT" "$FONT" "$TRANSCODER"; do
+  [[ -f $source ]] || {
+    echo "Missing brand source: $source" >&2
+    exit 1
+  }
+done
+
+export LC_ALL=C.UTF-8
+WORK_DIR=$(mktemp -d)
+trap 'rm -rf "$WORK_DIR"' EXIT
+
+validate_width() {
+  local input=$1 maximum=$2 line line_number=0
+
+  while IFS= read -r line || [[ -n $line ]]; do
+    ((line_number += 1))
+    if (( ${#line} > maximum )); then
+      echo "$input:$line_number exceeds $maximum columns (${#line})." >&2
+      exit 1
+    fi
+  done <"$input"
+}
+
+render_terminal_candidates() {
+  # Reproduce the September 2 first-boot treatment exactly: Manrope 600 at
+  # 56px on its original 800x188 canvas, then the historical 80x12 block
+  # transcode. Only the product label changes from MASLOW OS to MASLOW AI-OS.
+  if [[ -n $TERMINAL_RASTER ]]; then
+    [[ -f $TERMINAL_RASTER ]] || {
+      echo "Missing terminal raster: $TERMINAL_RASTER" >&2
+      exit 1
+    }
+    cp "$TERMINAL_RASTER" "$WORK_DIR/terminal-lockup.png"
+  else
+    "$MAGICK" -size 800x188 xc:none \
+      \( -background none "$MARK_GRADIENT" -resize 176x188 \) \
+      -gravity west -geometry +24+0 -composite \
+      -font "$FONT" -weight 600 -pointsize 56 -fill '#FFFFFF' \
+      -gravity west -annotate +230+0 "$TERMINAL_LABEL" \
+      -depth 8 "$WORK_DIR/terminal-lockup.png"
+  fi
+  "$TRANSCODER" "$WORK_DIR/terminal-lockup.png" "$OUTPUT_DIR/logo.txt" \
+    --width "$TERMINAL_WIDTH" --height 12 --mode block --threshold 50 >/dev/null
+
+  # The About mark is a compact terminal conversion of the approved Gradient
+  # Bridge. At 20x7, all six lobes and both connecting bridges remain distinct.
+  "$TRANSCODER" "$MARK_GRADIENT" "$OUTPUT_DIR/icon.txt" \
+    --width 20 --height 7 --mode block --threshold 40 >/dev/null
+  printf '\n   %s\n' "$PRODUCT_LABEL" >>"$OUTPUT_DIR/icon.txt"
+
+  validate_width "$OUTPUT_DIR/logo.txt" "$TERMINAL_WIDTH"
+  validate_width "$OUTPUT_DIR/icon.txt" 20
+}
+
+render_lockup() {
+  local text_color=$1 output=$2 scale=${3:-100}
+  local canvas_width=$((800 * scale / 100))
+  local canvas_height=$((188 * scale / 100))
+  local mark_width=$((176 * scale / 100))
+  local mark_height=$((118 * scale / 100))
+  local mark_gap=$((24 * scale / 100))
+  local wordmark_gap=$((8 * scale / 100))
+  local text_height=$((94 * scale / 100))
+  local maslow_width=$((270 * scale / 100))
+  local tag_width=$((194 * scale / 100))
+  local font_size=$((64 * scale / 100))
+  local stroke_width=$((scale >= 150 ? 2 : 1))
+
+  # The supplied canonical white lockup uses a soft neutral for both the
+  # separator and AI tag. The added -OS suffix continues that same tag color.
+  "$MAGICK" -background none "$MARK_GRADIENT" -trim +repage \
+    -resize "${mark_width}x${mark_height}" "$WORK_DIR/lockup-mark.png"
+  "$MAGICK" -size "${maslow_width}x${text_height}" xc:none \
+    -font "$FONT" -weight 600 -pointsize "$font_size" \
+    -fill "$text_color" -stroke "$text_color" -strokewidth "$stroke_width" -gravity center \
+    -annotate +0+0 'MASLOW' "$WORK_DIR/lockup-maslow.png"
+  "$MAGICK" -size "${tag_width}x${text_height}" xc:none \
+    -font "$FONT" -weight 600 -pointsize "$font_size" \
+    -fill '#C1C1C1' -stroke '#C1C1C1' -strokewidth "$stroke_width" -gravity center \
+    -annotate +0+0 '| AI-OS' "$WORK_DIR/lockup-ai-os.png"
+
+  "$MAGICK" \
+    "$WORK_DIR/lockup-mark.png" \( -size "${mark_gap}x1" xc:none \) \
+    "$WORK_DIR/lockup-maslow.png" \( -size "${wordmark_gap}x1" xc:none \) \
+    "$WORK_DIR/lockup-ai-os.png" \
+    -background none -gravity center +append -trim +repage -gravity center \
+    -extent "${canvas_width}x${canvas_height}" -depth 8 "$output"
+}
+
+render_graphical_candidates() {
+  render_lockup "#FFFFFF" "$OUTPUT_DIR/lockup-on-dark.png"
+  render_lockup "#121D35" "$OUTPUT_DIR/lockup-on-light.png"
+  render_lockup "#FFFFFF" "$OUTPUT_DIR/splash-lockup-on-dark.png" 150
+
+  "$MAGICK" -size 1920x1080 xc:"#121D35" \
+    "$OUTPUT_DIR/splash-lockup-on-dark.png" -gravity center -composite \
+    -depth 8 "$OUTPUT_DIR/startup-dark.png"
+  "$MAGICK" -size 1920x1080 xc:"#FFFFFF" \
+    "$OUTPUT_DIR/lockup-on-light.png" -gravity center -composite \
+    -depth 8 "$OUTPUT_DIR/startup-light.png"
+}
+
+html_escape_file() {
+  sed -e 's/&/\&amp;/g' -e 's/</\&lt;/g' -e 's/>/\&gt;/g' "$1"
+}
+
+write_review_board() {
+  {
+    cat <<'EOF'
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Maslow AI-OS brand preview</title>
+  <style>
+    :root { color-scheme: dark; }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: #0c1427; color: #f6f7f9; font: 15px/1.5 Manrope, system-ui, sans-serif; }
+    main { width: min(1440px, calc(100% - 48px)); margin: 40px auto 64px; }
+    h1 { margin: 0 0 8px; font-size: 30px; letter-spacing: .02em; }
+    .intro { margin: 0 0 28px; color: #b8c1d1; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(460px, 1fr)); gap: 20px; }
+    section { overflow: hidden; border: 1px solid #2c3852; border-radius: 14px; background: #121d35; }
+    h2 { margin: 0; padding: 14px 18px; border-bottom: 1px solid #2c3852; font-size: 14px; letter-spacing: .08em; text-transform: uppercase; }
+    .terminal { overflow-x: auto; padding: 28px 24px; background: #090f1d; }
+    pre { width: max-content; min-width: 100%; margin: 0; color: #f6f7f9; font: 15px/1.2 "CaskaydiaMono Nerd Font", "Cascadia Mono", "DejaVu Sans Mono", ui-monospace, monospace; white-space: pre; }
+    .about pre { font-size: 18px; line-height: 1.15; text-align: left; }
+    .frame { display: grid; place-items: center; min-height: 290px; padding: 28px; }
+    .frame.dark { background: #121d35; }
+    .frame.light { background: #fff; }
+    .frame img { display: block; width: min(100%, 720px); height: auto; }
+    .wide { grid-column: 1 / -1; }
+    .boot { width: 100%; aspect-ratio: 16 / 9; object-fit: contain; background: #050916; }
+    code { color: #6dc4ad; }
+  </style>
+</head>
+<body>
+<main>
+  <h1>Maslow AI-OS brand lab</h1>
+  <p class="intro">Preview-only candidates generated from the approved Gradient Bridge SVG. Terminal art is 100 columns to preserve the September 2 letterforms with AI- added.</p>
+  <div class="grid">
+    <section class="wide">
+      <h2>logo.txt · 100-column terminal</h2>
+      <div class="terminal"><pre>
+EOF
+    html_escape_file "$OUTPUT_DIR/logo.txt"
+    cat <<'EOF'
+</pre></div>
+    </section>
+    <section class="about">
+      <h2>icon.txt · compact About mark</h2>
+      <div class="terminal"><pre>
+EOF
+    html_escape_file "$OUTPUT_DIR/icon.txt"
+    cat <<'EOF'
+</pre></div>
+    </section>
+    <section>
+      <h2>Graphical lockup · dark</h2>
+      <div class="frame dark"><img src="lockup-on-dark.png" alt="MASLOW | AI-OS lockup on dark navy"></div>
+    </section>
+    <section>
+      <h2>Graphical lockup · light</h2>
+      <div class="frame light"><img src="lockup-on-light.png" alt="MASLOW | AI-OS lockup on white"></div>
+    </section>
+    <section class="wide">
+      <h2>Startup / shutdown composition · 150% lockup</h2>
+      <img class="boot" src="startup-dark.png" alt="Maslow AI-OS startup composition">
+    </section>
+  </div>
+</main>
+</body>
+</html>
+EOF
+  } >"$OUTPUT_DIR/preview.html"
+}
+
+render_graphical_candidates
+render_terminal_candidates
+write_review_board
+
+echo "Maslow AI-OS previews generated in $OUTPUT_DIR"
+echo "Shipping logo.txt, icon.txt, boot, login, and theme assets were not changed."

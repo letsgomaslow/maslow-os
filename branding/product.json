@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "product": {
     "id": "maslow-os",
-    "name": "Maslow OS",
+    "name": "Maslow AI-OS",
     "shortName": "Maslow",
     "tagline": "AI transformation, built with purpose.",
     "version": "0.1.0-preview.1",
@@ -30,6 +30,6 @@
   },
   "attribution": {
     "short": "Powered by the Omarchy engine",
-    "technical": "Maslow OS uses the Omarchy engine on an Arch Linux foundation."
+    "technical": "Maslow AI-OS uses the Omarchy engine on an Arch Linux foundation."
   }
 }

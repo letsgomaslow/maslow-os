@@ -9,7 +9,9 @@ MARK_DARK="$ROOT/branding/logos/maslow-mark-dark.svg"
 FONT="$ROOT/branding/fonts/manrope/Manrope-VariableFont_wght.ttf"
 PRODUCT_MANIFEST="$ROOT/branding/product.json"
 WALLPAPER_COLLAGE="$ROOT/branding/wallpapers/maslow-wallpaper-collage.png"
+WALLPAPER_SOURCE_DIR="$ROOT/branding/wallpapers"
 TERMINAL_ART_DIR=$(mktemp -d)
+TERMINAL_SOURCE_DIR="$ROOT/branding/terminal"
 render_wallpaper_assets=false
 
 if [[ ${1:-} == "--wallpapers" ]]; then
@@ -27,7 +29,9 @@ command -v "$MAGICK" >/dev/null || {
   exit 1
 }
 
-for source in "$MARK_GRADIENT" "$MARK_DARK" "$FONT" "$PRODUCT_MANIFEST"; do
+for source in \
+  "$MARK_GRADIENT" "$MARK_DARK" "$FONT" "$PRODUCT_MANIFEST" \
+  "$TERMINAL_SOURCE_DIR/logo.txt" "$TERMINAL_SOURCE_DIR/icon.txt"; do
   [[ -f $source ]] || {
     echo "Missing brand source: $source" >&2
     exit 1
@@ -35,11 +39,22 @@ for source in "$MARK_GRADIENT" "$MARK_DARK" "$FONT" "$PRODUCT_MANIFEST"; do
 done
 
 PRODUCT_NAME=$(jq -er '.product.name' "$PRODUCT_MANIFEST")
-PRODUCT_NAME_UPPER=${PRODUCT_NAME^^}
-
-if [[ $render_wallpaper_assets == "true" && ! -f $WALLPAPER_COLLAGE ]]; then
-  echo "Missing brand source: $WALLPAPER_COLLAGE" >&2
+[[ $PRODUCT_NAME == "Maslow AI-OS" ]] || {
+  echo "Unexpected product name: $PRODUCT_NAME" >&2
   exit 1
+}
+
+if [[ $render_wallpaper_assets == "true" ]]; then
+  for source in \
+    "$WALLPAPER_COLLAGE" \
+    "$WALLPAPER_SOURCE_DIR/05-gradient-bridge-quiet-field.webp" \
+    "$WALLPAPER_SOURCE_DIR/06-signal-over-water.webp" \
+    "$WALLPAPER_SOURCE_DIR/07-topographic-ascent.webp"; do
+    [[ -f $source ]] || {
+      echo "Missing brand source: $source" >&2
+      exit 1
+    }
+  done
 fi
 
 render_wallpapers() {
@@ -58,6 +73,11 @@ render_wallpapers() {
     1371x763+0+773
     1371x763+1381+773
   )
+  local -a logo_free_names=(
+    05-gradient-bridge-quiet-field.webp
+    06-signal-over-water.webp
+    07-topographic-ascent.webp
+  )
 
   mkdir -p "$dark_output" "$light_output"
   rm -f \
@@ -74,101 +94,68 @@ render_wallpapers() {
     cp "$dark_output/$name" "$light_output/$name"
   done
 
+  for name in "${logo_free_names[@]}"; do
+    "$MAGICK" "$WALLPAPER_SOURCE_DIR/$name" \
+      -filter Lanczos -resize '3840x2160^' -gravity center -extent 3840x2160 \
+      -strip -quality 94 "$dark_output/$name"
+    cp "$dark_output/$name" "$light_output/$name"
+  done
+
   "$MAGICK" "$dark_output/${names[0]}" -resize 1200x675^ -gravity center -extent 1200x675 -strip "$ROOT/themes/maslow-dark/preview.png"
   cp "$ROOT/themes/maslow-dark/preview.png" "$ROOT/themes/maslow-light/preview.png"
 }
 
 render_lockup() {
-  local mark=$1 text_color=$2 output=$3 width=${4:-800} height=${5:-188}
-  local mark_width=$((width * 22 / 100))
-  local font_size=$((height * 30 / 100))
-  local staged="$TERMINAL_ART_DIR/lockup.png"
+  local text_color=$1 output=$2 scale=${3:-100}
+  local canvas_width=$((800 * scale / 100))
+  local canvas_height=$((188 * scale / 100))
+  local mark_width=$((176 * scale / 100))
+  local mark_height=$((118 * scale / 100))
+  local mark_gap=$((24 * scale / 100))
+  local wordmark_gap=$((8 * scale / 100))
+  local text_height=$((94 * scale / 100))
+  local maslow_width=$((270 * scale / 100))
+  local tag_width=$((194 * scale / 100))
+  local font_size=$((64 * scale / 100))
+  local stroke_width=$((scale >= 150 ? 2 : 1))
 
-  "$MAGICK" -size "${width}x${height}" xc:none \
-    \( -background none "$mark" -resize "${mark_width}x${height}" \) -gravity west -geometry +24+0 -composite \
-    -font "$FONT" -weight 600 -pointsize "$font_size" -fill "$text_color" \
-    -gravity west -annotate +230+0 "$PRODUCT_NAME" -depth 8 "$staged"
+  "$MAGICK" -background none "$MARK_GRADIENT" -trim +repage \
+    -resize "${mark_width}x${mark_height}" "$TERMINAL_ART_DIR/lockup-mark.png"
+  "$MAGICK" -size "${maslow_width}x${text_height}" xc:none \
+    -font "$FONT" -weight 600 -pointsize "$font_size" \
+    -fill "$text_color" -stroke "$text_color" -strokewidth "$stroke_width" -gravity center \
+    -annotate +0+0 'MASLOW' "$TERMINAL_ART_DIR/lockup-maslow.png"
+  "$MAGICK" -size "${tag_width}x${text_height}" xc:none \
+    -font "$FONT" -weight 600 -pointsize "$font_size" \
+    -fill '#C1C1C1' -stroke '#C1C1C1' -strokewidth "$stroke_width" -gravity center \
+    -annotate +0+0 '| AI-OS' "$TERMINAL_ART_DIR/lockup-ai-os.png"
 
-  # Plymouth and SDDM center the full image canvas. Trim the asymmetric empty
-  # area created by the west-anchored composition before restoring that canvas,
-  # so the visible lockup—not its transparent pixels—lands on screen center.
-  "$MAGICK" "$staged" -trim +repage -gravity center -background none \
-    -extent "${width}x${height}" -depth 8 "$output"
-}
-
-center_terminal_line() {
-  local line=$1 padding
-
-  padding=$(((80 - ${#line}) / 2))
-  if (( padding < 0 )); then
-    padding=0
-  fi
-
-  printf '%*s%s\n' "$padding" "" "$line"
-}
-
-compose_terminal_lockup() {
-  local mark_path=$1 wordmark_path=$2
-  local mark_column_width=16 gap=3 row row_count mark_offset wordmark_offset padding
-  local mark_line wordmark_line
-  local -a mark_lines=() wordmark_lines=()
-
-  mapfile -t mark_lines <"$mark_path"
-  mapfile -t wordmark_lines <"$wordmark_path"
-
-  row_count=${#mark_lines[@]}
-  if (( ${#wordmark_lines[@]} > row_count )); then
-    row_count=${#wordmark_lines[@]}
-  fi
-
-  mark_offset=$(((row_count - ${#mark_lines[@]}) / 2))
-  wordmark_offset=$(((row_count - ${#wordmark_lines[@]}) / 2))
-
-  for ((row = 0; row < row_count; row++)); do
-    mark_line=""
-    wordmark_line=""
-
-    if (( row >= mark_offset && row < mark_offset + ${#mark_lines[@]} )); then
-      mark_line=${mark_lines[$((row - mark_offset))]}
-    fi
-    if (( row >= wordmark_offset && row < wordmark_offset + ${#wordmark_lines[@]} )); then
-      wordmark_line=${wordmark_lines[$((row - wordmark_offset))]}
-    fi
-
-    padding=$((mark_column_width - ${#mark_line} + gap))
-    printf '%s%*s%s\n' "$mark_line" "$padding" "" "$wordmark_line"
-  done
-
-  center_terminal_line "$PRODUCT_NAME_UPPER"
+  "$MAGICK" \
+    "$TERMINAL_ART_DIR/lockup-mark.png" \( -size "${mark_gap}x1" xc:none \) \
+    "$TERMINAL_ART_DIR/lockup-maslow.png" \( -size "${wordmark_gap}x1" xc:none \) \
+    "$TERMINAL_ART_DIR/lockup-ai-os.png" \
+    -background none -gravity center +append -trim +repage -gravity center \
+    -extent "${canvas_width}x${canvas_height}" -depth 8 "$output"
 }
 
 render_terminal_logo() {
-  "$MAGICK" -size 1200x220 xc:none \
-    -font "$FONT" -weight 900 -pointsize 128 -fill "#FFFFFF" \
-    -stroke "#FFFFFF" -strokewidth 4 -gravity center \
-    -annotate +0+0 "$PRODUCT_NAME_UPPER" -depth 8 "$TERMINAL_ART_DIR/wordmark.png"
+  cp "$TERMINAL_SOURCE_DIR/logo.txt" "$ROOT/logo.txt"
+}
 
-  "$ROOT/bin/omarchy-transcode-ascii" \
-    "$MARK_GRADIENT" "$TERMINAL_ART_DIR/mark.txt" \
-    --width 20 --height 5 --mode block --threshold 40 >/dev/null
-  "$ROOT/bin/omarchy-transcode-ascii" \
-    "$TERMINAL_ART_DIR/wordmark.png" "$TERMINAL_ART_DIR/wordmark.txt" \
-    --width 60 --height 6 --mode block --threshold 35 >/dev/null
-
-  compose_terminal_lockup \
-    "$TERMINAL_ART_DIR/mark.txt" \
-    "$TERMINAL_ART_DIR/wordmark.txt" >"$ROOT/logo.txt"
+render_terminal_icon() {
+  cp "$TERMINAL_SOURCE_DIR/icon.txt" "$ROOT/icon.txt"
 }
 
 if [[ $render_wallpaper_assets == "true" ]]; then
   render_wallpapers
 fi
 
-render_lockup "$MARK_GRADIENT" "#FFFFFF" "$ROOT/themes/maslow-dark/unlock.png"
-render_lockup "$MARK_GRADIENT" "#121D35" "$ROOT/themes/maslow-light/unlock.png"
-render_lockup "$MARK_GRADIENT" "#FFFFFF" "$ROOT/default/plymouth/logo.png"
+render_lockup "#FFFFFF" "$ROOT/themes/maslow-dark/unlock.png"
+render_lockup "#121D35" "$ROOT/themes/maslow-light/unlock.png"
+render_lockup "#FFFFFF" "$ROOT/default/plymouth/logo.png" 150
 cp "$ROOT/default/plymouth/logo.png" "$ROOT/default/sddm/omarchy/logo.png"
 render_terminal_logo
+render_terminal_icon
 
 "$MAGICK" -size 1200x675 xc:"#121D35" "$ROOT/themes/maslow-dark/unlock.png" -gravity center -composite -depth 8 "$ROOT/themes/maslow-dark/preview-unlock.png"
 "$MAGICK" -size 1200x675 xc:"#FFFFFF" "$ROOT/themes/maslow-light/unlock.png" -gravity center -composite -depth 8 "$ROOT/themes/maslow-light/preview-unlock.png"
@@ -193,4 +180,4 @@ cp "$ROOT/default/plymouth/lock.png" "$ROOT/default/sddm/omarchy/lock.png"
 "$MAGICK" -size 300x10 xc:"#24324D" -depth 8 "$ROOT/default/plymouth/progress_box.png"
 "$MAGICK" -size 300x10 xc:"#6DC4AD" -depth 8 "$ROOT/default/plymouth/progress_bar.png"
 
-echo "Maslow OS assets generated."
+echo "$PRODUCT_NAME assets generated."
