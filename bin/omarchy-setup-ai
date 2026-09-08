@@ -16,6 +16,7 @@ if omarchy-cmd-present maslow-hubctl; then
   if [[ $first_login == "true" ]]; then
     state=$(omarchy-setup-ai-state show) || exit $?
     [[ $(jq -r '.completedAt != null or .deferred' <<<"$state") == "false" ]] || exit 0
+    export OMARCHY_SHELL_IPC_TIMEOUT=60s
   fi
   exec omarchy-launch-hub setup
 fi
