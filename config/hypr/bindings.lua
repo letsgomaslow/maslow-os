@@ -1,3 +1,5 @@
+omarchy_seeded_webapp_bindings = false
+
 -- Keep only your personal keybinding overrides here. Add new bindings or
 -- unbind defaults before replacing them.
 
