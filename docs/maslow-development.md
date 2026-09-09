@@ -4,7 +4,7 @@ Updated 2026-09-09. This is the current workstream index, not a stable-release a
 
 ## Resume in a new context
 
-1. Read this file, [the Hub evidence handoff](handoffs/2026-09-08-maslow-hub.md), [the USB/native follow-up](handoffs/2026-09-08-hub-usb-follow-up.md), and [the internet OTA workflow](ota-update-workflow.md).
+1. Read this file, [the current OTA/observability implementation handoff](handoffs/2026-09-09-hub-ota-observability.md), [the Hub evidence handoff](handoffs/2026-09-08-maslow-hub.md), [the USB/native follow-up](handoffs/2026-09-08-hub-usb-follow-up.md), and [the internet OTA workflow](ota-update-workflow.md).
 2. Run `git status --short --branch`, `git log -5 --oneline`, and `git worktree list` in each repository you will touch. The saved runtime `main` checkout is not the Hub implementation checkout. Do not repeat implementation just because main lacks Hub.
 3. Select one ready backlog item below; identify its owner repository, acceptance criteria, delivery path, and dependencies before editing. Read that repository's AGENTS.md and matching task guide.
 4. Preserve unrelated changes and accepted images. No automatic push, branch merge, release publication, key provisioning, or disk erase follows from a documentation update.
@@ -32,9 +32,11 @@ The separate test clone is `hub-evidence/source-next` under that same local root
 - Independent graphical `0.1.3 → 0.1.4 → 0.1.3` and six preservation hashes passed on the preliminary fresh-installed ISO with the exact unchanged Hub archive, not on the corrected ISO. `0.1.4` is a visibly newer test fixture, not a release to promote. Terminal recovery also passed with the shell stopped in the migration rehearsal.
 - The user subsequently confirmed “Lenovo installation reached desktop.” Fresh installation reaching the desktop is passed as tester-reported hardware evidence. Reboot, onboarding, Bitwarden, authentication, and device update/rollback remain separate unverified checks.
 - On 2026-09-09 the user additionally reported successful everyday use of the installed Lenovo. This strengthens reported usability evidence, not itemized native update/recovery or authentication acceptance.
-- Production update trust is not provisioned. Disposable test keys/server were removed; normal external updates remain disabled. Signing, hosting, redistribution, publication, and itemized native acceptance are still gates.
+- Production update trust is not provisioned. Disposable prior test keys/server were removed; normal external updates remain disabled. The new public distribution scaffold and Pages are live, but signing, actual channel publication, redistribution, and itemized native acceptance remain gates.
 
 ## Feature state
+
+The table below describes the accepted installation baseline. New 0.2.0 source/package progress and its explicit gaps are in the [current implementation handoff](handoffs/2026-09-09-hub-ota-observability.md); an unsigned development package does not update the Lenovo or change accepted baseline evidence.
 
 | Area | Current behavior | Not yet established |
 | --- | --- | --- |
@@ -55,7 +57,7 @@ Lift estimates are relative engineering effort, not dates: XS = focused copy/che
 | Order / ID | Deliverable and acceptance | Lift | Owner / delivery | Dependency |
 | --- | --- | --- | --- | --- |
 | P0 / A1 | Capture itemized Lenovo results: install, USB-detached reboot, Hub, Bitwarden lock/unlock with test data, fresh app install before OS update, web-app lifecycle, errors | XS engineering; user hardware time | Runtime docs; no rebuild | User observations; no secrets in evidence |
-| P0 / A2 | Choose permanent immutable artifact endpoint and signing-key custody/rotation/recovery plan; document bootstrap for already-installed internal systems | S design; external decision | Hub + packages | User approval; private GitHub assets are not anonymous downloads |
+| P0 / A2 | Endpoint selected and scaffold live: public maslow-releases + Pages; authenticated bootstrap implemented. Operator still provisions protected signing and encrypted recovery backup | S; external key custody | Hub + packages | No production key or channel yet |
 | P0 / A3 | Provision approved trust and staging/alpha publication workflow; independently verify external download, rejection, apply, rollback, recovery on an installed client | M | Hub + packages; one-time trust bootstrap | A2; real keys outside repo/ISO/build cache; explicit publication approval |
 | P0 / A4 | Resolve Chrome redistribution before external images; if replacement needed, preserve a usable default browser and test fresh installs | S investigation; implementation TBD | Packages + ISO | Distribution approval; do not guess legal clearance |
 | P0 / A5 | Review and integrate coordinated branches, back up approved source remotely, record exact release inputs and complete Lenovo update/rollback using real channel | S–M | All repositories | A1–A4; source push/merge approval; no test-fixture promotion |
@@ -64,16 +66,16 @@ Lift estimates are relative engineering effort, not dates: XS = focused copy/che
 | P1 / Q3 | Add clear Bitwarden setup/locking guidance and document personal-vault versus agent credentials | S | Hub/docs | No claim of isolation; test with synthetic credentials |
 | P1 / Q4 | Make cache/resume preflight reusable: verify cache layout, self-contained Git snapshot, exact package inputs, and only rebuild changed packages | S–M | ISO tooling | Preserve signature checks and old images; use existing evidence scripts as references |
 | P1 / Q5 | Reproduce intermittent Featured status-read warning and fix root cause if found; retain malformed-then-valid regression | S investigation, fix TBD | Hub | Warning recovery fixed in 0.1.3; original cause remains unconfirmed |
-| P2 / F1 | Deliver one tested observability adapter with install consent, no-credential trace, failure visibility, uninstall/disable, offline skip | M | Hub package; optional install | A3, selected backend; no backend in ISO by default |
+| P0 / F1 | Complete local Langfuse adapter: candidate code/package exists; real traces, resource measurements, bounded logs/resource presentation, startup and recovery acceptance remain | M | Hub package; optional install | A3; native x86 evidence; no backend in ISO by default |
 | P2 / F2 | Adapt Connect to the approved local/serverless boundary, then improve detection and prove one provider with authorization/revocation | M–L; S architecture slice | Separate Connect, then Hub | Follow Connect's `docs/serverless-local-roadmap.md`; Vercel preferred, no VPS; durable state/policy decision required; not an OTA prerequisite |
 | P2 / F3 | Curate more data-only Featured entries with evidence-based Tested/Experimental/Coming soon labels | S | Signed catalog | A3; no executable catalog content |
 | P2 / S1 | Threat-model agent/secret separation; prototype restricted agents and user-approved credential operations, then adversarially test filesystem, clipboard, screen, sockets, and privilege boundaries | L overall; S design slice can start early | Runtime + Hub/Connect | Security review before handling real personal credentials; do not rely on prompt instructions |
 | P3 / F4 | One tested Paperclip/Hermes harness adapter, including compatibility, permissions, update and removal | M–L | Hub | Keep Coming soon until end-to-end proof; separate from full marketplace |
 | P3 / F5 | Full marketplace installer, universal memory, model routing, broad harness support | L | Separate scoped workstreams | Deferred; avoid expanding foundation work |
 
-Recommended next work: A1 evidence capture and A2 release-delivery decision, then A3. Low-lift UX improvements may proceed independently, but do not substitute for release/security gates. Security design S1 may start in parallel; it blocks any promise of agent-hidden secrets, not a controlled internal install test.
+Current approved work: A2's delivery choice is public `letsgomaslow/maslow-releases` with GitHub Pages metadata and protected local signing. Its public scaffold is live; production trust and releases remain absent. A3 and F1 are in implementation, with Q2/Q3/F3 and bounded update history in the same B payload. Read the current handoff for evidence and remaining gates. Security design S1 blocks any promise of agent-hidden secrets, not a controlled internal install test.
 
-For A2/A3, follow the [internet OTA workflow and payload options](ota-update-workflow.md). Recommended payload is an expanded, offline-skippable Observability guide (Q2, S lift), not a backend installation. Prove two successive package updates and rollback on the existing Lenovo. Catalog-only changes are a separate data-delivery test. Connect's serverless adaptation remains independent; no ISO rebuild, key provisioning, or publication is authorized by these documentation changes.
+For A2/A3, follow the [internet OTA workflow and payload options](ota-update-workflow.md), as superseded by the approved [local Langfuse implementation milestone](handoffs/2026-09-09-hub-ota-observability.md). The payload is a working optional local backend plus guidance, not just a Coming soon screen. Prove `0.1.3 → B → rollback → B → C` on installed systems. Connect's serverless adaptation and OS package updates remain independent. No ISO rebuild is needed; release promotion remains explicit.
 
 ## What worked, what failed, what to reuse
 
@@ -93,6 +95,8 @@ For A2/A3, follow the [internet OTA workflow and payload options](ota-update-wor
 | Broad cross-task reads and minute-by-minute progress create overhead | Delegate one bounded task per worker, at most two workers; return compact findings. Use cursor-based status waits, do not reread full task transcripts or narrate unchanged state. |
 
 ## Verification and session closeout
+
+2026-09-09 implementation checkpoint: Hub `b28d515`, package recipes `e4fab06`, public distribution `7e38da2`; 69 Python tests, UI contract, package checks, inspected native previews, and installed package/preflight rejection passed. No production release was published. Backend startup failed under Apple amd64 emulation; real traces, hardware measurements, signed OTA sequence, release C, and specified presentation gaps remain open. See the current handoff for exact package hash and evidence. The accepted ISO is unchanged.
 
 2026-09-09 checkpoint: documented A2/A3 internet delivery workflow, candidate payloads, and the separate Connect local/serverless roadmap. Existing relative-link targets and repository identity were checked; documentation whitespace checks passed. No code, deployment, trust, accepted artifact, or device state changed. Runtime/graphical tests were not rerun for documentation-only edits. Lesson: local MCP transport is not a local-only backend, and a visible feature is not proof of an operational internet channel. Next decision: artifact endpoint and signing-key custody, then secure installed-client bootstrap. Find the scoped documentation commits in each repository's Git history; accepted build revisions above remain unchanged.
 
