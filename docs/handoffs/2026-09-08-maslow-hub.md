@@ -1,6 +1,8 @@
 # Maslow Hub implementation and acceptance checkpoint
 
-Status: Internal engineering candidate complete. Hub implementation, migration rehearsal, graphical update/rollback on the preliminary ISO, corrected ISO assembly, exact artifact inspection, final fresh installation, and native screensaver fit are verified. This is not a publication or native Lenovo acceptance record.
+Status: Internal engineering candidate complete. Hub implementation, migration rehearsal, graphical update/rollback on the preliminary ISO, corrected ISO assembly, exact artifact inspection, final fresh installation, and installed-guest screensaver fit are verified. This is not a publication or Lenovo hardware acceptance record. References below to native UI/captures mean real Quickshell/desktop rendering inside the headless guest, not observed Lenovo hardware; local evidence directory names are retained unchanged.
+
+Follow-up: [verified USB and tester-reported Lenovo installation](2026-09-08-hub-usb-follow-up.md) records full USB readback and the user's subsequent confirmation that installation reached the desktop. It does not close itemized onboarding, security, recovery, or production delivery gates. Start new work from [development status and prioritized backlog](../maslow-development.md).
 
 ## Recorded inputs
 

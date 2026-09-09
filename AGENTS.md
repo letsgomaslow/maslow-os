@@ -1,3 +1,12 @@
+# Start Here: Active Maslow Hub Work
+
+- Read [development status, backlog, and lessons](docs/maslow-development.md), then its dated evidence handoffs before implementation. This is the single current progress index; do not infer completion from chat summaries.
+- Run `git status --short --branch`, `git log -5 --oneline`, and `git worktree list` before editing. Hub implementation is on `codex/maslow-hub` across runtime/packages/ISO; Hub source has its own repository. Product branches are not automatically integrated.
+- At session close, update the index and relevant handoff with commits, exact artifact evidence, tests/failures/skips, remaining gates, and one next action. Never store secrets, raw private logs, or ISO files in Git. Commit only scoped files; do not merge or publish without authorization.
+- Use at most two independent workers with disjoint ownership when useful. Route bounded inventory/docs to Luna, ordinary implementation to Terra, updater/migrations to Sol, and security/final integration review to Astra when those models are available and authorized. Report only routing actually used. Prefer compact cursor-based status; avoid full transcript reads and unchanged polling commentary.
+- Fast visual work uses Docker + headless Weston + real Quickshell/software rendering and inspected PNGs. Installed-system proof uses headless QEMU/TCG with CIDATA, SSH, and QMP screenshots/OCR; Lenovo is the final hardware target and USB is the installation medium. No UTM. Reuse installed overlays; rebuild media only for baseline/install changes or release checkpoints.
+- For documentation-only changes, check links, referenced revisions, staged scope, and `git diff --check`; do not rerun unchanged builds or acceptance suites.
+
 # Task Guides
 
 Deeper instructions for specific kinds of work live in `agents/skills/`. Read the
@@ -13,11 +22,12 @@ matching guide before starting:
 
 # Repository Topology
 
-Maslow OS is maintained as three coordinated downstream repositories. They are related stages of one product pipeline, not interchangeable copies:
+Maslow AI-OS has three coordinated OS repositories plus independently packaged Hub source. They are related stages of one product pipeline, not interchangeable copies:
 
 - `letsgomaslow/maslow-os` (this repository) owns the installed runtime, desktop, commands, themes, product metadata, migrations, and end-user documentation. Its public product branch and default branch is `main`.
 - `letsgomaslow/maslow-os-pkgs` owns Arch `PKGBUILD` recipes, package metadata, dependencies, file ownership, and package publication infrastructure. Its downstream product branch is `maslow`.
 - `letsgomaslow/maslow-os-iso` owns the bootable x86_64 installer, live environment, installation orchestrator, offline package mirror assembly, and VM acceptance harness. Its downstream product branch is `maslow`.
+- `letsgomaslow/maslow-hub` owns Hub UI, onboarding presentation, catalog, and bounded update/helper interfaces. Its source branch is `main`; recipes remain in `maslow-os-pkgs`. Maslow Connect remains separate.
 
 The build flow is `maslow-os source` -> `maslow-os-pkgs package recipes` -> `maslow-os-iso installation media`. The ISO repository consumes explicit checkouts of both preceding repositories for local-source builds; it does not replace either one.
 
@@ -39,7 +49,7 @@ The build flow is `maslow-os source` -> `maslow-os-pkgs package recipes` -> `mas
 
 # Native acceptance and preview guardrails
 
-- Read `docs/handoffs/2026-09-05-verified-usb-native-acceptance.md` before continuing this candidate. Preserve its exact build inputs and ISO checksum; later documentation commits do not alter the tested artifact.
+- Read the current handoffs linked from `docs/maslow-development.md`; the September 5 verified-USB handoff is historical evidence for an older candidate. Preserve each artifact's exact inputs/hash; later documentation commits do not change tested bytes.
 - Separate source-test, build/artifact, USB readback, tester-reported native, and directly observed visual evidence. A general "everything works" report is not an itemized AI, recovery, performance, or post-update test log.
 - Test fresh app installation before the first `omarchy update`. A manual database repair or update on an existing installation cannot substitute for that gate. Never use standalone `pacman -Sy` to conceal a fresh-install failure.
 - Preserve the temporary Maslow runtime package hold and supported `omarchy update` path. Do not bypass the hold, switch channels, or claim a stable signed Maslow channel without separate approval and reviewed packages.
