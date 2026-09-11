@@ -1,5 +1,13 @@
 # Hub recovery release after Lenovo feedback
 
+## Latest checkpoint: published and anonymously verified
+
+On September 11 the operator completed protected signing in `../hub-evidence/ota-recovery-021/signed-run.4jssK8`. Local signature, compatibility, expiry, package hash and catalog validation passed. The coordinator published the exact final 0.2.1 package to its immutable checksum release, re-downloaded all released package/signature bytes anonymously, then promoted staging sequence 3 in distribution commit `8791c37972525af0edcbe6ee980d70b7f97d4577`. GitHub Pages reported that exact commit built successfully.
+
+`../hub-evidence/ota-recovery-021/verify-public.py` independently fetched the public manifest, signatures, catalog and all three packages without authentication. Exact metadata comparison and normal delivery signature/hash/compatibility/expiry validation passed for versions 0.1.3, 0.2.0 and 0.2.1. Metadata expires September 24, 2026 at 23:56:41 UTC. Alpha, private source, ISO and bootstrap trust were unchanged. The signing instructions below are historical and must not be repeated for this publication.
+
+Next action belongs to the Lenovo tester: open existing Hub Updates, Check for updates, select/apply 0.2.1 once, approve the laptop administrator prompt and wait for Hub to reopen. Confirm installed 0.2.1 before testing Observability. Report its visible stage and next action; if it fails, capture the error or manually share the safe diagnostic report instead of repeatedly reinstalling. A successful public download is not proof that Lenovo updated or that Langfuse started or received a real Hermes trace.
+
 ## Scope and evidence
 
 The user reported successful one-time internet trust enrollment, then confusing update discovery and repeated Observability installation failures. Screenshots show the 0.2.0 Observability command family is present, but do not independently establish the installed package version, completed OTA transaction, preserved state or rollback. The first diagnostic confirmed Docker active with socket permission denied; `id -nG` showed `maslow wheel`, and the Docker group had no listed member. Memory passed and Docker storage could not be measured. The user followed advice to add Docker access and reported a subsequent failure; its cause is unknown. Do not assume the later failure is another permission problem or that repeated button presses corrupted data.
