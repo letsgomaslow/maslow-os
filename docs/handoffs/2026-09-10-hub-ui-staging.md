@@ -34,6 +34,16 @@ The user explicitly chose learning through an internal Lenovo staging test rathe
 
 ## Signing and next action
 
+### Publication attempt: GitHub tag restriction
+
+The user explicitly approved public package publication and staging promotion. Publication created baseline draft release ID `386741196`, then GitHub rejected publication with HTTP 422: bare 40- or 64-character hexadecimal tag names are forbidden. The draft retains the original two verified baseline assets and remains unpublished; no staging metadata was pushed. Do not retry the raw-hash tag or mistake the draft for a public release.
+
+Hub release-only fix `fe4b9b8` uses `sha256-<digest>` tags and retains bare checksum local bundle directories. Added rejection and builder→delivery round-trip tests; 73 Python tests plus UI checks passed. The new round-trip test initially exposed test-key file permissions under macOS OpenSSL; the test now applies the same owner-only requirement as real signing, without weakening validation. No installed helper/UI/package bytes changed; no rebuild or new ISO is needed.
+
+Corrected local bundle: `hub-evidence/ota-ui-020/retagged-sequence-2/bundle`. Both original package signatures and the original catalog signature were reverified and reused. The manifest uses sequence 2 with only artifact URLs and sequence changed; it still expires `2026-09-24T23:56:41Z`. Unsigned corrected manifest SHA-256: `ae72a2ef5b429304f10eacc01ffddcfcef42162ce9a79344d4f663c8c815160d`. Operator command `hub-evidence/ota-ui-020/sign-staging-url-fix.sh` asks once to sign this manifest, validates the full bundle, and runs a dry run. Syntax checked; private signing remains operator-only. The old sign-staging.sh is obsolete because it pins the older tooling revision.
+
+**Current next action:** operator signs the corrected manifest, then coordinator verifies this specific sequence-2 bundle and continues the already authorized public release and staging promotion using prefixed tags. No additional publication-approval loop is needed for this naming-only correction. Preserve/review the failed raw-tag draft separately; never replace an already published immutable artifact. Anonymous verification and Lenovo bootstrap follow successful Pages promotion.
+
 Operator signing completed in `hub-evidence/ota-ui-020/signed-run.DR648T`. Coordinator reran the existing publication tool in dry-run mode against that bundle and the independently pinned public fingerprint: both exact package signatures/hashes, signed sequence-1 manifest, and signed catalog validated. The new package remains `498dc788...dc992` (58,332 bytes); baseline remains `3baa23be...20b` (35,138 bytes). Bootstrap script checksum is `7cc4eff684827b5a1e4780ffcc648728b550e58d00f09a386a0bb98b60208055`. GitHub Releases remains empty; Pages still serves the scaffold. Next action is explicit approval to publish these exact public packages and promote staging, followed by anonymous byte/signature verification. Do not ask the operator to sign again unless the payload or metadata changes.
 
 Operator previously created an encrypted private key and reports a separate recovery backup. Public SPKI SHA-256 fingerprint reverified: `daacaa5aac138710a3950097b29a05abd3f69c9a8efad512321c45f3103d1ee4`. No private key/passphrase was read into agent context or copied into a build container or artifact.
