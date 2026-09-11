@@ -1,10 +1,10 @@
 # Maslow AI-OS development: start here
 
-Updated 2026-09-09. This is the current workstream index, not a stable-release announcement. Update this file at each meaningful checkpoint; keep detailed evidence in dated handoffs rather than expanding AGENTS.md into a second backlog.
+Updated 2026-09-10. This is the current workstream index, not a stable-release announcement. Update this file at each meaningful checkpoint; keep detailed evidence in dated handoffs rather than expanding AGENTS.md into a second backlog.
 
 ## Resume in a new context
 
-1. Read this file, [the current OTA/observability implementation handoff](handoffs/2026-09-09-hub-ota-observability.md), [the Hub evidence handoff](handoffs/2026-09-08-maslow-hub.md), [the USB/native follow-up](handoffs/2026-09-08-hub-usb-follow-up.md), and [the internet OTA workflow](ota-update-workflow.md).
+1. Read this file, [the current Hub UI staging handoff](handoffs/2026-09-10-hub-ui-staging.md), [the OTA/observability implementation handoff](handoffs/2026-09-09-hub-ota-observability.md), [the Hub evidence handoff](handoffs/2026-09-08-maslow-hub.md), [the USB/native follow-up](handoffs/2026-09-08-hub-usb-follow-up.md), and [the internet OTA workflow](ota-update-workflow.md).
 2. Run `git status --short --branch`, `git log -5 --oneline`, and `git worktree list` in each repository you will touch. The saved runtime `main` checkout is not the Hub implementation checkout. Do not repeat implementation just because main lacks Hub.
 3. Select one ready backlog item below; identify its owner repository, acceptance criteria, delivery path, and dependencies before editing. Read that repository's AGENTS.md and matching task guide.
 4. Preserve unrelated changes and accepted images. No automatic push, branch merge, release publication, key provisioning, or disk erase follows from a documentation update.
@@ -95,6 +95,10 @@ For A2/A3, follow the [internet OTA workflow and payload options](ota-update-wor
 | Broad cross-task reads and minute-by-minute progress create overhead | Delegate one bounded task per worker, at most two workers; return compact findings. Use cursor-based status waits, do not reread full task transcripts or narrate unchanged state. |
 
 ## Verification and session closeout
+
+2026-09-10 UI staging checkpoint: user approved a narrowly scoped experiential OTA test, separating experimental observability maturity from mandatory update safety. Hub `6ea55de` restores guided setup and a returning-user overview; 71 Python tests, guided UI contract checks, inspected real Quickshell renders, package ownership, and installed-guest setup/launcher preservation passed. New unsigned 0.2.0 package SHA-256 `498dc7883ecd8bd11ae3539d549554b1dd423b41d02b12facc83a43b388dc992` supersedes the earlier unpromoted candidate for this test. No ISO rebuild or Lenovo change. QMP output remained inactive, not installed visual proof. Operator signing script is ready; next is local signing, exact-artifact publication review, anonymous verification, then Lenovo enrollment/OTA feedback. Read the new UI staging handoff before acting on older broader release gates.
+
+2026-09-10 signing checkpoint: operator-created encrypted key and public fingerprint are recorded in the current OTA handoff; separate recovery backup is operator-reported, not restore-tested. Exact baseline/candidate package hashes match and Hub's 69 Python tests plus release checks passed again. No release or channel was published and no Lenovo trust was changed. Native observability validation and candidate acceptance, not key creation, are the next release blockers. Checkpoint documentation is local and uncommitted; accepted artifact revisions remain unchanged.
 
 2026-09-09 implementation checkpoint: Hub `b28d515`, package recipes `e4fab06`, public distribution `7e38da2`; 69 Python tests, UI contract, package checks, inspected native previews, and installed package/preflight rejection passed. No production release was published. Backend startup failed under Apple amd64 emulation; real traces, hardware measurements, signed OTA sequence, release C, and specified presentation gaps remain open. See the current handoff for exact package hash and evidence. The accepted ISO is unchanged.
 

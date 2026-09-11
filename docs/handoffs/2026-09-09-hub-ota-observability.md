@@ -8,6 +8,14 @@ The approved payload is now local Langfuse for Hermes plus Observability guidanc
 
 ## Delivery foundation
 
+### 2026-09-10 signing checkpoint
+
+- Operator created an encrypted private signing key outside repositories and generated a parseable RSA public key. File metadata confirmed owner-only permissions. Operator reports a separate encrypted-key recovery backup; backup restoration has not been tested. No private key or passphrase was displayed, uploaded, or copied into release output.
+- Public trust fingerprint (SHA-256 of SPKI DER): `daacaa5aac138710a3950097b29a05abd3f69c9a8efad512321c45f3103d1ee4`. This is public information, not a signing credential. No client trust was enrolled.
+- Rechecked exact 0.1.3 and 0.2.0 package hashes against this handoff; both match. Hub `b28d515` passed `bash release/check.sh`: 69 Python tests, UI contract, version consistency, and whitespace checks. Bootstrap rejection messages came from expected negative tests, not a real enrollment failure.
+- GitHub release inventory remains empty. Signing preparation is complete, but packages/catalog/channel have not been signed or published. The candidate's native backend and presentation acceptance gates below remain unchanged; key readiness does not authorize promoting the unverified payload.
+- Next engineering step: resume isolated native x86 backend/trace validation and complete candidate acceptance before requesting operator signing and exact-artifact staging promotion. Do not request the passphrase in chat or load the plaintext `.env` into agent context; existing release tools use local interactive prompts.
+
 - Private Hub source checkout: sibling `maslow-hub`, branch `main`. Update history is `5062e2d`; delivery tools/CI are `d8e3230`; authenticated bootstrap utility staging is `330de78`; native UI is `8db1588`; guarded adapter development candidate is `b28d5150979dc2df16dc0d5fce161e883cc878d3`. Package assets recipe is `e4fab06`. These are not the accepted ISO's source revisions.
 - Public distribution: [letsgomaslow/maslow-releases](https://github.com/letsgomaslow/maslow-releases), separate from private source. Scaffold commits `447747c` and `7e38da2`; GitHub Pages serves [the public root](https://letsgomaslow.github.io/maslow-releases/). Anonymous HTTPS returned the scaffold. GitHub's immutable-release protection was enabled and read back as enabled.
 - No production key, signed package, signed channel, or signed catalog has been published. A reachable static site is not a functioning update channel. Protected operator signing and encrypted recovery backup remain required before promotion.
