@@ -1,6 +1,8 @@
 # Maslow AI-OS development: start here
 
-Updated 2026-09-10. This is the current workstream index, not a stable-release announcement. Update this file at each meaningful checkpoint; keep detailed evidence in dated handoffs rather than expanding AGENTS.md into a second backlog.
+Updated 2026-09-11. This is the current workstream index, not a stable-release announcement. Update this file at each meaningful checkpoint; keep detailed evidence in dated handoffs rather than expanding AGENTS.md into a second backlog.
+
+Current priority: [Hub recovery after Lenovo feedback](handoffs/2026-09-11-hub-recovery.md). The user enrolled trust and exercised Hub/Observability, but encountered hidden progress and installation failures. First failure was confirmed Docker socket permission denial, consistent with intentional OS security defaults; the subsequent failure is not diagnosed. Stop command-by-command hardware troubleshooting and repair/test the experience before asking the user to update again. Signed 0.2.0 staging remains the current public package; 0.2.1 repair is not yet released. Read this newer handoff before the historical publication checkpoints below.
 
 ## Resume in a new context
 
