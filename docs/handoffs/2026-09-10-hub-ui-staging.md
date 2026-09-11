@@ -34,6 +34,16 @@ The user explicitly chose learning through an internal Lenovo staging test rathe
 
 ## Signing and next action
 
+### Published and anonymously verified
+
+The operator signed the corrected sequence-2 manifest and the coordinator continued the already-authorized publication. Both prefixed package releases are now public and GitHub reports `immutable:true`. Public distribution commit `59460037e769019475d27650ac6d91d14ed2e6b8` atomically promoted the staging manifest/signature and catalog/signature, public bootstrap script/checksum/key, and accurate internal-test status. GitHub Pages deployment run `34553966910` completed successfully for that exact commit. Alpha was not created or changed.
+
+Anonymous HTTPS downloads (curl with config disabled, no GitHub authorization) of both packages and detached signatures matched the reviewed local bytes; OpenSSL verified both against the pinned public key. Downloaded staging metadata matched the committed bytes. Downloaded bootstrap script matched independently recorded checksum `7cc4eff684827b5a1e4780ffcc648728b550e58d00f09a386a0bb98b60208055`. The complete fetched manifest/catalog/packages and fetched public key passed `prepare-github-delivery.py` using the independently pinned fingerprint. Temporary verification evidence: `/tmp/maslow-public-artifacts.IQEqKW` and `/tmp/maslow-public-channel.XxY4HK`; these are local diagnostic copies, not required client delivery paths. The verifier's generated plan always says “Not published” because it never publishes; that generic output is not the actual release status.
+
+Live channel: `https://letsgomaslow.github.io/maslow-releases/hub/staging/manifest.json`. Bootstrap: `https://letsgomaslow.github.io/maslow-releases/bootstrap/bootstrap-trust.py`. Manifest sequence 2 and catalog sequence 1 expire `2026-09-24T23:56:41Z`; renew signed metadata before expiry for continued discovery. No background renewal task was scheduled. Both exact package checksums remain as recorded above. The earlier raw-tag failed draft ID `386741196` remains unpublished and separate; do not confuse it with the two immutable releases.
+
+**Current next action:** user enrolls the Lenovo once with the independently supplied script checksum and public fingerprint, then uses Hub Updates to discover and apply 0.2.0. No files or private keys need copying from the Mac. Normal Lenovo administrator authorization is required, not the release-signing passphrase. Test the new layout/settings preservation before optional observability installation, then rollback/reapply. Actual installed internet update, successful UI reload, physical-device rollback and backend traces remain pending user/installed evidence. Do not ask the user to sign or approve this already-published bundle again.
+
 ### Publication attempt: GitHub tag restriction
 
 The user explicitly approved public package publication and staging promotion. Publication created baseline draft release ID `386741196`, then GitHub rejected publication with HTTP 422: bare 40- or 64-character hexadecimal tag names are forbidden. The draft retains the original two verified baseline assets and remains unpublished; no staging metadata was pushed. Do not retry the raw-hash tag or mistake the draft for a public release.

@@ -32,7 +32,7 @@ The separate test clone is `hub-evidence/source-next` under that same local root
 - Independent graphical `0.1.3 → 0.1.4 → 0.1.3` and six preservation hashes passed on the preliminary fresh-installed ISO with the exact unchanged Hub archive, not on the corrected ISO. `0.1.4` is a visibly newer test fixture, not a release to promote. Terminal recovery also passed with the shell stopped in the migration rehearsal.
 - The user subsequently confirmed “Lenovo installation reached desktop.” Fresh installation reaching the desktop is passed as tester-reported hardware evidence. Reboot, onboarding, Bitwarden, authentication, and device update/rollback remain separate unverified checks.
 - On 2026-09-09 the user additionally reported successful everyday use of the installed Lenovo. This strengthens reported usability evidence, not itemized native update/recovery or authentication acceptance.
-- Production update trust is not provisioned. Disposable prior test keys/server were removed; normal external updates remain disabled. The new public distribution scaffold and Pages are live, but signing, actual channel publication, redistribution, and itemized native acceptance remain gates.
+- The accepted ISO still requires one-time client trust enrollment. Signed internal staging is now published and anonymously verified (distribution `5946003`, Hub 0.2.0 with exact 0.1.3 rollback). Stable/alpha promotion, actual Lenovo internet update/rollback, redistribution of installer media, and itemized native acceptance remain separate gates. See the current UI staging handoff before using older scaffold-only checkpoints.
 
 ## Feature state
 
@@ -95,6 +95,8 @@ For A2/A3, follow the [internet OTA workflow and payload options](ota-update-wor
 | Broad cross-task reads and minute-by-minute progress create overhead | Delegate one bounded task per worker, at most two workers; return compact findings. Use cursor-based status waits, do not reread full task transcripts or narrate unchanged state. |
 
 ## Verification and session closeout
+
+Current publication state: signed staging is LIVE and anonymously verified. Distribution commit `5946003`; successful Pages run `34553966910`; both package releases immutable. Manifest sequence 2 / catalog sequence 1 expire September 24, 2026 at 23:56:41 UTC. Public packages, signatures, metadata, fingerprint and bootstrap checksum verified. Next is user-performed one-time Lenovo enrollment, Hub 0.1.3→0.2.0 update and feedback, then rollback/reapply. No more signing or publication approval is needed for this bundle. Read the UI staging handoff's published section for endpoints and evidence; older entries below are historical checkpoints.
 
 Publication checkpoint: user approved publication, but GitHub rejected bare checksum tags with HTTP 422. Nothing is public except the prior scaffold; one failed unpublished baseline draft remains. Release-only fix `fe4b9b8` uses `sha256-<digest>` tags and passes 73 tests plus UI checks. Exact package bytes/signatures are unchanged. A prepared sequence-2 manifest needs one operator signature via `hub-evidence/ota-ui-020/sign-staging-url-fix.sh`; then continue already-authorized promotion. See the UI staging handoff's publication-attempt section. Do not repeat the original signing script, rebuild packages, or ask for publication approval again solely for this naming fix.
 
