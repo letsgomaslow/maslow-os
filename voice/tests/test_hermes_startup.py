@@ -1,4 +1,6 @@
 import asyncio
+import json
+import sys
 import tempfile
 import unittest
 from pathlib import Path
@@ -6,6 +8,8 @@ from pathlib import Path
 from maslow_voice import offline_worker
 from maslow_voice.coordinator import HERMES_START_TIMEOUT as ONLINE_HERMES_START_TIMEOUT
 from maslow_voice.coordinator import _wait_for_hermes as wait_for_online_hermes
+from maslow_voice.coordinator import _wait_for_owned_hermes
+from maslow_voice.coordinator import _terminate_hermes_process_group
 from maslow_voice.errors import VoiceError
 from maslow_voice.offline import OfflineRuntime
 
@@ -103,6 +107,45 @@ class HermesStartupDeadlineTests(unittest.IsolatedAsyncioTestCase):
                 waiting.cancel()
                 with self.assertRaises(asyncio.CancelledError):
                     await asyncio.wait_for(waiting, 0.1)
+
+    async def test_online_cancellation_kills_owned_parent_and_grandchild(self):
+        with tempfile.TemporaryDirectory() as root:
+            sentinel = Path(root) / "grandchild-survived"
+            grandchild_code = (
+                "import time; from pathlib import Path; time.sleep(0.5); "
+                f"Path({json.dumps(str(sentinel))}).write_text('survived')"
+            )
+            parent_code = (
+                "import subprocess,sys,time; "
+                f"child=subprocess.Popen([sys.executable,'-c',{json.dumps(grandchild_code)}]); "
+                "print(child.pid,flush=True); time.sleep(60)"
+            )
+            process = await asyncio.create_subprocess_exec(
+                sys.executable, "-u", "-c", parent_code,
+                stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.DEVNULL,
+                start_new_session=True,
+            )
+            await asyncio.wait_for(process.stdout.readline(), 2)
+            started = asyncio.Event()
+
+            async def probe():
+                started.set()
+                await asyncio.Event().wait()
+
+            waiting = asyncio.create_task(_wait_for_owned_hermes(process, probe))
+            try:
+                await started.wait()
+                waiting.cancel()
+                with self.assertRaises(asyncio.CancelledError):
+                    await asyncio.wait_for(waiting, 2)
+                self.assertIsNotNone(process.returncode)
+                await asyncio.sleep(0.7)
+                self.assertFalse(sentinel.exists())
+            finally:
+                waiting.cancel()
+                await asyncio.gather(waiting, return_exceptions=True)
+                if process.returncode is None:
+                    await _terminate_hermes_process_group(process, force=True)
 
     async def test_offline_parent_allows_worker_deadline_and_cleanup_margin(self):
         self.assertEqual(ONLINE_HERMES_START_TIMEOUT, 120)

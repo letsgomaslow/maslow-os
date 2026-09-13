@@ -5,6 +5,7 @@ import hashlib
 import json
 import os
 import secrets
+import signal
 import shutil
 import socket
 from pathlib import Path
@@ -45,6 +46,38 @@ async def _wait_for_hermes(process, probe, *, timeout=HERMES_START_TIMEOUT,
         if remaining <= 0:
             raise VoiceError("HERMES_START_TIMEOUT", "Hermes did not become ready in time. Check its setup and retry.")
         await sleep(min(poll_interval, remaining))
+
+
+async def _terminate_hermes_process_group(process, *, force=False):
+    group = process.pid
+    try:
+        os.killpg(group, signal.SIGKILL if force else signal.SIGTERM)
+    except ProcessLookupError:
+        pass
+    try:
+        await asyncio.wait_for(process.wait(), 10)
+    except TimeoutError:
+        pass
+    if not force:
+        try:
+            # The parent can exit before a helper descendant. The group remains
+            # owned by this just-spawned session until every descendant exits.
+            os.killpg(group, signal.SIGKILL)
+        except ProcessLookupError:
+            pass
+    if process.returncode is None:
+        await process.wait()
+
+
+async def _wait_for_owned_hermes(process, probe):
+    try:
+        await _wait_for_hermes(process, probe)
+    except asyncio.CancelledError:
+        await _terminate_hermes_process_group(process, force=True)
+        raise
+    except VoiceError:
+        await _terminate_hermes_process_group(process)
+        raise
 
 
 def clean_environment():
@@ -177,22 +210,12 @@ class HermesRuntime:
             client = HermesClient(endpoint, token)
             self.processes[key] = process
             try:
-                await _wait_for_hermes(process, client.capabilities)
-            except asyncio.CancelledError:
-                self.processes.pop(key, None)
-                if process.returncode is None:
-                    process.kill()
-                    await process.wait()
-                raise
+                await _wait_for_owned_hermes(process, client.capabilities)
             except VoiceError:
                 self.processes.pop(key, None)
-                if process.returncode is None:
-                    process.terminate()
-                    try:
-                        await asyncio.wait_for(process.wait(), 10)
-                    except TimeoutError:
-                        process.kill()
-                        await process.wait()
+                raise
+            except asyncio.CancelledError:
+                self.processes.pop(key, None)
                 raise
             self.clients[key] = client
             return client
