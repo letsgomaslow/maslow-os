@@ -3,7 +3,7 @@ import json
 import tempfile
 import unittest
 from pathlib import Path
-from unittest.mock import AsyncMock
+from unittest.mock import AsyncMock, Mock, patch
 
 from maslow_voice.daemon import VoiceService
 from maslow_voice.errors import VoiceError
@@ -130,3 +130,27 @@ class ServiceTests(unittest.IsolatedAsyncioTestCase):
         self.assertIsNone(self.service.offline.process)
         self.assertIsNone(self.service.offline.display)
         self.assertEqual(original.read_text(), "original")
+
+    async def test_readiness_releases_its_temporary_offline_workspace(self):
+        runtime = Mock()
+        runtime.open_display = AsyncMock()
+        runtime.start = AsyncMock()
+        runtime.stop = AsyncMock()
+        runtime.model_request = AsyncMock(return_value={"models": [{"name": "small:latest"}]})
+        self.service.settings.update({"mode": "offline", "model": "small:latest"})
+        with patch("maslow_voice.offline.OfflineRuntime", return_value=runtime):
+            await self.service.dispatch({"action": "test"})
+        runtime.start.assert_awaited_once()
+        runtime.stop.assert_awaited_once()
+        self.assertIsNone(self.service.offline)
+
+    async def test_large_child_history_cannot_break_the_control_frame(self):
+        approval = {"request_id": "exact", "message": "Review the complete proposed command."}
+        children = [{"result": "x" * 200000, "instructions": "y" * 12000} for _ in range(20)]
+        tasks = [{"id": str(i), "result": "r" * 12000, "source": "s" * 12000,
+                  "children": children, "approval": approval} for i in range(50)]
+        with patch.object(self.service.store, "list", return_value=tasks):
+            snapshot = self.service.snapshot()
+        self.assertLess(len(json.dumps(snapshot).encode()), 4 * 1024 * 1024)
+        self.assertEqual(snapshot["tasks"][0]["approval"], approval)
+        self.assertEqual(len(tasks[0]["children"][0]["result"]), 200000)

@@ -150,6 +150,13 @@ class VoiceService:
 
     async def offline_runtime(self, project=None):
         from .offline import OfflineRuntime
+        source = Path(os.path.abspath(project)) if project else None
+        if self.offline and self.offline.workspace and self.offline.workspace.source != source:
+            if self.provider or self.store.active():
+                raise VoiceError("OFFLINE_PROJECT_BUSY", "Finish current work and end this conversation before choosing another offline project.")
+            await self.offline.stop()
+            self.offline = None
+            self.offline_clients.clear()
         if self.offline is None:
             self.offline = OfflineRuntime(self.directory, self.settings.value)
         runtime = self.offline
@@ -245,6 +252,7 @@ class VoiceService:
     async def check_readiness(self, discover=False):
         config = self.settings.value
         checks, models = [], []
+        testing_new_workspace = config["mode"] == "offline" and self.offline is None and not self.provider and not self.store.active()
         def add(name, ok, message):
             checks.append({"name": name, "ok": bool(ok), "message": message})
         add("Hermes coordinator", shutil.which("hermes"), "Install and configure Hermes through Hub for task handoff.")
@@ -280,6 +288,11 @@ class VoiceService:
             add("Connection", False, error.message)
         except Exception:
             add("Connection", False, "The selected Voice runtime needs setup. No fallback was used.")
+        finally:
+            if testing_new_workspace and self.offline and not self.provider and not self.store.active():
+                await self.offline.stop()
+                self.offline = None
+                self.offline_clients.clear()
         self.readiness = {"ready": bool(checks) and all(check["ok"] for check in checks), "checks": checks, "models": models}
         await self.publish()
         return {"readiness": self.readiness}

@@ -144,11 +144,74 @@ Item {
     background: Rectangle { radius: 8; color: "#1E2D47"; border.width: parent.activeFocus ? 2 : 1; border.color: parent.activeFocus ? "#6DC4AD" : "#75879D" }
   }
   component VoiceSelect: ComboBox {
+    id: select
     implicitHeight: 44
     Layout.fillWidth: true
     font.family: "Manrope"
     font.pixelSize: 14
-    background: Rectangle { radius: 8; color: "#F6F7F9"; border.width: parent.activeFocus ? 2 : 1; border.color: parent.activeFocus ? "#247967" : "#121D35" }
+    leftPadding: 12
+    rightPadding: 36
+    palette.text: "#FFFFFF"
+    palette.buttonText: "#FFFFFF"
+    palette.highlightedText: "#121D35"
+    palette.highlight: "#6DC4AD"
+    background: Rectangle {
+      radius: 8
+      color: "#1E2D47"
+      border.width: select.activeFocus ? 2 : 1
+      border.color: select.activeFocus ? "#6DC4AD" : "#75879D"
+    }
+    contentItem: Text {
+      text: select.displayText
+      color: select.enabled ? "#FFFFFF" : "#D1D5DB"
+      font: select.font
+      elide: Text.ElideRight
+      verticalAlignment: Text.AlignVCenter
+    }
+    indicator: Text {
+      x: select.width - width - 12
+      y: (select.height - height) / 2
+      text: "\u25BE"
+      color: select.enabled ? "#FFFFFF" : "#D1D5DB"
+      font.pixelSize: 18
+      Accessible.ignored: true
+    }
+    delegate: ItemDelegate {
+      id: option
+      required property int index
+      width: select.popup.width - 12
+      implicitHeight: 44
+      text: select.textAt(index)
+      highlighted: select.highlightedIndex === index
+      contentItem: Text {
+        text: option.text
+        color: option.highlighted ? "#121D35" : "#FFFFFF"
+        font: select.font
+        elide: Text.ElideRight
+        verticalAlignment: Text.AlignVCenter
+      }
+      background: Rectangle {
+        radius: 6
+        color: option.highlighted ? "#6DC4AD" : "#1E2D47"
+        border.width: option.activeFocus ? 2 : 0
+        border.color: "#FFFFFF"
+      }
+    }
+    popup: Popup {
+      width: select.width
+      padding: 6
+      implicitHeight: Math.min(contentItem.implicitHeight + 12, 264, card.height - 40)
+      // Keep every option inside the controller's input region.
+      y: select.mapToItem(card, 0, select.height).y + implicitHeight + 6 > card.height - 20 ? -implicitHeight - 6 : select.height + 6
+      background: Rectangle { color: "#1E2D47"; radius: 8; border.color: "#6DC4AD"; border.width: 1 }
+      contentItem: ListView {
+        clip: true
+        implicitHeight: contentHeight
+        model: select.popup.visible ? select.delegateModel : null
+        currentIndex: select.highlightedIndex
+        ScrollIndicator.vertical: ScrollIndicator {}
+      }
+    }
   }
   component VoiceCheck: CheckBox {
     implicitHeight: 44
