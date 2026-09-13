@@ -2,7 +2,16 @@
 
 Date: 2026-09-13
 
-This handoff records the unsigned final Hub 0.3.0 candidate and the completed test-channel update, rollback, corrected reapply, visual and cleanup evidence. It does not authorize signing, publication, branch integration, an ISO rebuild, or a stable-channel claim.
+This handoff records signed Hub 0.3.0 staging publication and completed test-channel update, rollback, corrected reapply, visual and cleanup evidence. Physical Lenovo and live-provider acceptance remain open. Source integration and stable-channel promotion are separate work.
+
+## Publication checkpoint
+
+- The operator ran the prepared Mac signing script and reported completion. The resulting `signed-run.Tq5YrY` bundle matches the pinned manifest and archive. Hub's existing delivery verifier validated all signatures, hashes, compatibility, URLs, expiry and catalog with the enrolled public key; the agent accessed no private key or passphrase.
+- Immutable release `388003802` published on September 13 at 19:14:44 UTC. Its archive remains SHA-256 `debde65343df2a0c6d2ff1305c0bb4e29f35ab08ecc268028d6f492468914d45`; GitHub reports `immutable: true` and both assets uploaded. All four historical/current packages and their signatures were downloaded anonymously and verified before channel promotion at 19:15:46 UTC.
+- Public distribution commit `bfd869fbb4da6776abe24fff58de01fe3afe20b7` was pushed to `letsgomaslow/maslow-releases` main, promoting staging manifest sequence 4. The signed catalog sequence 1, enrolled trust and all older immutable packages are unchanged. No runtime/Hub/package source branch was pushed or merged.
+- At 19:16:59 UTC, all four metadata files fetched anonymously from `https://letsgomaslow.github.io/maslow-releases/hub/staging/` matched the exact signed bundle. Hub's verifier passed again using those live metadata files and the immutable packages downloaded anonymously before promotion. The Pages job reported success with an older SHA; exact live byte verification, rather than that stale job SHA, establishes the promoted content.
+- Evidence is under `/Users/r.david/.codex/worktrees/43ab/hub-evidence/ota-voice-030/signed-run.Tq5YrY/`: `publish-artifacts.log`, `verification-artifacts.json`, `verification-promotion.json`, `public-release.json`, and `anonymous-verified-promotion/`. The verifier's generated plan always says publication is separate; these publication records supersede its static planning label.
+- This publication changed delivery metadata and release descriptions only. No package rebuild or repeated installed test was needed; the exact previously tested archive was signed and published. Existing Lenovo trust is reused.
 
 ## Current status
 
@@ -24,8 +33,8 @@ This handoff records the unsigned final Hub 0.3.0 candidate and the completed te
 | Final Hub archive | `maslow-hub-0.3.0-1-any.pkg.tar.zst` |
 | Final Hub archive size | `474751421` bytes |
 | Final Hub archive SHA-256 | `debde65343df2a0c6d2ff1305c0bb4e29f35ab08ecc268028d6f492468914d45` |
-| Prepared unsigned manifest sequence | `4` |
-| Unsigned manifest SHA-256 | `5a58cb57b65782633fe8d43f8ec33f6c5f3ccefd158eb96ab5629f3c87df5ef7` |
+| Published signed manifest sequence | `4` |
+| Manifest SHA-256 | `5a58cb57b65782633fe8d43f8ec33f6c5f3ccefd158eb96ab5629f3c87df5ef7` |
 | Retained signed catalog sequence | `1` |
 | Retained catalog expiry | `2026-09-24T23:56:41Z` |
 | Existing public-key fingerprint | `daacaa5aac138710a3950097b29a05abd3f69c9a8efad512321c45f3103d1ee4` |
@@ -48,16 +57,16 @@ Voice `0.1.2-1` installs its own `/usr/lib/maslow-voice/launch`, copied from the
 - Package recipe checks passed at `5e423aeddea4b5b42d7fbfbe5bd7f85391c10db4`. The outer Hub archive ownership remains within the existing updater allowlist.
 - Real Quickshell ran under headless Weston 15 with Pixman software rendering at 1280x800. The Install, Active, and Failed/Resume Voice states were inspected without clipping, overlap, broken wrapping or missing controls. These captures predate the final What's New copy correction, which does not alter the Voice-page layout; see `voice-ota-030/ui/QA.md`, `install-final.png`, `active-final.png` and `failed-resume-final.png`.
 - Native update evidence is in `voice-ota-030/installed-hub-030-final.log` and `voice-ota-030/final-installed-state.log`. The inspected `voice-ota-030/guest/hub-030-settled-visible.png` establishes the corrected final Hub screen after reboot, while `voice-ota-030/final-reboot-state.log` reconfirms the installed state and one new Quickshell process. Earlier installed Settings evidence remains valid because the final candidate changes only What's New copy. Canonical guest cleanup passed.
-- The final archive bytes and manifest inputs have been hash-verified. The signing helper passed shell syntax validation and its noninteractive guard exits before any private-key access. No private key was opened, and nothing was signed or published.
+- Before operator signing, the final archive and manifest were hash-verified, the helper passed shell syntax validation, and its noninteractive guard exited before private-key access. The operator then signed the bundle, and publication completed as recorded above.
 
 ## Delivery flow
 
-1. On the signing Mac, run the pinned `sign-voice.sh` from an interactive terminal. It verifies the exact source, recipe, archive, manifest and public-key fingerprints, then prompts through OpenSSL exactly twice: once for the new Hub archive and once for manifest sequence 4. It reuses the already signed immutable historical packages and catalog sequence 1.
-2. Let the existing Hub release tooling prepare the GitHub delivery and complete its publication dry run. Review the exact immutable release upload and Pages staging promotion, then continue the already authorized preview publication flow; the signing script itself does not publish.
-3. From an anonymous environment, fetch the public staging metadata and artifacts, then verify catalog, manifest and package signatures, hashes, sequence 4, retained historical versions, URL and expiry.
+1. Completed: the operator signed the pinned new archive and manifest using the existing protected Mac key. Historical packages and catalog signatures were retained.
+2. Completed: existing Hub tooling validated the bundle, uploaded the immutable release, and promoted staging metadata through the public distribution checkout.
+3. Completed: anonymous artifact downloads and live metadata passed the signature, hash, sequence, retained-version, URL and expiry checks recorded above.
 4. On the Lenovo, use the existing Hub Updates flow to check and apply 0.3.0. Record the visible version, unchanged core/runtime hold, preserved launcher state and single running Quickshell process, then inspect Voice installation, launch and rollback behavior.
 
-The public baseline was fetched and anonymously reverified on September 13. It remains manifest sequence 3 with immutable Hub 0.1.3, 0.2.0 and 0.2.1 packages. Catalog sequence 1 remains valid through September 24, 2026 at 23:56:41 UTC. Sequence 4 is prepared locally and remains unsigned and unpublished.
+The public baseline was anonymously verified at sequence 3 before publication. Public staging now serves signed sequence 4 with immutable Hub 0.1.3, 0.2.0, 0.2.1 and 0.3.0 packages. Catalog sequence 1 and the metadata expiry of September 24, 2026 at 23:56:41 UTC remain unchanged.
 
 ## Scope and limitations
 
@@ -65,12 +74,8 @@ The public baseline was fetched and anonymously reverified on September 13. It r
 - Hub rollback changes Hub only. It does not remove optional Maslow Voice or Hermes packages; the native rollback confirmed that both packages and the Voice service remain installed.
 - Voice is cloud-first on the accepted base because that base does not include Weston or Ollama. Local mode requires those additional local packages and a selected downloaded model.
 - The current evidence covers source behavior, package structure, software-rendered UI, signed disposable-channel update/rollback and installed disabled-state setup. It does not establish live OpenAI or LiveKit audio, physical microphone/speaker behavior, provider latency, or Lenovo production-channel delivery.
-- Publication remains a separate explicit action after signing and anonymous verification. This handoff does not change trust enrollment, source remotes, package channels, release assets or GitHub Pages.
+- The approved publication changed the public release assets, staging metadata and release descriptions. Trust enrollment, source remotes, the core OS package channel and the accepted ISO remain unchanged.
 
 ## Next action
 
-The native test-channel gate is complete. On the signing Mac, run the pinned command below in an interactive Terminal, enter the existing encrypted-key passphrase at the two OpenSSL prompts, then follow the existing publish, anonymous verification and Lenovo Hub sequence above. This does not establish live-provider audio or physical Lenovo acceptance.
-
-```bash
-bash /Users/r.david/.codex/worktrees/43ab/hub-evidence/ota-voice-030/sign-voice.sh
-```
+Signing and publication are complete. On Lenovo, open Hub → Updates → Check for updates → Apply update and approve the normal graphical administrator prompt. Wait for Hub to reopen and confirm Installed version 0.3.0. Select Voice → Install Voice, enter the Lenovo administrator password in the opened terminal if requested, and wait for completion. Open Voice Settings to configure the chosen cloud provider and run its connection check before starting a conversation. Record microphone, playback, interruption and Voice-off behavior separately from successful OTA installation. Local support still needs its additional tools/models. Mac signing and trust bootstrap are not steps to repeat.
