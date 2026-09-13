@@ -419,25 +419,27 @@ class ClaudeSdkAdapter:
             try:
                 await progress(status="running", provider_session_id=task["id"], thread_id=task["id"])
                 await self.client.query(instructions, session_id=task["id"])
-                text, session_id, turn_id, completed = [], task["id"], None, False
+                streamed_text, terminal_result = [], None
+                session_id, turn_id, completed = task["id"], None, False
                 async for message in self.client.receive_response():
                     if isinstance(message, sdk.AssistantMessage):
                         session_id = message.session_id or session_id
                         turn_id = message.uuid or message.message_id or turn_id
                         for block in message.content:
                             if isinstance(block, sdk.TextBlock):
-                                text.append(block.text)
+                                streamed_text.append(block.text)
                     elif isinstance(message, sdk.ResultMessage):
                         completed = True
                         session_id = message.session_id or session_id
                         turn_id = message.uuid or turn_id
                         if message.result:
-                            text.append(message.result)
+                            terminal_result = message.result
                         if message.is_error:
                             raise VoiceError("EXECUTION_FAILED", "Claude could not complete the task. Review its task for details.")
                 if not completed:
                     raise VoiceError("CLAUDE_DISCONNECTED", "Claude stopped before returning a final result.")
-                return {"status": "completed", "result": "\n".join(part for part in text if part),
+                result = terminal_result or "\n".join(part for part in streamed_text if part)
+                return {"status": "completed", "result": result,
                         "provider_session_id": session_id, "thread_id": session_id, "turn_id": turn_id}
             finally:
                 await self.client.disconnect()

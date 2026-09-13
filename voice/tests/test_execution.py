@@ -381,7 +381,26 @@ class ClaudeAdapterTests(unittest.IsolatedAsyncioTestCase):
         self.assertTrue(FakeClaudeClient.instance.config_existed)
         self.assertTrue(FakeClaudeClient.instance.disconnected)
         self.assertIsInstance(FakeClaudeClient.instance.permission, FakeClaudeSdk.PermissionResultDeny)
+        self.assertEqual(result["result"], "Claude done")
         self.assertEqual(result["turn_id"], "result-1")
+
+    async def test_terminal_result_does_not_duplicate_streamed_assistant_text(self):
+        class DuplicateTerminalClient(FakeClaudeClient):
+            async def receive_response(self):
+                yield FakeClaudeSdk.AssistantMessage()
+                terminal = FakeClaudeSdk.ResultMessage()
+                terminal.result = "Claude done"
+                yield terminal
+
+        adapter = ClaudeSdkAdapter("test", client_factory=DuplicateTerminalClient, sdk_module=FakeClaudeSdk)
+
+        async def callback(**changes):
+            return False
+
+        result = await adapter.run({"id": "d8e6ef43-5d27-47df-b9f4-4d21c5ad13c5", "project": "/work"}, {},
+                                   "Reply once", callback, callback)
+        self.assertEqual(result["result"], "Claude done")
+
 
 class ExecutionRoutingTests(unittest.IsolatedAsyncioTestCase):
     async def test_server_mode_pins_both_coders_to_selected_endpoint(self):
