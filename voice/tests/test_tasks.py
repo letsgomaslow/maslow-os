@@ -240,6 +240,37 @@ class HermesTests(unittest.IsolatedAsyncioTestCase):
             await manager.close()
             store.close()
 
+    async def test_explicit_dead_offline_worker_interrupts_without_resubmit(self):
+        class OfflineExecutor:
+            submits = 0
+
+            async def submit(self, task):
+                self.submits += 1
+                return {"run_id": "unexpected"}
+
+            async def status(self, run_id):
+                raise VoiceError("OFFLINE_UNAVAILABLE", "offline worker exited")
+
+            async def events(self, run_id):
+                if False:
+                    yield {}
+
+        with tempfile.TemporaryDirectory() as root:
+            store = TaskStore(root)
+            task, _ = store.create("dead-offline-worker", BRIEF, root, "offline", "Fix navigation")
+            store.update(task["id"], state="running", run_id="offline-run")
+            executor, children = OfflineExecutor(), AsyncMock()
+            manager = TaskManager(store, AsyncMock(return_value=executor), AsyncMock(), children)
+            await manager._run(task["id"])
+            interrupted = store.get(task["id"])
+            self.assertEqual(interrupted["state"], "interrupted")
+            self.assertEqual(interrupted["run_id"], "offline-run")
+            self.assertEqual(interrupted["error"]["code"], "COORDINATOR_EXITED")
+            self.assertEqual(executor.submits, 0)
+            children.cancel.assert_awaited_once_with(task["id"])
+            await manager.close()
+            store.close()
+
     async def test_continue_queued_while_interrupted_monitor_drains_starts_after_cleanup(self):
         class DeadExecutor:
             def __init__(self):

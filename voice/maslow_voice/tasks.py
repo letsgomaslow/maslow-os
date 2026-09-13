@@ -143,7 +143,7 @@ class TaskManager:
                             await self.publish()
                             return
                         confirmed_exit = getattr(client, "confirmed_process_exit", None)
-                        if confirmed_exit and confirmed_exit():
+                        if exc.code == "OFFLINE_UNAVAILABLE" or (confirmed_exit and confirmed_exit()):
                             if self.children:
                                 await self.children.cancel(task_id)
                             self.store.update(task_id, state="interrupted", error={
