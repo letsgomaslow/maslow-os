@@ -47,6 +47,9 @@ class VoiceService:
         self.last_activity = time.monotonic()
         self.lifecycle_lock = asyncio.Lock()
         self.turn_lock = asyncio.Lock()
+        self.conversation_requests = set()
+        self.startup_task = None
+        self.provider_cleanup = None
         self.work = set()
         self.offline = None
         self.offline_clients = {}
@@ -185,69 +188,111 @@ class VoiceService:
 
     async def start_voice(self, *, audio=True, project="", context=""):
         async with self.lifecycle_lock:
-            if self.provider:
-                if audio != self.voice["enabled"]:
-                    await self._stop_provider()
-                else:
-                    return
-            if project:
-                path = Path(project).expanduser()
-                if not path.is_absolute() or not path.is_dir():
-                    raise VoiceError("PROJECT_REQUIRED", "Choose an existing project folder.")
-                self.project = str(path.resolve())
-            self.context = text_field(context, "context", 12000)
-            config = dict(self.settings.value)
-            config["piper_executable"] = "/usr/lib/maslow-voice-local/piper"
-            if not config["speech_directory"]:
-                config["speech_directory"] = str(self.directory / "speech")
-            if config["mode"] == "offline":
-                runtime = await self.offline_runtime(self.project or None)
-                config["model_request"] = runtime.model_request
-                config["server_url"] = "http://127.0.0.1:11434"
-                config["server_kind"] = "ollama"
-            if config["mode"] in {"offline", "server"} and audio:
-                check = await asyncio.to_thread(verify_speech, config["speech_directory"])
-                if not check:
-                    raise VoiceError("SPEECH_NOT_READY", "Download and verify the local speech models in Settings.")
-            transport = PortAudioTransport(microphone_device=config["microphone_device"], speaker_device=config["speaker_device"])
-            self.voice.update(error="", state="connecting", enabled=audio)
-            await self.publish()
-            epoch = self.provider_epoch = object()
-            async def emit(event):
-                if self.provider_epoch is epoch:
-                    await self.provider_event(event)
-            async def submit(intent, turn_id):
-                if self.provider_epoch is not epoch:
-                    raise VoiceError("TURN_ENDED", "This conversation has ended. Please repeat the request.")
-                return await self.submit_intent(intent, turn_id)
-            provider = self.provider_factory(config, await self.selected_secrets(), emit, submit, transport)
-            self.provider = provider
+            self.startup_task = asyncio.current_task()
+            epoch = None
             try:
+                if self.provider_cleanup and not self.provider_cleanup.done():
+                    await asyncio.shield(self.provider_cleanup)
+                if self.provider:
+                    if audio != self.voice["enabled"]:
+                        await self._stop_provider()
+                    else:
+                        return
+                if project:
+                    path = Path(project).expanduser()
+                    if not path.is_absolute() or not path.is_dir():
+                        raise VoiceError("PROJECT_REQUIRED", "Choose an existing project folder.")
+                    self.project = str(path.resolve())
+                self.context = text_field(context, "context", 12000)
+                epoch = self.provider_epoch = object()
+                self.voice.update(error="", state="connecting", enabled=audio, microphone=False, speaking=False)
+                await self.publish()
+                config = dict(self.settings.value)
+                config["piper_executable"] = "/usr/lib/maslow-voice-local/piper"
+                if not config["speech_directory"]:
+                    config["speech_directory"] = str(self.directory / "speech")
+                if config["mode"] == "offline":
+                    runtime = await self.offline_runtime(self.project or None)
+                    config["model_request"] = runtime.model_request
+                    config["server_url"] = "http://127.0.0.1:11434"
+                    config["server_kind"] = "ollama"
+                if config["mode"] in {"offline", "server"} and audio:
+                    check = await asyncio.to_thread(verify_speech, config["speech_directory"])
+                    if not check:
+                        raise VoiceError("SPEECH_NOT_READY", "Download and verify the local speech models in Settings.")
+                values = await self.selected_secrets()
+                if self.provider_epoch is not epoch:
+                    raise asyncio.CancelledError()
+                transport = PortAudioTransport(microphone_device=config["microphone_device"], speaker_device=config["speaker_device"])
+                async def emit(event):
+                    if self.provider_epoch is epoch:
+                        await self.provider_event(event)
+                async def submit(intent, turn_id):
+                    if self.provider_epoch is not epoch:
+                        raise VoiceError("TURN_ENDED", "This conversation has ended. Please repeat the request.")
+                    return await self.submit_intent(intent, turn_id)
+                provider = self.provider_factory(config, values, emit, submit, transport)
+                self.provider = provider
                 await provider.start(audio=audio)
+                if self.provider_epoch is not epoch:
+                    raise asyncio.CancelledError()
                 self.last_activity = time.monotonic()
+                await self.publish()
             except BaseException:
-                await self._stop_provider()
+                if epoch is not None and self.provider_epoch is epoch:
+                    await self._stop_provider()
                 raise
-            await self.publish()
+            finally:
+                if self.startup_task is asyncio.current_task():
+                    self.startup_task = None
 
-    async def _stop_provider(self):
+    def _detach_provider(self):
         self.provider_epoch = None
         self.turns.clear()
         provider, self.provider = self.provider, None
+        self.voice.update(enabled=False, state="disabled", microphone=False, speaking=False, level=0)
+        if provider:
+            self.provider_cleanup = self.background(self._release_provider(provider))
+        return self.provider_cleanup
+
+    async def _release_provider(self, provider):
+        # A device shutdown failure must not skip the cloud/session teardown.
+        transport = getattr(provider, "audio_transport", None)
+        if transport:
+            try:
+                await asyncio.wait_for(transport.stop(), 2)
+            except Exception:
+                pass
         try:
-            if provider:
-                await provider.stop()
-        finally:
-            self.voice.update(enabled=False, state="disabled", microphone=False, speaking=False, level=0)
+            await asyncio.wait_for(provider.stop(), 3)
+        except Exception:
+            # The epoch has already been revoked. A remote cleanup failure
+            # cannot reactivate this conversation.
+            pass
+
+    async def _stop_provider(self):
+        cleanup = self._detach_provider()
+        if cleanup:
+            await asyncio.shield(cleanup)
 
     async def end_voice(self, preserve_error=False):
-        async with self.lifecycle_lock:
-            await self._stop_provider()
-            if not preserve_error:
-                self.voice["error"] = ""
-            self.session = {"id": str(uuid.uuid4()), "transcript": []}
-            self.source, self.turn_id = "", ""
-            await self.publish()
+        # Do not wait for lifecycle_lock: its owner may be connecting indefinitely.
+        cleanup = self._detach_provider()
+        current = asyncio.current_task()
+        pending = set(self.conversation_requests)
+        if self.startup_task:
+            pending.add(self.startup_task)
+        for task in pending:
+            if task is not current and not task.done():
+                task.cancel()
+        self.voice.update(enabled=False, state="disabled", microphone=False, speaking=False, level=0)
+        if not preserve_error:
+            self.voice["error"] = ""
+        self.session = {"id": str(uuid.uuid4()), "transcript": []}
+        self.source, self.turn_id = "", ""
+        await self.publish()
+        if cleanup:
+            await asyncio.shield(cleanup)
 
     async def check_readiness(self, discover=False):
         config = self.settings.value
@@ -298,6 +343,24 @@ class VoiceService:
         return {"readiness": self.readiness}
 
     async def dispatch(self, request):
+        if request.get("action") not in {"start_voice", "submit_text"}:
+            return await self._dispatch(request)
+        current = asyncio.current_task()
+        self.conversation_requests.add(current)
+        try:
+            return await self._dispatch(request)
+        except asyncio.CancelledError:
+            raise
+        except Exception as error:
+            if isinstance(error, VoiceError) and error.code in {"INVALID_REQUEST", "INVALID_BRIEF", "PROJECT_REQUIRED", "SESSION_PROJECT_FIXED", "SESSION_CONTEXT_FIXED"}:
+                raise
+            self.voice["error"] = error.message if isinstance(error, VoiceError) else "Voice could not connect. Check its setup and try again."
+            await self.end_voice(preserve_error=True)
+            raise
+        finally:
+            self.conversation_requests.discard(current)
+
+    async def _dispatch(self, request):
         action = request.get("action")
         allowed = {
             "status": set(), "configure": {"settings"}, "credential": {"name", "value"}, "test": set(), "models": set(),

@@ -1,6 +1,6 @@
 # Voice execution bridge
 
-Voice is a coordinator, not a coding or desktop automation runtime. The conversational provider sends a summarized task to a separate local Hermes Runs service. Hermes can invoke only the three reviewed plugin tools, which call the Voice daemon over its private authenticated Unix socket. The daemon resolves the immutable Hermes `session_id` to the saved Voice task before calling `ExecutionManager.handle(task, operation, params)`.
+The conversational provider sends a summarized task to a separate local Hermes Runs service. Hermes has terminal and file tools plus three reviewed plugin tools that call the Voice daemon over its private authenticated Unix socket. The daemon resolves the immutable Hermes `session_id` to the saved Voice task before calling `ExecutionManager.handle(task, operation, params)`.
 
 ## Operations
 

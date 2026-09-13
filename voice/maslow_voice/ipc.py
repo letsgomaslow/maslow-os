@@ -35,6 +35,7 @@ class ControlServer:
         self.path, self.dispatch, self.snapshot, self.peer_check = path, dispatch, snapshot, peer_check
         self.watchers = set()
         self.connections = set()
+        self.requests = set()
         self.server = None
 
     async def start(self):
@@ -64,6 +65,33 @@ class ControlServer:
 
     async def _connection(self, reader, writer):
         self.connections.add(writer)
+        pending = {}
+        ordered = asyncio.Lock()
+        barrier = None
+        async def answer(request, metadata, wait_for=None, safety=False):
+            try:
+                if metadata["cancelled"]:
+                    raise asyncio.CancelledError()
+                if wait_for:
+                    await asyncio.shield(wait_for)
+                if safety:
+                    result = await self.dispatch(request)
+                else:
+                    async with ordered:
+                        if metadata["cancelled"]:
+                            raise asyncio.CancelledError()
+                        result = await self.dispatch(request)
+                response = {"ok": True, **(result or {})}
+            except asyncio.CancelledError:
+                response = {"ok": True, "cancelled": True}
+            except VoiceError as error:
+                response = {"ok": False, "error": error.as_dict()}
+            except Exception:
+                response = {"ok": False, "error": {"code": "CONTROL_FAILED", "message": "Voice could not complete this action. Check its setup and try again."}}
+            try:
+                await self.send(writer, response)
+            except (OSError, TimeoutError, VoiceError):
+                pass
         try:
             if not self.peer_check(writer):
                 return
@@ -81,8 +109,27 @@ class ControlServer:
                         self.watchers.add(writer)
                         await self.send(writer, self.snapshot())
                     else:
-                        result = await self.dispatch(request)
-                        await self.send(writer, {"ok": True, **(result or {})})
+                        action = request.get("action")
+                        if request == {"action": "end_voice"}:
+                            # Off must also discard older queued conversation
+                            # requests, so none can restart capture after Off.
+                            for task, metadata in tuple(pending.items()):
+                                if metadata["action"] in {"start_voice", "submit_text"}:
+                                    metadata["cancelled"] = True
+                                    # The daemon first revokes the provider epoch,
+                                    # then cancels active work. Cancelling here
+                                    # could run a stale callback before revocation.
+                        if len(pending) >= 32 and action != "end_voice":
+                            raise VoiceError("CONTROL_BUSY", "Voice has too many pending requests. Wait for the current action or turn Voice off.")
+                        safety = action in {"end_voice", "mute", "silence", "status"}
+                        metadata = {"action": action, "cancelled": False}
+                        task = asyncio.create_task(answer(request, metadata, None if safety else barrier, safety))
+                        pending[task] = metadata
+                        self.requests.add(task)
+                        task.add_done_callback(lambda done: pending.pop(done, None))
+                        task.add_done_callback(self.requests.discard)
+                        if action == "end_voice":
+                            barrier = task
                 except VoiceError as error:
                     await self.send(writer, {"ok": False, "error": error.as_dict()})
                 except (ValueError, UnicodeError, asyncio.LimitOverrunError):
@@ -93,6 +140,8 @@ class ControlServer:
         except (OSError, TimeoutError):
             pass
         finally:
+            if pending:
+                await asyncio.gather(*pending, return_exceptions=True)
             self.watchers.discard(writer)
             self.connections.discard(writer)
             writer.close()
@@ -107,4 +156,8 @@ class ControlServer:
             await self.server.wait_closed()
         for writer in tuple(self.connections):
             writer.close()
+        pending = tuple(self.requests)
+        for task in pending:
+            task.cancel()
+        await asyncio.gather(*pending, return_exceptions=True)
         self.path.unlink(missing_ok=True)

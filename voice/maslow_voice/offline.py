@@ -340,7 +340,9 @@ class OfflineRuntime:
             "--socket=offline-display", "--config=" + str(config), "--width=1280", "--height=800",
             env=env, stdin=asyncio.subprocess.DEVNULL, stdout=asyncio.subprocess.DEVNULL, stderr=asyncio.subprocess.DEVNULL)
         candidate = runtime / "offline-display"
-        for _ in range(100):
+        # Cold Mesa/compositor startup can exceed five seconds on low-power
+        # hardware. Readiness still requires the verified private socket.
+        for _ in range(600):
             if self.display.returncode is not None:
                 break
             try:

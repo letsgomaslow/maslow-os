@@ -105,6 +105,157 @@ class ServiceTests(unittest.IsolatedAsyncioTestCase):
         finally:
             await control.close()
 
+    async def test_same_watch_socket_off_cancels_blocked_start_and_queued_restart(self):
+        entered, stopped = asyncio.Event(), asyncio.Event()
+        instances = []
+        class SlowProvider(FakeProvider):
+            def __init__(self, *args):
+                super().__init__(*args)
+                self.audio_transport = AsyncMock()
+                instances.append(self)
+            async def start(self, audio=True):
+                entered.set()
+                await asyncio.Event().wait()
+            async def stop(self):
+                stopped.set()
+        self.service.provider_factory = SlowProvider
+        control = self.service.control = ControlServer(self.root / "responsive.sock", self.service.dispatch,
+            self.service.snapshot, peer_check=lambda writer: True)
+        await control.start()
+        reader, writer = await asyncio.open_unix_connection(str(control.path))
+        try:
+            writer.write(b'{"action":"watch"}\n')
+            await writer.drain()
+            await reader.readline()
+            start = json.dumps({"action": "start_voice", "project": str(self.project)}).encode() + b"\n"
+            writer.write(start)
+            await writer.drain()
+            await asyncio.wait_for(entered.wait(), 1)
+            writer.write(start + b'{"action":"end_voice"}\n')
+            await writer.drain()
+            replies, states = [], []
+            async def receive():
+                while len(replies) < 3:
+                    item = json.loads(await reader.readline())
+                    if "ok" in item:
+                        replies.append(item)
+                    else:
+                        states.append(item["voice"]["state"])
+            await asyncio.wait_for(receive(), 1)
+            self.assertTrue(all(reply["ok"] for reply in replies))
+            self.assertEqual(sum(bool(reply.get("cancelled")) for reply in replies), 2)
+            self.assertIn("connecting", states)
+            self.assertIn("disabled", states)
+            self.assertEqual(len(instances), 1)
+            self.assertTrue(stopped.is_set())
+            instances[0].audio_transport.stop.assert_awaited_once()
+            self.assertIsNone(self.service.provider)
+        finally:
+            writer.close()
+            await writer.wait_closed()
+            await control.close()
+
+    async def test_same_watch_socket_off_cancels_typed_inference_and_rejects_late_handoff(self):
+        entered, rejected = asyncio.Event(), asyncio.Event()
+        class SlowProvider(FakeProvider):
+            async def text(self, text, context):
+                await super().text(text, context)
+                entered.set()
+                try:
+                    await asyncio.Event().wait()
+                except asyncio.CancelledError:
+                    # Even a delayed callback during cancellation has no authority.
+                    try:
+                        await self.submit({"objective": "Late", "summary": "Late"}, "turn-Do work")
+                    except VoiceError:
+                        rejected.set()
+                    raise
+        self.service.provider_factory = SlowProvider
+        control = self.service.control = ControlServer(self.root / "typed-responsive.sock", self.service.dispatch,
+            self.service.snapshot, peer_check=lambda writer: True)
+        await control.start()
+        reader, writer = await asyncio.open_unix_connection(str(control.path))
+        try:
+            writer.write(b'{"action":"watch"}\n')
+            await writer.drain()
+            await reader.readline()
+            writer.write(json.dumps({"action": "submit_text", "text": "Do work", "project": str(self.project)}).encode() + b"\n")
+            await writer.drain()
+            await asyncio.wait_for(entered.wait(), 1)
+            writer.write(b'{"action":"end_voice"}\n')
+            await writer.drain()
+            replies = []
+            async def receive():
+                while len(replies) < 2:
+                    item = json.loads(await reader.readline())
+                    if "ok" in item:
+                        replies.append(item)
+            await asyncio.wait_for(receive(), 1)
+            self.assertTrue(rejected.is_set())
+            self.assertEqual(self.service.store.list(), [])
+            self.assertFalse(self.service.voice["microphone"])
+            self.assertEqual(self.service.voice["state"], "disabled")
+        finally:
+            writer.close()
+            await writer.wait_closed()
+            await control.close()
+
+    async def test_offline_connecting_is_visible_before_preparation_and_off_interrupts_it(self):
+        self.service.settings.update({"mode": "offline"})
+        entered = asyncio.Event()
+        async def prepare(project):
+            entered.set()
+            await asyncio.Event().wait()
+        with patch.object(self.service, "offline_runtime", side_effect=prepare):
+            start = asyncio.create_task(self.service.dispatch({"action": "start_voice", "project": str(self.project)}))
+            await asyncio.wait_for(entered.wait(), 1)
+            self.assertEqual(self.service.voice["state"], "connecting")
+            await asyncio.wait_for(self.service.dispatch({"action": "end_voice"}), 1)
+            with self.assertRaises(asyncio.CancelledError):
+                await start
+            self.assertEqual(self.service.voice["state"], "disabled")
+
+    async def test_preparation_failure_settles_disabled_with_safe_error(self):
+        self.service.settings.update({"mode": "offline"})
+        with patch.object(self.service, "offline_runtime", side_effect=RuntimeError("private endpoint and secret")):
+            with self.assertRaises(RuntimeError):
+                await self.service.dispatch({"action": "start_voice", "project": str(self.project)})
+        self.assertEqual(self.service.voice["state"], "disabled")
+        self.assertFalse(self.service.voice["microphone"])
+        self.assertNotIn("secret", self.service.voice["error"])
+        self.assertTrue(self.service.voice["error"])
+
+    async def test_control_keeps_mutations_ordered_while_status_bypasses_wait(self):
+        gate, entered = asyncio.Event(), asyncio.Event()
+        actions = []
+        async def dispatch(request):
+            action = request["action"]
+            actions.append(action)
+            if action == "configure":
+                entered.set()
+                await gate.wait()
+                actions.append("configured")
+            return {"completed": action}
+        control = ControlServer(self.root / "ordered.sock", dispatch, lambda: {}, peer_check=lambda writer: True)
+        await control.start()
+        reader, writer = await asyncio.open_unix_connection(str(control.path))
+        try:
+            writer.write(b'{"action":"configure"}\n{"action":"task_action"}\n{"action":"status"}\n')
+            await writer.drain()
+            await asyncio.wait_for(entered.wait(), 1)
+            first = json.loads(await asyncio.wait_for(reader.readline(), 1))
+            self.assertEqual(first["completed"], "status")
+            self.assertNotIn("task_action", actions)
+            gate.set()
+            rest = [json.loads(await asyncio.wait_for(reader.readline(), 1)) for _ in range(2)]
+            self.assertEqual([item["completed"] for item in rest], ["configure", "task_action"])
+            self.assertLess(actions.index("configured"), actions.index("task_action"))
+        finally:
+            gate.set()
+            writer.close()
+            await writer.wait_closed()
+            await control.close()
+
     async def test_offline_model_discovery_needs_no_selected_model_or_runtime(self):
         models = self.root / "models"
         manifest = models / "manifests/registry.ollama.ai/library/small/latest"
@@ -154,3 +305,10 @@ class ServiceTests(unittest.IsolatedAsyncioTestCase):
         self.assertLess(len(json.dumps(snapshot).encode()), 4 * 1024 * 1024)
         self.assertEqual(snapshot["tasks"][0]["approval"], approval)
         self.assertEqual(len(tasks[0]["children"][0]["result"]), 200000)
+
+    async def test_audio_shutdown_failure_does_not_skip_provider_cleanup(self):
+        provider = Mock()
+        provider.audio_transport.stop = AsyncMock(side_effect=OSError("device disconnected"))
+        provider.stop = AsyncMock()
+        await self.service._release_provider(provider)
+        provider.stop.assert_awaited_once()
