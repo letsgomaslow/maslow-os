@@ -8,6 +8,7 @@ from unittest.mock import AsyncMock, Mock, patch
 from maslow_voice.daemon import VoiceService
 from maslow_voice.errors import VoiceError
 from maslow_voice.ipc import ControlServer
+from maslow_voice.hermes import HermesClient
 
 
 class FakeProvider:
@@ -294,6 +295,22 @@ class ServiceTests(unittest.IsolatedAsyncioTestCase):
         runtime.start.assert_awaited_once()
         runtime.stop.assert_awaited_once()
         self.assertIsNone(self.service.offline)
+
+    async def test_new_offline_task_evicts_reported_dead_hermes_client(self):
+        runtime = AsyncMock()
+        runtime.launch_hermes.return_value = {"endpoint": "http://127.0.0.1:18001", "token": "fresh"}
+        self.service.offline_runtime = AsyncMock(return_value=runtime)
+        self.service.hermes.model_config = AsyncMock(return_value=({"provider": "custom", "default": "local"}, {}))
+        project = str(self.project)
+        dead = HermesClient("http://127.0.0.1:18000", "old", request=runtime.hermes_request,
+            discard_process=lambda: self.service.offline_clients.pop(project, None))
+        dead.record_process_exit()
+        self.service.offline_clients[project] = dead
+
+        client = await self.service.executor_client({"mode": "offline", "project": project})
+        self.assertIsNot(client, dead)
+        self.assertIs(self.service.offline_clients[project], client)
+        runtime.launch_hermes.assert_awaited_once()
 
     async def test_large_child_history_cannot_break_the_control_frame(self):
         approval = {"request_id": "exact", "message": "Review the complete proposed command."}

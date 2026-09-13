@@ -444,7 +444,10 @@ class OfflineRuntime:
                 future = self.pending.pop(data.get("id"), None)
                 if future and not future.done():
                     if "error" in data:
-                        future.set_exception(fail("OFFLINE_OPERATION_FAILED", "The isolated operation failed. Check local model and tool readiness."))
+                        if data["error"] == {"code": "OFFLINE_HERMES_EXITED"}:
+                            future.set_exception(fail("OFFLINE_HERMES_EXITED", "The isolated task coordinator stopped."))
+                        else:
+                            future.set_exception(fail("OFFLINE_OPERATION_FAILED", "The isolated operation failed. Check local model and tool readiness."))
                     else:
                         future.set_result(data.get("result"))
         except (OSError, ValueError, TypeError, asyncio.LimitOverrunError):

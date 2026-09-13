@@ -9,9 +9,10 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
-from unittest.mock import patch
+from unittest.mock import AsyncMock, patch
 
 from maslow_voice.errors import VoiceError
+from maslow_voice import offline_worker
 from maslow_voice.offline import OfflineRuntime, OfflineWorkspace, manifest, sandbox_command, snapshot, validate_model_tree
 
 
@@ -164,6 +165,63 @@ class BoundaryTests(unittest.IsolatedAsyncioTestCase):
                 with self.assertRaises(VoiceError) as failure:
                     await runtime.start()
                 self.assertEqual(failure.exception.code, "OFFLINE_OLLAMA_REQUIRED")
+
+    async def test_worker_reports_only_confirmed_owned_hermes_exit(self):
+        endpoint = "http://127.0.0.1:18000"
+        params = {"url": endpoint + "/v1/runs/run_1", "method": "GET"}
+
+        class Process:
+            returncode = 75
+
+        offline_worker.HERMES[endpoint] = {"token": "local", "process": Process()}
+        emitted = []
+        try:
+            with patch.object(offline_worker, "READY", True), patch.object(offline_worker, "terminate") as terminate, \
+                    patch.object(offline_worker, "emit", emitted.append):
+                await offline_worker.handle({"id": 1, "method": "hermes_request", "params": params})
+            self.assertEqual(emitted, [{"id": 1, "error": {"code": "OFFLINE_HERMES_EXITED"}}])
+            terminate.assert_awaited_once_with(offline_worker.HERMES[endpoint]["process"])
+
+            Process.returncode = None
+            emitted.clear()
+            with patch.object(offline_worker, "READY", True), patch.object(offline_worker, "emit", emitted.append), \
+                    patch.object(offline_worker, "json_request", side_effect=OSError):
+                await offline_worker.handle({"id": 2, "method": "hermes_request", "params": params})
+            self.assertEqual(emitted, [{"id": 2, "error": "Isolated operation failed."}])
+        finally:
+            offline_worker.HERMES.pop(endpoint, None)
+
+    async def test_terminate_cleans_owned_session_after_parent_exit(self):
+        class Process:
+            pid = 4321
+            returncode = 75
+            wait = AsyncMock()
+
+        with patch.object(offline_worker.os, "killpg") as killpg:
+            await offline_worker.terminate(Process())
+        killpg.assert_called_once_with(4321, offline_worker.signal.SIGKILL)
+        Process.wait.assert_not_awaited()
+
+    async def test_runtime_allows_only_owned_hermes_exit_error(self):
+        with tempfile.TemporaryDirectory() as root:
+            runtime = OfflineRuntime(Path(root).resolve(), {})
+
+            class Process:
+                returncode = 0
+
+            for error, expected in (({"code": "OFFLINE_HERMES_EXITED"}, "OFFLINE_HERMES_EXITED"),
+                                    ({"code": "UNTRUSTED_CODE"}, "OFFLINE_OPERATION_FAILED")):
+                reader = asyncio.StreamReader()
+                reader.feed_data((json.dumps({"id": 1, "error": error}) + "\n").encode())
+                reader.feed_eof()
+                runtime.process = Process()
+                runtime.process.stdout = reader
+                future = asyncio.get_running_loop().create_future()
+                runtime.pending[1] = future
+                await runtime._read()
+                with self.assertRaises(VoiceError) as failure:
+                    await future
+                self.assertEqual(failure.exception.code, expected)
 
 
 @unittest.skipUnless(sys.platform == "linux" and shutil.which("bwrap"), "requires real Linux bubblewrap")

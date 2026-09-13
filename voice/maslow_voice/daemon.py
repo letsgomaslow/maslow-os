@@ -177,12 +177,16 @@ class VoiceService:
         if task["mode"] == "offline":
             async with self.offline_client_lock:
                 runtime = await self.offline_runtime(task["project"])
+                cached = self.offline_clients.get(task["project"])
+                if cached and cached.discard_dead_process():
+                    self.offline_clients.pop(task["project"], None)
                 if task["project"] not in self.offline_clients:
                     model, environment = await self.hermes.model_config("offline")
                     configuration = hermes_configuration(model, "", 18000, "/project")
                     source = Path(__file__).resolve().parent.parent / "hermes_plugin"
                     endpoint = await runtime.launch_hermes(configuration, source, {"MASLOW_VOICE_TOOL_TOKEN": self.tool_token})
-                    self.offline_clients[task["project"]] = HermesClient(endpoint["endpoint"], endpoint["token"], request=runtime.hermes_request)
+                    self.offline_clients[task["project"]] = HermesClient(endpoint["endpoint"], endpoint["token"], request=runtime.hermes_request,
+                        discard_process=lambda project=task["project"]: self.offline_clients.pop(project, None))
                 return self.offline_clients[task["project"]]
         return await self.hermes.ensure(task)
 

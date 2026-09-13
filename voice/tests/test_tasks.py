@@ -1,7 +1,7 @@
 import asyncio
 import tempfile
 import unittest
-from unittest.mock import AsyncMock, patch
+from unittest.mock import AsyncMock, Mock, patch
 from pathlib import Path
 
 from maslow_voice.errors import VoiceError
@@ -267,6 +267,27 @@ class HermesTests(unittest.IsolatedAsyncioTestCase):
             self.assertEqual(interrupted["run_id"], "offline-run")
             self.assertEqual(interrupted["error"]["code"], "COORDINATOR_EXITED")
             self.assertEqual(executor.submits, 0)
+            children.cancel.assert_awaited_once_with(task["id"])
+            await manager.close()
+            store.close()
+
+    async def test_explicit_dead_offline_hermes_child_interrupts_without_resubmit(self):
+        executor, children = AsyncMock(), AsyncMock()
+        executor.record_process_exit = Mock()
+        executor.status.side_effect = VoiceError("OFFLINE_HERMES_EXITED", "owned Hermes child exited")
+        executor.confirmed_process_exit.return_value = False
+        with tempfile.TemporaryDirectory() as root:
+            store = TaskStore(root)
+            task, _ = store.create("dead-offline-hermes", BRIEF, root, "offline", "Fix navigation")
+            store.update(task["id"], state="running", run_id="offline-run")
+            manager = TaskManager(store, AsyncMock(return_value=executor), AsyncMock(), children)
+            await manager._run(task["id"])
+            interrupted = store.get(task["id"])
+            self.assertEqual(interrupted["state"], "interrupted")
+            self.assertEqual(interrupted["run_id"], "offline-run")
+            self.assertEqual(interrupted["error"]["code"], "COORDINATOR_EXITED")
+            executor.submit.assert_not_awaited()
+            executor.record_process_exit.assert_called_once_with()
             children.cancel.assert_awaited_once_with(task["id"])
             await manager.close()
             store.close()

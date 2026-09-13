@@ -24,6 +24,10 @@ HERMES_START_TIMEOUT = 120
 HERMES_START_POLL_INTERVAL = 0.5
 
 
+class OfflineHermesExited(Exception):
+    pass
+
+
 class NoRedirect(request.HTTPRedirectHandler):
     def redirect_request(self, *args, **kwargs):
         raise ValueError("redirect rejected")
@@ -86,11 +90,11 @@ async def launch(argv, *, env=None, cwd="/project", **kwargs):
 
 
 async def terminate(process):
+    try:
+        os.killpg(process.pid, signal.SIGKILL)
+    except ProcessLookupError:
+        pass
     if process.returncode is None:
-        try:
-            os.killpg(process.pid, signal.SIGKILL)
-        except ProcessLookupError:
-            pass
         await process.wait()
 
 
@@ -274,7 +278,7 @@ async def hermes_start(params):
     # Ignore host profile and provider environment; this profile is local only.
     env.update(HERMES_HOME=str(profile), API_SERVER_HOST="127.0.0.1", API_SERVER_PORT=str(port), API_SERVER_KEY=token,
         OPENAI_API_KEY="offline-local", OPENAI_BASE_URL="http://127.0.0.1:11434/v1", HERMES_ENABLE_PROJECT_PLUGINS="false",
-        HERMES_NO_AUTO_INSTALL="1", DO_NOT_TRACK="1", MASLOW_VOICE_TOOL_SOCKET="/run/voice/tools.sock",
+        HERMES_DISABLE_LAZY_INSTALLS="1", DO_NOT_TRACK="1", MASLOW_VOICE_TOOL_SOCKET="/run/voice/tools.sock",
         MASLOW_VOICE_TOOL_TOKEN=params.get("environment", {}).get("MASLOW_VOICE_TOOL_TOKEN", "offline"),
         MASLOW_VOICE_MODE="offline", TERMINAL_CWD="/project")
     process = await launch(["hermes", "gateway", "run"], env=env, stdin=asyncio.subprocess.DEVNULL,
@@ -287,7 +291,7 @@ async def hermes_start(params):
     except BaseException:
         await terminate(process)
         raise
-    HERMES[endpoint] = token
+    HERMES[endpoint] = {"token": token, "process": process}
     return {"endpoint": endpoint, "token": token}
 
 
@@ -318,7 +322,17 @@ async def dispatch(method, params):
             raise ValueError("unsupported hermes operation")
         if parsed.query or parsed.fragment or params.get("method", "GET") not in {"GET", "POST"}:
             raise ValueError()
-        return await asyncio.to_thread(json_request, url, params.get("method", "GET"), params.get("body"), HERMES[endpoint], params.get("headers"))
+        owned = HERMES[endpoint]
+        if owned["process"].returncode is not None:
+            await terminate(owned["process"])
+            raise OfflineHermesExited()
+        try:
+            return await asyncio.to_thread(json_request, url, params.get("method", "GET"), params.get("body"), owned["token"], params.get("headers"))
+        except Exception:
+            if owned["process"].returncode is not None:
+                await terminate(owned["process"])
+                raise OfflineHermesExited() from None
+            raise
     if method == "open_application":
         applications = {
             "terminal": (["foot", "--working-directory=/project"],),
@@ -363,6 +377,8 @@ async def handle(message):
     try:
         result = await dispatch(message.get("method"), message.get("params", {}))
         emit({"id": identity, "result": result})
+    except OfflineHermesExited:
+        emit({"id": identity, "error": {"code": "OFFLINE_HERMES_EXITED"}})
     except Exception:
         # Never send raw exception strings, paths, provider responses or secrets.
         emit({"id": identity, "error": "Isolated operation failed."})

@@ -31,8 +31,14 @@ class HermesClient:
             raise VoiceError("COORDINATOR_AUTH_REQUIRED", "The execution coordinator needs its local access credential.")
         self.endpoint, self.token, self.request = endpoint.rstrip("/"), token, request
         self._process_exited, self._discard_process = process_exited, discard_process
+        self._reported_process_exit = False
+
+    def record_process_exit(self):
+        self._reported_process_exit = True
 
     def confirmed_process_exit(self):
+        if self._reported_process_exit:
+            return True
         if not self._process_exited:
             return False
         try:

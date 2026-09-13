@@ -7,6 +7,8 @@ from .errors import VoiceError
 from .hermes import normalized_status
 from .store import TERMINAL
 
+DEAD_COORDINATOR_ERRORS = {"OFFLINE_UNAVAILABLE", "OFFLINE_HERMES_EXITED"}
+
 
 def text_field(value, name, maximum=12000, required=False):
     if not isinstance(value, str) or len(value) > maximum or "\x00" in value or (required and not value.strip()):
@@ -95,7 +97,7 @@ class TaskManager:
     async def _run(self, task_id):
         task = self.store.get(task_id)
         lock = self.project_locks.setdefault(task["project"], asyncio.Lock())
-        stream = None
+        stream, client = None, None
         try:
             async with lock:
                 task = self.store.get(task_id)
@@ -143,14 +145,8 @@ class TaskManager:
                             await self.publish()
                             return
                         confirmed_exit = getattr(client, "confirmed_process_exit", None)
-                        if exc.code == "OFFLINE_UNAVAILABLE" or (confirmed_exit and confirmed_exit()):
-                            if self.children:
-                                await self.children.cancel(task_id)
-                            self.store.update(task_id, state="interrupted", error={
-                                "code": "COORDINATOR_EXITED",
-                                "message": "The local task coordinator stopped. Review partial changes, then use Continue to start a new attempt.",
-                            })
-                            await self.publish()
+                        if exc.code in DEAD_COORDINATOR_ERRORS or (confirmed_exit and confirmed_exit()):
+                            await self._interrupt_dead_coordinator(task_id, client)
                             return
                         self.store.update(task_id, error={"code": "RECONNECTING", "message": "Reconnecting to the task coordinator; this task has not been resubmitted."})
                         await self.publish()
@@ -159,6 +155,9 @@ class TaskManager:
         except asyncio.CancelledError:
             raise
         except VoiceError as exc:
+            if exc.code in DEAD_COORDINATOR_ERRORS:
+                await self._interrupt_dead_coordinator(task_id, client)
+                return
             if self.children:
                 await self.children.cancel(task_id)
             task = self.store.get(task_id)
@@ -174,6 +173,18 @@ class TaskManager:
             if stream:
                 stream.cancel()
                 await asyncio.gather(stream, return_exceptions=True)
+
+    async def _interrupt_dead_coordinator(self, task_id, client):
+        record_exit = getattr(client, "record_process_exit", None)
+        if record_exit:
+            record_exit()
+        if self.children:
+            await self.children.cancel(task_id)
+        self.store.update(task_id, state="interrupted", error={
+            "code": "COORDINATOR_EXITED",
+            "message": "The local task coordinator stopped. Review partial changes, then use Continue to start a new attempt.",
+        })
+        await self.publish()
 
     async def _events(self, task_id, client, run_id):
         try:
