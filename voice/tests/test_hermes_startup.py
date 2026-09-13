@@ -1,16 +1,19 @@
 import asyncio
+import hashlib
 import json
 import sys
 import tempfile
 import unittest
 from pathlib import Path
-from unittest.mock import patch
+from types import SimpleNamespace
+from unittest.mock import AsyncMock, patch
 
 from maslow_voice import offline_worker
 from maslow_voice.coordinator import HERMES_START_TIMEOUT as ONLINE_HERMES_START_TIMEOUT
 from maslow_voice.coordinator import _wait_for_hermes as wait_for_online_hermes
 from maslow_voice.coordinator import _wait_for_owned_hermes
 from maslow_voice.coordinator import _terminate_hermes_process_group
+from maslow_voice.coordinator import HermesRuntime
 from maslow_voice.coordinator import process_confirmed_dead
 from maslow_voice.errors import VoiceError
 from maslow_voice.offline import OfflineRuntime
@@ -181,6 +184,34 @@ class HermesStartupDeadlineTests(unittest.IsolatedAsyncioTestCase):
             self.assertTrue(process_confirmed_dead(123, "19"))
         with patch("maslow_voice.coordinator.Path.read_text", side_effect=PermissionError):
             self.assertFalse(process_confirmed_dead(123, "19"))
+
+    async def test_ensure_evicts_only_confirmed_dead_cached_client(self):
+        class CachedClient:
+            def __init__(self, dead):
+                self.dead = dead
+
+            def discard_dead_process(self):
+                return self.dead
+
+        with tempfile.TemporaryDirectory() as root:
+            model = {"provider": "custom", "default": "fixture"}
+            task = {"mode": "server", "project": root}
+            key = hashlib.sha256(json.dumps([task["mode"], task["project"], model], sort_keys=True).encode()).hexdigest()[:24]
+            runtime = HermesRuntime(Path(root).resolve(), SimpleNamespace(value={}), None, Path(root) / "tools.sock", "token")
+            runtime.model_config = AsyncMock(return_value=(model, {}))
+
+            alive = CachedClient(False)
+            runtime.clients[key] = alive
+            self.assertIs(await runtime.ensure(task), alive)
+
+            runtime.clients[key] = CachedClient(True)
+            runtime.processes[key] = object()
+            with patch("maslow_voice.coordinator.shutil.which", return_value=None):
+                with self.assertRaises(VoiceError) as failure:
+                    await runtime.ensure(task)
+            self.assertEqual(failure.exception.code, "HERMES_MISSING")
+            self.assertNotIn(key, runtime.clients)
+            self.assertNotIn(key, runtime.processes)
 
 
 if __name__ == "__main__":

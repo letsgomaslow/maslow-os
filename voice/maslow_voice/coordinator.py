@@ -189,7 +189,12 @@ class HermesRuntime:
             model, provider_env = await self.model_config(task["mode"])
             key = hashlib.sha256(json.dumps([task["mode"], task["project"], model], sort_keys=True).encode()).hexdigest()[:24]
             if key in self.clients:
-                return self.clients[key]
+                client = self.clients[key]
+                if client.discard_dead_process():
+                    self.clients.pop(key, None)
+                    self.processes.pop(key, None)
+                else:
+                    return client
             profile = private_directory(self.directory / key)
             locator = profile / "voice-runtime.json"
             if locator.is_file():
