@@ -8,6 +8,7 @@ from maslow_voice.config import Settings, validate_settings, validate_endpoint
 from maslow_voice.coordinator import clean_environment, hermes_configuration
 from maslow_voice.errors import VoiceError
 from maslow_voice.models import verify_speech
+from maslow_voice.voices import LIVEKIT_VOICES, OPENAI_VOICES
 
 
 class ConfigurationTests(unittest.TestCase):
@@ -25,6 +26,24 @@ class ConfigurationTests(unittest.TestCase):
             settings.update({"mode": "offline", "model": "chosen-local-model"})
             self.assertEqual(Settings(root).value["mode"], "offline")
             self.assertEqual(settings.path.stat().st_mode & 0o777, 0o600)
+            settings.update({"realtime_voice": "marin", "livekit_voice": "Olivia"})
+            self.assertEqual(Settings(root).value["realtime_voice"], "marin")
+            self.assertEqual(Settings(root).value["livekit_voice"], "Olivia")
+
+    def test_cloud_voice_defaults_and_validation_follow_the_curated_lists(self):
+        self.assertEqual(validate_settings({})["realtime_voice"], "cedar")
+        self.assertEqual(validate_settings({})["livekit_voice"], "Ashley")
+        self.assertEqual(validate_settings({"realtime_voice": OPENAI_VOICES[-1]})["realtime_voice"], OPENAI_VOICES[-1])
+        self.assertEqual(validate_settings({"livekit_voice": LIVEKIT_VOICES[-1]})["livekit_voice"], LIVEKIT_VOICES[-1])
+        with self.assertRaises(VoiceError):
+            validate_settings({"realtime_voice": "unsupported"})
+        with self.assertRaises(VoiceError):
+            validate_settings({"livekit_voice": "unsupported"})
+        for value in ([], {}):
+            with self.assertRaises(VoiceError):
+                validate_settings({"realtime_voice": value})
+            with self.assertRaises(VoiceError):
+                validate_settings({"livekit_voice": value})
 
     def test_dedicated_hermes_profile_has_no_fallback_or_broad_tools(self):
         config = hermes_configuration({"provider": "custom", "default": "local"}, "token", 9000, "/work")

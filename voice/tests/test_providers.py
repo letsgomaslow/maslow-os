@@ -171,10 +171,13 @@ class OpenAIRealtimeProviderTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(append["type"], "input_audio_buffer.append")
         self.assertEqual(len(base64.b64decode(append["audio"])), 480 * 2)
 
+        self.audio.played_ms = 0
         await self.socket.inbox.put(json.dumps({"type": "response.output_item.added", "item": {"id": "assistant-1", "role": "assistant"}}))
         await self.socket.inbox.put(json.dumps({"type": "response.output_audio.delta", "delta": base64.b64encode(b"\0\0" * 240).decode()}))
         await asyncio.sleep(0)
+        await self.provider.wait_playback()
         self.assertEqual(len(self.audio.played), 1)
+        self.audio.played_ms = 10
 
         await self.socket.inbox.put(json.dumps({"type": "input_audio_buffer.speech_started"}))
         await asyncio.sleep(0)
