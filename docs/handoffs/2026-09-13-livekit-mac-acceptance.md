@@ -1,5 +1,7 @@
 # LiveKit setup and Mac acceptance checkpoint
 
+Superseded next action: the user subsequently confirmed these LiveKit auditions worked. Both providers now have saved native voice choices, and live OpenAI testing is in progress. Follow the [OpenAI Realtime checkpoint](2026-09-13-openai-realtime-mac-acceptance.md) before requesting credentials again, restarting testers, or preparing an update. Details below retain the earlier evidence and state at that checkpoint.
+
 The user reports a confusing three-value LiveKit setup, no visible Hub 0.3.1 update, and a conversation that starts then stops with the microphone off. They offered their LiveKit project credentials for testing on the development Mac before another Lenovo update. This checkpoint supersedes the next-action guidance in the [earlier LiveKit correction handoff](2026-09-13-livekit-setup-correction.md); it does not alter its built artifact or test evidence.
 
 ## Source and delivery boundaries
