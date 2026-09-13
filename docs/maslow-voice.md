@@ -37,7 +37,7 @@ Install Voice plus local speech and fully offline support with:
 omarchy-install-voice local
 ```
 
-The equivalent routed commands are `omarchy install voice` and `omarchy install voice local`. Installation enables and starts `maslow-voice.service`, rescans shell plugins, and opens Voice Settings. In Settings:
+The equivalent routed commands are `omarchy install voice` and `omarchy install voice local`. Installation enables and starts `maslow-voice.service`, then opens Voice Settings when the desktop is unlocked and ready. If it finishes while locked, plugin refresh waits for the next explicit open after unlocking. In Settings:
 
 1. Choose one of the four modes and enter its non-secret connection settings.
 2. Save any BYOK credential. The value is sent over standard input to the local controller and stored in the desktop Secret Service keyring; it is not written to `settings.json`, placed in process arguments, or handled by Hub.
@@ -49,7 +49,7 @@ The `english-base-1` speech pack is 211,308,198 bytes and uses pinned, checksumm
 
 ## Execution boundary
 
-The conversation model never becomes the executor. A validated intent crosses to `TaskManager`, which persists an immutable task identity and submits it to a loopback-only Hermes Runs service with an idempotency key. The dedicated Hermes profile has terminal and file tools plus three reviewed daemon tools: `delegate_coding`, `open_application`, and `open_website`. The daemon tools cross a private, owner-only, authenticated Unix socket. Task status polling is authoritative; the event stream contributes bounded progress facts.
+The conversation model never becomes the executor. A validated intent crosses to `TaskManager`, which persists an immutable task identity and submits it to a loopback-only Hermes Runs service with an idempotency key. The dedicated Hermes profile has terminal and file tools plus three reviewed daemon tools, exposed as `maslow_delegate_coding`, `maslow_open_application`, and `maslow_open_website`. Pinned Hermes defers these schemas behind `tool_search`, `tool_describe`, and `tool_call`; their absence from the initial direct tool list is expected. The daemon tools cross a private, owner-only, authenticated Unix socket. Task status polling is authoritative; the event stream contributes bounded progress facts.
 
 Hermes can delegate coding through either structured adapter:
 
@@ -72,6 +72,8 @@ The per-user `maslow-voice.service` belongs to the graphical session, uses a pri
 
 Tasks and bounded event history live in a private SQLite database under the user's Voice state directory. On daemon startup, active tasks are recovered and reconciled by their saved Hermes run ID rather than blindly resubmitted. Submission uses a stable idempotency identity. A handoff or stop that cannot be reconciled safely is marked interrupted for review. Offline shutdown terminates the namespace and nested display while retaining the private project snapshot for restart, review, or export.
 
+Hermes cold startup has a bounded two-minute readiness allowance. Dedicated profiles disable unrelated lazy dependency installation through Hermes's supported configuration; upstream security checks remain enabled. If the local coordinator is confirmed to have exited, its task becomes interrupted while retaining the prior run identity and partial work. Continue starts a new explicit attempt. Temporary connection failures alone retain reconciliation of the same run. Voice never treats a network error as permission to repeat execution.
+
 ## Package ownership and pinned dependencies
 
 The runtime repository owns `voice/`, `omarchy-install-voice`, `omarchy-launch-voice`, shell/menu integration, and this reference. The `maslow-os-pkgs` repository owns the two package recipes:
@@ -86,7 +88,9 @@ Direct Python requirements are pinned and expanded into hash-checked lock files.
 The source tests cover provider selection and intent validation, lifecycle and task persistence, Hermes Runs reconciliation, Codex and Claude adapter contracts, approvals and cancellation, local model handling, offline filesystem/export controls, and the QML UI contract. Run them with:
 
 ```bash
-./test/shell
+bash test/shell.d/voice-test.sh
 ```
 
-The code and automated tests do not establish successful live OpenAI or LiveKit sessions, a real Ollama or LM Studio conversation, real Codex/Claude execution against the selected model, native microphone/speaker behavior, Linux nested-display interaction, the complete speech-to-task-to-reviewed-export journey, package installation from a published channel, or Lenovo hardware acceptance. Record those separately as live credential, service, packaging, desktop, and hardware evidence before describing Voice v1 as release-ready.
+This focused runner also participates in `./test/shell`. SDK integration tests require the pinned Voice dependencies; Linux isolation tests need a kernel/container that permits the required namespaces. See the [implementation handoff](handoffs/2026-09-13-maslow-voice-implementation.md) for exact test counts, broader baseline failures, real Quickshell renders, installed packages, local speech, offline model inference/export, nested Foot interaction and actual coding-binary protocol evidence.
+
+Live OpenAI/LiveKit sessions, physical microphone/speaker behavior, a real local-model conversation and coding quality, sustained application interaction, the complete speech-to-task-to-reviewed-export journey, a published package channel and Lenovo acceptance remain separate gates. Record them before describing Voice v1 as release-ready.

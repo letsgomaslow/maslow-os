@@ -2,6 +2,8 @@
 
 Updated 2026-09-13. This is the current workstream index, not a stable-release announcement. Update this file at each meaningful checkpoint; keep detailed evidence in dated handoffs rather than expanding AGENTS.md into a second backlog.
 
+Voice implementation: [Maslow Voice implementation and acceptance](handoffs/2026-09-13-maslow-voice-implementation.md) records the separate `codex/maslow-voice` runtime, Hub and package worktrees, source changes, internal package builds, real Quickshell and installed QEMU evidence, and remaining live-provider/hardware gates. Resume Voice there. It has not been merged or published and does not replace the Hub release baseline below.
+
 Current priority: [Support-readiness closeout, RCA and next steps](handoffs/2026-09-12-support-readiness-closeout.md). Lenovo's latest screenshot shows Hub 0.2.1 / Up to date, but Observability remains blocked and the tester rejects screenshot-driven support. Public staging sequence 3 was anonymously verified September 11 at distribution `8791c37972525af0edcbe6ee980d70b7f97d4577`. Next recommendation: design a consent-based support report and durable setup timeline, then test failure/recovery end to end. No new ISO, signing, trust enrollment or repeat 0.2.1 update is needed. Remote support infrastructure is proposed, not implemented or authorized by this documentation closeout.
 
 ## Resume in a new context
