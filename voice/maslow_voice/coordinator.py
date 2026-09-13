@@ -77,7 +77,7 @@ def hermes_configuration(model, api_token, port, project):
         "fallback_model": None, "fallback_models": [], "auxiliary": auxiliary,
         "memory": {"enabled": False}, "compression": {"enabled": False},
         "skills": {"creation_nudge_interval": 0, "external_dirs": []},
-        "plugins": {"entries": {"maslow-voice": {"enabled": True}}},
+        "plugins": {"enabled": ["maslow-voice"], "entries": {"maslow-voice": {"enabled": True}}},
         "telemetry": {"enabled": False}, "display": {"show_reasoning": False},
     }
 

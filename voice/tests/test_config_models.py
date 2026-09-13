@@ -29,6 +29,8 @@ class ConfigurationTests(unittest.TestCase):
     def test_dedicated_hermes_profile_has_no_fallback_or_broad_tools(self):
         config = hermes_configuration({"provider": "custom", "default": "local"}, "token", 9000, "/work")
         self.assertEqual(config["platform_toolsets"]["api_server"], ["terminal", "file", "maslow_voice"])
+        self.assertEqual(config["plugins"]["enabled"], ["maslow-voice"])
+        self.assertTrue(config["plugins"]["entries"]["maslow-voice"]["enabled"])
         self.assertIsNone(config["fallback_model"])
         self.assertFalse(config["compression"]["enabled"])
         self.assertNotIn("api_key", config["model"])
