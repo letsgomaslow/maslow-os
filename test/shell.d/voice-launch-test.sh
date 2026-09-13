@@ -27,7 +27,7 @@ from pathlib import Path
 name = Path(sys.argv[0]).name
 if name == "flock":
     try:
-        fcntl.flock(int(sys.argv[-1]), fcntl.LOCK_EX | fcntl.LOCK_NB)
+        fcntl.flock(int(sys.argv[-1]), fcntl.LOCK_EX | (fcntl.LOCK_NB if "-n" in sys.argv else 0))
     except BlockingIOError:
         sys.exit(1)
     sys.exit(0)
@@ -47,7 +47,9 @@ if name == "omarchy-hyprland-session-locked":
 if name == "omarchy-shell":
     action = sys.argv[1:3]
     if action == ["lock", "status"]:
-        done(s.get("lock", json.dumps(dict(locked=False, requested=False, pending=False, sessionLocked=False, secure=False))), s.get("lock_exit", 0))
+        exits = s.get("lock_exits", [s.get("lock_exit", 0)])
+        code = exits.pop(0) if len(exits) > 1 else exits[0]
+        done(s.get("lock", json.dumps(dict(locked=False, requested=False, pending=False, sessionLocked=False, secure=False))), code)
     if action == ["shell", "listPlugins"]:
         if "registry" in s: done(s["registry"])
         scans = s.get("scans", 0)
@@ -77,9 +79,16 @@ done()
                XDG_RUNTIME_DIR=str(runtime), VOICE_TEST_STATE=str(state_file),
                VOICE_TEST_STARTED=str(fixture / "started"), VOICE_TEST_RELEASE=str(fixture / "release"))
 
-    def run(state, command="launch", page="settings"):
+    marker = runtime / "maslow-voice-refresh-pending"
+
+    def run(state, command="launch", page="settings", pending=False, graphical=True):
+        if pending:
+            marker.touch(mode=0o600)
+        else:
+            marker.unlink(missing_ok=True)
         state_file.write_text(json.dumps(state))
-        result = subprocess.run(["bash", str(root / f"bin/omarchy-{command}-voice"), page], env=env, text=True, capture_output=True, timeout=8)
+        call_env = env if graphical else dict(env, XDG_RUNTIME_DIR="")
+        result = subprocess.run(["bash", str(root / f"bin/omarchy-{command}-voice"), page], env=call_env, text=True, capture_output=True, timeout=8)
         assert result.returncode == 0, result.stderr
         return json.loads(state_file.read_text()), result.stdout
 
@@ -120,7 +129,7 @@ done()
 
     state, _ = run({"present": False, "compositor": [1, 0]})
     no_mutation(state)
-    state, _ = run({"present": False, "compositor": [1, 1, 0]})
+    state, _ = run({"present": False, "compositor": [1, 1, 1, 0]})
     assert len(actions(state, "rescanPlugins")) == 1
     assert not actions(state, "summon")
     print("ok - lock transitions before refresh or summon defer the next mutation")
@@ -138,7 +147,44 @@ done()
     assert ["omarchy-pkg-add", "maslow-voice", "maslow-voice-local"] in state["calls"]
     assert ["systemctl", "--user", "enable", "--now", "maslow-voice.service"] in state["calls"]
     assert "installed" in output
+    assert marker.exists() and marker.stat().st_mode & 0o777 == 0o600
     print("ok - install succeeds and enables Voice while deferring locked desktop refresh")
+
+    state, _ = run({}, pending=True)
+    assert len(actions(state, "rescanPlugins")) == 1
+    assert len(actions(state, "summon")) == 1
+    assert not marker.exists()
+    state, _ = run({})
+    assert not actions(state, "rescanPlugins")
+    print("ok - deferred upgrade refreshes an existing panel once after unlock")
+
+    state, _ = run({}, command="install", page="local")
+    assert len(actions(state, "rescanPlugins")) == 1
+    assert len(actions(state, "summon")) == 1
+    assert not marker.exists()
+    print("ok - unlocked install refreshes an already registered old Voice panel")
+
+    state, _ = run({"lock_exits": [0, 0, 1, 0, 0]}, pending=True)
+    assert len(actions(state, "rescanPlugins")) == 1
+    assert len(actions(state, "listPlugins")) == 3
+    assert not marker.exists()
+    print("ok - upgrade waits for rebuilt services before accepting the existing registry")
+
+    for _ in range(2):
+        state, _ = run({"disabled": True}, pending=True)
+        no_mutation(state)
+        assert marker.exists()
+    state, _ = run({"lock_exit": 1}, pending=True)
+    no_mutation(state)
+    assert marker.exists()
+    state, _ = run({"summon": "unknown"}, pending=True)
+    assert marker.exists()
+    print("ok - disabled or uncertain upgrade keeps its refresh marker without repeated scans")
+
+    state, output = run({}, command="install", page="local", graphical=False)
+    no_mutation(state)
+    assert "new desktop session" in output
+    print("ok - nongraphical install completes with an honest new-session instruction")
 
     state_file.write_text(json.dumps(dict(present=False, block_scan=True)))
     first = subprocess.Popen(["bash", str(root / "bin/omarchy-launch-voice")], env=env, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -157,4 +203,34 @@ done()
     assert len(actions(state, "rescanPlugins")) == 1
     assert len(actions(state, "summon")) == 1
     print("ok - simultaneous openers cannot trigger duplicate plugin refresh")
+
+    (fixture / "started").unlink()
+    (fixture / "release").unlink()
+    state_file.write_text(json.dumps(dict(present=False, block_scan=True)))
+    first = subprocess.Popen(["bash", str(root / "bin/omarchy-launch-voice")], env=env, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    installer = None
+    try:
+        deadline = time.monotonic() + 5
+        while not (fixture / "started").exists():
+            assert time.monotonic() < deadline
+            time.sleep(.01)
+        installer = subprocess.Popen(["bash", str(root / "bin/omarchy-install-voice")], env=env, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        deadline = time.monotonic() + 5
+        while not any(call[:3] == ["systemctl", "--user", "enable"] for call in json.loads(state_file.read_text())["calls"]):
+            assert time.monotonic() < deadline
+            time.sleep(.01)
+        time.sleep(.1)
+        assert not marker.exists(), "installer wrote a marker outside the opener lock"
+    finally:
+        (fixture / "release").touch()
+        output, error = first.communicate(timeout=5)
+        if installer:
+            install_output, install_error = installer.communicate(timeout=5)
+    assert first.returncode == 0, error
+    assert installer.returncode == 0, install_error
+    state = json.loads(state_file.read_text())
+    assert len(actions(state, "rescanPlugins")) == 2
+    assert len(actions(state, "summon")) == 2
+    assert not marker.exists()
+    print("ok - concurrent install cannot lose its refresh marker to an earlier opener")
 PY

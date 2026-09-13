@@ -53,7 +53,12 @@ else
   fi
   desktop_unlocked || defer_open
   state=$(plugin_state) || defer_open
-  if [[ $state == "missing" ]]; then
+  if [[ $state == "disabled" ]]; then
+    echo "Enable Maslow Voice in desktop plugins, then open Voice again."
+    exit 0
+  fi
+  refresh_pending="$XDG_RUNTIME_DIR/maslow-voice-refresh-pending"
+  if [[ $state == "missing" || -f $refresh_pending ]]; then
     # Rescanning destroys and recreates every plugin service, including the
     # session locker. Never do it while locked or when lock state is unknown.
     desktop_unlocked || defer_open
@@ -61,7 +66,11 @@ else
     deadline=$((SECONDS + 30))
     while (( SECONDS < deadline )); do
       state=$(plugin_state) || defer_open
-      [[ $state == "missing" ]] || break
+      # The old registry remains readable while an upgrade scan runs. Wait
+      # for the lock service to return too: it is recreated after the scan.
+      if [[ $state != "missing" ]] && desktop_unlocked; then
+        break
+      fi
       sleep 0.25
     done
   fi
@@ -74,4 +83,5 @@ else
   result=$(omarchy-shell shell summon maslow.voice "{\"page\":\"$page\"}") || defer_open
   # The IPC command exits successfully even when summon returns "unknown".
   [[ $result == "ok" ]] || defer_open
+  rm -f -- "$refresh_pending"
 fi
