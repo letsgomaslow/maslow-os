@@ -1,0 +1,20 @@
+[Unit]
+Description=Maslow Voice conversational coordinator
+After=graphical-session.target
+PartOf=graphical-session.target
+
+[Service]
+Type=simple
+ExecStart=/usr/lib/maslow-voice/venv/bin/python -m maslow_voice.daemon
+Environment=PYTHONPATH=/usr/lib/maslow-voice
+Environment=PYTHONDONTWRITEBYTECODE=1
+Environment=HF_HUB_OFFLINE=1
+Environment=TRANSFORMERS_OFFLINE=1
+UMask=0077
+Restart=on-failure
+RestartSec=3
+TimeoutStopSec=15
+KillMode=control-group
+
+[Install]
+WantedBy=graphical-session.target

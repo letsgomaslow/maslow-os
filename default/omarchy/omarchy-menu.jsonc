@@ -22,6 +22,7 @@
 
   // Root Menu
   "hub": {"icon":"󰚩","label":"Maslow Hub","when":"omarchy-cmd-present maslow-hubctl","action":"omarchy-launch-hub"},
+  "voice": {"icon":"󰍬","label":"Maslow Voice","when":"omarchy-cmd-present omarchy-voice-control","action":"omarchy-launch-voice"},
   "apps": {"icon":"󰀻","label":"Apps","aliases":["app","applications"],"provider":"apps"},
   "learn": {"icon":"󰧑","label":"Learn"},
   "trigger": {"icon":"󱓞","label":"Trigger"},

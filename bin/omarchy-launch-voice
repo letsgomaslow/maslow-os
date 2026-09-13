@@ -1,0 +1,17 @@
+#!/bin/bash
+# omarchy:summary=Open Maslow Voice
+# omarchy:args=[talk|type|tasks|settings]
+# omarchy:examples=omarchy launch voice | omarchy launch voice settings
+
+set -euo pipefail
+(( $# <= 1 )) || { echo "Choose one Voice page." >&2; exit 1; }
+page=${1:-talk}
+case "$page" in
+  talk|type|tasks|settings) ;;
+  *) echo "Choose talk, type, tasks, or settings." >&2; exit 1 ;;
+esac
+if omarchy-cmd-missing omarchy-voice-control; then
+  omarchy-launch-hub voice
+else
+  omarchy-shell shell summon maslow.voice "{\"page\":\"$page\"}"
+fi

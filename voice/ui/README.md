@@ -1,0 +1,13 @@
+# Maslow Voice plugin
+
+The kept-loaded `maslow.voice` plugin owns one persistent layer-shell surface within the existing shell. Its transparent input mask covers only the orb and, while open, the compact controls. Closing controls leaves the orb present and does not end a conversation or cancel tasks.
+
+The 56-pixel idle orb sits at bottom right. Conversation states take priority and use an 88-pixel bottom-center orb. Outstanding tasks, results, and approvals use bottom left, including while voice is disabled and grey. Placement and size hold during pointer hover, press, keyboard focus, or open controls. Fixed position keeps bottom right; reduced motion freezes animation. The configured display selects one output, falling back to the first available output. Fixed position changes placement while retaining the larger conversation diameter. The shell lock service immediately hides controls and sends end_voice when locking.
+
+`VoiceController.qml` owns the transport. It starts `omarchy-voice-control --watch`, accepts schema-1 snapshots, and writes JSON requests to standard input. Credentials never appear in command arguments and the form clears its value after submission. Preview mode records requests in memory without contacting the production controller.
+
+Settings expose offline, local/remote server, OpenAI, and LiveKit connections, model discovery, model/speech folders, and credentials. Tasks accept user-written steering and continuation instructions. Approval controls show the supplied request details and carry its request identity. Offline export first requests a review, displays its changed paths, then submits the review digest and those paths when the user chooses Export reviewed changes.
+
+Compile `VoiceOrb.frag` with the target Qt `qsb --glsl "100 es,120,150"` into `VoiceOrb.frag.qsb`; OpenGL requires those GLSL variants. The packaged shader runs by default on graphics renderers. `MASLOW_VOICE_GPU_SHADER=0` disables it; Qt software rendering selects the gradient fallback automatically. The gradient remains beneath the shader to preserve visibility if shader loading or graphics pipeline creation fails. Reduced motion freezes both variants.
+
+Run `node voice/tests/ui-contract-test.mjs` for structural checks. For actual input-region and placement verification, use `voice/tests/ui-preview.qml` with a layer-shell compositor. Weston alone lacks that protocol; a nested Sway instance on headless Weston provides it. Copy `ui/` and the preview to a common Quickshell config root, changing the preview import to `"ui"`. Fixture IPC exposes page, state, mode, tasks, close, status, and captured requests without starting the production transport. This fixture is development-only and is not an installed entry point.

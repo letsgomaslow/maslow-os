@@ -1,0 +1,19 @@
+#!/bin/bash
+# omarchy:summary=Install the optional Maslow Voice runtime
+# omarchy:args=[local]
+# omarchy:examples=omarchy install voice | omarchy install voice local
+
+set -euo pipefail
+(( $# <= 1 )) || { echo "Use only the optional 'local' argument." >&2; exit 1; }
+if [[ ${1:-} == "local" ]]; then
+  omarchy-pkg-add maslow-voice maslow-voice-local || exit 1
+elif [[ $# == 0 ]]; then
+  omarchy-pkg-add maslow-voice || exit 1
+else
+  echo "Use 'local' to include local speech and isolation tools." >&2
+  exit 1
+fi
+systemctl --user daemon-reload
+systemctl --user enable --now maslow-voice.service
+omarchy-shell shell rescanPlugins
+omarchy-launch-voice settings
