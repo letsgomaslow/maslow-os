@@ -13,7 +13,7 @@ ShellRoot {
     Component.onCompleted: voiceController.setFixture({
       schemaVersion: 1,
       voice: { enabled: false, state: "disabled", microphone: false, speaking: false, level: 0, error: "" },
-      settings: { mode: "offline", server_kind: "ollama", server_url: "http://127.0.0.1:11434", model: "qwen3:8b", default_coder: "codex", reduced_motion: false, fixed_position: false, display: "", ollama_models: "/home/maslow/.ollama/models", speech_directory: "/home/maslow/.local/share/maslow-voice/speech" },
+      settings: { mode: "livekit", livekit_url: "wss://your-project.livekit.cloud", server_kind: "ollama", server_url: "http://127.0.0.1:11434", model: "qwen3:8b", default_coder: "codex", reduced_motion: false, fixed_position: false, display: "", ollama_models: "/home/maslow/.ollama/models", speech_directory: "/home/maslow/.local/share/maslow-voice/speech" },
       tasks: [], session: { id: "fixture", transcript: [] },
       readiness: { ready: true, checks: [{ name: "Speech models", ok: true, message: "Available on this computer." }], models: [{ id: "qwen3:8b", label: "Qwen 3 · 8B" }] }
     })
@@ -48,6 +48,8 @@ ShellRoot {
       panel.voiceController.setFixture(next)
     }
     function requests(): string { return JSON.stringify(panel.voiceController.fixtureRequests) }
+    function setupSaved(): void { panel.voiceController.applyLine('{"ok":true,"livekit_saved":true}') }
+    function setupError(): void { panel.voiceController.applyLine('{"ok":false,"error":{"message":"LiveKit setup could not be saved. Check the project URL and try again."}}') }
     function status(): string { return JSON.stringify({ placement: panel.heldPlacement, diameter: panel.heldDiameter, desired: panel.desiredPlacement, controllerOpen: panel.controllerOpen, state: panel.voice.state }) }
   }
 }

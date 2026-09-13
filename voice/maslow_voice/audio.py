@@ -59,6 +59,7 @@ class PortAudioTransport:
 
     ``sounddevice`` is loaded only when physical audio was explicitly requested,
     keeping typed sessions and tests free from an audio-server dependency.
+    ``capture=False`` opens only the speaker for microphone-free previews.
     """
 
     def __init__(
@@ -69,6 +70,8 @@ class PortAudioTransport:
         queue_frames: int = 32,
         microphone_device: str | int | None = None,
         speaker_device: str | int | None = None,
+        on_error: Callable[[], Awaitable[None]] | None = None,
+        capture: bool = True,
     ) -> None:
         self.sample_rate = sample_rate
         self.blocksize = blocksize
@@ -85,6 +88,8 @@ class PortAudioTransport:
         self._played_samples = 0
         self._generation = 0
         self._apm = None
+        self._on_error = on_error
+        self._capture = capture
 
     @property
     def played_ms(self):
@@ -95,13 +100,15 @@ class PortAudioTransport:
             return
         try:
             import sounddevice as sounddevice
-            from livekit import rtc
+            if self._capture:
+                from livekit import rtc
         except ImportError as error:
             raise RuntimeError("PortAudio support is not installed") from error
-        self._apm = rtc.AudioProcessingModule(echo_cancellation=True, noise_suppression=True, high_pass_filter=True)
-        self._apm.set_stream_delay_ms(30)
-        self._loop = asyncio.get_running_loop()
-        self._handler = handler
+        if self._capture:
+            self._apm = rtc.AudioProcessingModule(echo_cancellation=True, noise_suppression=True, high_pass_filter=True)
+            self._apm.set_stream_delay_ms(30)
+            self._loop = asyncio.get_running_loop()
+            self._handler = handler
         self._running = True
 
         def input_callback(indata: Any, rendered: bytes, frames: int) -> None:
@@ -113,38 +120,67 @@ class PortAudioTransport:
 
         def output_callback(outdata: Any, frames: int, _time: Any, _status: Any) -> None:
             required = frames * 2
-            chunk = self._output.popleft() if self._output else b""
-            data = (chunk[:required] + b"\0" * required)[:required]
-            if len(chunk) > required:
-                self._output.appendleft(chunk[required:])
-            self._played_samples += min(len(chunk), required) // 2
+            data = bytearray(required)
+            written = 0
+            # RTC packets may be shorter than the device callback (10 ms vs
+            # 20 ms). Join available PCM before padding a genuine underrun.
+            while written < required:
+                try:
+                    chunk = self._output.popleft()
+                except IndexError:
+                    break
+                count = min(len(chunk), required - written)
+                data[written:written + count] = chunk[:count]
+                written += count
+                if count < len(chunk):
+                    self._output.appendleft(chunk[count:])
+            self._played_samples += written // 2
             outdata[:] = data
-            return data
+            return bytes(data)
 
         def callback(indata, outdata, frames, time, status):
             rendered = output_callback(outdata, frames, time, status)
             input_callback(indata, rendered, frames)
 
-        self._stream = sounddevice.RawStream(
-            samplerate=self.sample_rate,
-            blocksize=self.blocksize,
-            channels=1,
-            dtype="int16",
-            device=(self.microphone_device, self.speaker_device),
-            callback=callback,
-        )
         try:
+            stream_type = sounddevice.RawStream if self._capture else sounddevice.RawOutputStream
+            self._stream = stream_type(
+                samplerate=self.sample_rate,
+                blocksize=self.blocksize,
+                channels=1,
+                dtype="int16",
+                device=(self.microphone_device, self.speaker_device) if self._capture else self.speaker_device,
+                callback=callback if self._capture else output_callback,
+            )
             self._stream.start()
         except BaseException:
             self._running = False
-            self._stream.close()
+            if self._stream is not None:
+                self._stream.close()
             self._stream = None
             raise
-        self._pump = asyncio.create_task(self._drain_input())
+        if self._capture:
+            self._pump = asyncio.create_task(self._run_input())
 
     def _put_input(self, frame: PcmFrame) -> None:
-        if not self._queue.full():
+        if self._capture and self._running and not self._muted and not self._queue.full():
             self._queue.put_nowait(frame)
+
+    async def _run_input(self) -> None:
+        try:
+            await self._drain_input()
+        except asyncio.CancelledError:
+            raise
+        except Exception:
+            # An APM or provider-input failure must not leave physical capture
+            # running with a dead consumer or expose raw SDK diagnostics.
+            try:
+                await self.stop()
+            except Exception:
+                # stop already attempts close even when the driver rejects it.
+                pass
+            if self._on_error is not None:
+                await self._on_error()
 
     async def _drain_input(self) -> None:
         while self._running:
@@ -189,6 +225,9 @@ class PortAudioTransport:
 
     async def set_muted(self, muted: bool) -> None:
         self._muted = muted
+        if muted:
+            while not self._queue.empty():
+                self._queue.get_nowait()
 
     async def stop(self) -> None:
         self._running = False
@@ -197,13 +236,16 @@ class PortAudioTransport:
         while not self._queue.empty():
             self._queue.get_nowait()
         if self._pump is not None:
-            self._pump.cancel()
-            try:
-                await self._pump
-            except asyncio.CancelledError:
-                pass
+            if self._pump is not asyncio.current_task():
+                self._pump.cancel()
+                try:
+                    await self._pump
+                except asyncio.CancelledError:
+                    pass
             self._pump = None
         if self._stream is not None:
-            self._stream.stop()
-            self._stream.close()
-            self._stream = None
+            stream, self._stream = self._stream, None
+            try:
+                stream.stop()
+            finally:
+                stream.close()

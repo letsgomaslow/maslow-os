@@ -37,9 +37,13 @@ class Credentials:
         _, value = await self._run(["lookup", *self._attributes(name)])
         return value
 
-    async def set(self, name, value):
+    @staticmethod
+    def validate_value(value):
         if not isinstance(value, str) or not value.strip() or len(value) > 16384 or "\x00" in value:
             raise VoiceError("INVALID_CREDENTIAL", "Enter a non-empty account credential.")
+
+    async def set(self, name, value):
+        self.validate_value(value)
         code, _ = await self._run(["store", "--label=Maslow Voice " + name, *self._attributes(name)], value)
         if code:
             raise VoiceError("KEYRING_LOCKED", "The account could not be saved. Unlock the desktop keyring and try again.")

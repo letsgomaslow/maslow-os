@@ -13,7 +13,7 @@ import uuid
 from pathlib import Path
 
 from .audio import PortAudioTransport
-from .config import Settings, atomic_json, private_directory, runtime_directory
+from .config import Settings, atomic_json, private_directory, runtime_directory, validate_settings
 from .coordinator import HermesRuntime, hermes_configuration
 from .hermes import HermesClient
 from .errors import VoiceError
@@ -46,6 +46,7 @@ class VoiceService:
         self.provider_epoch = None
         self.last_activity = time.monotonic()
         self.lifecycle_lock = asyncio.Lock()
+        self.configuration_lock = asyncio.Lock()
         self.turn_lock = asyncio.Lock()
         self.conversation_requests = set()
         self.startup_task = None
@@ -201,6 +202,8 @@ class VoiceService:
                     if audio != self.voice["enabled"]:
                         await self._stop_provider()
                     else:
+                        if audio:
+                            await self.provider.mute(False)
                         return
                 if project:
                     path = Path(project).expanduser()
@@ -227,10 +230,14 @@ class VoiceService:
                 values = await self.selected_secrets()
                 if self.provider_epoch is not epoch:
                     raise asyncio.CancelledError()
-                transport = PortAudioTransport(microphone_device=config["microphone_device"], speaker_device=config["speaker_device"])
                 async def emit(event):
                     if self.provider_epoch is epoch:
                         await self.provider_event(event)
+                async def audio_error():
+                    await emit({"type": "error", "code": "AUDIO_FAILED",
+                                "message": "Microphone audio stopped. Check the selected microphone and speakers, then start talking again."})
+                transport = PortAudioTransport(microphone_device=config["microphone_device"], speaker_device=config["speaker_device"],
+                                               on_error=audio_error)
                 async def submit(intent, turn_id):
                     if self.provider_epoch is not epoch:
                         raise VoiceError("TURN_ENDED", "This conversation has ended. Please repeat the request.")
@@ -347,6 +354,9 @@ class VoiceService:
         return {"readiness": self.readiness}
 
     async def dispatch(self, request):
+        if request.get("action") in {"configure", "configure_livekit", "credential"}:
+            async with self.configuration_lock:
+                return await self._dispatch(request)
         if request.get("action") not in {"start_voice", "submit_text"}:
             return await self._dispatch(request)
         current = asyncio.current_task()
@@ -368,6 +378,7 @@ class VoiceService:
         action = request.get("action")
         allowed = {
             "status": set(), "configure": {"settings"}, "credential": {"name", "value"}, "test": set(), "models": set(),
+            "configure_livekit": {"url", "api_key", "api_secret"},
             "download_speech": set(), "start_voice": {"project", "context"}, "end_voice": set(), "mute": {"muted"},
             "silence": set(), "submit_text": {"text", "project", "context"},
             "task_action": {"id", "operation", "text", "approval_id", "child_id", "review_id", "paths"},
@@ -376,6 +387,8 @@ class VoiceService:
             raise VoiceError("INVALID_REQUEST", "That Voice action or field is not supported.")
         if action == "status":
             return {"snapshot": self.snapshot()}
+        if action == "configure_livekit":
+            return await self.configure_livekit(request)
         if action == "configure":
             changes = request.get("settings", {})
             if not isinstance(changes, dict):
@@ -459,6 +472,64 @@ class VoiceService:
                 await self.tasks.action(task["id"], operation, request.get("text", ""), request.get("approval_id"))
         await self.publish()
         return {}
+
+    async def configure_livekit(self, request):
+        """Save one complete connection, retaining blank credential fields."""
+        if self.store.active():
+            raise VoiceError("TASKS_ACTIVE", "Finish or stop current tasks before changing their execution connection.")
+        url = request.get("url")
+        if not isinstance(url, str) or not url.strip():
+            raise VoiceError("INVALID_ENDPOINT", "Enter your LiveKit project URL.")
+        changes = {"mode": "livekit", "livekit_url": url.strip()}
+        validate_settings(dict(self.settings.value, **changes))
+        supplied = {"livekit_key": request.get("api_key", ""), "livekit_secret": request.get("api_secret", "")}
+        for value in supplied.values():
+            if not isinstance(value, str):
+                raise VoiceError("INVALID_CREDENTIAL", "Enter an account credential or leave it blank to keep the saved value.")
+            if value.strip():
+                Credentials.validate_value(value)
+        previous = {name: await self.credentials.get(name) for name in supplied}
+        values = {name: value.strip() or previous[name] for name, value in supplied.items()}
+        if not all(values.values()):
+            raise VoiceError("LIVEKIT_SETUP_INCOMPLETE", "Enter the LiveKit API key and API secret. Blank fields only keep credentials already saved.")
+        # Validate all fields before interrupting the current conversation.
+        await self.end_voice()
+        async with self.lifecycle_lock:
+            if self.store.active():
+                raise VoiceError("TASKS_ACTIVE", "Finish or stop current tasks before changing their execution connection.")
+            if self.provider:
+                await self.end_voice()
+            if self.offline:
+                await self.offline.stop()
+                self.offline = None
+                self.offline_clients.clear()
+            attempted = []
+            try:
+                for name, value in values.items():
+                    if value != previous[name]:
+                        attempted.append(name)
+                        await self.credentials.set(name, value)
+                self.settings.update(changes)
+            except BaseException:
+                async def restore():
+                    failed = False
+                    for name in reversed(attempted):
+                        try:
+                            if previous[name]:
+                                await self.credentials.set(name, previous[name])
+                            else:
+                                await self.credentials.delete(name)
+                            if await self.credentials.get(name) != previous[name]:
+                                failed = True
+                        except Exception:
+                            failed = True
+                    if failed:
+                        raise VoiceError("LIVEKIT_RESTORE_FAILED", "LiveKit setup was not saved completely. Unlock the desktop keyring and save both credentials again.")
+                await asyncio.shield(restore())
+                raise
+            self.readiness = {"ready": False, "checks": [], "models": []}
+        await self.publish()
+        return {"livekit_saved": True}
 
     async def tool_request(self, request):
         if not isinstance(request, dict) or set(request) - {"operation", "params", "session_id", "token"}:

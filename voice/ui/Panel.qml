@@ -20,6 +20,10 @@ Item {
   property string feedback: ""
   property string credentialName: "openai"
   property string credentialValue: ""
+  property bool livekitSetupSaving: false
+  property bool livekitSetupSucceeded: false
+  property string livekitSetupStatus: ""
+  property bool advancedTaskSettingsOpen: false
   property bool focusedOrb: false
   property alias voiceController: controller
 
@@ -47,8 +51,8 @@ Item {
   readonly property bool working: tasks.some(function(task) { return task.state !== "dismissed" && task.dismissed !== true })
 
   function stateText() {
-    if (disabled) return "Voice is disabled"
     if (voice.error) return "Needs attention"
+    if (disabled) return "Voice is off"
     if (voice.state === "connecting") return "Connecting"
     if (voice.state === "thinking") return "Thinking"
     if (voice.speaking === true || voice.state === "speaking" || voice.state === "talking") return "Speaking"
@@ -98,6 +102,38 @@ Item {
     credentialValue = ""
     feedback = "Credential sent to the local controller."
   }
+  function submitLiveKitSetup(url, apiKey, apiSecret) {
+    livekitSetupSucceeded = false
+    if (url.trim() === "") {
+      livekitSetupStatus = "Enter your LiveKit project URL before saving."
+      return
+    }
+    livekitSetupSaving = true
+    livekitSetupSucceeded = false
+    livekitSetupStatus = "Saving LiveKit setup…"
+    send("configure_livekit", { url: url.trim(), api_key: apiKey, api_secret: apiSecret })
+  }
+  function microphoneText() {
+    if (voice.state === "connecting") return "Connecting — requesting microphone access"
+    if (voice.state === "listening") return voice.microphone === true ? "Listening — microphone on" : "Listening — microphone off"
+    return voice.microphone === true ? "Microphone on" : "Microphone off"
+  }
+  function handleControlResponse(response) {
+    if (!livekitSetupSaving) return
+    if (response.ok === true && response.livekit_saved === true) {
+      livekitSetupSaving = false
+      livekitSetupSucceeded = true
+      livekitApiKeyField.text = ""
+      livekitApiSecretField.text = ""
+      livekitSetupStatus = "LiveKit setup saved on this computer. Start talking to request microphone access."
+      return
+    }
+    if (response.ok === false) {
+      livekitSetupSaving = false
+      livekitSetupSucceeded = false
+      livekitSetupStatus = String((response.error || {}).message || "LiveKit setup could not be saved. Check the fields and try again.")
+    }
+  }
   function open(payloadJson) {
     var payload = {}
     try { payload = JSON.parse(String(payloadJson || "{}")) } catch (error) {}
@@ -120,7 +156,15 @@ Item {
     orbButton.focus = false
   }
 
-  VoiceController { id: controller; fixtureMode: root.nativePreviewFixtureMode }
+  VoiceController {
+    id: controller
+    fixtureMode: root.nativePreviewFixtureMode
+    onResponseReceived: function(response) { root.handleControlResponse(response) }
+    onTransportErrorChanged: {
+      if (transportError !== "" && root.livekitSetupSaving)
+        root.handleControlResponse({ ok: false, error: { message: transportError } })
+    }
+  }
   Component.onCompleted: Qt.callLater(function() { controller.start() })
 
   component VoiceField: TextField {
@@ -284,9 +328,9 @@ Item {
       id: card
       visible: root.controllerOpen
       width: Math.min(600, panelWindow.width - 32)
-      height: Math.min(580, panelWindow.height - 150)
+      height: Math.min(680, panelWindow.height - 32)
       x: Math.max(16, Math.min(panelWindow.width - width - 16, orbButton.x + orbButton.width / 2 - width / 2))
-      y: panelWindow.height - height - 136
+      y: Math.max(16, panelWindow.height - height - 136)
       color: "#121D35"
       radius: 17
       border.color: "#6DC4AD"
@@ -328,7 +372,7 @@ Item {
             }
           }
           Rectangle { Layout.fillWidth: true; height: 1; color: "#496078" }
-          Text { visible: root.feedback !== "" || controller.transportError !== ""; text: controller.transportError || root.feedback; color: "#EE7BB3"; Layout.fillWidth: true; wrapMode: Text.Wrap }
+          Text { visible: root.feedback !== "" || controller.transportError !== ""; text: controller.transportError || root.feedback; color: "#EE7BB3"; Layout.fillWidth: true; wrapMode: Text.Wrap; Accessible.role: Accessible.AlertMessage; Accessible.name: text }
           StackLayout {
             Layout.fillWidth: true
             Layout.fillHeight: true
@@ -338,12 +382,12 @@ Item {
                 anchors.fill: parent
                 spacing: 12
                 Item { Layout.fillHeight: true }
+                Text { visible: root.voice.error || controller.transportError; Layout.alignment: Qt.AlignHCenter; text: root.voice.error || controller.transportError; color: "#EE7BB3"; font.family: "Manrope"; wrapMode: Text.WordWrap; Accessible.role: Accessible.AlertMessage; Accessible.name: text }
                 Text { Layout.alignment: Qt.AlignHCenter; text: root.conversation ? root.stateText() : "What would you like to work on?"; color: "#FFFFFF"; font.family: "Manrope"; font.pixelSize: 24 }
                 VoiceButton { id: talkAction; Layout.alignment: Qt.AlignHCenter; text: root.conversation ? "End conversation" : "Start talking"; onClicked: root.conversation ? root.send("end_voice") : root.send("start_voice", { project: root.selectedProject, context: root.explicitContext }) }
                 VoiceField { Layout.fillWidth: true; placeholderText: "Project folder for tasks (optional for conversation)"; text: root.selectedProject; onTextEdited: root.selectedProject = text; Accessible.name: "Project folder" }
                 Text { Layout.alignment: Qt.AlignHCenter; text: "Talk through an idea, or ask Maslow to hand work to your agents."; color: "#D1D5DB"; font.family: "Manrope"; font.pixelSize: 15; wrapMode: Text.WordWrap; horizontalAlignment: Text.AlignHCenter; Layout.maximumWidth: 520 }
-                Text { Layout.alignment: Qt.AlignHCenter; text: "Microphone: " + (root.voice.microphone === true ? "On" : "Off") + (root.transcript.length > 0 ? "  ·  Captions: " + String(root.transcript[root.transcript.length - 1].text || "") : ""); color: "#D1D5DB"; font.family: "Manrope"; font.pixelSize: 13; wrapMode: Text.WordWrap; horizontalAlignment: Text.AlignHCenter; Layout.maximumWidth: 520; Accessible.role: Accessible.StatusBar; Accessible.name: text }
-                Text { visible: root.voice.error || controller.transportError; Layout.alignment: Qt.AlignHCenter; text: root.voice.error || controller.transportError; color: "#EE7BB3"; font.family: "Manrope"; wrapMode: Text.WordWrap; Accessible.role: Accessible.AlertMessage; Accessible.name: text }
+                Text { Layout.alignment: Qt.AlignHCenter; text: root.microphoneText() + (root.transcript.length > 0 ? "  ·  Captions: " + String(root.transcript[root.transcript.length - 1].text || "") : ""); color: "#D1D5DB"; font.family: "Manrope"; font.pixelSize: 13; wrapMode: Text.WordWrap; horizontalAlignment: Text.AlignHCenter; Layout.maximumWidth: 520; Accessible.role: Accessible.StatusBar; Accessible.name: text }
                 Item { Layout.fillHeight: true }
               }
             }
@@ -426,22 +470,42 @@ Item {
                   VoiceField { Layout.fillWidth: true; placeholderText: "Selected model"; text: String(root.settings.model || ""); Accessible.name: "Selected model"; onEditingFinished: root.configure("model", text) }
                   VoiceButton { text: "Download speech models"; onClicked: root.send("download_speech") }
                 }
-                Text { visible: root.settings.mode === "livekit"; text: "LiveKit server address"; color: "#D1D5DB"; font.family: "Manrope" }
-                VoiceField { visible: root.settings.mode === "livekit"; Layout.fillWidth: true; placeholderText: "LiveKit server address"; text: String(root.settings.livekit_url || ""); Accessible.name: "LiveKit server address"; onEditingFinished: root.configure("livekit_url", text) }
+                ColumnLayout {
+                  visible: root.settings.mode === "livekit"
+                  Layout.fillWidth: true
+                  spacing: 8
+                  Text { text: "LiveKit setup"; color: "#FFFFFF"; font.family: "Manrope"; font.pixelSize: 18; Accessible.role: Accessible.Heading }
+                  Text { text: "Enter your project URL and credentials together. Expressive mode is included."; color: "#D1D5DB"; font.family: "Manrope"; wrapMode: Text.WordWrap; Layout.fillWidth: true }
+                  Text { text: "Project URL"; color: "#FFFFFF"; font.family: "Manrope" }
+                  VoiceField { id: livekitUrlField; Layout.fillWidth: true; placeholderText: "wss://your-project.livekit.cloud"; text: String(root.settings.livekit_url || ""); Accessible.name: "LiveKit project URL" }
+                  Text { text: "API key"; color: "#FFFFFF"; font.family: "Manrope" }
+                  VoiceField { id: livekitApiKeyField; Layout.fillWidth: true; echoMode: TextInput.Password; placeholderText: "API key"; Accessible.name: "LiveKit API key" }
+                  Text { text: "API secret"; color: "#FFFFFF"; font.family: "Manrope" }
+                  VoiceField { id: livekitApiSecretField; Layout.fillWidth: true; echoMode: TextInput.Password; placeholderText: "API secret"; Accessible.name: "LiveKit API secret" }
+                  Text { text: "Leave API key or API secret blank to keep the saved value. Existing credentials stay private and are never shown here."; color: "#D1D5DB"; font.family: "Manrope"; wrapMode: Text.WordWrap; Layout.fillWidth: true }
+                  VoiceButton { text: root.livekitSetupSaving ? "Saving LiveKit setup…" : "Save LiveKit setup"; enabled: !root.livekitSetupSaving; onClicked: root.submitLiveKitSetup(livekitUrlField.text, livekitApiKeyField.text, livekitApiSecretField.text) }
+                  Text { visible: root.livekitSetupStatus !== ""; text: root.livekitSetupStatus; color: root.livekitSetupSucceeded ? "#6DC4AD" : "#EE7BB3"; font.family: "Manrope"; wrapMode: Text.WordWrap; Layout.fillWidth: true; Accessible.role: root.livekitSetupSucceeded ? Accessible.StatusBar : Accessible.AlertMessage; Accessible.name: text }
+                }
                 Text { visible: root.settings.mode === "openai"; text: "OpenAI voice model"; color: "#D1D5DB"; font.family: "Manrope" }
                 VoiceField { visible: root.settings.mode === "openai"; Layout.fillWidth: true; placeholderText: "OpenAI voice model"; text: String(root.settings.realtime_model || ""); Accessible.name: "OpenAI voice model"; onEditingFinished: root.configure("realtime_model", text) }
-                Text { text: "Credentials are stored privately on this computer."; color: "#D1D5DB"; font.family: "Manrope" }
-                VoiceSelect { model: ["OpenAI API key", "LiveKit API key", "LiveKit secret", "Model server token", "Anthropic API key"]; Accessible.name: "Credential type"; onActivated: root.credentialName = ["openai", "livekit_key", "livekit_secret", "server_token", "anthropic"][currentIndex] }
-                VoiceField { Layout.fillWidth: true; echoMode: TextInput.Password; placeholderText: "Paste credential"; text: root.credentialValue; onTextEdited: root.credentialValue = text; Accessible.name: "Credential" }
-                VoiceButton { text: "Save credential"; enabled: root.credentialValue !== ""; onClicked: root.submitCredential() }
-                VoiceSelect { model: ["Codex", "Claude Code", "Hermes"]; currentIndex: ["codex", "claude", "hermes"].indexOf(root.settings.default_coder || "codex"); Accessible.name: "Default coding agent"; onActivated: root.configure("default_coder", ["codex", "claude", "hermes"][currentIndex]) }
-                VoiceField { Layout.fillWidth: true; placeholderText: "Task model (optional)"; text: String(root.settings.execution_model || ""); Accessible.name: "Task model"; onEditingFinished: root.configure("execution_model", text) }
-                VoiceButton { text: ["openai", "livekit"].indexOf(root.settings.mode) >= 0 ? "Check setup" : "Check connection and readiness"; onClicked: root.send("test") }
+                Text { visible: root.settings.mode !== "livekit"; text: "Credentials are stored privately on this computer."; color: "#D1D5DB"; font.family: "Manrope" }
+                VoiceSelect { visible: root.settings.mode !== "livekit"; model: ["OpenAI API key", "Model server token", "Anthropic API key"]; Accessible.name: "Credential type"; onActivated: root.credentialName = ["openai", "server_token", "anthropic"][currentIndex] }
+                VoiceField { visible: root.settings.mode !== "livekit"; Layout.fillWidth: true; echoMode: TextInput.Password; placeholderText: "Paste credential"; text: root.credentialValue; onTextEdited: root.credentialValue = text; Accessible.name: "Credential" }
+                VoiceButton { visible: root.settings.mode !== "livekit"; text: "Save credential"; enabled: root.credentialValue !== ""; onClicked: root.submitCredential() }
+                VoiceSelect { visible: root.settings.mode !== "livekit"; model: ["Codex", "Claude Code", "Hermes"]; currentIndex: ["codex", "claude", "hermes"].indexOf(root.settings.default_coder || "codex"); Accessible.name: "Default coding agent"; onActivated: root.configure("default_coder", ["codex", "claude", "hermes"][currentIndex]) }
+                VoiceField { visible: root.settings.mode !== "livekit"; Layout.fillWidth: true; placeholderText: "Task model (optional)"; text: String(root.settings.execution_model || ""); Accessible.name: "Task model"; onEditingFinished: root.configure("execution_model", text) }
+                VoiceButton { visible: root.settings.mode === "livekit"; text: root.advancedTaskSettingsOpen ? "Hide task settings" : "Task settings"; onClicked: root.advancedTaskSettingsOpen = !root.advancedTaskSettingsOpen }
+                ColumnLayout { visible: root.settings.mode === "livekit" && root.advancedTaskSettingsOpen; Layout.fillWidth: true; spacing: 8
+                  Text { text: "Task settings"; color: "#FFFFFF"; font.family: "Manrope"; font.pixelSize: 18; Accessible.role: Accessible.Heading }
+                  VoiceSelect { model: ["Codex", "Claude Code", "Hermes"]; currentIndex: ["codex", "claude", "hermes"].indexOf(root.settings.default_coder || "codex"); Accessible.name: "Default coding agent"; onActivated: root.configure("default_coder", ["codex", "claude", "hermes"][currentIndex]) }
+                  VoiceField { Layout.fillWidth: true; placeholderText: "Task model (optional)"; text: String(root.settings.execution_model || ""); Accessible.name: "Task model"; onEditingFinished: root.configure("execution_model", text) }
+                }
+                VoiceButton { visible: root.settings.mode !== "livekit"; text: root.settings.mode === "openai" ? "Check setup" : "Check connection and readiness"; onClicked: root.send("test") }
                 VoiceCheck { text: "Reduce voice motion"; checked: root.reducedMotion; onToggled: root.configure("reduced_motion", checked); Accessible.name: text }
                 VoiceCheck { text: "Keep orb at a fixed position"; checked: root.fixedPosition; onToggled: root.configure("fixed_position", checked); Accessible.name: text }
                 VoiceField { Layout.fillWidth: true; placeholderText: "Display name or connector"; text: String(settings.display || ""); Accessible.name: "Voice display"; onEditingFinished: root.configure("display", text) }
-                Text { text: root.readiness.ready === true ? (["openai", "livekit"].indexOf(root.settings.mode) >= 0 ? "Setup fields are ready. Start talking to test the connection and audio." : "Connection is ready.") : "Check setup before starting voice."; color: root.readiness.ready === true ? "#6DC4AD" : "#D1D5DB"; font.family: "Manrope"; wrapMode: Text.WordWrap; Layout.fillWidth: true; Accessible.role: Accessible.StatusBar }
-                Repeater { model: root.readiness.checks || []; delegate: Text { required property var modelData; text: (modelData.ok === true ? "Ready: " : "Needs attention: ") + String(modelData.name || "Check") + " — " + String(modelData.message || ""); color: modelData.ok === true ? "#6DC4AD" : "#EE7BB3"; font.family: "Manrope"; wrapMode: Text.WordWrap; Layout.fillWidth: true } }
+                Text { visible: root.settings.mode !== "livekit"; text: root.readiness.ready === true ? (root.settings.mode === "openai" ? "Setup fields are ready. Start talking to test the connection and audio." : "Connection is ready.") : "Check setup before starting voice."; color: root.readiness.ready === true ? "#6DC4AD" : "#D1D5DB"; font.family: "Manrope"; wrapMode: Text.WordWrap; Layout.fillWidth: true; Accessible.role: Accessible.StatusBar }
+                Repeater { model: root.settings.mode === "livekit" ? [] : (root.readiness.checks || []); delegate: Text { required property var modelData; text: (modelData.ok === true ? "Ready: " : "Needs attention: ") + String(modelData.name || "Check") + " — " + String(modelData.message || ""); color: modelData.ok === true ? "#6DC4AD" : "#EE7BB3"; font.family: "Manrope"; wrapMode: Text.WordWrap; Layout.fillWidth: true } }
               }
             }
           }

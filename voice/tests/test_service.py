@@ -40,6 +40,135 @@ class ServiceTests(unittest.IsolatedAsyncioTestCase):
         self.service.store.close()
         self.temporary.cleanup()
 
+    def livekit_credentials(self, initial=None):
+        values = dict(initial or {})
+        async def get(name):
+            return values.get(name, "")
+        async def save(name, value):
+            values[name] = value
+        async def delete(name):
+            values.pop(name, None)
+        self.credentials.get.side_effect = get
+        self.credentials.set.side_effect = save
+        self.credentials.delete.side_effect = delete
+        return values
+
+    async def test_livekit_setup_ack_requires_saved_complete_connection_and_hides_values(self):
+        values = self.livekit_credentials()
+        result = await self.service.dispatch({"action": "configure_livekit", "url": "wss://voice.invalid/",
+                                              "api_key": "private-project-key", "api_secret": "private-project-secret"})
+        self.assertEqual(result, {"livekit_saved": True})
+        self.assertEqual(values, {"livekit_key": "private-project-key", "livekit_secret": "private-project-secret"})
+        self.assertEqual(self.service.settings.value["mode"], "livekit")
+        self.assertEqual(self.service.settings.value["livekit_url"], "wss://voice.invalid")
+        public = json.dumps(self.service.snapshot()) + self.service.settings.path.read_text()
+        self.assertNotIn("private-project-key", public)
+        self.assertNotIn("private-project-secret", public)
+
+    async def test_livekit_blank_credentials_keep_existing_values(self):
+        values = self.livekit_credentials({"livekit_key": "saved-key", "livekit_secret": "saved-secret"})
+        result = await self.service.dispatch({"action": "configure_livekit", "url": "wss://voice.invalid", "api_key": "", "api_secret": " "})
+        self.assertTrue(result["livekit_saved"])
+        self.credentials.set.assert_not_called()
+        self.assertEqual(values["livekit_secret"], "saved-secret")
+
+    async def test_livekit_invalid_or_incomplete_setup_does_not_interrupt_conversation(self):
+        self.livekit_credentials()
+        await self.service.dispatch({"action": "submit_text", "text": "hello"})
+        provider = self.service.provider
+        before = dict(self.service.settings.value)
+        for fields in ({"url": "http://voice.invalid", "api_key": "key", "api_secret": "secret"},
+                       {"url": "wss://voice.invalid", "api_key": "key", "api_secret": ""},
+                       {"url": "wss://voice.invalid", "api_key": None, "api_secret": "secret"}):
+            with self.assertRaises(VoiceError):
+                await self.service.dispatch({"action": "configure_livekit", **fields})
+            self.assertIs(self.service.provider, provider)
+            self.assertEqual(self.service.settings.value, before)
+            self.credentials.set.assert_not_called()
+
+    async def test_livekit_second_write_failure_restores_both_credentials_and_settings(self):
+        original = {"livekit_key": "old-key", "livekit_secret": "old-secret"}
+        values = self.livekit_credentials(original)
+        before = dict(self.service.settings.value)
+        async def fail_second(name, value):
+            values[name] = value
+            if value == "new-secret":
+                raise VoiceError("KEYRING_LOCKED", "Unlock the desktop keyring.")
+        self.credentials.set.side_effect = fail_second
+        with self.assertRaises(VoiceError):
+            await self.service.dispatch({"action": "configure_livekit", "url": "wss://voice.invalid", "api_key": "new-key", "api_secret": "new-secret"})
+        self.assertEqual(values, original)
+        self.assertEqual(self.service.settings.value, before)
+
+    async def test_livekit_settings_write_failure_removes_new_credentials(self):
+        values = self.livekit_credentials()
+        before = dict(self.service.settings.value)
+        with patch.object(self.service.settings, "update", side_effect=OSError("write denied")):
+            with self.assertRaises(OSError):
+                await self.service.dispatch({"action": "configure_livekit", "url": "wss://voice.invalid", "api_key": "new-key", "api_secret": "new-secret"})
+        self.assertEqual(values, {})
+        self.assertEqual(self.service.settings.value, before)
+
+    async def test_livekit_cancelled_save_restores_credentials_before_returning(self):
+        original = {"livekit_key": "old-key", "livekit_secret": "old-secret"}
+        values = self.livekit_credentials(original)
+        async def cancel_second(name, value):
+            values[name] = value
+            if value == "new-secret":
+                raise asyncio.CancelledError()
+        self.credentials.set.side_effect = cancel_second
+        with self.assertRaises(asyncio.CancelledError):
+            await self.service.dispatch({"action": "configure_livekit", "url": "wss://voice.invalid", "api_key": "new-key", "api_secret": "new-secret"})
+        self.assertEqual(values, original)
+
+    async def test_livekit_rollback_verifies_removal_and_reports_incomplete_restore(self):
+        self.livekit_credentials()
+        self.credentials.delete.side_effect = None
+        with patch.object(self.service.settings, "update", side_effect=OSError("write denied")):
+            with self.assertRaises(VoiceError) as caught:
+                await self.service.dispatch({"action": "configure_livekit", "url": "wss://voice.invalid", "api_key": "new-key", "api_secret": "new-secret"})
+        self.assertEqual(caught.exception.code, "LIVEKIT_RESTORE_FAILED")
+        self.assertNotIn("new-secret", caught.exception.message)
+
+    async def test_livekit_valid_setup_ends_existing_conversation_and_revokes_old_turn(self):
+        self.livekit_credentials()
+        await self.service.dispatch({"action": "submit_text", "text": "hello"})
+        provider = self.service.provider
+        await self.service.dispatch({"action": "configure_livekit", "url": "wss://voice.invalid", "api_key": "key", "api_secret": "secret"})
+        self.assertIsNone(self.service.provider)
+        self.assertFalse(provider.started)
+        with self.assertRaises(VoiceError):
+            await provider.submit({"objective": "Late", "summary": "Late"}, "turn-hello")
+
+    async def test_livekit_active_task_blocks_credential_and_settings_writes(self):
+        self.livekit_credentials()
+        with patch.object(self.service.store, "active", return_value=[{"id": "active"}]):
+            with self.assertRaisesRegex(VoiceError, "Finish or stop"):
+                await self.service.dispatch({"action": "configure_livekit", "url": "wss://voice.invalid", "api_key": "key", "api_secret": "secret"})
+        self.credentials.set.assert_not_called()
+
+    async def test_explicit_audio_start_unmutes_existing_audio_conversation(self):
+        await self.service.dispatch({"action": "start_voice"})
+        provider = self.service.provider
+        provider.mute = AsyncMock()
+        await self.service.dispatch({"action": "start_voice"})
+        self.assertIs(self.service.provider, provider)
+        provider.mute.assert_awaited_once_with(False)
+
+    async def test_livekit_save_ack_is_top_level_on_actual_ipc_wire(self):
+        self.livekit_credentials()
+        control = ControlServer(self.root / "save.sock", self.service.dispatch, self.service.snapshot, peer_check=lambda writer: True)
+        await control.start()
+        try:
+            reader, writer = await asyncio.open_unix_connection(str(control.path))
+            writer.write(json.dumps({"action": "configure_livekit", "url": "wss://voice.invalid", "api_key": "key", "api_secret": "secret"}).encode() + b"\n")
+            await writer.drain()
+            self.assertEqual(json.loads(await reader.readline()), {"ok": True, "livekit_saved": True})
+            writer.close()
+            await writer.wait_closed()
+        finally:
+            await control.close()
+
     async def test_typed_session_never_enables_microphone_and_voice_off_preserves_task(self):
         await self.service.dispatch({"action": "submit_text", "text": "Fix tests", "project": str(self.project)})
         self.assertFalse(self.service.voice["enabled"])

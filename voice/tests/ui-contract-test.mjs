@@ -33,6 +33,27 @@ assert.match(panel, /approval/);
 assert.match(panel, /approval_id/);
 assert.match(panel, /approval\.request_id/);
 assert.match(panel, /credential/);
+assert.match(panel, /function submitLiveKitSetup\(url, apiKey, apiSecret\)/);
+assert.match(panel, /configure_livekit/);
+assert.match(panel, /url: url\.trim\(\), api_key: apiKey, api_secret: apiSecret/);
+assert.match(panel, /Project URL/);
+assert.match(panel, /API key/);
+assert.match(panel, /API secret/);
+assert.match(panel, /echoMode: TextInput\.Password/);
+assert.match(panel, /Save LiveKit setup/);
+assert.match(panel, /Expressive mode is included/);
+assert.match(panel, /Leave API key or API secret blank to keep the saved value/);
+assert.match(panel, /visible: root\.settings\.mode !== "livekit"; model: \["OpenAI API key", "Model server token", "Anthropic API key"\]/);
+assert.match(panel, /Connecting — requesting microphone access/);
+assert.match(panel, /Listening — microphone on/);
+assert.match(panel, /livekitApiKeyField\.text = ""/);
+assert.match(panel, /livekitApiSecretField\.text = ""/);
+assert.match(panel, /color: root\.livekitSetupSucceeded \? "#6DC4AD" : "#EE7BB3"/);
+assert.match(panel, /Task settings/);
+assert.match(panel, /if \(voice\.error\) return "Needs attention"[\s\S]*if \(disabled\) return "Voice is off"/);
+assert.match(controller, /signal responseReceived\(var response\)/);
+assert.match(controller, /typeof value\.ok === "boolean"/);
+assert.match(controller, /responseReceived\(value\)/);
 assert.match(panel, /selectedProject/);
 assert.match(panel, /explicitContext/);
 assert.match(panel, /does not capture screenshots automatically/);
@@ -66,4 +87,37 @@ assert.deepEqual(Array.from(sent[0].paths), ["README.md"]);
 runInNewContext(`${actionFunction}; taskAction({id:"one", approval:{}}, "approve");`, context);
 assert.equal(sent.length, 1, "Stale approval must not send a request");
 assert.ok(context.feedback.includes("stale"));
+const livekitSubmitFunction = panel.match(/function submitLiveKitSetup\(url, apiKey, apiSecret\) \{[\s\S]*?\n  \}/)[0];
+const livekitResponsesFunction = panel.match(/function handleControlResponse\(response\) \{[\s\S]*?\n  \}/)[0];
+const livekitSent = [];
+const livekitContext = { send: (action, body) => livekitSent.push({ action, ...body }), livekitSetupSaving: false, livekitSetupSucceeded: false, livekitSetupStatus: "", livekitApiKeyField: { text: "key" }, livekitApiSecretField: { text: "secret" } };
+runInNewContext(`${livekitSubmitFunction}; submitLiveKitSetup("wss://project.livekit.cloud", "key", "secret");`, livekitContext);
+assert.deepEqual(livekitSent[0], { action: "configure_livekit", url: "wss://project.livekit.cloud", api_key: "key", api_secret: "secret" });
+assert.equal(livekitContext.livekitSetupSaving, true);
+runInNewContext(`${livekitResponsesFunction}; handleControlResponse({ ok: true });`, livekitContext);
+assert.equal(livekitContext.livekitSetupSaving, true, "An unrelated acknowledgement must not confirm LiveKit save");
+runInNewContext(`${livekitResponsesFunction}; handleControlResponse({ ok: true, livekit_saved: true });`, livekitContext);
+assert.equal(livekitContext.livekitSetupSaving, false);
+assert.match(livekitContext.livekitSetupStatus, /saved/);
+assert.equal(livekitContext.livekitApiKeyField.text, "");
+assert.equal(livekitContext.livekitApiSecretField.text, "");
+livekitContext.livekitSetupStatus = "";
+runInNewContext(`${livekitSubmitFunction}; submitLiveKitSetup("", "", "");`, livekitContext);
+assert.equal(livekitSent.length, 1, "A missing URL must not dispatch a setup request");
+assert.match(livekitContext.livekitSetupStatus, /Enter your LiveKit project URL/);
+assert.equal(livekitContext.livekitSetupSucceeded, false);
+runInNewContext(`${livekitSubmitFunction}; submitLiveKitSetup("wss://project.livekit.cloud", "", "");`, livekitContext);
+runInNewContext(`${livekitResponsesFunction}; handleControlResponse({ ok: false, error: {message: "Setup was not saved."} });`, livekitContext);
+assert.equal(livekitContext.livekitSetupSaving, false);
+assert.equal(livekitContext.livekitSetupSucceeded, false, "Failure text containing saved must still display an error");
+const microphoneFunction = panel.match(/function microphoneText\(\) \{[\s\S]*?\n  \}/)[0];
+for (const [state, microphone, expected] of [
+  ["listening", false, "Listening — microphone off"],
+  ["listening", true, "Listening — microphone on"],
+  ["speaking", false, "Microphone off"],
+  ["disabled", false, "Microphone off"],
+  ["connecting", false, "Connecting — requesting microphone access"],
+]) {
+  assert.equal(runInNewContext(`${microphoneFunction}; microphoneText();`, { voice: {state, microphone} }), expected);
+}
 console.log("Maslow Voice UI contract and approval/export behavior checks passed.");

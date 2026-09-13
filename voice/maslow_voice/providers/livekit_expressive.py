@@ -35,10 +35,15 @@ class LiveKitExpressiveProvider(VoiceProvider):
         self.agent_name = str(self.config.get("livekit_agent_name", "maslow-voice-agent"))
         self._tool_turns = {}
         self._known_turns = set()
+        self._closing = False
+        self._failure: ProviderError | None = None
 
     async def start(self, audio: bool = True) -> None:
         if self._started:
             return
+        self._closing = False
+        self._failure = None
+        self._muted = False
         await self._state_event("connecting", microphone=False)
         try:
             rtc, api, agents = self._imports()
@@ -50,6 +55,8 @@ class LiveKitExpressiveProvider(VoiceProvider):
             self._client_room = rtc.Room()
             self._worker_room = rtc.Room()
             self._client_room.on("track_subscribed", self._on_track_subscribed)
+            for room in (self._client_room, self._worker_room):
+                room.on("disconnected", self._room_disconnected)
             await self._client_room.connect(url, client_token)
             await self._worker_room.connect(url, worker_token)
             self._source = rtc.AudioSource(48_000, 1)
@@ -60,14 +67,20 @@ class LiveKitExpressiveProvider(VoiceProvider):
             self._session.on("agent_state_changed", self._agent_state)
             self._session.on("user_input_transcribed", self._user_transcript)
             self._session.on("conversation_item_added", self._conversation_item)
+            self._session.on("error", self._session_error)
+            self._session.on("close", self._session_closed)
             self._started = True
             await self._session.start(agent=self._agent, room=self._worker_room, record=False,
                                       room_options=agents.room_io.RoomOptions(participant_identity=client_identity,
                                                                              audio_input=audio, audio_output=audio, video_input=False))
-            self._started = True
-            self._audio_enabled = audio
+            if self._failure:
+                raise self._failure
             if audio and self.audio_transport is not None:
+                await self.audio_transport.set_muted(False)
                 await self.audio_transport.start(self._on_audio)
+            if self._failure:
+                raise self._failure
+            self._audio_enabled = audio
             await self._state_event("listening", microphone=audio)
         except asyncio.CancelledError:
             await self.stop()
@@ -79,7 +92,48 @@ class LiveKitExpressiveProvider(VoiceProvider):
                 # Cleanup attempts every owned resource. Preserve the original
                 # connection error if one of those resources also fails to close.
                 pass
-            await self._raise_start_error(error, "LiveKit Voice could not connect")
+            public_error = self._public_error(error)
+            await self._error(public_error)
+            raise public_error from error
+
+    @staticmethod
+    def _public_error(error: Any) -> ProviderError:
+        # SDK event models wrap the actual API exception. Classify structured
+        # status/type only: its diagnostic text can contain endpoints or tokens.
+        cause = getattr(error, "error", error)
+        status = getattr(cause, "status_code", None)
+        if status in {401, 403}:
+            return ProviderError("LiveKit denied access. Open Settings and verify the saved project account and inference permissions.", "LIVEKIT_AUTH_FAILED")
+        if status in {402, 429}:
+            return ProviderError("LiveKit inference is unavailable. Check project billing and usage limits, then try again.", "LIVEKIT_USAGE_LIMIT")
+        if type(cause).__name__ == "PortAudioError":
+            return ProviderError("Microphone or speaker access failed. Check device selection and microphone permission, then start talking again.", "AUDIO_UNAVAILABLE")
+        if isinstance(cause, ProviderError):
+            return cause
+        return ProviderError("LiveKit Voice stopped. Check project setup and inference access, then start talking again.", "LIVEKIT_SESSION_FAILED")
+
+    def _fail(self, error: ProviderError) -> None:
+        if self._closing or self._failure is not None:
+            return
+        self._failure = error
+        # Revoke turn submission and microphone forwarding before async cleanup.
+        self._started = False
+        self._audio_enabled = False
+        task = asyncio.create_task(self._error(error))
+        self._event_tasks.add(task)
+        task.add_done_callback(self._event_tasks.discard)
+
+    def _session_error(self, event: Any) -> None:
+        error = getattr(event, "error", event)
+        if getattr(error, "recoverable", False):
+            return
+        self._fail(self._public_error(error))
+
+    def _session_closed(self, event: Any) -> None:
+        self._fail(self._public_error(getattr(event, "error", None)))
+
+    def _room_disconnected(self, _reason: Any) -> None:
+        self._fail(ProviderError("LiveKit room ended unexpectedly. Check internet access and project setup, then start talking again.", "LIVEKIT_DISCONNECTED"))
 
     def _imports(self) -> tuple[Any, Any, Any]:
         try:
@@ -181,7 +235,7 @@ class LiveKitExpressiveProvider(VoiceProvider):
         self._inference_clients.append(stt)
         llm = inference.LLM(model="google/gemma-4-31b-it", api_key=key, api_secret=secret)
         self._inference_clients.append(llm)
-        tts = inference.TTS(model="inworld/inworld-tts-2", voice="Ashley", api_key=key, api_secret=secret,
+        tts = inference.TTS(model="inworld/inworld-tts-2", voice=str(self.config.get("livekit_voice") or "Ashley"), api_key=key, api_secret=secret,
                             http_session=self._http_session)
         self._inference_clients.append(tts)
         session = agents.AgentSession(
@@ -201,6 +255,8 @@ class LiveKitExpressiveProvider(VoiceProvider):
         task.add_done_callback(self._event_tasks.discard)
 
     def _agent_state(self, event):
+        if self._closing or self._failure:
+            return
         state = str(event.new_state)
         if state in {"listening", "thinking", "speaking"}:
             self._queue_event({"type": "voice_state", "state": state, "microphone": self._audio_enabled and not self._muted,
@@ -239,6 +295,7 @@ class LiveKitExpressiveProvider(VoiceProvider):
         task.add_done_callback(self._audio_tasks.discard)
 
     async def _play_remote_track(self, track: Any) -> None:
+        stream = None
         try:
             rtc, _api, _agents = self._imports()
             stream = rtc.AudioStream(track)
@@ -248,12 +305,16 @@ class LiveKitExpressiveProvider(VoiceProvider):
                 frame = event.frame
                 pcm = bytes(frame.data)
                 await self.audio_transport.play(PcmFrame(pcm, frame.sample_rate, frame.num_channels))
-                await self._state_event("speaking", microphone=False, speaking=True)
+                # RTC delivers silent frames between replies too. AgentSession
+                # owns speaking/listening state; packet arrival cannot set it.
         except asyncio.CancelledError:
             raise
         except Exception as error:
             if self._started:
                 await self._error(error, "LiveKit audio stream failed")
+        finally:
+            if stream is not None:
+                await stream.aclose()
 
     async def text(self, text: str, context: str = "") -> None:
         if not self._started or self._session is None:
@@ -283,6 +344,7 @@ class LiveKitExpressiveProvider(VoiceProvider):
             await self._state_event("listening", microphone=self._audio_enabled and not self._muted)
 
     async def stop(self) -> None:
+        self._closing = True
         self._started = False
         self._tool_turns.clear()
         self._known_turns.clear()

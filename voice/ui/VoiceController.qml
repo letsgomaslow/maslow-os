@@ -16,7 +16,9 @@ Item {
     tasks: [], session: { id: "", transcript: [] }, readiness: { ready: false, checks: [], models: [] }
   })
   property string transportError: ""
+  property var lastResponse: ({})
   property bool watching: watchProcess.running
+  signal responseReceived(var response)
 
   function setFixture(next) {
     fixtureMode = true
@@ -44,8 +46,11 @@ Item {
       if (value && value.schemaVersion === 1 && value.voice && value.settings) {
         snapshot = value
         transportError = ""
-      } else if (value && value.ok === false && value.error) {
-        transportError = String(value.error.message || "Voice control needs attention.")
+      } else if (value && typeof value.ok === "boolean") {
+        lastResponse = value
+        if (value.ok === false && value.error)
+          transportError = String(value.error.message || "Voice control needs attention.")
+        responseReceived(value)
       }
     } catch (error) {
       transportError = "Voice control returned an unreadable response."

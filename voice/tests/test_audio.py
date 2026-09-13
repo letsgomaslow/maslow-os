@@ -4,7 +4,7 @@ import unittest
 import asyncio
 from array import array
 from types import SimpleNamespace
-from unittest.mock import patch
+from unittest.mock import AsyncMock, Mock, patch
 
 from maslow_voice.audio import PCM16K, PCM24K, PCM48K, PcmFrame, PortAudioTransport, resample_pcm16
 
@@ -25,6 +25,97 @@ class PcmResamplingTests(unittest.TestCase):
 
 
 class PlaybackTransportTests(unittest.IsolatedAsyncioTestCase):
+    async def test_output_only_preview_joins_audio_without_opening_or_processing_microphone(self):
+        stream = SimpleNamespace(start=Mock(), stop=Mock(), close=Mock())
+        output_factory = Mock(return_value=stream)
+        duplex_factory = Mock(side_effect=AssertionError("preview must not open a microphone"))
+        processing_factory = Mock(side_effect=AssertionError("preview must not construct microphone processing"))
+        sounddevice = SimpleNamespace(RawStream=duplex_factory, RawOutputStream=output_factory)
+        rtc = SimpleNamespace(AudioProcessingModule=processing_factory)
+        handler = AsyncMock()
+        transport = PortAudioTransport(capture=False, microphone_device="do-not-open", speaker_device="preview-speaker")
+        with patch.dict("sys.modules", {"sounddevice": sounddevice, "livekit": SimpleNamespace(rtc=rtc)}):
+            await transport.start(handler)
+            try:
+                output_factory.assert_called_once()
+                options = output_factory.call_args.kwargs
+                self.assertEqual(options["device"], "preview-speaker")
+                self.assertEqual(options["channels"], 1)
+                self.assertEqual(options["dtype"], "int16")
+                self.assertIsNone(transport._handler)
+                self.assertIsNone(transport._pump)
+                self.assertIsNone(transport._apm)
+                self.assertIsNone(transport._loop)
+                first, second = b"\x11\x00" * 480, b"\x22\x00" * 480
+                for packet in (first, second):
+                    await transport.play(PcmFrame(packet))
+                # Microphone mute controls remain harmless for speaker previews.
+                await transport.set_muted(True)
+                rendered = bytearray(1920)
+                options["callback"](rendered, 960, None, None)
+                self.assertEqual(bytes(rendered), first + second)
+                self.assertEqual(transport.played_ms, 20)
+                await transport.set_muted(False)
+                transport._put_input((PcmFrame(first), first))
+                self.assertTrue(transport._queue.empty())
+                await transport.play(PcmFrame(first))
+                await transport.clear_playback()
+                options["callback"](rendered, 960, None, None)
+                self.assertEqual(bytes(rendered), b"\0" * 1920)
+                self.assertEqual(transport.played_ms, 0)
+                duplex_factory.assert_not_called()
+                processing_factory.assert_not_called()
+                handler.assert_not_called()
+            finally:
+                await transport.stop()
+                await transport.stop()
+            stream.start.assert_called_once()
+            stream.stop.assert_called_once()
+            stream.close.assert_called_once()
+
+    async def test_output_only_start_failure_closes_speaker_and_leaves_no_input_pump(self):
+        stream = SimpleNamespace(start=Mock(side_effect=RuntimeError("speaker unavailable")), close=Mock())
+        sounddevice = SimpleNamespace(RawOutputStream=Mock(return_value=stream))
+        transport = PortAudioTransport(capture=False)
+        # Playback-only operation does not require the capture/AEC dependency.
+        with patch.dict("sys.modules", {"sounddevice": sounddevice, "livekit": None}):
+            with self.assertRaisesRegex(RuntimeError, "speaker unavailable"):
+                await transport.start(AsyncMock())
+        self.assertFalse(transport._running)
+        self.assertIsNone(transport._stream)
+        self.assertIsNone(transport._pump)
+        stream.close.assert_called_once()
+        await transport.stop()
+
+    async def test_failed_input_pump_closes_device_and_reports_safe_failure(self):
+        report = AsyncMock()
+        transport = PortAudioTransport(on_error=report)
+        transport._running = True
+        stream = transport._stream = SimpleNamespace(stop=Mock(), close=Mock())
+        transport._drain_input = AsyncMock(side_effect=RuntimeError("private diagnostic"))
+        transport._pump = asyncio.create_task(transport._run_input())
+        await transport._pump
+        self.assertFalse(transport._running)
+        self.assertIsNone(transport._pump)
+        self.assertIsNone(transport._stream)
+        stream.stop.assert_called_once()
+        stream.close.assert_called_once()
+        report.assert_awaited_once_with()
+
+    async def test_mute_discards_queued_capture_and_late_callbacks_after_stop(self):
+        transport = PortAudioTransport()
+        transport._running = True
+        frame = (PcmFrame(b"\x00\x00" * 960), b"\x00\x00" * 960)
+        transport._put_input(frame)
+        self.assertEqual(transport._queue.qsize(), 1)
+        await transport.set_muted(True)
+        transport._put_input(frame)
+        self.assertTrue(transport._queue.empty())
+        await transport.stop()
+        await transport.set_muted(False)
+        transport._put_input(frame)
+        self.assertTrue(transport._queue.empty())
+
     async def test_clear_playback_aborts_a_producer_waiting_on_full_queue(self):
         transport = PortAudioTransport(blocksize=480, queue_frames=2)
         transport._running = True
@@ -44,7 +135,7 @@ class PlaybackTransportTests(unittest.IsolatedAsyncioTestCase):
             producer.cancel()
             await asyncio.gather(producer, return_exceptions=True)
 
-    async def test_duplex_callback_feeds_rendered_speaker_pcm_to_aec_in_ten_ms_frames(self):
+    async def test_duplex_callback_joins_two_ten_ms_packets_and_feeds_the_same_audio_to_aec(self):
         class Frame:
             def __init__(self, pcm, sample_rate, channels, samples):
                 self.data = bytearray(pcm)
@@ -74,7 +165,8 @@ class PlaybackTransportTests(unittest.IsolatedAsyncioTestCase):
             try:
                 speaker = b"\x11\x00" * 480 + b"\x22\x00" * 480
                 microphone = b"\x33\x00" * 960
-                await transport.play(PcmFrame(speaker))
+                await transport.play(PcmFrame(speaker[:960]))
+                await transport.play(PcmFrame(speaker[960:]))
                 rendered = bytearray(1920)
                 stream.callback(microphone, rendered, 960, None, None)
                 cleaned = await asyncio.wait_for(delivered.get(), 1)
@@ -91,6 +183,53 @@ class PlaybackTransportTests(unittest.IsolatedAsyncioTestCase):
             finally:
                 await transport.stop()
             self.assertTrue(stream.stopped and stream.closed)
+
+    async def test_callback_preserves_variable_packet_remainders_and_counts_only_queued_audio(self):
+        class Stream:
+            def __init__(self, **options):
+                self.callback = options["callback"]
+            def start(self): pass
+            def stop(self): pass
+            def close(self): pass
+        transport = PortAudioTransport()
+        rtc = SimpleNamespace(AudioProcessingModule=Mock())
+        with patch.dict("sys.modules", {"sounddevice": SimpleNamespace(RawStream=Stream), "livekit": SimpleNamespace(rtc=rtc)}):
+            await transport.start(AsyncMock())
+            # Playback does not depend on microphone capture being enabled.
+            await transport.set_muted(True)
+            try:
+                first = b"\x11\x00" * 240
+                second = b"\x22\x00" * 960
+                third = b"\x33\x00" * 480
+                for packet in (first, second, third):
+                    await transport.play(PcmFrame(packet))
+                rendered = bytearray(1920)
+                transport._stream.callback(b"\0" * 1920, rendered, 960, None, None)
+                self.assertEqual(bytes(rendered), first + second[:1440])
+                self.assertEqual(list(transport._output), [second[1440:], third])
+                self.assertEqual(transport.played_ms, 20)
+
+                transport._stream.callback(b"\0" * 1920, rendered, 960, None, None)
+                self.assertEqual(bytes(rendered), second[1440:] + third + b"\0" * 480)
+                self.assertFalse(transport._output)
+                self.assertEqual(transport.played_ms, 35)
+
+                transport._stream.callback(b"\0" * 1920, rendered, 960, None, None)
+                self.assertEqual(bytes(rendered), b"\0" * 1920)
+                self.assertEqual(transport.played_ms, 35)
+
+                # Barge-in clears a partial remainder as well as whole packets.
+                await transport.play(PcmFrame(second))
+                short_output = bytearray(480)
+                transport._stream.callback(b"\0" * 480, short_output, 240, None, None)
+                self.assertEqual(bytes(short_output), second[:480])
+                self.assertEqual(list(transport._output), [second[480:]])
+                await transport.clear_playback()
+                transport._stream.callback(b"\0" * 1920, rendered, 960, None, None)
+                self.assertEqual(bytes(rendered), b"\0" * 1920)
+                self.assertEqual(transport.played_ms, 0)
+            finally:
+                await transport.stop()
 
     async def test_installed_aec_accepts_duplex_ten_ms_pcm(self):
         try:
