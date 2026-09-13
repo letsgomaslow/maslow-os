@@ -5,7 +5,7 @@ import unittest
 from pathlib import Path
 
 from maslow_voice.config import Settings, validate_settings, validate_endpoint
-from maslow_voice.coordinator import hermes_configuration
+from maslow_voice.coordinator import clean_environment, hermes_configuration
 from maslow_voice.errors import VoiceError
 from maslow_voice.models import verify_speech
 
@@ -33,7 +33,11 @@ class ConfigurationTests(unittest.TestCase):
         self.assertTrue(config["plugins"]["entries"]["maslow-voice"]["enabled"])
         self.assertIsNone(config["fallback_model"])
         self.assertFalse(config["compression"]["enabled"])
+        self.assertFalse(config["security"]["allow_lazy_installs"])
         self.assertNotIn("api_key", config["model"])
+        environment = clean_environment()
+        self.assertEqual(environment["HERMES_DISABLE_LAZY_INSTALLS"], "1")
+        self.assertNotIn("HERMES_NO_AUTO_INSTALL", environment)
 
     def test_speech_readiness_checks_bytes_and_refuses_symlinks(self):
         with tempfile.TemporaryDirectory() as root:

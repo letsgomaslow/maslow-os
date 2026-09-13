@@ -85,7 +85,7 @@ def clean_environment():
                "XDG_SESSION_TYPE", "DISPLAY", "DBUS_SESSION_BUS_ADDRESS", "TERM")
     result = {key: os.environ[key] for key in allowed if key in os.environ}
     result.update(PATH="/usr/local/bin:/usr/bin:/bin", PYTHONUNBUFFERED="1", HERMES_ENABLE_PROJECT_PLUGINS="false",
-                  HERMES_NO_AUTO_INSTALL="1", DO_NOT_TRACK="1", HF_HUB_OFFLINE="1", TRANSFORMERS_OFFLINE="1")
+                  HERMES_DISABLE_LAZY_INSTALLS="1", DO_NOT_TRACK="1", HF_HUB_OFFLINE="1", TRANSFORMERS_OFFLINE="1")
     return result
 
 
@@ -137,6 +137,7 @@ def hermes_configuration(model, api_token, port, project):
         "agent": {"max_turns": 60}, "terminal": {"backend": "local", "cwd": project},
         "fallback_model": None, "fallback_models": [], "auxiliary": auxiliary,
         "memory": {"enabled": False}, "compression": {"enabled": False},
+        "security": {"allow_lazy_installs": False},
         "skills": {"creation_nudge_interval": 0, "external_dirs": []},
         "plugins": {"enabled": ["maslow-voice"], "entries": {"maslow-voice": {"enabled": True}}},
         "telemetry": {"enabled": False}, "display": {"show_reasoning": False},
