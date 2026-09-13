@@ -13,5 +13,65 @@ esac
 if omarchy-cmd-missing omarchy-voice-control; then
   omarchy-launch-hub voice
 else
-  omarchy-shell shell summon maslow.voice "{\"page\":\"$page\"}"
+  defer_open() {
+    echo "Voice is installed. Unlock your desktop and open Voice again when it is ready."
+    exit 0
+  }
+
+  desktop_unlocked() {
+    local state=0 status
+    omarchy-hyprland-session-locked || state=$?
+    # Exit 2 means unknown, not unlocked. Also check a lock being prepared by
+    # the shell before the compositor has acquired it.
+    [[ $state == 1 ]] || return 1
+    status=$(omarchy-shell lock status 2>/dev/null) || return 1
+    jq -e '.locked == false and .requested == false and .pending == false
+      and .sessionLocked == false and .secure == false' <<<"$status" >/dev/null 2>&1
+  }
+
+  plugin_state() {
+    local plugins
+    plugins=$(omarchy-shell shell listPlugins 2>/dev/null) || return 1
+    jq -er '
+      if type != "array" then error("invalid registry") else
+        [.[] | select(.id == "maslow.voice")] as $voice |
+        if ($voice | length) == 0 then "missing"
+        elif $voice[0].enabled == true then "enabled"
+        elif $voice[0].enabled == false then "disabled"
+        else error("invalid plugin") end
+      end' <<<"$plugins" 2>/dev/null
+  }
+
+  [[ -n ${XDG_RUNTIME_DIR:-} && -d $XDG_RUNTIME_DIR ]] || defer_open
+  umask 077
+  # Serialise discovery across the install dialog, Hub and desktop shortcut.
+  # A second opener must not reload all shell services during the first scan.
+  exec 9>"$XDG_RUNTIME_DIR/maslow-voice-open.lock"
+  if ! flock -n 9; then
+    echo "Voice is already opening."
+    exit 0
+  fi
+  desktop_unlocked || defer_open
+  state=$(plugin_state) || defer_open
+  if [[ $state == "missing" ]]; then
+    # Rescanning destroys and recreates every plugin service, including the
+    # session locker. Never do it while locked or when lock state is unknown.
+    desktop_unlocked || defer_open
+    omarchy-shell shell rescanPlugins >/dev/null 2>&1 || defer_open
+    deadline=$((SECONDS + 30))
+    while (( SECONDS < deadline )); do
+      state=$(plugin_state) || defer_open
+      [[ $state == "missing" ]] || break
+      sleep 0.25
+    done
+  fi
+  if [[ $state == "disabled" ]]; then
+    echo "Enable Maslow Voice in desktop plugins, then open Voice again."
+    exit 0
+  fi
+  [[ $state == "enabled" ]] || defer_open
+  desktop_unlocked || defer_open
+  result=$(omarchy-shell shell summon maslow.voice "{\"page\":\"$page\"}") || defer_open
+  # The IPC command exits successfully even when summon returns "unknown".
+  [[ $result == "ok" ]] || defer_open
 fi

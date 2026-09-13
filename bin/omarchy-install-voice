@@ -15,5 +15,4 @@ else
 fi
 systemctl --user daemon-reload
 systemctl --user enable --now maslow-voice.service
-omarchy-shell shell rescanPlugins
 omarchy-launch-voice settings
