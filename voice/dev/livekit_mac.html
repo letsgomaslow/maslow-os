@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Maslow Voice · Private Mac test</title>
+<style>
+[hidden]{display:none!important}
+:root{color-scheme:dark;font-family:Manrope,ui-sans-serif,system-ui,sans-serif;color:#fff;background:#121d35}*{box-sizing:border-box}body{margin:0}main{max-width:900px;margin:auto;padding:48px 28px}header{display:flex;justify-content:space-between;gap:20px;align-items:center}.brand{letter-spacing:.17em;font-size:14px;font-weight:750}.tag{font-size:12px;color:#6dc4ad;border:1px solid #6dc4ad66;padding:8px 12px;border-radius:99px}h1{font-size:clamp(28px,5vw,40px);font-weight:600;letter-spacing:-.03em;margin:40px 0 12px}p{color:#cbd2df;line-height:1.6}section{margin-top:28px;padding:26px;background:#192740;border:1px solid #40506a;border-radius:20px}h2{font-size:20px;margin:0 0 12px}form{display:grid;gap:18px;margin-top:24px}label{display:grid;gap:8px;font-size:14px;font-weight:600}input,select{width:100%;height:48px;padding:12px;background:#121d35;border:1px solid #738096;border-radius:9px;color:#fff;font:inherit}input:focus-visible,select:focus-visible,button:focus-visible{outline:3px solid #ee7bb3;outline-offset:3px}button{cursor:pointer;min-height:46px;border:0;border-radius:9px;padding:12px 18px;font:600 14px inherit;color:#121d35;background:#6dc4ad}button.secondary{color:#fff;background:#344660;border:1px solid #738096}button:disabled,select:disabled{opacity:.45;cursor:default}.actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:22px}.small{font-size:13px}.status{font-weight:650;margin-top:20px;color:#fff}.error{color:#ffb9ce}.success{color:#8dddc8}.orb{width:24px;height:24px;flex-shrink:0;background:#8992a2;border-radius:100%;transition:background .3s,transform .3s}.row{display:flex;align-items:center;gap:12px}body[data-state=listening] .orb{background:#6dc4ad;animation:breathe 2s ease-in-out infinite}body[data-state=speaking] .orb{background:#ee7bb3;animation:breathe .7s ease-in-out infinite}body[data-state=connecting] .orb,body[data-state=thinking] .orb{background:#ab8ee0;animation:breathe 1.2s ease-in-out infinite}@keyframes breathe{50%{transform:scale(1.18)}}@media(prefers-reduced-motion:reduce){.orb{animation:none!important;transition:none}}#transcript p{border-top:1px solid #40506a;padding-top:10px}#connection-note{margin-bottom:0}details{margin-top:22px;color:#cbd2df}summary{cursor:pointer;padding:12px 0}
+</style>
+<main>
+<header><span class="brand">MASLOW</span><span class="tag">PRIVATE MAC TEST</span></header>
+<h1>Let’s get Voice talking.</h1>
+<p>This page tests the real Maslow LiveKit Expressive connection on this Mac. Account details stay in the local tester process’s memory. Clear saved connection removes them; stopping the tester also removes them.</p>
+<section>
+<h2>1. Connect your LiveKit project</h2>
+<p class="small">Copy all three values from the same LiveKit project. Paste them here, then save.</p>
+<form id="setup" autocomplete="off">
+<label>Project URL<input id="url" name="project" placeholder="wss://your-project.livekit.cloud" required autocomplete="off" spellcheck="false"></label>
+<label>API key<input id="key" name="project-key" type="password" required autocomplete="off" spellcheck="false"></label>
+<label>API secret<input id="secret" name="project-secret" type="password" required autocomplete="new-password" spellcheck="false"></label>
+<button id="save" type="submit">Save connection</button>
+</form>
+<p id="connection-note" class="small" role="status">No account details saved.</p>
+<button id="change-connection" type="button" class="secondary" hidden>Change connection</button>
+</section>
+<section>
+<h2>2. Test the conversation</h2>
+<p class="small">Choose a voice for a short comparison sample or your conversation. Every preview uses the same sample. Actual conversations use Expressive speech. These tests use your LiveKit account.</p>
+<label for="voice">Voice<select id="voice" disabled aria-describedby="voice-note"></select></label><p id="voice-note" class="small">Voice names and languages are the verified options for this tester.</p>
+<div class="actions"><button id="probe" disabled>Check connection</button><button id="audition" disabled>Preview voice</button><button id="conversation" disabled>Start talking</button><button id="end" class="secondary" disabled>Stop audio</button></div>
+<div class="row"><span class="orb" aria-hidden="true"></span><p id="state" class="status" role="status">Microphone off</p></div>
+<p id="error" class="error" role="alert"></p><p id="result" class="success" role="status"></p>
+<p class="small">Preview voice plays the same sample through speakers without opening the microphone. Start talking turns on this Mac’s microphone and speakers. If macOS asks, allow microphone access for the app running the tester. Stop audio turns it off and clears the transcript. Closing this page also ends capture within a few seconds.</p>
+<div id="transcript" aria-live="polite"></div>
+<details><summary>About this test</summary><p class="small">This checks Maslow’s real voice provider and Mac audio. The Linux desktop interface is tested separately. Task handoff is disabled in this tester.</p><button id="forget" class="secondary">Clear saved connection</button></details>
+</section>
+</main>
+<script nonce="__NONCE__">
+const nonce="__NONCE__", $=id=>document.getElementById(id);
+let pending=false,transcriptText="",currentMode=null,selectedVoice="",voicesLoaded=false,editingSetup=false;
+async function action(name,body={}){
+  const response=await fetch('/action/'+name,{method:'POST',headers:{'Content-Type':'application/json','X-Maslow-Test':nonce},body:JSON.stringify(body)});
+  const data=await response.json();if(!response.ok)throw Error(data.error?.message||'The test could not complete.');return data;
+}
+async function run(name,body){
+  pending=true;$('error').textContent='';
+  try{await action(name,body);return true;}catch(error){$('error').textContent=error.message;return false;}finally{pending=false;}
+}
+$('setup').onsubmit=async event=>{event.preventDefault();$('save').disabled=true;const body={url:$('url').value,key:$('key').value,secret:$('secret').value};if(await run('save',body)){$('setup').reset();editingSetup=false;$('connection-note').textContent='Connection saved privately. You can check it now.';}body.key=body.secret=body.url='';$('save').disabled=false;};
+$('change-connection').onclick=()=>{editingSetup=true;$('setup').hidden=false;$('url').focus();};
+$('voice').onchange=()=>{selectedVoice=$('voice').value;};
+for(const name of ['probe','forget'])$(name).onclick=()=>run(name,{});
+$('audition').onclick=()=>run('audition',{voice:selectedVoice});
+$('conversation').onclick=()=>run('conversation',{voice:selectedVoice});
+$('end').onclick=()=>run('end',{});
+addEventListener('pagehide',()=>{if(currentMode==='conversation'||currentMode==='audition')fetch('/action/end',{method:'POST',headers:{'Content-Type':'application/json','X-Maslow-Test':nonce},body:'{}',keepalive:true}).catch(()=>{});});
+async function refresh(){
+ try{
+  const s=await(await fetch('/status',{cache:'no-store'})).json();currentMode=s.mode;document.body.dataset.state=s.state;
+  const busy=!!s.busy||pending,ready=!!s.ready;
+  $('setup').hidden=ready&&!editingSetup;$('change-connection').hidden=!ready||editingSetup;$('change-connection').disabled=busy;
+  $('probe').disabled=$('audition').disabled=$('conversation').disabled=!ready||busy;$('end').disabled=!s.busy;$('save').disabled=busy;$('voice').disabled=!ready||busy;
+  if(!voicesLoaded&&Array.isArray(s.voices)){const choice=s.selected_voice||s.voices[0]?.name||'';$('voice').replaceChildren(...s.voices.map(voice=>{const option=document.createElement('option');option.value=voice.name;option.textContent=voice.name+' · '+voice.language;return option;}));selectedVoice=choice;$('voice').value=choice;voicesLoaded=true;}
+  $('connection-note').textContent=s.ready?'Connection saved privately. The entry fields have been cleared.':'No account details saved.';
+  $('state').textContent=s.mode==='audition'&&s.busy?'Playing '+(s.selected_voice||selectedVoice)+' · microphone off':s.mode==='probe'&&s.busy?'Checking LiveKit · microphone off':s.state==='connecting'?'Connecting · waiting to turn on microphone':s.microphone?(s.state==='speaking'?'Maslow is speaking · microphone on':'Listening · microphone on'):'Microphone off';
+  if(s.error)$('error').textContent=s.error.message;
+  $('result').textContent=s.result?(s.result.audition_complete?'Finished '+s.result.voice+'. Choose another voice to compare, or start talking.':s.result.passed?'Connection passed: speech recognized and spoken reply received. Now try Start talking.':'The connection test did not complete. See the message above.') : '';
+  const turns=await(await fetch('/view',{headers:{'X-Maslow-Test':nonce},cache:'no-store'})).json();
+  const signature=JSON.stringify(turns);if(signature!==transcriptText){transcriptText=signature;$('transcript').replaceChildren(...turns.map(turn=>{const p=document.createElement('p');p.textContent=(turn.role==='user'?'You: ':'Maslow: ')+turn.text;return p;}));}
+ }catch(error){$('state').textContent='Tester disconnected · close this page';$('probe').disabled=$('audition').disabled=$('conversation').disabled=$('voice').disabled=true;}
+ setTimeout(refresh,600);
+}
+refresh();
+</script></html>
