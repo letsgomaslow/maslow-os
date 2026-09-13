@@ -17,6 +17,34 @@ PROVIDER_KEYS = {
     "openrouter": "OPENROUTER_API_KEY", "openai": "OPENAI_API_KEY", "anthropic": "ANTHROPIC_API_KEY",
     "nous-api": "NOUS_API_KEY", "lmstudio": "LM_API_KEY", "custom": "OPENAI_API_KEY",
 }
+HERMES_START_TIMEOUT = 120
+HERMES_START_POLL_INTERVAL = 0.5
+
+
+async def _wait_for_hermes(process, probe, *, timeout=HERMES_START_TIMEOUT,
+                           poll_interval=HERMES_START_POLL_INTERVAL, clock=None, sleep=None):
+    loop = asyncio.get_running_loop()
+    clock = clock or loop.time
+    sleep = sleep or asyncio.sleep
+    deadline = clock() + timeout
+    while True:
+        if process.returncode is not None:
+            raise VoiceError("HERMES_START_FAILED", "The Hermes coordinator did not start. Check the packaged API dependencies and execution model.")
+        remaining = deadline - clock()
+        if remaining <= 0:
+            raise VoiceError("HERMES_START_TIMEOUT", "Hermes did not become ready in time. Check its setup and retry.")
+        try:
+            await asyncio.wait_for(probe(), remaining)
+            return
+        except TimeoutError:
+            if clock() >= deadline:
+                raise VoiceError("HERMES_START_TIMEOUT", "Hermes did not become ready in time. Check its setup and retry.") from None
+        except VoiceError:
+            pass
+        remaining = deadline - clock()
+        if remaining <= 0:
+            raise VoiceError("HERMES_START_TIMEOUT", "Hermes did not become ready in time. Check its setup and retry.")
+        await sleep(min(poll_interval, remaining))
 
 
 def clean_environment():
@@ -148,15 +176,23 @@ class HermesRuntime:
             atomic_json(locator, {"pid": process.pid, "start": process_identity(process.pid), "endpoint": endpoint, "token": token})
             client = HermesClient(endpoint, token)
             self.processes[key] = process
-            for _ in range(60):
-                if process.returncode is not None:
-                    raise VoiceError("HERMES_START_FAILED", "The Hermes coordinator did not start. Check the packaged API dependencies and execution model.")
-                try:
-                    await client.capabilities()
-                    self.clients[key] = client
-                    return client
-                except VoiceError:
-                    await asyncio.sleep(0.5)
-            process.terminate()
-            await process.wait()
-            raise VoiceError("HERMES_START_TIMEOUT", "Hermes did not become ready in time. Check its setup and retry.")
+            try:
+                await _wait_for_hermes(process, client.capabilities)
+            except asyncio.CancelledError:
+                self.processes.pop(key, None)
+                if process.returncode is None:
+                    process.kill()
+                    await process.wait()
+                raise
+            except VoiceError:
+                self.processes.pop(key, None)
+                if process.returncode is None:
+                    process.terminate()
+                    try:
+                        await asyncio.wait_for(process.wait(), 10)
+                    except TimeoutError:
+                        process.kill()
+                        await process.wait()
+                raise
+            self.clients[key] = client
+            return client

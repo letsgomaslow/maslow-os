@@ -20,6 +20,8 @@ TOOLS = {}
 HERMES = {}
 TOOL_SERVER = None
 READY = False
+HERMES_START_TIMEOUT = 120
+HERMES_START_POLL_INTERVAL = 0.5
 
 
 class NoRedirect(request.HTTPRedirectHandler):
@@ -90,6 +92,32 @@ async def terminate(process):
         except ProcessLookupError:
             pass
         await process.wait()
+
+
+async def _wait_for_hermes(process, probe, *, timeout=HERMES_START_TIMEOUT,
+                           poll_interval=HERMES_START_POLL_INTERVAL, clock=None, sleep=None):
+    loop = asyncio.get_running_loop()
+    clock = clock or loop.time
+    sleep = sleep or asyncio.sleep
+    deadline = clock() + timeout
+    while True:
+        if process.returncode is not None:
+            raise ValueError("hermes start failed")
+        remaining = deadline - clock()
+        if remaining <= 0:
+            raise ValueError("hermes timeout")
+        try:
+            await asyncio.wait_for(probe(), remaining)
+            return
+        except TimeoutError:
+            if clock() >= deadline:
+                raise ValueError("hermes timeout") from None
+        except Exception:
+            pass
+        remaining = deadline - clock()
+        if remaining <= 0:
+            raise ValueError("hermes timeout")
+        await sleep(min(poll_interval, remaining))
 
 
 async def configure(params):
@@ -252,17 +280,15 @@ async def hermes_start(params):
     process = await launch(["hermes", "gateway", "run"], env=env, stdin=asyncio.subprocess.DEVNULL,
                            stdout=asyncio.subprocess.DEVNULL, stderr=asyncio.subprocess.DEVNULL)
     endpoint = f"http://127.0.0.1:{port}"
-    for _ in range(120):
-        if process.returncode is not None:
-            raise ValueError("hermes start failed")
-        try:
-            await asyncio.to_thread(json_request, endpoint + "/v1/capabilities", "GET", None, token)
-            HERMES[endpoint] = token
-            return {"endpoint": endpoint, "token": token}
-        except Exception:
-            await asyncio.sleep(0.5)
-    await terminate(process)
-    raise ValueError("hermes timeout")
+    async def probe():
+        return await asyncio.to_thread(json_request, endpoint + "/v1/capabilities", "GET", None, token)
+    try:
+        await _wait_for_hermes(process, probe)
+    except BaseException:
+        await terminate(process)
+        raise
+    HERMES[endpoint] = token
+    return {"endpoint": endpoint, "token": token}
 
 
 async def dispatch(method, params):

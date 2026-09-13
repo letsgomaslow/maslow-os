@@ -502,7 +502,7 @@ class OfflineRuntime:
 
     async def launch_hermes(self, configuration, plugin, environment):
         files = {name: (Path(plugin) / name).read_text() for name in ("__init__.py", "plugin.yaml")}
-        return await self.request("hermes_start", {"configuration": configuration, "plugin": files, "environment": environment}, timeout=90)
+        return await self.request("hermes_start", {"configuration": configuration, "plugin": files, "environment": environment}, timeout=135)
 
     async def hermes_request(self, url, method="GET", body=None, token="", headers=None, timeout=60):
         # Matches HermesClient's request injection interface. URL remains worker-local.
