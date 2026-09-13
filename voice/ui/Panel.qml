@@ -436,11 +436,11 @@ Item {
                 VoiceButton { text: "Save credential"; enabled: root.credentialValue !== ""; onClicked: root.submitCredential() }
                 VoiceSelect { model: ["Codex", "Claude Code", "Hermes"]; currentIndex: ["codex", "claude", "hermes"].indexOf(root.settings.default_coder || "codex"); Accessible.name: "Default coding agent"; onActivated: root.configure("default_coder", ["codex", "claude", "hermes"][currentIndex]) }
                 VoiceField { Layout.fillWidth: true; placeholderText: "Task model (optional)"; text: String(root.settings.execution_model || ""); Accessible.name: "Task model"; onEditingFinished: root.configure("execution_model", text) }
-                VoiceButton { text: "Check connection and readiness"; onClicked: root.send("test") }
+                VoiceButton { text: ["openai", "livekit"].indexOf(root.settings.mode) >= 0 ? "Check setup" : "Check connection and readiness"; onClicked: root.send("test") }
                 VoiceCheck { text: "Reduce voice motion"; checked: root.reducedMotion; onToggled: root.configure("reduced_motion", checked); Accessible.name: text }
                 VoiceCheck { text: "Keep orb at a fixed position"; checked: root.fixedPosition; onToggled: root.configure("fixed_position", checked); Accessible.name: text }
                 VoiceField { Layout.fillWidth: true; placeholderText: "Display name or connector"; text: String(settings.display || ""); Accessible.name: "Voice display"; onEditingFinished: root.configure("display", text) }
-                Text { text: root.readiness.ready === true ? "Connection is ready." : "Check the connection before starting voice."; color: root.readiness.ready === true ? "#6DC4AD" : "#D1D5DB"; font.family: "Manrope"; Accessible.role: Accessible.StatusBar }
+                Text { text: root.readiness.ready === true ? (["openai", "livekit"].indexOf(root.settings.mode) >= 0 ? "Setup fields are ready. Start talking to test the connection and audio." : "Connection is ready.") : "Check setup before starting voice."; color: root.readiness.ready === true ? "#6DC4AD" : "#D1D5DB"; font.family: "Manrope"; wrapMode: Text.WordWrap; Layout.fillWidth: true; Accessible.role: Accessible.StatusBar }
                 Repeater { model: root.readiness.checks || []; delegate: Text { required property var modelData; text: (modelData.ok === true ? "Ready: " : "Needs attention: ") + String(modelData.name || "Check") + " — " + String(modelData.message || ""); color: modelData.ok === true ? "#6DC4AD" : "#EE7BB3"; font.family: "Manrope"; wrapMode: Text.WordWrap; Layout.fillWidth: true } }
               }
             }

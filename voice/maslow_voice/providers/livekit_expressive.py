@@ -27,6 +27,8 @@ class LiveKitExpressiveProvider(VoiceProvider):
         self._source: Any = None
         self._session: Any = None
         self._agent: Any = None
+        self._http_session: Any = None
+        self._inference_clients: list[Any] = []
         self._audio_tasks: set[asyncio.Task[None]] = set()
         self._event_tasks: set[asyncio.Task[None]] = set()
         self.room_name: str | None = None
@@ -52,7 +54,8 @@ class LiveKitExpressiveProvider(VoiceProvider):
             await self._worker_room.connect(url, worker_token)
             self._source = rtc.AudioSource(48_000, 1)
             track = rtc.LocalAudioTrack.create_audio_track("maslow-voice-microphone", self._source)
-            await self._client_room.local_participant.publish_track(track)
+            await self._client_room.local_participant.publish_track(
+                track, rtc.TrackPublishOptions(source=rtc.TrackSource.SOURCE_MICROPHONE))
             self._session = self._create_agent_session(agents, key, secret)
             self._session.on("agent_state_changed", self._agent_state)
             self._session.on("user_input_transcribed", self._user_transcript)
@@ -66,8 +69,16 @@ class LiveKitExpressiveProvider(VoiceProvider):
             if audio and self.audio_transport is not None:
                 await self.audio_transport.start(self._on_audio)
             await self._state_event("listening", microphone=audio)
+        except asyncio.CancelledError:
+            await self.stop()
+            raise
         except Exception as error:
-            await self._disconnect()
+            try:
+                await self.stop()
+            except Exception:
+                # Cleanup attempts every owned resource. Preserve the original
+                # connection error if one of those resources also fails to close.
+                pass
             await self._raise_start_error(error, "LiveKit Voice could not connect")
 
     def _imports(self) -> tuple[Any, Any, Any]:
@@ -159,11 +170,24 @@ class LiveKitExpressiveProvider(VoiceProvider):
         # tool arguments. Bind the actual optional SDK type before decoration.
         IntentAgent.submit_intent.__annotations__["context"] = agents.RunContext
         IntentAgent.submit_intent = function_tool(IntentAgent.submit_intent)
+        import aiohttp
         from livekit.plugins import silero
+        # This agent runs inside the desktop daemon, outside LiveKit's job
+        # worker. Its lazy STT/TTS streams therefore need an explicitly owned
+        # HTTP session instead of relying on the worker's context variable.
+        self._http_session = aiohttp.ClientSession()
+        stt = inference.STT(model="deepgram/nova-3", language="en", api_key=key, api_secret=secret,
+                            http_session=self._http_session)
+        self._inference_clients.append(stt)
+        llm = inference.LLM(model="google/gemma-4-31b-it", api_key=key, api_secret=secret)
+        self._inference_clients.append(llm)
+        tts = inference.TTS(model="inworld/inworld-tts-2", voice="Ashley", api_key=key, api_secret=secret,
+                            http_session=self._http_session)
+        self._inference_clients.append(tts)
         session = agents.AgentSession(
-            stt=inference.STT(model="deepgram/nova-3", language="en", api_key=key, api_secret=secret),
-            llm=inference.LLM(model="google/gemma-4-31b-it", api_key=key, api_secret=secret),
-            tts=inference.TTS(model="inworld/inworld-tts-2", voice="Ashley", api_key=key, api_secret=secret),
+            stt=stt,
+            llm=llm,
+            tts=tts,
             expressive=True,
             vad=silero.VAD.load(),
             turn_detection="stt",
@@ -207,9 +231,8 @@ class LiveKitExpressiveProvider(VoiceProvider):
 
     def _on_track_subscribed(self, track: Any, _publication: Any, participant: Any) -> None:
         # The named worker's remote output is the only audio rendered locally.
-        kind = getattr(track, "kind", None)
-        kind_name = str(getattr(kind, "name", kind)).lower()
-        if getattr(participant, "identity", "") != self.agent_name or kind_name not in {"kind_audio", "audio"}:
+        rtc, _api, _agents = self._imports()
+        if getattr(participant, "identity", "") != self.agent_name or getattr(track, "kind", None) != rtc.TrackKind.KIND_AUDIO:
             return
         task = asyncio.create_task(self._play_remote_track(track))
         self._audio_tasks.add(task)
@@ -264,8 +287,12 @@ class LiveKitExpressiveProvider(VoiceProvider):
         self._tool_turns.clear()
         self._known_turns.clear()
         self._audio_enabled = False
+        errors = []
         if self.audio_transport is not None:
-            await self.audio_transport.stop()
+            try:
+                await self.audio_transport.stop()
+            except Exception as error:
+                errors.append(error)
         for task in tuple(self._audio_tasks):
             task.cancel()
         if self._audio_tasks:
@@ -273,21 +300,57 @@ class LiveKitExpressiveProvider(VoiceProvider):
         for task in tuple(self._event_tasks):
             task.cancel()
         await asyncio.gather(*self._event_tasks, return_exceptions=True)
-        await self._disconnect()
+        try:
+            await self._disconnect()
+        except Exception as error:
+            errors.append(error)
         await self._state_event("disabled", microphone=False)
+        if errors:
+            raise errors[0]
 
     async def _disconnect(self) -> None:
+        errors = []
         if self._session is not None:
             close = getattr(self._session, "aclose", None)
-            if close is not None:
-                await close()
-            self._session = None
+            try:
+                if close is not None:
+                    await close()
+            except Exception as error:
+                errors.append(error)
+            finally:
+                self._session = None
+        # AgentSession closes its streams, but the inference clients belong to
+        # us. LLM owns a separate httpx client; STT/TTS share our aiohttp session.
+        for client in self._inference_clients:
+            try:
+                await client.aclose()
+            except Exception as error:
+                errors.append(error)
+        self._inference_clients.clear()
+        if self._http_session is not None:
+            try:
+                await self._http_session.close()
+            except Exception as error:
+                errors.append(error)
+            finally:
+                self._http_session = None
         for room_name in ("_client_room", "_worker_room"):
             room = getattr(self, room_name)
             if room is not None:
                 disconnect = getattr(room, "disconnect", None)
-                if disconnect is not None:
-                    await disconnect()
-                setattr(self, room_name, None)
+                try:
+                    if disconnect is not None:
+                        await disconnect()
+                except Exception as error:
+                    errors.append(error)
+                finally:
+                    setattr(self, room_name, None)
+        if self._source is not None:
+            try:
+                await self._source.aclose()
+            except Exception as error:
+                errors.append(error)
         self._source = None
         self._agent = None
+        if errors:
+            raise errors[0]

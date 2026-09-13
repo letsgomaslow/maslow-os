@@ -47,6 +47,26 @@ The equivalent routed commands are `omarchy install voice` and `omarchy install 
 
 The `english-base-1` speech pack is 211,308,198 bytes and uses pinned, checksummed assets: Faster Whisper `base.en` and Piper `en_US-ljspeech-medium`. Downloads are resumable and restricted to the recorded HTTPS hosts and sizes. Local inference loads files only from the verified speech directory.
 
+### First LiveKit Expressive conversation
+
+Use Voice 0.1.3 or later. Voice 0.1.2 has confirmed LiveKit HTTP-session and audio-track wiring defects; valid account credentials alone cannot fix that version. Hub 0.3.1 carries the correction and shows **Update Voice** for an older installation. Apply the Hub update, then explicitly update Voice from Hub's Voice page.
+
+On any computer, sign in to [LiveKit Cloud](https://cloud.livekit.io), create a project, then open its **Settings → API Keys**. Create an API key if needed and keep that same project's URL, API key and API secret available. Its URL starts with `wss://` and normally ends with `.livekit.cloud`. The project needs available LiveKit Inference usage; check its usage/billing page if the account reports a limit. Do not share the secret in chat or screenshots.
+
+On the Lenovo, open **Voice → Settings** and choose **LiveKit voice** under **Choose how you connect**:
+
+| LiveKit value | Maslow Voice field/action |
+| --- | --- |
+| Project URL (`LIVEKIT_URL`) | Paste into **LiveKit server address**, then press Tab to save. |
+| API key (`LIVEKIT_API_KEY`) | Select **LiveKit API key** in the credential dropdown, paste into **Paste credential**, then choose **Save credential**. |
+| API secret (`LIVEKIT_API_SECRET`) | Select **LiveKit secret**, paste into the same credential field, then choose **Save credential** again. |
+
+Choose **Check setup**. For cloud modes this checks saved fields and local prerequisites, not account authentication or working audio. Open **Talk**, choose **Start talking**, then speak first. Check that your words appear and that you hear a reply; try interrupting a reply, then choose **End conversation**. A project folder and coding-agent settings are unnecessary for this initial conversation test.
+
+Maslow runs the conversation agent on the Lenovo and connects it to the LiveKit project. No separate Cloud agent deployment is required. Expressive Mode is already enabled in the application with `expressive=True`; there is no Maslow or account toggle to set. Its Inworld TTS 2 / Ashley voice, Deepgram transcription and Gemma model use [LiveKit Inference](https://docs.livekit.io/agents/models/inference/), so separate model-provider keys are unnecessary. See [LiveKit's Expressive Mode documentation](https://docs.livekit.io/agents/models/tts/expressive/).
+
+Source/SDK and installed-package tests do not establish a real account conversation. Record successful authentication, microphone capture, transcript, audible reply, interruption and stop on the Lenovo separately.
+
 ## Execution boundary
 
 The conversation model never becomes the executor. A validated intent crosses to `TaskManager`, which persists an immutable task identity and submits it to a loopback-only Hermes Runs service with an idempotency key. The dedicated Hermes profile has terminal and file tools plus three reviewed daemon tools, exposed as `maslow_delegate_coding`, `maslow_open_application`, and `maslow_open_website`. Pinned Hermes defers these schemas behind `tool_search`, `tool_describe`, and `tool_call`; their absence from the initial direct tool list is expected. The daemon tools cross a private, owner-only, authenticated Unix socket. Task status polling is authoritative; the event stream contributes bounded progress facts.

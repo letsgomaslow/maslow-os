@@ -8,7 +8,18 @@ from unittest.mock import patch
 from maslow_voice.providers.livekit_expressive import LiveKitExpressiveProvider
 
 
-class LiveKitSdkSurfaceTests(unittest.IsolatedAsyncioTestCase):
+class LiveKitNoNetworkTest(unittest.IsolatedAsyncioTestCase):
+    def setUp(self):
+        try:
+            from livekit import agents
+        except ImportError:
+            self.skipTest("LiveKit provider dependencies are not installed")
+        prewarm = patch.object(agents.inference.LLM, "prewarm")
+        prewarm.start()
+        self.addCleanup(prewarm.stop)
+
+
+class LiveKitSdkSurfaceTests(LiveKitNoNetworkTest):
     async def test_expressive_agent_session_and_room_token_construct(self) -> None:
         try:
             from livekit import api, agents
@@ -34,7 +45,7 @@ class LiveKitSdkSurfaceTests(unittest.IsolatedAsyncioTestCase):
         self.assertGreater(len(token), 20)
 
 
-class LiveKitProviderConstructionTests(unittest.IsolatedAsyncioTestCase):
+class LiveKitProviderConstructionTests(LiveKitNoNetworkTest):
     async def test_our_named_agent_session_factory_uses_the_installed_sdk(self) -> None:
         try:
             from livekit import api, agents, rtc
@@ -53,6 +64,7 @@ class LiveKitProviderConstructionTests(unittest.IsolatedAsyncioTestCase):
             emit=emit,
             submit=submit,
         )
+        self.addAsyncCleanup(provider.stop)
         provider.room_name = "voice-test"
         token = provider._token(api, "a" * 32, "b" * 32, provider.agent_name)
         session = provider._create_agent_session(agents, "a" * 32, "b" * 32)
@@ -74,6 +86,7 @@ class LiveKitProviderConstructionTests(unittest.IsolatedAsyncioTestCase):
             submitted.append(turn_id)
             return {"id": "task"}
         provider = LiveKitExpressiveProvider(config={"mode": "livekit"}, secrets={}, emit=emit, submit=submit)
+        self.addAsyncCleanup(provider.stop)
         session = provider._create_agent_session(agents, "a" * 32, "b" * 32)
         provider._started = True
         first = agents.llm.ChatMessage(role="user", content=["Fix the first project"])
