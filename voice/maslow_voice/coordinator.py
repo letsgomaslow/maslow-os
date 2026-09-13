@@ -128,6 +128,24 @@ def process_identity(pid):
         return None
 
 
+def process_confirmed_dead(pid, expected_start):
+    path = Path(f"/proc/{int(pid)}/stat")
+    try:
+        data = path.read_text()
+    except FileNotFoundError:
+        return True
+    except (OSError, ValueError):
+        return False
+    try:
+        fields = data.rsplit(")", 1)[1].split()
+        if fields[0] == "Z":
+            return True
+        actual_start = fields[19]
+    except (IndexError, ValueError):
+        return False
+    return bool(expected_start and actual_start != expected_start)
+
+
 def hermes_configuration(model, api_token, port, project):
     auxiliary = {kind: {"provider": "main", "model": model.get("default", model.get("model", ""))}
                  for kind in ("compression", "title_generation", "vision", "web_extract", "curator")}
@@ -178,7 +196,12 @@ class HermesRuntime:
                 try:
                     data = json.loads(locator.read_text())
                     if data["start"] and process_identity(data["pid"]) == data["start"]:
-                        client = HermesClient(data["endpoint"], data["token"])
+                        def discard(key=key):
+                            self.clients.pop(key, None)
+                            self.processes.pop(key, None)
+                        client = HermesClient(data["endpoint"], data["token"],
+                            process_exited=lambda pid=data["pid"], start=data["start"]: process_confirmed_dead(pid, start),
+                            discard_process=discard)
                         await client.capabilities()
                         self.clients[key] = client
                         return client
@@ -208,7 +231,11 @@ class HermesRuntime:
                                                            stderr=asyncio.subprocess.DEVNULL, start_new_session=True)
             endpoint = f"http://127.0.0.1:{port}"
             atomic_json(locator, {"pid": process.pid, "start": process_identity(process.pid), "endpoint": endpoint, "token": token})
-            client = HermesClient(endpoint, token)
+            def discard(key=key):
+                self.clients.pop(key, None)
+                self.processes.pop(key, None)
+            client = HermesClient(endpoint, token, process_exited=lambda: process.returncode is not None,
+                                  discard_process=discard)
             self.processes[key] = process
             try:
                 await _wait_for_owned_hermes(process, client.capabilities)

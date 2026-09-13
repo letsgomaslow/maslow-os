@@ -36,6 +36,7 @@ class TaskManager:
     def __init__(self, store, client_factory, publish, children=None):
         self.store, self.client_factory, self.publish, self.children = store, client_factory, publish, children
         self.monitors = {}
+        self.restart_pending = set()
         self.project_locks = {}
         self.clients = {}
         self.closed = False
@@ -56,7 +57,22 @@ class TaskManager:
         return task
 
     def _start(self, task):
-        if task["id"] not in self.monitors or self.monitors[task["id"]].done():
+        current = self.monitors.get(task["id"])
+        if current and not current.done():
+            if task["state"] == "queued" and task["id"] not in self.restart_pending:
+                self.restart_pending.add(task["id"])
+
+                def restart(_done, identity=task["id"]):
+                    self.restart_pending.discard(identity)
+                    if self.closed:
+                        return
+                    saved = self.store.get(identity)
+                    if saved["state"] == "queued":
+                        self._start(saved)
+
+                current.add_done_callback(restart)
+            return
+        if current is None or current.done():
             worker = asyncio.create_task(self._run(task["id"]))
             self.monitors[task["id"]] = worker
             def finished(done, identity=task["id"]):
@@ -126,6 +142,16 @@ class TaskManager:
                             self.store.update(task_id, state="interrupted", error={"code": "RUN_LOST", "message": "The coordinator no longer has this run. Review its partial results before continuing."})
                             await self.publish()
                             return
+                        confirmed_exit = getattr(client, "confirmed_process_exit", None)
+                        if confirmed_exit and confirmed_exit():
+                            if self.children:
+                                await self.children.cancel(task_id)
+                            self.store.update(task_id, state="interrupted", error={
+                                "code": "COORDINATOR_EXITED",
+                                "message": "The local task coordinator stopped. Review partial changes, then use Continue to start a new attempt.",
+                            })
+                            await self.publish()
+                            return
                         self.store.update(task_id, error={"code": "RECONNECTING", "message": "Reconnecting to the task coordinator; this task has not been resubmitted."})
                         await self.publish()
                         delay = min(delay * 2, 30)
@@ -172,6 +198,10 @@ class TaskManager:
             if task["state"] not in TERMINAL | {"waiting_input"}:
                 raise VoiceError("TASK_ACTIVE", "Use Redirect while this task is running.")
             answer = text_field(text, "continuation", required=True)
+            client = self.clients.get(task_id)
+            discard = getattr(client, "discard_dead_process", None)
+            if discard and discard():
+                self.clients.pop(task_id, None)
             brief = dict(task["brief"], summary=task["brief"]["summary"] + "\nUser continuation: " + answer)
             result = self.store.update(task_id, state="queued", run_id=None, attempt=task.get("attempt", 0) + 1, brief=brief, error=None, dismissed=False)
             self._start(result)

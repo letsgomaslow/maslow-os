@@ -4,12 +4,14 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 from maslow_voice import offline_worker
 from maslow_voice.coordinator import HERMES_START_TIMEOUT as ONLINE_HERMES_START_TIMEOUT
 from maslow_voice.coordinator import _wait_for_hermes as wait_for_online_hermes
 from maslow_voice.coordinator import _wait_for_owned_hermes
 from maslow_voice.coordinator import _terminate_hermes_process_group
+from maslow_voice.coordinator import process_confirmed_dead
 from maslow_voice.errors import VoiceError
 from maslow_voice.offline import OfflineRuntime
 
@@ -167,6 +169,18 @@ class HermesStartupDeadlineTests(unittest.IsolatedAsyncioTestCase):
             self.assertEqual(captured["method"], "hermes_start")
             self.assertEqual(captured["timeout"], 135)
             self.assertGreaterEqual(captured["timeout"], offline_worker.HERMES_START_TIMEOUT + 10)
+
+    def test_reconnected_process_requires_positive_death_evidence(self):
+        zombie = "123 (hermes gateway) Z " + " ".join(str(value) for value in range(1, 22))
+        live = "123 (hermes gateway) S " + " ".join(str(value) for value in range(1, 22))
+        with patch("maslow_voice.coordinator.Path.read_text", return_value=zombie):
+            self.assertTrue(process_confirmed_dead(123, "19"))
+        with patch("maslow_voice.coordinator.Path.read_text", return_value=live):
+            self.assertFalse(process_confirmed_dead(123, "19"))
+        with patch("maslow_voice.coordinator.Path.read_text", side_effect=FileNotFoundError):
+            self.assertTrue(process_confirmed_dead(123, "19"))
+        with patch("maslow_voice.coordinator.Path.read_text", side_effect=PermissionError):
+            self.assertFalse(process_confirmed_dead(123, "19"))
 
 
 if __name__ == "__main__":

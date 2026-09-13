@@ -1,7 +1,7 @@
 import asyncio
 import tempfile
 import unittest
-from unittest.mock import AsyncMock
+from unittest.mock import AsyncMock, patch
 from pathlib import Path
 
 from maslow_voice.errors import VoiceError
@@ -140,5 +140,166 @@ class HermesTests(unittest.IsolatedAsyncioTestCase):
             await manager._run(task["id"])
             children.cancel.assert_awaited_once_with(task["id"])
             self.assertEqual(store.get(task["id"])["state"], "interrupted")
+            await manager.close()
+            store.close()
+
+    async def test_confirmed_coordinator_exit_interrupts_without_resubmit_and_continue_starts_fresh(self):
+        class Executor:
+            def __init__(self, *, dead=False, result=""):
+                self.dead, self.result = dead, result
+                self.submits, self.discarded, self.submitted_attempt = 0, False, None
+
+            def confirmed_process_exit(self):
+                return self.dead
+
+            def discard_dead_process(self):
+                if not self.dead:
+                    return False
+                self.discarded = True
+                return True
+
+            async def submit(self, task):
+                self.submits += 1
+                self.submitted_attempt = task["attempt"]
+                return {"run_id": "fresh-run"}
+
+            async def status(self, run_id):
+                if self.dead:
+                    raise VoiceError("HTTP_FAILED", "coordinator unavailable")
+                return {"status": "completed", "run_id": run_id, "output": self.result}
+
+            async def events(self, run_id):
+                if False:
+                    yield {}
+
+        with tempfile.TemporaryDirectory() as root:
+            store = TaskStore(root)
+            task, _ = store.create("dead-coordinator", BRIEF, root, "openai", "Fix navigation")
+            store.update(task["id"], state="accepted", run_id="accepted-run")
+            dead, fresh, children = Executor(dead=True), Executor(result="Recovered result"), AsyncMock()
+            clients = iter((dead, fresh))
+
+            async def factory(task):
+                return next(clients)
+
+            manager = TaskManager(store, factory, AsyncMock(), children)
+            await manager._run(task["id"])
+            interrupted = store.get(task["id"])
+            self.assertEqual(interrupted["state"], "interrupted")
+            self.assertEqual(interrupted["run_id"], "accepted-run")
+            self.assertEqual(interrupted["error"]["code"], "COORDINATOR_EXITED")
+            self.assertEqual(dead.submits, 0)
+            children.cancel.assert_awaited_once_with(task["id"])
+
+            await manager.action(task["id"], "continue", "Try again after the coordinator stopped")
+            await asyncio.gather(*list(manager.monitors.values()))
+            completed = store.get(task["id"])
+            self.assertTrue(dead.discarded)
+            self.assertEqual(fresh.submits, 1)
+            self.assertEqual(fresh.submitted_attempt, 1)
+            self.assertEqual(completed["state"], "completed")
+            self.assertEqual(completed["result"], "Recovered result")
+            await manager.close()
+            store.close()
+
+    async def test_transient_status_failure_keeps_reconnecting_without_resubmit(self):
+        class Executor:
+            def __init__(self):
+                self.polls, self.submits = 0, 0
+
+            def confirmed_process_exit(self):
+                return False
+
+            async def submit(self, task):
+                self.submits += 1
+                return {"run_id": "unexpected"}
+
+            async def status(self, run_id):
+                self.polls += 1
+                if self.polls == 1:
+                    raise VoiceError("HTTP_FAILED", "temporary failure")
+                return {"status": "completed", "run_id": run_id, "output": "Eventually complete"}
+
+            async def events(self, run_id):
+                if False:
+                    yield {}
+
+        with tempfile.TemporaryDirectory() as root:
+            store = TaskStore(root)
+            task, _ = store.create("transient-coordinator", BRIEF, root, "openai", "Fix navigation")
+            store.update(task["id"], state="running", run_id="known-run")
+            executor = Executor()
+            manager = TaskManager(store, AsyncMock(return_value=executor), AsyncMock())
+            with patch("maslow_voice.tasks.asyncio.sleep", new=AsyncMock()):
+                await manager._run(task["id"])
+            completed = store.get(task["id"])
+            self.assertEqual(executor.polls, 2)
+            self.assertEqual(executor.submits, 0)
+            self.assertEqual(completed["state"], "completed")
+            self.assertEqual(completed["result"], "Eventually complete")
+            await manager.close()
+            store.close()
+
+    async def test_continue_queued_while_interrupted_monitor_drains_starts_after_cleanup(self):
+        class DeadExecutor:
+            def __init__(self):
+                self.events_started = asyncio.Event()
+                self.draining = asyncio.Event()
+                self.release = asyncio.Event()
+
+            def confirmed_process_exit(self):
+                return True
+
+            def discard_dead_process(self):
+                return True
+
+            async def status(self, run_id):
+                await self.events_started.wait()
+                raise VoiceError("HTTP_FAILED", "coordinator exited")
+
+            async def events(self, run_id):
+                self.events_started.set()
+                try:
+                    await asyncio.Event().wait()
+                    yield {}
+                finally:
+                    self.draining.set()
+                    await self.release.wait()
+
+        class FreshExecutor:
+            async def submit(self, task):
+                return {"run_id": "continued-run"}
+
+            async def status(self, run_id):
+                return {"status": "completed", "run_id": run_id, "output": "Continued"}
+
+            async def events(self, run_id):
+                if False:
+                    yield {}
+
+        with tempfile.TemporaryDirectory() as root:
+            store = TaskStore(root)
+            task, _ = store.create("continue-during-cleanup", BRIEF, root, "openai", "Fix navigation")
+            task = store.update(task["id"], state="accepted", run_id="dead-run")
+            dead, fresh = DeadExecutor(), FreshExecutor()
+            clients = iter((dead, fresh))
+
+            async def factory(task):
+                return next(clients)
+
+            manager = TaskManager(store, factory, AsyncMock(), AsyncMock())
+            manager._start(task)
+            await dead.draining.wait()
+            self.assertEqual(store.get(task["id"])["state"], "interrupted")
+            await manager.action(task["id"], "continue", "Continue after cleanup")
+            self.assertEqual(store.get(task["id"])["state"], "queued")
+            self.assertFalse(manager.monitors[task["id"]].done())
+            dead.release.set()
+            for _ in range(20):
+                await asyncio.sleep(0)
+                if store.get(task["id"])["state"] == "completed":
+                    break
+            self.assertEqual(store.get(task["id"])["state"], "completed")
+            self.assertEqual(store.get(task["id"])["result"], "Continued")
             await manager.close()
             store.close()

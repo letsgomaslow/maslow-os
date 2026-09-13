@@ -23,13 +23,30 @@ If you need clarification, return a concise question and make no dependent chang
 
 
 class HermesClient:
-    def __init__(self, endpoint, token, request=request_json):
+    def __init__(self, endpoint, token, request=request_json, *, process_exited=None, discard_process=None):
         parsed = urlsplit(endpoint)
         if parsed.scheme != "http" or parsed.hostname not in {"127.0.0.1", "::1"} or parsed.username or parsed.password or parsed.query or parsed.fragment or parsed.path not in {"", "/"}:
             raise VoiceError("INVALID_COORDINATOR", "The execution coordinator must be a private local service.")
         if not token:
             raise VoiceError("COORDINATOR_AUTH_REQUIRED", "The execution coordinator needs its local access credential.")
         self.endpoint, self.token, self.request = endpoint.rstrip("/"), token, request
+        self._process_exited, self._discard_process = process_exited, discard_process
+
+    def confirmed_process_exit(self):
+        if not self._process_exited:
+            return False
+        try:
+            return self._process_exited() is True
+        except Exception:
+            # Failure to inspect a local process is not evidence that it exited.
+            return False
+
+    def discard_dead_process(self):
+        if not self.confirmed_process_exit():
+            return False
+        if self._discard_process:
+            self._discard_process()
+        return True
 
     def _run_path(self, run_id, operation=""):
         if not isinstance(run_id, str) or not RUN_ID.fullmatch(run_id):
