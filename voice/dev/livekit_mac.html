@@ -8,10 +8,10 @@
 <main>
 <header><span class="brand">MASLOW</span><span class="tag">PRIVATE MAC TEST</span></header>
 <h1>Let’s get Voice talking.</h1>
-<p>This page tests the real Maslow LiveKit Expressive connection on this Mac. Account details stay in the local tester process’s memory. Clear saved connection removes them; stopping the tester also removes them.</p>
+<p id="intro">This page tests the real Maslow LiveKit Expressive connection on this Mac. Account details stay in the local tester process’s memory. Clear saved connection removes them; stopping the tester also removes them.</p>
 <section>
-<h2>1. Connect your LiveKit project</h2>
-<p class="small">Copy all three values from the same LiveKit project. Paste them here, then save.</p>
+<h2 id="setup-title">1. Connect your LiveKit project</h2>
+<p class="small" id="setup-help">Copy all three values from the same LiveKit project. Paste them here, then save.</p>
 <form id="setup" autocomplete="off">
 <label>Project URL<input id="url" name="project" placeholder="wss://your-project.livekit.cloud" required autocomplete="off" spellcheck="false"></label>
 <label>API key<input id="key" name="project-key" type="password" required autocomplete="off" spellcheck="false"></label>
@@ -23,7 +23,7 @@
 </section>
 <section>
 <h2>2. Test the conversation</h2>
-<p class="small">Choose a voice for a short comparison sample or your conversation. Every preview uses the same sample. Actual conversations use Expressive speech. These tests use your LiveKit account.</p>
+<p class="small" id="test-help">Choose a voice for a short comparison sample or your conversation. Every preview uses the same sample. Actual conversations use Expressive speech. These tests use your LiveKit account.</p>
 <label for="voice">Voice<select id="voice" disabled aria-describedby="voice-note"></select></label><p id="voice-note" class="small">Voice names and languages are the verified options for this tester.</p>
 <div class="actions"><button id="probe" disabled>Check connection</button><button id="audition" disabled>Preview voice</button><button id="conversation" disabled>Start talking</button><button id="end" class="secondary" disabled>Stop audio</button></div>
 <div class="row"><span class="orb" aria-hidden="true"></span><p id="state" class="status" role="status">Microphone off</p></div>
@@ -34,7 +34,16 @@
 </section>
 </main>
 <script nonce="__NONCE__">
-const nonce="__NONCE__", $=id=>document.getElementById(id);
+const nonce="__NONCE__", $=id=>document.getElementById(id),openai="__PROVIDER__"==='openai',providerLabel=openai?'OpenAI Realtime':'LiveKit';
+if(openai){
+ document.title='Maslow Voice · OpenAI Realtime test';
+ $('intro').textContent='Test Maslow with OpenAI Realtime on this Mac. Your API key stays in the local tester process’s memory. Clear saved connection or stop the tester to remove it.';
+ $('setup-title').textContent='1. Connect OpenAI';
+ $('setup-help').textContent='Paste your OpenAI API key here, then save. Testing uses your OpenAI API account and its available credit.';
+ for(const id of ['url','secret']){$(id).required=false;$(id).disabled=true;$(id).closest('label').hidden=true;}
+ $('test-help').textContent='Choose a voice, preview it, then try a conversation. Every preview asks OpenAI to read the same sample. Each test starts a fresh session so your chosen voice takes effect.';
+ $('voice-note').textContent='Ten built-in Realtime voices. Start with Cedar and Marin, which OpenAI recommends for quality.';
+}
 let pending=false,transcriptText="",currentMode=null,selectedVoice="",voicesLoaded=false,editingSetup=false;
 async function action(name,body={}){
   const response=await fetch('/action/'+name,{method:'POST',headers:{'Content-Type':'application/json','X-Maslow-Test':nonce},body:JSON.stringify(body)});
@@ -44,10 +53,11 @@ async function run(name,body){
   pending=true;$('error').textContent='';
   try{await action(name,body);return true;}catch(error){$('error').textContent=error.message;return false;}finally{pending=false;}
 }
-$('setup').onsubmit=async event=>{event.preventDefault();$('save').disabled=true;const body={url:$('url').value,key:$('key').value,secret:$('secret').value};if(await run('save',body)){$('setup').reset();editingSetup=false;$('connection-note').textContent='Connection saved privately. You can check it now.';}body.key=body.secret=body.url='';$('save').disabled=false;};
-$('change-connection').onclick=()=>{editingSetup=true;$('setup').hidden=false;$('url').focus();};
+$('setup').onsubmit=async event=>{event.preventDefault();$('save').disabled=true;const body=openai?{key:$('key').value}:{url:$('url').value,key:$('key').value,secret:$('secret').value};if(await run('save',body)){$('setup').reset();editingSetup=false;$('connection-note').textContent='Connection saved privately. You can check it now.';}for(const key of Object.keys(body))body[key]='';$('save').disabled=false;};
+$('change-connection').onclick=()=>{editingSetup=true;$('setup').hidden=false;$(openai?'key':'url').focus();};
 $('voice').onchange=()=>{selectedVoice=$('voice').value;};
-for(const name of ['probe','forget'])$(name).onclick=()=>run(name,{});
+$('probe').onclick=()=>run('probe',{voice:selectedVoice});
+$('forget').onclick=()=>run('forget',{});
 $('audition').onclick=()=>run('audition',{voice:selectedVoice});
 $('conversation').onclick=()=>run('conversation',{voice:selectedVoice});
 $('end').onclick=()=>run('end',{});
@@ -58,9 +68,9 @@ async function refresh(){
   const busy=!!s.busy||pending,ready=!!s.ready;
   $('setup').hidden=ready&&!editingSetup;$('change-connection').hidden=!ready||editingSetup;$('change-connection').disabled=busy;
   $('probe').disabled=$('audition').disabled=$('conversation').disabled=!ready||busy;$('end').disabled=!s.busy;$('save').disabled=busy;$('voice').disabled=!ready||busy;
-  if(!voicesLoaded&&Array.isArray(s.voices)){const choice=s.selected_voice||s.voices[0]?.name||'';$('voice').replaceChildren(...s.voices.map(voice=>{const option=document.createElement('option');option.value=voice.name;option.textContent=voice.name+' · '+voice.language;return option;}));selectedVoice=choice;$('voice').value=choice;voicesLoaded=true;}
+  if(!voicesLoaded&&Array.isArray(s.voices)){const choice=s.selected_voice||s.voices[0]?.name||'';$('voice').replaceChildren(...s.voices.map(voice=>{const option=document.createElement('option');option.value=voice.name;option.textContent=openai?voice.name[0].toUpperCase()+voice.name.slice(1):voice.name+' · '+voice.language;return option;}));selectedVoice=choice;$('voice').value=choice;voicesLoaded=true;}
   $('connection-note').textContent=s.ready?'Connection saved privately. The entry fields have been cleared.':'No account details saved.';
-  $('state').textContent=s.mode==='audition'&&s.busy?'Playing '+(s.selected_voice||selectedVoice)+' · microphone off':s.mode==='probe'&&s.busy?'Checking LiveKit · microphone off':s.state==='connecting'?'Connecting · waiting to turn on microphone':s.microphone?(s.state==='speaking'?'Maslow is speaking · microphone on':'Listening · microphone on'):'Microphone off';
+  $('state').textContent=s.mode==='audition'&&s.busy?'Previewing '+(s.selected_voice||selectedVoice)+' · microphone off':s.mode==='probe'&&s.busy?'Checking '+providerLabel+' · microphone off':s.state==='connecting'?'Connecting · waiting to turn on microphone':s.microphone?(s.state==='speaking'?'Maslow is speaking · microphone on':'Listening · microphone on'):'Microphone off';
   if(s.error)$('error').textContent=s.error.message;
   $('result').textContent=s.result?(s.result.audition_complete?'Finished '+s.result.voice+'. Choose another voice to compare, or start talking.':s.result.passed?'Connection passed: speech recognized and spoken reply received. Now try Start talking.':'The connection test did not complete. See the message above.') : '';
   const turns=await(await fetch('/view',{headers:{'X-Maslow-Test':nonce},cache:'no-store'})).json();

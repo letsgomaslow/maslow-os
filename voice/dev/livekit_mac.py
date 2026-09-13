@@ -1,4 +1,4 @@
-"""Private, development-only LiveKit probe and native Mac audio test.
+"""Private, development-only cloud Voice probe and native Mac audio test.
 
 Run with PYTHONPATH=voice using the Voice provider environment. No credentials,
 captured audio, or transcripts are written to disk. This is not the Linux IPC
@@ -26,6 +26,7 @@ from maslow_voice.config import validate_endpoint
 from maslow_voice.errors import VoiceError
 from maslow_voice.providers.base import ProviderError
 from maslow_voice.providers.livekit_expressive import LiveKitExpressiveProvider
+from maslow_voice.voices import OPENAI_VOICES
 
 VOICES = [
     {"name": "Ashley", "language": "English (US)"},
@@ -97,7 +98,12 @@ async def synthetic_speech():
 
 
 class Session:
-    def __init__(self, provider_factory=None):
+    def __init__(self, provider_factory=None, *, kind="livekit"):
+        if kind not in {"livekit", "openai"}:
+            raise ValueError("Unsupported test provider")
+        self.kind = kind
+        self.label = "OpenAI Realtime" if kind == "openai" else "LiveKit"
+        self.voices = [{"name": name, "language": "Realtime"} for name in OPENAI_VOICES] if kind == "openai" else VOICES
         self.provider_factory = provider_factory
         self.credentials = {}
         self.url = ""
@@ -118,14 +124,15 @@ class Session:
         self.cleanup_task = None
         self.engine = ""
         self.playback = {}
-        self.selected_voice = "Ashley"
+        self.selected_voice = "cedar" if kind == "openai" else "Ashley"
+        self._partial = {}
 
     def status(self):
         return {"ready": bool(self.credentials), "busy": bool(self.job and not self.job.done()),
                 "state": self.state, "microphone": self.microphone, "error": self.error,
                 "mode": self.mode, "result": self.result, "turns": self.turns, "level": self.level,
                 "engine": self.engine, "playback": self.playback,
-                "selected_voice": self.selected_voice, "voices": VOICES}
+                "selected_voice": self.selected_voice, "voices": self.voices, "provider": self.kind}
 
     async def emit(self, event):
         kind = event.get("type")
@@ -140,8 +147,20 @@ class Session:
         elif kind == "transcript":
             role = event.get("role")
             if role in self.turns:
-                self.turns[role] += 1
-                self.transcripts.append({"role": role, "text": str(event.get("text", ""))[:4000]})
+                # Streaming deltas update one visible turn; a final transcript
+                # replaces them, rather than duplicating words and turn counts.
+                item = self._partial.get(role)
+                final = event.get("final", True)
+                value = str(event.get("text", ""))[:4000]
+                if item is None:
+                    item = {"role": role, "text": ""}
+                    self.transcripts.append(item)
+                item["text"] = value if final else (item["text"] + value)[:4000]
+                if final:
+                    self.turns[role] += 1
+                    self._partial.pop(role, None)
+                else:
+                    self._partial[role] = item
                 self.transcripts = self.transcripts[-16:]
         elif kind == "level":
             self.level = event["level"]
@@ -156,6 +175,15 @@ class Session:
     def save(self, body):
         if self.status()["busy"]:
             raise ProviderError("End the current test before changing the connection.", "TEST_BUSY")
+        if self.kind == "openai":
+            if (not isinstance(body, dict) or set(body) != {"key"}
+                    or not isinstance(body["key"], str) or not body["key"].strip()
+                    or len(body["key"]) > 4096 or any(c.isspace() for c in body["key"].strip())):
+                raise ProviderError("Paste your OpenAI API key in the private field.", "INVALID_SETUP")
+            self.credentials = {"openai": body["key"].strip()}
+            self.error = None
+            self.result = None
+            return
         if not isinstance(body, dict) or set(body) != {"url", "key", "secret"}:
             raise ProviderError("Enter all three LiveKit fields.", "INVALID_SETUP")
         if any(not isinstance(value, str) or not value.strip() or len(value) > 4096 for value in body.values()):
@@ -168,16 +196,17 @@ class Session:
 
     def start(self, mode, voice=None):
         if not self.credentials:
-            raise ProviderError("Save the three LiveKit fields first.", "SETUP_REQUIRED")
+            raise ProviderError("Save your OpenAI API key first." if self.kind == "openai" else "Save the three LiveKit fields first.", "SETUP_REQUIRED")
         if self.status()["busy"]:
             raise ProviderError("A test is already running.", "TEST_BUSY")
         if voice is not None:
-            if not isinstance(voice, str) or voice not in {item["name"] for item in VOICES}:
+            if not isinstance(voice, str) or voice not in {item["name"] for item in self.voices}:
                 raise ProviderError("Choose one of the available sample voices.", "INVALID_VOICE")
             self.selected_voice = voice
         self.stop_signal = asyncio.Event()
         self.mode, self.error, self.result = mode, None, None
         self.transcripts = []
+        self._partial.clear()
         self.turns = {"user": 0, "assistant": 0}
         self.state, self.microphone = "connecting", False
         self.last_seen = time.monotonic()
@@ -188,7 +217,7 @@ class Session:
         # Reload only between sessions, allowing provider fixes to be retested
         # without moving account values to disk or restarting this private form.
         audio_module = importlib.import_module("maslow_voice.audio")
-        provider_module = importlib.import_module("maslow_voice.providers.livekit_expressive")
+        provider_module = importlib.import_module("maslow_voice.providers." + ("openai_realtime" if self.kind == "openai" else "livekit_expressive"))
         if self.provider_factory is None:
             importlib.reload(audio_module)
             importlib.reload(provider_module)
@@ -207,8 +236,10 @@ class Session:
                 owner.playback["played_ms"] = self.played_ms
                 await super().play(frame)
         transport = ProbeAudio() if mode == "probe" else NativeAudio(capture=mode != "audition", on_error=self.audio_failed)
-        factory = self.provider_factory or provider_module.LiveKitExpressiveProvider
-        provider = factory(config={"mode": "livekit", "livekit_url": self.url, "livekit_voice": self.selected_voice},
+        factory = self.provider_factory or getattr(provider_module, "OpenAIRealtimeProvider" if self.kind == "openai" else "LiveKitExpressiveProvider")
+        config = {"mode": self.kind, "livekit_url": self.url, "livekit_voice": self.selected_voice,
+                  "realtime_voice": self.selected_voice}
+        provider = factory(config=config,
                                          secrets=dict(self.credentials), emit=self.emit,
                                          submit=self.reject_task, audio_transport=transport)
         self.provider = provider
@@ -236,12 +267,18 @@ class Session:
                 # The same exact text provides a fair voice comparison. Agent
                 # sessions still use Expressive mode for real conversations.
                 async with asyncio.timeout(45):
-                    await provider._session.say(SAMPLE_TEXT)
+                    if self.kind == "openai":
+                        await provider.text("Read this voice comparison sample aloud exactly, with no introduction or added words: " + SAMPLE_TEXT)
+                    else:
+                        await provider._session.say(SAMPLE_TEXT)
                 # RTC also sends silence after speech. Drain the native tail
                 # with a bound so that continuous silence cannot hold preview.
                 with contextlib.suppress(TimeoutError):
-                    async with asyncio.timeout(1):
-                        await transport.wait_playback()
+                    async with asyncio.timeout(15 if self.kind == "openai" else 1):
+                        if self.kind == "openai":
+                            await provider.wait_playback()
+                        else:
+                            await transport.wait_playback()
                 if not self.error:
                     if self.playback["audible_samples"] < 4800:
                         raise ProviderError("This voice did not return a playable sample. Try another voice or preview again.", "VOICE_SAMPLE_EMPTY")
@@ -259,9 +296,11 @@ class Session:
         except asyncio.CancelledError:
             raise
         except TimeoutError:
-            self.error = {"code": "LIVEKIT_TEST_TIMEOUT", "message": "LiveKit did not finish the connection or spoken reply in time."}
+            self.error = {"code": self.kind.upper() + "_TEST_TIMEOUT", "message": self.label + " did not finish the connection or spoken reply in time."}
         except Exception as error:
-            safe = error if isinstance(error, ProviderError) else LiveKitExpressiveProvider._public_error(error)
+            safe = error if isinstance(error, ProviderError) else (
+                LiveKitExpressiveProvider._public_error(error) if self.kind == "livekit" else
+                ProviderError("OpenAI could not complete the test. Check the connection and try again.", "OPENAI_TEST_FAILED"))
             self.error = {"code": safe.code, "message": str(safe)}
         finally:
             self.microphone = False
@@ -281,6 +320,7 @@ class Session:
             self.state = "error" if self.error else "disabled"
             self.microphone = False
             self.transcripts = []
+            self._partial.clear()
             self.level = 0
             if mode == "probe" and not self.result:
                 self.result = {"passed": False, "physical_microphone_tested": False}
@@ -297,6 +337,7 @@ class Session:
                 await asyncio.shield(self.cleanup_task)
             self.microphone = False
             self.transcripts = []
+            self._partial.clear()
 
 
 SESSION = web.AppKey("session", Session)
@@ -333,7 +374,7 @@ def create_app(session=None):
 
     async def index(request):
         page = Path(__file__).with_suffix(".html").read_text()
-        return web.Response(text=page.replace("__NONCE__", app[TOKEN]), content_type="text/html")
+        return web.Response(text=page.replace("__NONCE__", app[TOKEN]).replace("__PROVIDER__", app[SESSION].kind), content_type="text/html")
 
     async def status(request):
         return web.json_response(app[SESSION].status())
@@ -378,13 +419,13 @@ def create_app(session=None):
     return app
 
 
-async def main(port=0):
+async def main(port=0, provider="livekit"):
     # Third-party SDK logs can contain endpoints. Keep only our bounded, safe
     # status visible; never persist their raw logs in this credentialed test.
     logging.disable(logging.CRITICAL)
     loop = asyncio.get_running_loop()
     loop.set_exception_handler(lambda _loop, _context: None)
-    app = create_app()
+    app = create_app(Session(kind=provider))
     runner = web.AppRunner(app, access_log=None)
     await runner.setup()
     site = web.TCPSite(runner, "127.0.0.1", port)
@@ -404,8 +445,9 @@ async def main(port=0):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--port", type=int, default=0)
+    parser.add_argument("--provider", choices=("livekit", "openai"), default="livekit")
     arguments = parser.parse_args()
     try:
-        asyncio.run(main(arguments.port))
+        asyncio.run(main(arguments.port, arguments.provider))
     except KeyboardInterrupt:
         pass
