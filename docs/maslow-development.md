@@ -1,12 +1,12 @@
 # Maslow AI-OS development: start here
 
-Updated 2026-09-11. This is the current workstream index, not a stable-release announcement. Update this file at each meaningful checkpoint; keep detailed evidence in dated handoffs rather than expanding AGENTS.md into a second backlog.
+Updated 2026-09-13. This is the current workstream index, not a stable-release announcement. Update this file at each meaningful checkpoint; keep detailed evidence in dated handoffs rather than expanding AGENTS.md into a second backlog.
 
-Current priority: [Hub recovery after Lenovo feedback](handoffs/2026-09-11-hub-recovery.md). Signed Hub 0.2.1 recovery is now public staging sequence 3, anonymously verified after Pages deployment at distribution commit `8791c37972525af0edcbe6ee980d70b7f97d4577`. Next: user updates Lenovo through its existing Hub Updates page, confirms installed 0.2.1, and reports the guided Observability result. No ISO rebuild or trust re-enrollment. First prior failure was Docker socket permission denial; the later backend failure remains undiagnosed. Publication is not hardware or real-trace acceptance. Read this newer handoff before the historical checkpoints below.
+Current priority: [Support-readiness closeout, RCA and next steps](handoffs/2026-09-12-support-readiness-closeout.md). Lenovo's latest screenshot shows Hub 0.2.1 / Up to date, but Observability remains blocked and the tester rejects screenshot-driven support. Public staging sequence 3 was anonymously verified September 11 at distribution `8791c37972525af0edcbe6ee980d70b7f97d4577`. Next recommendation: design a consent-based support report and durable setup timeline, then test failure/recovery end to end. No new ISO, signing, trust enrollment or repeat 0.2.1 update is needed. Remote support infrastructure is proposed, not implemented or authorized by this documentation closeout.
 
 ## Resume in a new context
 
-1. Read this file, [the current Hub UI staging handoff](handoffs/2026-09-10-hub-ui-staging.md), [the OTA/observability implementation handoff](handoffs/2026-09-09-hub-ota-observability.md), [the Hub evidence handoff](handoffs/2026-09-08-maslow-hub.md), [the USB/native follow-up](handoffs/2026-09-08-hub-usb-follow-up.md), and [the internet OTA workflow](ota-update-workflow.md).
+1. Read this file and [the latest support-readiness closeout](handoffs/2026-09-12-support-readiness-closeout.md), then [recovery release evidence](handoffs/2026-09-11-hub-recovery.md). Use older linked handoffs for provenance, not current signing or device instructions.
 2. Run `git status --short --branch`, `git log -5 --oneline`, and `git worktree list` in each repository you will touch. The saved runtime `main` checkout is not the Hub implementation checkout. Do not repeat implementation just because main lacks Hub.
 3. Select one ready backlog item below; identify its owner repository, acceptance criteria, delivery path, and dependencies before editing. Read that repository's AGENTS.md and matching task guide.
 4. Preserve unrelated changes and accepted images. No automatic push, branch merge, release publication, key provisioning, or disk erase follows from a documentation update.
@@ -34,11 +34,11 @@ The separate test clone is `hub-evidence/source-next` under that same local root
 - Independent graphical `0.1.3 → 0.1.4 → 0.1.3` and six preservation hashes passed on the preliminary fresh-installed ISO with the exact unchanged Hub archive, not on the corrected ISO. `0.1.4` is a visibly newer test fixture, not a release to promote. Terminal recovery also passed with the shell stopped in the migration rehearsal.
 - The user subsequently confirmed “Lenovo installation reached desktop.” Fresh installation reaching the desktop is passed as tester-reported hardware evidence. Reboot, onboarding, Bitwarden, authentication, and device update/rollback remain separate unverified checks.
 - On 2026-09-09 the user additionally reported successful everyday use of the installed Lenovo. This strengthens reported usability evidence, not itemized native update/recovery or authentication acceptance.
-- The accepted ISO still requires one-time client trust enrollment. Signed internal staging is now published and anonymously verified (distribution `5946003`, Hub 0.2.0 with exact 0.1.3 rollback). Stable/alpha promotion, actual Lenovo internet update/rollback, redistribution of installer media, and itemized native acceptance remain separate gates. See the current UI staging handoff before using older scaffold-only checkpoints.
+- The accepted ISO requires one-time client trust enrollment; the Lenovo has already completed it and visibly runs 0.2.1. Signed staging sequence 3 retains 0.2.0 and exact 0.1.3 recovery packages. Stable/alpha promotion, Lenovo rollback, installer redistribution and itemized native acceptance remain separate gates. See the latest closeout before older checkpoints.
 
 ## Feature state
 
-The table below describes the accepted installation baseline. New 0.2.0 source/package progress and its explicit gaps are in the [current implementation handoff](handoffs/2026-09-09-hub-ota-observability.md); an unsigned development package does not update the Lenovo or change accepted baseline evidence.
+The table below describes the accepted ISO installation baseline, not the later 0.2.1 OTA feature state. Current release and support gaps are in the [latest closeout](handoffs/2026-09-12-support-readiness-closeout.md). The ISO remains unchanged.
 
 | Area | Current behavior | Not yet established |
 | --- | --- | --- |
@@ -59,8 +59,10 @@ Lift estimates are relative engineering effort, not dates: XS = focused copy/che
 | Order / ID | Deliverable and acceptance | Lift | Owner / delivery | Dependency |
 | --- | --- | --- | --- | --- |
 | P0 / A1 | Capture itemized Lenovo results: install, USB-detached reboot, Hub, Bitwarden lock/unlock with test data, fresh app install before OS update, web-app lifecycle, errors | XS engineering; user hardware time | Runtime docs; no rebuild | User observations; no secrets in evidence |
-| P0 / A2 | Endpoint selected and scaffold live: public maslow-releases + Pages; authenticated bootstrap implemented. Operator still provisions protected signing and encrypted recovery backup | S; external key custody | Hub + packages | No production key or channel yet |
-| P0 / A3 | Provision approved trust and staging/alpha publication workflow; independently verify external download, rejection, apply, rollback, recovery on an installed client | M | Hub + packages; one-time trust bootstrap | A2; real keys outside repo/ISO/build cache; explicit publication approval |
+| Maintenance / A2 | Signed staging operational; renew metadata before September 24, 2026 expiry; encrypted key recovery remains operator-managed | S; operator signature | Public distribution | Preserve immutable packages and trust; explicit promotion |
+| P0 / A3 | Staging and Lenovo 0.2.1 arrival established; complete native rollback/recovery and feature acceptance before alpha | M remaining | Hub + packages | No repeated bootstrap; distinguish public verification from native acceptance |
+| P0 / R1 | Define safe support schema/consent, then durable timeline and preview/send/report-reference workflow | S design; M implementation | Hub + separately approved private serverless intake | Read latest closeout; hosting, authentication, retention and cost controls need decisions |
+| P0 / R2 | Reproduce denied/stale Docker access, restart/resume and backend failures; show one accurate next action and diagnose from a report | M | Hub + installed x86 testing | R1; real traces remain required; no unrestricted remote shell |
 | P0 / A4 | Resolve Chrome redistribution before external images; if replacement needed, preserve a usable default browser and test fresh installs | S investigation; implementation TBD | Packages + ISO | Distribution approval; do not guess legal clearance |
 | P0 / A5 | Review and integrate coordinated branches, back up approved source remotely, record exact release inputs and complete Lenovo update/rollback using real channel | S–M | All repositories | A1–A4; source push/merge approval; no test-fixture promotion |
 | P1 / Q1 | Fix installer tip that still advertises Kdenlive as a default; verify wording matches optional availability | XS | ISO source; next planned media build | Do not rebuild accepted media solely for this wording |
@@ -75,7 +77,7 @@ Lift estimates are relative engineering effort, not dates: XS = focused copy/che
 | P3 / F4 | One tested Paperclip/Hermes harness adapter, including compatibility, permissions, update and removal | M–L | Hub | Keep Coming soon until end-to-end proof; separate from full marketplace |
 | P3 / F5 | Full marketplace installer, universal memory, model routing, broad harness support | L | Separate scoped workstreams | Deferred; avoid expanding foundation work |
 
-Current approved work: A2's delivery choice is public `letsgomaslow/maslow-releases` with GitHub Pages metadata and protected local signing. Its public scaffold is live; production trust and releases remain absent. A3 and F1 are in implementation, with Q2/Q3/F3 and bounded update history in the same B payload. Read the current handoff for evidence and remaining gates. Security design S1 blocks any promise of agent-hidden secrets, not a controlled internal install test.
+Current checkpoint: A2 staging delivery and 0.2.1 publication are complete; Lenovo visibly reports 0.2.1. A3 native recovery and F1 backend/trace acceptance remain open. R1/R2 are recommended next, not authorization to deploy or collect device data. Security design S1 still blocks any promise of agent-hidden secrets.
 
 For A2/A3, follow the [internet OTA workflow and payload options](ota-update-workflow.md), as superseded by the approved [local Langfuse implementation milestone](handoffs/2026-09-09-hub-ota-observability.md). The payload is a working optional local backend plus guidance, not just a Coming soon screen. Prove `0.1.3 → B → rollback → B → C` on installed systems. Connect's serverless adaptation and OS package updates remain independent. No ISO rebuild is needed; release promotion remains explicit.
 
@@ -98,7 +100,9 @@ For A2/A3, follow the [internet OTA workflow and payload options](ota-update-wor
 
 ## Verification and session closeout
 
-Current publication state: signed staging is LIVE and anonymously verified. Distribution commit `5946003`; successful Pages run `34553966910`; both package releases immutable. Manifest sequence 2 / catalog sequence 1 expire September 24, 2026 at 23:56:41 UTC. Public packages, signatures, metadata, fingerprint and bootstrap checksum verified. Next is user-performed one-time Lenovo enrollment, Hub 0.1.3→0.2.0 update and feedback, then rollback/reapply. No more signing or publication approval is needed for this bundle. Read the UI staging handoff's published section for endpoints and evidence; older entries below are historical checkpoints.
+Current publication record: signed staging sequence 3 / catalog sequence 1, distribution `8791c37972525af0edcbe6ee980d70b7f97d4577`, independently verified September 11. Versions 0.1.3, 0.2.0 and 0.2.1 remain immutable; metadata expires September 24, 2026 at 23:56:41 UTC. Lenovo's supplied photo shows 0.2.1. No further signing or enrollment for that update. This closeout did not republish or revalidate the live endpoint. Read the latest closeout for current action.
+
+### Historical checkpoints, not instructions to repeat
 
 Publication checkpoint: user approved publication, but GitHub rejected bare checksum tags with HTTP 422. Nothing is public except the prior scaffold; one failed unpublished baseline draft remains. Release-only fix `fe4b9b8` uses `sha256-<digest>` tags and passes 73 tests plus UI checks. Exact package bytes/signatures are unchanged. A prepared sequence-2 manifest needs one operator signature via `hub-evidence/ota-ui-020/sign-staging-url-fix.sh`; then continue already-authorized promotion. See the UI staging handoff's publication-attempt section. Do not repeat the original signing script, rebuild packages, or ask for publication approval again solely for this naming fix.
 

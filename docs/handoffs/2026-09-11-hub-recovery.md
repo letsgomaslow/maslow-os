@@ -1,5 +1,7 @@
 # Hub recovery release after Lenovo feedback
 
+Superseded for current actions by the [support-readiness closeout](2026-09-12-support-readiness-closeout.md): Lenovo now visibly reports 0.2.1. Preserve this document as release evidence; do not repeat the historical signing or update instructions below.
+
 ## Latest checkpoint: published and anonymously verified
 
 On September 11 the operator completed protected signing in `../hub-evidence/ota-recovery-021/signed-run.4jssK8`. Local signature, compatibility, expiry, package hash and catalog validation passed. The coordinator published the exact final 0.2.1 package to its immutable checksum release, re-downloaded all released package/signature bytes anonymously, then promoted staging sequence 3 in distribution commit `8791c37972525af0edcbe6ee980d70b7f97d4577`. GitHub Pages reported that exact commit built successfully.
@@ -28,7 +30,7 @@ Prepare Hub 0.2.1 as a recovery-focused package without an ISO rebuild. Track in
 
 Keep the signed 0.2.0 and exact 0.1.3 packages immutable and available for recovery. Preserve onboarding, launchers, provider configuration, backend credentials and trace volumes. No backend image/database upgrade is part of this repair. Source is private; public staging requires a reviewed artifact, protected operator signing, and anonymous verification. Do not tell the user to update until that release is actually published and verified.
 
-## Verification and next action
+## Historical pre-publication verification checkpoint
 
 Implementation is committed in the private Hub checkout at `02caa562c626a4bae7a16e86187bd6d80b73e3ef`, following `1d12d8a5ad9b6c9111d59dc49489671c740c3e44`. Runtime/package behavior and ISO are unchanged. Public staging was checked anonymously and remains sequence 2 / Hub 0.2.0. The Lenovo should remain unchanged until signing, explicit staging publication and anonymous verification complete. Native backend startup/real trace acceptance is still a distinct gate, not established by simulated progress or permission checks.
 
@@ -45,7 +47,7 @@ The repaired Hub can be delivered through its existing package-owned update path
 - Actual guest QMP image `../hub-evidence/ota-recovery-021/installed/final-021.png` confirms installed 0.2.1 UI and update history. Idle display initially reported inactive; waking revealed a crashed-lockscreen failsafe. Authenticated SSH recovery in the disposable guest restored the display. This is a separate harness/runtime issue, not evidence of an observability failure. The same-version local rebuild retained the earlier status-label QML in the live process even though the final file on disk was correct; do not reuse version numbers for public artifacts. Final source status-label regression passes, but that last label change was not independently confirmed in a fresh-process installed render.
 - Installed diagnostic command ran and reported actual 4 GiB safeguard and Docker permission failures without granting access. This constrained guest is not a supported Langfuse hardware benchmark. Real backend startup, Hermes trace receipt and Lenovo recovery are still unverified.
 
-## Immediate next action: protected signing, then staging publication
+## Historical signing procedure, already completed
 
 Unsigned public-only bundle is `../hub-evidence/ota-recovery-021/public-sequence-3/bundle`. It retains the exact signed 0.1.3 and 0.2.0 rollback packages and existing signed catalog. Proposed staging sequence 3 expires September 24, 2026; re-check current public sequence and expiry before promotion. Manifest SHA-256 is `4369f9688ed45ef0dc43d549133d920252a8640760ccdb4df3d31dae0c3db882`.
 
