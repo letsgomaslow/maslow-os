@@ -19,6 +19,7 @@ from .hermes import HermesClient
 from .errors import VoiceError
 from .ipc import ControlServer, MAX_REQUEST, peer_is_owner, remove_stale_socket
 from .keyring import Credentials
+from .live_tasks import LiveTaskPlanner, LiveTranscript, live_request_id, live_update_text
 from .models import discover_models, download_speech, test_model, verify_speech
 from .providers import create_provider
 from .store import TaskStore, TERMINAL
@@ -26,7 +27,8 @@ from .tasks import TaskManager, text_field, validate_brief
 
 
 class VoiceService:
-    def __init__(self, directory=None, runtime=None, *, provider_factory=create_provider, credentials=None, executor_factory=None):
+    def __init__(self, directory=None, runtime=None, *, provider_factory=create_provider, credentials=None, executor_factory=None,
+                 audio_transport_factory=PortAudioTransport, live_planner=None):
         self.settings = Settings(directory)
         self.directory = self.settings.directory
         self.runtime = private_directory(Path(runtime)) if runtime else runtime_directory()
@@ -34,15 +36,20 @@ class VoiceService:
         self.store = TaskStore(self.directory)
         self.store.prune(self.settings.value["retention_days"])
         self.provider_factory = provider_factory
+        self.audio_transport_factory = audio_transport_factory
+        self.live_planner = live_planner or LiveTaskPlanner()
         self.provider = None
         self.session = {"id": str(uuid.uuid4()), "transcript": []}
         self.voice = {"enabled": False, "state": "disabled", "microphone": False, "speaking": False, "level": 0, "error": ""}
-        self.readiness = {"ready": False, "checks": [], "models": []}
+        self.readiness = {"ready": False, "checks": [], "models": [],
+                          "conversation": {"ready": False, "checks": []}, "tasks": {"ready": False, "checks": []}}
         self.project = ""
         self.context = ""
         self.turn_id = ""
         self.source = ""
         self.turns = {}
+        self.live_transcript = LiveTranscript()
+        self.live_delegations = {}
         self.provider_epoch = None
         self.last_activity = time.monotonic()
         self.lifecycle_lock = asyncio.Lock()
@@ -105,6 +112,11 @@ class VoiceService:
             # A failed connection must release physical capture immediately.
             if self.provider:
                 self.background(self.end_voice(preserve_error=True))
+        elif kind == "closed":
+            # Remote expiry and hangup are terminal for the audio conversation.
+            # Durable tasks keep running after this provider is detached.
+            if self.provider:
+                self.background(self.end_voice())
         elif kind == "level":
             level = max(0, min(float(event.get("level", 0)), 1))
             self.voice["level"] = level
@@ -132,7 +144,107 @@ class VoiceService:
                         self.turns.pop(next(iter(self.turns)))
                 self.source, self.turn_id = text, identity or ""
                 self.last_activity = time.monotonic()
+        elif kind == "transcript_delta":
+            role = "user" if event.get("role") == "user" else "assistant"
+            raw_delta = event.get("delta")
+            delta = raw_delta[:8000] if isinstance(raw_delta, str) else ""
+            self.live_transcript.append(role, delta, event.get("start_ms"), event.get("end_ms"))
+            if delta:
+                transcript = self.session["transcript"]
+                if transcript and transcript[-1].get("partial") and transcript[-1]["role"] == role:
+                    transcript[-1]["text"] = (transcript[-1]["text"] + delta)[-24000:]
+                else:
+                    transcript.append({"role": role, "text": delta, "partial": True})
+                self.session["transcript"] = transcript[-100:]
+                self.last_activity = time.monotonic()
+        elif kind == "delegation" and self.settings.value["mode"] == "gpt_live":
+            identity = event.get("delegation_id")
+            if isinstance(identity, str) and identity and identity not in self.live_delegations:
+                self.live_delegations[identity] = None
+                self.background(self._handle_live_delegation(
+                    self.provider, self.provider_epoch, identity, event.get("offset_ms"), self.live_transcript.mark()))
         await self.publish()
+
+    async def _append_live_context(self, provider, epoch, kind, content, delegation_id=None):
+        content = live_update_text(content)
+        if not content or self.provider is not provider or self.provider_epoch is not epoch:
+            return False
+        try:
+            await provider.append_context(kind, content, delegation_id)
+            return True
+        except VoiceError:
+            return False
+
+    async def _prepare_live_task(self, transcript, delegation_id, *, session_id, project, context, preferred_coder):
+        path = Path(project).expanduser()
+        if not project or not path.is_absolute() or not path.is_dir():
+            raise VoiceError("PROJECT_REQUIRED", "Choose an existing project folder before delegating work.")
+        project = str(path.resolve())
+        active = [task for task in self.store.active() if task["project"] == project]
+        plan = await asyncio.wait_for(self.live_planner.prepare(
+            transcript, context=context, preferred_coder=preferred_coder, active_tasks=active), 5)
+        if plan["action"] == "new":
+            request_id = live_request_id(session_id, delegation_id, plan["source"])
+            task = await self.tasks.submit(request_id, plan["brief"], project, "gpt_live", plan["source"], preferred_coder)
+        else:
+            task = await self.tasks.action(plan["task_id"], plan["action"], plan.get("text", ""))
+        return task, plan["action"]
+
+    async def _handle_live_delegation(self, provider, epoch, delegation_id, offset_ms, untimed_through):
+        try:
+            # Transcript fragments and the delegation notice use independent
+            # event streams. Yield briefly for fragments at the same offset.
+            await asyncio.sleep(0.1)
+            if self.provider is not provider or self.provider_epoch is not epoch:
+                return
+            transcript = self.live_transcript.snapshot(offset_ms, untimed_through)
+            task, action = await self._prepare_live_task(
+                transcript, delegation_id, session_id=self.session["id"], project=self.project,
+                context=self.context, preferred_coder=self.settings.value["default_coder"])
+            if self.provider is not provider or self.provider_epoch is not epoch:
+                return  # The durable task survives, but this conversation is gone.
+            self.live_delegations[delegation_id] = task["id"]
+            message = ("Maslow accepted the delegated task locally. The task remains active if audio stops." if action == "new"
+                       else "Maslow accepted the task cancellation." if action == "cancel"
+                       else "Maslow sent the correction to the active task.")
+            await self._append_live_context(provider, epoch, "thinking", message, delegation_id)
+            self.background(self._relay_live_task(provider, epoch, task["id"], delegation_id))
+        except asyncio.CancelledError:
+            raise
+        except Exception as error:
+            message = error.message if isinstance(error, VoiceError) else "The local task planner needs attention."
+            await self._append_live_context(provider, epoch, "commentary", "I could not start that task. " + message, delegation_id)
+
+    async def _relay_live_task(self, provider, epoch, task_id, delegation_id=None):
+        previous = None
+        while True:
+            task = self.store.get(task_id)
+            state = task["state"]
+            if state != previous:
+                previous = state
+                if state == "accepted":
+                    await self._append_live_context(provider, epoch, "thinking", "Hermes accepted the task.", delegation_id)
+                elif state == "running":
+                    await self._append_live_context(provider, epoch, "thinking", "The selected local agent is working on the task.", delegation_id)
+                elif state == "awaiting_approval":
+                    await self._append_live_context(provider, epoch, "commentary", "The task needs your approval in Voice before it can continue.", delegation_id)
+                elif state == "waiting_input":
+                    await self._append_live_context(provider, epoch, "commentary", "The task needs more information. Review it in Voice to continue.", delegation_id)
+                elif state == "completed":
+                    result = live_update_text(task.get("result") or "The task completed with no result summary.", 400)
+                    await self._append_live_context(provider, epoch, "commentary", "The task completed. " + result, delegation_id)
+                    return
+                elif state in {"failed", "interrupted"}:
+                    error = task.get("error") or {}
+                    message = live_update_text(error.get("message") or "The task stopped before a verified result.", 400)
+                    await self._append_live_context(provider, epoch, "commentary", message, delegation_id)
+                    return
+                elif state == "cancelled":
+                    await self._append_live_context(provider, epoch, "commentary", "The task was cancelled.", delegation_id)
+                    return
+            if self.provider is not provider or self.provider_epoch is not epoch:
+                return
+            await asyncio.sleep(0.25)
 
     async def submit_intent(self, intent, turn_id=None):
         brief = validate_brief(intent)
@@ -149,7 +261,8 @@ class VoiceService:
 
     async def selected_secrets(self):
         mode = self.settings.value["mode"]
-        names = {"offline": [], "server": ["server_token"], "openai": ["openai"], "livekit": ["livekit_key", "livekit_secret"]}[mode]
+        names = {"offline": [], "server": ["server_token"], "openai": ["openai"], "gpt_live": ["openai"],
+                 "livekit": ["livekit_key", "livekit_secret"]}[mode]
         return {name: await self.credentials.get(name) for name in names}
 
     async def offline_runtime(self, project=None):
@@ -236,8 +349,8 @@ class VoiceService:
                 async def audio_error():
                     await emit({"type": "error", "code": "AUDIO_FAILED",
                                 "message": "Microphone audio stopped. Check the selected microphone and speakers, then start talking again."})
-                transport = PortAudioTransport(microphone_device=config["microphone_device"], speaker_device=config["speaker_device"],
-                                               on_error=audio_error)
+                transport = self.audio_transport_factory(microphone_device=config["microphone_device"],
+                                                         speaker_device=config["speaker_device"], on_error=audio_error)
                 async def submit(intent, turn_id):
                     if self.provider_epoch is not epoch:
                         raise VoiceError("TURN_ENDED", "This conversation has ended. Please repeat the request.")
@@ -260,6 +373,8 @@ class VoiceService:
     def _detach_provider(self):
         self.provider_epoch = None
         self.turns.clear()
+        self.live_transcript.clear()
+        self.live_delegations.clear()
         provider, self.provider = self.provider, None
         self.voice.update(enabled=False, state="disabled", microphone=False, speaking=False, level=0)
         if provider:
@@ -275,7 +390,10 @@ class VoiceService:
             except Exception:
                 pass
         try:
-            await asyncio.wait_for(provider.stop(), 3)
+            timeout = getattr(provider, "cleanup_timeout", 3)
+            if type(timeout) not in {int, float} or timeout < 3 or timeout > 30:
+                timeout = 3
+            await asyncio.wait_for(provider.stop(), timeout)
         except Exception:
             # The epoch has already been revoked. A remote cleanup failure
             # cannot reactivate this conversation.
@@ -307,6 +425,46 @@ class VoiceService:
 
     async def check_readiness(self, discover=False):
         config = self.settings.value
+        if config["mode"] == "gpt_live":
+            conversation_checks, task_checks = [], []
+            key = (await self.selected_secrets()).get("openai", "")
+            conversation_checks.append({"name": "GPT-Live account", "ok": bool(key),
+                "message": "The OpenAI credential is saved in the desktop keyring. Start talking to test the real session."})
+            hermes_ready = bool(shutil.which("hermes"))
+            task_checks.append({"name": "Hermes coordinator", "ok": hermes_ready,
+                "message": "Install Hermes through Hub for durable task handoff."})
+            if hermes_ready:
+                try:
+                    await self.hermes.model_config("gpt_live")
+                    model_ready, model_message = True, "The selected native Hermes inference profile is configured."
+                except VoiceError as error:
+                    model_ready, model_message = False, error.message
+            else:
+                model_ready, model_message = False, "Configure Hermes after it is installed."
+            task_checks.append({"name": "Hermes inference", "ok": model_ready, "message": model_message})
+            coder = config["default_coder"]
+            if coder == "codex":
+                selected_ready = bool(shutil.which("codex"))
+                selected_message = "Codex is installed; its connection is checked when the task starts." if selected_ready else "Install or repair Codex before selecting it for GPT-Live tasks."
+            elif coder == "claude":
+                try:
+                    __import__("claude_agent_sdk")
+                    sdk_ready = True
+                except ImportError:
+                    sdk_ready = False
+                selected_ready = bool(sdk_ready and await self.credentials.get("anthropic"))
+                selected_message = "Claude is configured; its connection is checked when the task starts." if selected_ready else "Install the Claude SDK and connect its account before selecting Claude."
+            else:
+                selected_ready = hermes_ready and model_ready
+                selected_message = "Hermes will execute the task directly." if selected_ready else "Finish the Hermes setup before selecting it for GPT-Live tasks."
+            task_checks.append({"name": "Selected task agent", "ok": selected_ready, "message": selected_message})
+            conversation_ready = all(check["ok"] for check in conversation_checks)
+            tasks_ready = all(check["ok"] for check in task_checks)
+            self.readiness = {"ready": conversation_ready and tasks_ready, "checks": conversation_checks + task_checks, "models": [],
+                              "conversation": {"ready": conversation_ready, "checks": conversation_checks},
+                              "tasks": {"ready": tasks_ready, "checks": task_checks}}
+            await self.publish()
+            return {"readiness": self.readiness}
         checks, models = [], []
         testing_new_workspace = config["mode"] == "offline" and self.offline is None and not self.provider and not self.store.active()
         def add(name, ok, message):
@@ -429,6 +587,34 @@ class VoiceService:
         elif action == "submit_text":
             text = text_field(request.get("text"), "message", 12000, True)
             async with self.turn_lock:
+                if self.settings.value["mode"] == "gpt_live":
+                    project = request.get("project", "")
+                    if project:
+                        path = Path(project).expanduser()
+                        if not path.is_absolute() or not path.is_dir():
+                            raise VoiceError("PROJECT_REQUIRED", "Choose an existing project folder.")
+                        resolved = str(path.resolve())
+                        if self.provider and self.project and resolved != self.project:
+                            raise VoiceError("SESSION_PROJECT_FIXED", "End this conversation before choosing a different project.")
+                        self.project = resolved
+                    context = text_field(request.get("context", self.context), "context", 12000)
+                    if self.provider and context != self.context:
+                        raise VoiceError("SESSION_CONTEXT_FIXED", "End this conversation before changing its context.")
+                    self.context = context
+                    identity = uuid.uuid4().hex
+                    self.session["transcript"] = [*self.session["transcript"], {"role": "user", "text": text}][-100:]
+                    task, action = await self._prepare_live_task(
+                        [{"role": "user", "text": text}], identity, session_id=self.session["id"], project=self.project,
+                        context=self.context, preferred_coder=self.settings.value["default_coder"])
+                    if self.provider:
+                        provider, epoch = self.provider, self.provider_epoch
+                        message = ("Maslow accepted the typed task locally. It remains active if audio stops." if action == "new"
+                                   else "Maslow accepted the task cancellation." if action == "cancel"
+                                   else "Maslow sent the correction to the active task.")
+                        await self._append_live_context(provider, epoch, "thinking", message, None)
+                        self.background(self._relay_live_task(provider, epoch, task["id"], None))
+                    await self.publish()
+                    return {"task": {"id": task["id"], "state": task["state"], "title": task["title"]}}
                 if not self.provider:
                     await self.start_voice(audio=False, project=request.get("project", ""), context=request.get("context", ""))
                 else:

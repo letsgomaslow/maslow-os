@@ -15,6 +15,7 @@ from maslow_voice.errors import VoiceError
 from .base import VoiceProvider
 from .livekit_expressive import LiveKitExpressiveProvider
 from .local import LocalProvider
+from .openai_live import OpenAILiveProvider
 from .openai_realtime import OpenAIRealtimeProvider
 
 Emit = Callable[[dict[str, Any]], Awaitable[None]]
@@ -47,6 +48,8 @@ def create_provider(
         return LiveKitExpressiveProvider(**common)
     if mode == "openai":
         return OpenAIRealtimeProvider(**common)
+    if mode == "gpt_live":
+        return OpenAILiveProvider(**common)
     if mode in {"offline", "server"}:
         return LocalProvider(**common)
     raise VoiceError("INVALID_SETTINGS", "Choose one of the supported Voice options.")

@@ -15,7 +15,7 @@ from .errors import VoiceError
 from .hermes import HermesClient
 
 PROVIDER_KEYS = {
-    "openrouter": "OPENROUTER_API_KEY", "openai": "OPENAI_API_KEY", "anthropic": "ANTHROPIC_API_KEY",
+    "openrouter": "OPENROUTER_API_KEY", "openai": "OPENAI_API_KEY", "openai-api": "OPENAI_API_KEY", "anthropic": "ANTHROPIC_API_KEY",
     "nous-api": "NOUS_API_KEY", "lmstudio": "LM_API_KEY", "custom": "OPENAI_API_KEY",
 }
 HERMES_START_TIMEOUT = 120

@@ -1,8 +1,8 @@
-"""Development-only GPT-Live audio adapter with host-owned client delegation.
+"""GPT-Live audio adapter with host-owned client delegation.
 
-This is deliberately separate from the production provider factory. Live sends
-continuous audio and transcript fragments, not Realtime items or safe work
-intents. The host owns interpretation, authorization and backend task lifetime.
+Live sends continuous audio and transcript fragments, not Realtime items or
+safe work intents. The host owns interpretation, authorization and backend task
+lifetime.
 """
 from __future__ import annotations
 
@@ -14,11 +14,10 @@ import uuid
 from typing import Any
 
 from maslow_voice.audio import PCM24K, PcmFrame, resample_pcm16
-from maslow_voice.voices import OPENAI_VOICES
+from maslow_voice.voices import LIVE_VOICES
 from .base import ProviderError, VoiceProvider
 from .openai_realtime import OpenAIRealtimeProvider, _default_socket_factory
 
-LIVE_VOICES = (*OPENAI_VOICES, "quartz", "ripple", "vesper", "willow", "stone", "gleam", "meridian", "bossa", "tempo", "beacon", "delta", "cinder")
 CLOSE_REASONS = {"close_requested", "expired", "content", "remote_hangup", "connection_lost"}
 
 
@@ -28,18 +27,21 @@ class OpenAILiveProvider(VoiceProvider):
         kwargs.setdefault("submit", self._reject_submit)
         super().__init__(**kwargs)
         self._socket_factory = self.config.get("socket_factory", _default_socket_factory)
+        # Graceful close can spend up to 15 seconds waiting for the provider's
+        # terminal usage event, followed by bounded socket cleanup.
+        self.cleanup_timeout = 25
         self._socket = None
         self._reader = self._playback_task = self._silence_task = None
-        self._write_lock = asyncio.Lock()
-        self._stop_lock = asyncio.Lock()
-        self._ready = asyncio.Event()
-        self._finalized = asyncio.Event()
+        self._write_lock = None
+        self._stop_lock = None
+        self._ready = None
+        self._finalized = None
         self._session_started = False
         self._closing = False
         self._failure = None
         self._speaking = False
         self._input_silence = bool(self.config.get("live_input_silence", False))
-        self._queue = asyncio.Queue(maxsize=6000)
+        self._queue = None
         self._queued_bytes = 0
         self._max_audio_bytes = PCM24K * 2 * 60
         self._generation = 0
@@ -87,8 +89,9 @@ class OpenAILiveProvider(VoiceProvider):
     async def start(self, audio=True):
         if self._started:
             return
-        self._ready.clear()
-        self._finalized.clear()
+        self._ready = asyncio.Event()
+        self._finalized = asyncio.Event()
+        self._queue = asyncio.Queue(maxsize=6000)
         self._closing = self._session_started = False
         self._failure = None
         self._muted = self._speaking = False
@@ -139,6 +142,8 @@ class OpenAILiveProvider(VoiceProvider):
     async def _send(self, event):
         if self._socket is None:
             raise ProviderError("Start GPT-Live before sending an update.", "LIVE_NOT_STARTED")
+        if self._write_lock is None:
+            self._write_lock = asyncio.Lock()
         async with self._write_lock:
             await asyncio.wait_for(self._socket.send(json.dumps(event, separators=(",", ":"))), 10)
 
@@ -214,6 +219,9 @@ class OpenAILiveProvider(VoiceProvider):
 
     def _clear_output(self):
         self._generation += 1
+        if self._queue is None:
+            self._queued_bytes = 0
+            return
         while not self._queue.empty():
             self._queue.get_nowait()
             self._queue.task_done()
@@ -249,7 +257,8 @@ class OpenAILiveProvider(VoiceProvider):
             await self._fail(error)
 
     async def wait_playback(self):
-        await self._queue.join()
+        if self._queue is not None:
+            await self._queue.join()
         if self.audio_transport is not None:
             await self.audio_transport.wait_playback()
         if self._failure:
@@ -257,13 +266,13 @@ class OpenAILiveProvider(VoiceProvider):
 
     async def _read_events(self):
         try:
-            while self._socket is not None and not self._finalized.is_set():
+            while self._socket is not None and self._finalized is not None and not self._finalized.is_set():
                 raw = await self._socket.recv()
                 await self._handle_event(json.loads(raw))
         except asyncio.CancelledError:
             raise
         except Exception as error:
-            if not self._finalized.is_set():
+            if self._finalized is None or not self._finalized.is_set():
                 await self._fail(error)
 
     @staticmethod
@@ -280,7 +289,8 @@ class OpenAILiveProvider(VoiceProvider):
         if kind == "session.started":
             self._session_started = True
             self._metrics["session_started"] = True
-            self._ready.set()
+            if self._ready is not None:
+                self._ready.set()
         elif kind == "session.output_audio.delta" and self._started and not self._closing:
             pcm = base64.b64decode(event.get("delta", ""), validate=True)
             if len(pcm) % 2:
@@ -330,8 +340,10 @@ class OpenAILiveProvider(VoiceProvider):
             self._metrics["finalized"] = True
             reason = event.get("reason")
             self._metrics["closed_reason"] = reason if reason in CLOSE_REASONS else "other"
-            self._finalized.set()
-            self._ready.set()
+            if self._finalized is not None:
+                self._finalized.set()
+            if self._ready is not None:
+                self._ready.set()
             self._started = self._audio_enabled = self._speaking = False
             self._clear_output()
             await self._event({"type": "closed", "finalized": True, "reason": self._metrics["closed_reason"], "usage_seconds": self._metrics["usage_seconds"]})
@@ -364,7 +376,8 @@ class OpenAILiveProvider(VoiceProvider):
         self._metrics["errors"] += 1
         self._metrics["last_error_code"] = self._failure.code
         self._started = self._audio_enabled = self._speaking = False
-        self._ready.set()
+        if self._ready is not None:
+            self._ready.set()
         self._clear_output()
         try:
             if self.audio_transport is not None:
@@ -374,10 +387,13 @@ class OpenAILiveProvider(VoiceProvider):
         await self._error(self._failure)
 
     async def stop(self):
+        if self._stop_lock is None:
+            self._stop_lock = asyncio.Lock()
         async with self._stop_lock:
             self._closing = True
             self._started = self._audio_enabled = self._speaking = False
-            self._ready.set()
+            if self._ready is not None:
+                self._ready.set()
             if self._silence_task is not None:
                 self._silence_task.cancel()
                 await asyncio.gather(self._silence_task, return_exceptions=True)
@@ -388,7 +404,7 @@ class OpenAILiveProvider(VoiceProvider):
             except Exception:
                 pass
             try:
-                if self._socket is not None and self._session_started and not self._finalized.is_set() and not self._failure:
+                if self._socket is not None and self._session_started and self._finalized is not None and not self._finalized.is_set() and not self._failure:
                     await asyncio.wait_for(self._send({"type": "session.close", "event_id": uuid.uuid4().hex}), 2)
                     await asyncio.wait_for(self._finalized.wait(), self.config.get("live_close_timeout", 15))
             except Exception:
@@ -409,5 +425,5 @@ class OpenAILiveProvider(VoiceProvider):
                     except Exception:
                         pass
                 await self._voice_state("disabled")
-                if self._session_started and not self._finalized.is_set():
+                if self._session_started and self._finalized is not None and not self._finalized.is_set():
                     await self._event({"type": "closed", "finalized": False, "reason": "unconfirmed", "usage_seconds": self._metrics["usage_seconds"]})

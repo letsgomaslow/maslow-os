@@ -179,6 +179,16 @@ class OpenAILiveTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(self.events[-1]['reason'], 'unconfirmed')
         self.assertTrue(self.socket.closed)
 
+    async def test_remote_expiry_releases_audio_capture_and_reports_disabled(self):
+        await self.provider.start()
+        await self.provider._handle_event({'type': 'session.closed', 'reason': 'expired', 'usage': {'seconds': 11}})
+        self.audio.stop.assert_awaited_once()
+        self.assertFalse(self.provider._started)
+        self.assertFalse(self.events[-1]['microphone'])
+        self.assertEqual(self.events[-2], {
+            'type': 'closed', 'finalized': True, 'reason': 'expired', 'usage_seconds': 11,
+        })
+
     async def test_cancelled_start_releases_socket_and_owned_reader_without_capture(self):
         self.socket.ack_start = False
         task = asyncio.create_task(self.provider.start())

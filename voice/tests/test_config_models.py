@@ -1,14 +1,17 @@
 import hashlib
 import json
+import sys
 import tempfile
 import unittest
 from pathlib import Path
+from types import SimpleNamespace
+from unittest.mock import patch
 
 from maslow_voice.config import Settings, validate_settings, validate_endpoint
-from maslow_voice.coordinator import clean_environment, hermes_configuration
+from maslow_voice.coordinator import clean_environment, hermes_configuration, read_existing_model
 from maslow_voice.errors import VoiceError
 from maslow_voice.models import verify_speech
-from maslow_voice.voices import LIVEKIT_VOICES, OPENAI_VOICES
+from maslow_voice.voices import LIVEKIT_VOICES, LIVE_VOICES, OPENAI_VOICES
 
 
 class ConfigurationTests(unittest.TestCase):
@@ -32,7 +35,9 @@ class ConfigurationTests(unittest.TestCase):
 
     def test_cloud_voice_defaults_and_validation_follow_the_curated_lists(self):
         self.assertEqual(validate_settings({})["realtime_voice"], "cedar")
+        self.assertEqual(validate_settings({})["live_voice"], "marin")
         self.assertEqual(validate_settings({})["livekit_voice"], "Ashley")
+        self.assertEqual(validate_settings({"mode": "gpt_live", "live_voice": LIVE_VOICES[-1]})["mode"], "gpt_live")
         self.assertEqual(validate_settings({"realtime_voice": OPENAI_VOICES[-1]})["realtime_voice"], OPENAI_VOICES[-1])
         self.assertEqual(validate_settings({"livekit_voice": LIVEKIT_VOICES[-1]})["livekit_voice"], LIVEKIT_VOICES[-1])
         with self.assertRaises(VoiceError):
@@ -44,6 +49,16 @@ class ConfigurationTests(unittest.TestCase):
                 validate_settings({"realtime_voice": value})
             with self.assertRaises(VoiceError):
                 validate_settings({"livekit_voice": value})
+
+    def test_native_hermes_openai_api_provider_name_is_supported(self):
+        with tempfile.TemporaryDirectory() as root:
+            home = Path(root)
+            (home / "config.yaml").write_text('{"model":{"default":"gpt-5-mini","provider":"openai-api"}}')
+            (home / ".env").write_text("OPENAI_API_KEY=fixture-key\n")
+            with patch.dict(sys.modules, {"yaml": SimpleNamespace(safe_load=json.loads)}):
+                model, environment = read_existing_model(home)
+        self.assertEqual(model, {"default": "gpt-5-mini", "provider": "openai-api"})
+        self.assertEqual(environment, {"OPENAI_API_KEY": "fixture-key"})
 
     def test_dedicated_hermes_profile_has_no_fallback_or_broad_tools(self):
         config = hermes_configuration({"provider": "custom", "default": "local"}, "token", 9000, "/work")

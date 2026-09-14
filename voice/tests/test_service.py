@@ -14,6 +14,8 @@ from maslow_voice.hermes import HermesClient
 class FakeProvider:
     def __init__(self, config, secrets, emit, submit, transport):
         self.emit, self.submit = emit, submit
+        self.config, self.transport = config, transport
+        self.context_updates = []
         self.started = False
     async def start(self, audio=True):
         self.started = True
@@ -22,6 +24,8 @@ class FakeProvider:
         self.started = False
     async def text(self, text, context):
         await self.emit({"type": "transcript", "role": "user", "text": text, "final": True, "turn_id": "turn-" + text})
+    async def append_context(self, kind, content, delegation_id=None):
+        self.context_updates.append((kind, content, delegation_id))
 
 
 class ServiceTests(unittest.IsolatedAsyncioTestCase):
@@ -181,6 +185,93 @@ class ServiceTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(self.service.session["transcript"], [])
         self.assertEqual(len(self.service.store.list()), 1)
         self.assertNotIn("test-secret-never-echo", json.dumps(self.service.snapshot()))
+
+    async def test_gpt_live_delegation_uses_bounded_fragments_and_task_survives_audio_stop(self):
+        self.service.settings.update({"mode": "gpt_live", "default_coder": "codex"})
+        await self.service.dispatch({"action": "start_voice", "project": str(self.project)})
+        provider = self.service.provider
+        await self.service.provider_event({"type": "transcript_delta", "role": "user", "delta": "Create ", "start_ms": 10, "end_ms": 20})
+        await self.service.provider_event({"type": "transcript_delta", "role": "user", "delta": "a harmless note.", "start_ms": 20, "end_ms": 40})
+        await self.service.provider_event({"type": "delegation", "delegation_id": "delegation-1", "offset_ms": 40})
+        await self.service.provider_event({"type": "delegation", "delegation_id": "delegation-1", "offset_ms": 40})
+        for _ in range(40):
+            if self.service.store.list():
+                break
+            await asyncio.sleep(.01)
+        task = self.service.store.list()[0]
+        self.assertEqual(task["mode"], "gpt_live")
+        self.assertEqual(task["brief"]["tool_preference"], "codex")
+        self.assertIn("Create a harmless note", task["source"])
+        self.assertEqual(self.service.live_delegations["delegation-1"], task["id"])
+        self.assertEqual(len(self.service.store.list()), 1)
+        self.assertTrue(any(update[0] == "thinking" and update[2] == "delegation-1" for update in provider.context_updates))
+        await self.service.end_voice()
+        await asyncio.sleep(.3)
+        self.assertEqual(self.service.store.get(task["id"])["state"], "queued")
+
+    async def test_gpt_live_typed_task_does_not_open_audio_or_live_connection(self):
+        self.service.settings.update({"mode": "gpt_live", "default_coder": "hermes"})
+        result = await self.service.dispatch({"action": "submit_text", "text": "Create a harmless note", "project": str(self.project)})
+        self.assertIsNone(self.service.provider)
+        self.assertFalse(self.service.voice["microphone"])
+        task = self.service.store.get(result["task"]["id"])
+        self.assertEqual(task["brief"]["tool_preference"], "hermes")
+        self.assertEqual(task["source"], "User transcript: Create a harmless note")
+
+    async def test_gpt_live_cancel_words_cancel_existing_task_without_creating_another(self):
+        self.service.settings.update({"mode": "gpt_live", "default_coder": "hermes"})
+        first = await self.service.dispatch({
+            "action": "submit_text", "text": "Create a harmless note", "project": str(self.project),
+        })
+        result = await self.service.dispatch({
+            "action": "submit_text", "text": "Cancel that task.", "project": str(self.project),
+        })
+        self.assertEqual(result["task"]["id"], first["task"]["id"])
+        self.assertEqual(result["task"]["state"], "cancelled")
+        self.assertEqual(len(self.service.store.list()), 1)
+        self.assertIsNone(self.service.provider)
+
+    async def test_gpt_live_reports_conversation_and_task_readiness_separately(self):
+        self.service.settings.update({"mode": "gpt_live", "default_coder": "codex"})
+        self.service.hermes.model_config = AsyncMock(return_value=({"provider": "openai-api", "default": "gpt-5-mini"}, {}))
+        with patch("maslow_voice.daemon.shutil.which", side_effect=lambda name: "/usr/bin/" + name):
+            result = await self.service.dispatch({"action": "test"})
+        readiness = result["readiness"]
+        self.assertTrue(readiness["conversation"]["ready"])
+        self.assertTrue(readiness["tasks"]["ready"])
+        self.assertTrue(readiness["ready"])
+        self.service.hermes.model_config.assert_awaited_once_with("gpt_live")
+
+    async def test_audio_transport_factory_can_supply_installed_integration_transport(self):
+        transport = object()
+        factory = Mock(return_value=transport)
+        self.service.audio_transport_factory = factory
+        await self.service.dispatch({"action": "start_voice"})
+        self.assertIs(self.service.provider.transport, transport)
+        factory.assert_called_once_with(microphone_device="", speaker_device="", on_error=unittest.mock.ANY)
+
+    async def test_remote_provider_close_detaches_conversation_but_preserves_task(self):
+        await self.service.dispatch({"action": "start_voice", "project": str(self.project)})
+        provider = self.service.provider
+        task = await self.service.tasks.submit(
+            "remote-close-task", {"objective": "Keep working", "summary": "Keep working"},
+            str(self.project), "openai", "Keep working", "codex")
+        await self.service.provider_event({"type": "closed", "reason": "expired", "finalized": True})
+        for _ in range(20):
+            if self.service.provider is None and not provider.started:
+                break
+            await asyncio.sleep(.01)
+        self.assertIsNone(self.service.provider)
+        self.assertFalse(provider.started)
+        self.assertFalse(self.service.voice["microphone"])
+        self.assertEqual(self.service.store.get(task["id"])["state"], "queued")
+
+    async def test_gpt_live_cleanup_uses_provider_close_handshake_budget(self):
+        provider = Mock(cleanup_timeout=25, audio_transport=None)
+        provider.stop = AsyncMock()
+        with patch("maslow_voice.daemon.asyncio.wait_for", wraps=asyncio.wait_for) as wait_for:
+            await self.service._release_provider(provider)
+        self.assertEqual(wait_for.call_args.args[1], 25)
 
     async def test_provider_cannot_override_project_mode_or_permissions(self):
         with self.assertRaises(VoiceError):
