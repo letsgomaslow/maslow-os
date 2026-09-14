@@ -25,7 +25,9 @@ class LiveKitNativeExpressiveProvider(LiveKitExpressiveProvider):
     def _agent_session_options(self) -> dict[str, Any]:
         # Agents 1.8.1 documents this explicit opt-out. PortAudio still runs
         # local APM; physical acoustic-echo validation remains a separate gate.
-        return {"aec_warmup_duration": 0.0}
+        # Gateway STT finals can be sentence fragments or empty. Let local VAD
+        # end native turns, retaining the SDK's pause and interruption defaults.
+        return {"aec_warmup_duration": 0.0, "turn_detection": "vad"}
 
     def _agent_state(self, event: Any) -> None:
         # AgentSession announces listening before custom device startup is

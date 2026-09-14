@@ -261,7 +261,7 @@ class NativeProviderTests(unittest.IsolatedAsyncioTestCase):
         self.assertIs(session.output.audio, provider._native_output)
         self.assertEqual(session.start.await_args.kwargs, {"agent": provider._agent, "record": False})
         audio.start.assert_awaited_once_with(provider._on_audio)
-        self.assertEqual(provider._agent_session_options(), {"aec_warmup_duration": 0.0})
+        self.assertEqual(provider._agent_session_options(), {"aec_warmup_duration": 0.0, "turn_detection": "vad"})
         self.assertEqual(LiveKitExpressiveProvider._agent_session_options(provider), {})
         await provider.stop()
 
@@ -420,6 +420,30 @@ class NativeProviderTests(unittest.IsolatedAsyncioTestCase):
         provider._session = session
         self.addAsyncCleanup(provider._disconnect)
         self.assertEqual(session._opts.aec_warmup_duration, 0.0)
+        self.assertEqual(session.turn_detection, "vad")
+        self.assertEqual(session.options.turn_handling["turn_detection"], "vad")
+        self.assertEqual(session.options.endpointing["min_delay"], 0.5)
+        self.assertEqual(session.options.endpointing["max_delay"], 3.0)
+        self.assertTrue(session.options.interruption["enabled"])
+
+    async def test_real_agents_room_constructor_keeps_stt_turn_detection_default(self):
+        try:
+            from livekit import agents
+        except ImportError:
+            self.skipTest("LiveKit optional SDK is not installed")
+        provider = LiveKitExpressiveProvider(
+            config={"mode": "livekit", "livekit_url": "wss://voice.invalid"},
+            secrets={"livekit_key": "a" * 32, "livekit_secret": "b" * 32},
+            emit=AsyncMock(),
+            submit=AsyncMock(),
+            audio_transport=None,
+        )
+        with patch.object(agents.inference.LLM, "prewarm"):
+            session = provider._create_agent_session(agents, "a" * 32, "b" * 32)
+        provider._session = session
+        self.addAsyncCleanup(provider._disconnect)
+        self.assertEqual(session.turn_detection, "stt")
+        self.assertEqual(session.options.turn_handling["turn_detection"], "stt")
 
 
 class _Session:

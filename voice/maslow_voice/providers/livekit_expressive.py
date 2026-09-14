@@ -246,14 +246,17 @@ class LiveKitExpressiveProvider(VoiceProvider):
         tts = inference.TTS(model="inworld/inworld-tts-2", voice=str(self.config.get("livekit_voice") or "Ashley"), api_key=key, api_secret=secret,
                             http_session=self._http_session)
         self._inference_clients.append(tts)
+        session_options = {
+            "turn_detection": "stt",
+            **self._agent_session_options(),
+        }
         session = agents.AgentSession(
             stt=stt,
             llm=llm,
             tts=tts,
             expressive=True,
             vad=silero.VAD.load(),
-            turn_detection="stt",
-            **self._agent_session_options(),
+            **session_options,
         )
         self._agent = IntentAgent()
         return session
