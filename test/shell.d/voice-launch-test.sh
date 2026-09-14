@@ -53,6 +53,12 @@ if name == "omarchy-shell":
     if action == ["shell", "listPlugins"]:
         if "registry" in s: done(s["registry"])
         scans = s.get("scans", 0)
+        failures = s.get("post_scan_registry_failures", 0)
+        if scans and failures:
+            s["post_scan_registry_failures"] -= 1
+            done(code=1)
+        if scans and s.get("post_scan_registry_unavailable"):
+            done(code=1)
         pending = s.get("pending", 0)
         if scans and pending:
             s["pending"] -= 1
@@ -81,13 +87,15 @@ done()
 
     marker = runtime / "maslow-voice-refresh-pending"
 
-    def run(state, command="launch", page="settings", pending=False, graphical=True):
+    def run(state, command="launch", page="settings", pending=False, graphical=True, extra_env=None):
         if pending:
             marker.touch(mode=0o600)
         else:
             marker.unlink(missing_ok=True)
         state_file.write_text(json.dumps(state))
         call_env = env if graphical else dict(env, XDG_RUNTIME_DIR="")
+        if extra_env:
+            call_env = dict(call_env, **extra_env)
         result = subprocess.run(["bash", str(root / f"bin/omarchy-{command}-voice"), page], env=call_env, text=True, capture_output=True, timeout=8)
         assert result.returncode == 0, result.stderr
         return json.loads(state_file.read_text()), result.stdout
@@ -126,6 +134,29 @@ done()
     assert not actions(state, "rescanPlugins")
     assert len(actions(state, "summon")) == 1
     print("ok - new plugin discovery scans once, awaits registration and avoids repeat refresh")
+
+    state, _ = run({"present": False, "post_scan_registry_failures": 2}, pending=True)
+    assert len(actions(state, "rescanPlugins")) == 1
+    assert len(actions(state, "listPlugins")) == 4
+    assert len(actions(state, "summon")) == 1
+    assert not marker.exists()
+    print("ok - transient post-rescan registry failures retry before opening once")
+
+    state, _ = run({"present": False, "post_scan_registry_failures": 1, "compositor": [1, 1, 1, 0]}, pending=True)
+    assert len(actions(state, "rescanPlugins")) == 1
+    assert not actions(state, "summon")
+    assert marker.exists()
+    print("ok - a lock transition after transient registry recovery prevents opening")
+
+    bash_environment = fixture / "fast-retry.bash"
+    bash_environment.write_text("sleep() { SECONDS=$((SECONDS + 1)); }\n")
+    state, output = run({"present": False, "post_scan_registry_unavailable": True}, pending=True,
+                        extra_env={"BASH_ENV": str(bash_environment)})
+    assert len(actions(state, "rescanPlugins")) == 1
+    assert not actions(state, "summon")
+    assert marker.exists()
+    assert "open Voice again" in output
+    print("ok - permanently unavailable post-rescan registry never opens Voice")
 
     state, _ = run({"present": False, "compositor": [1, 0]})
     no_mutation(state)

@@ -65,11 +65,17 @@ else
     omarchy-shell shell rescanPlugins >/dev/null 2>&1 || defer_open
     deadline=$((SECONDS + 30))
     while (( SECONDS < deadline )); do
-      state=$(plugin_state) || defer_open
-      # The old registry remains readable while an upgrade scan runs. Wait
-      # for the lock service to return too: it is recreated after the scan.
-      if [[ $state != "missing" ]] && desktop_unlocked; then
-        break
+      # Quickshell rebuilds the plugin registry asynchronously. listPlugins
+      # can briefly time out after a successful rescan, so treat it like the
+      # missing registry and let the bounded loop retry.
+      if state=$(plugin_state); then
+        # The old registry remains readable while an upgrade scan runs. Wait
+        # for the lock service to return too: it is recreated after the scan.
+        if [[ $state != "missing" ]] && desktop_unlocked; then
+          break
+        fi
+      else
+        state=""
       fi
       sleep 0.25
     done
