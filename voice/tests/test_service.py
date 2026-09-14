@@ -9,6 +9,8 @@ from maslow_voice.daemon import VoiceService
 from maslow_voice.errors import VoiceError
 from maslow_voice.ipc import ControlServer
 from maslow_voice.hermes import HermesClient
+from maslow_voice.audio import PcmFrame
+from maslow_voice.providers.openai_live import OpenAILiveProvider
 
 
 class FakeProvider:
@@ -249,6 +251,96 @@ class ServiceTests(unittest.IsolatedAsyncioTestCase):
         await self.service.dispatch({"action": "start_voice"})
         self.assertIs(self.service.provider.transport, transport)
         factory.assert_called_once_with(microphone_device="", speaker_device="", on_error=unittest.mock.ANY)
+
+    async def test_blocked_level_watcher_does_not_block_gpt_live_input_or_outlive_close(self):
+        class Socket:
+            def __init__(self):
+                self.inbox = asyncio.Queue()
+                self.sent = []
+            async def send(self, raw):
+                event = json.loads(raw)
+                self.sent.append(event)
+                if event["type"] == "session.start":
+                    self.inbox.put_nowait(json.dumps({"type": "session.started"}))
+                elif event["type"] == "session.close":
+                    self.inbox.put_nowait(json.dumps({"type": "session.closed", "reason": "close_requested"}))
+            async def recv(self):
+                return await self.inbox.get()
+            async def close(self):
+                pass
+
+        class Audio:
+            def __init__(self):
+                self.handler = None
+                self.stop_count = 0
+            async def start(self, handler):
+                self.handler = handler
+            async def set_muted(self, _muted):
+                pass
+            async def stop(self):
+                self.stop_count += 1
+            async def play(self, _frame):
+                pass
+            async def wait_playback(self):
+                pass
+            async def clear_playback(self):
+                pass
+
+        socket, audio = Socket(), Audio()
+        async def socket_factory(*_args):
+            return socket
+        def provider_factory(config, secrets, emit, submit, transport):
+            return OpenAILiveProvider(
+                config=dict(config, socket_factory=socket_factory, live_close_timeout=.02),
+                secrets=secrets, emit=emit, submit=submit, audio_transport=transport)
+        self.service.provider_factory = provider_factory
+        self.service.audio_transport_factory = lambda **_kwargs: audio
+        self.service.settings.update({"mode": "gpt_live"})
+        await self.service.dispatch({"action": "start_voice", "project": str(self.project)})
+
+        publish_entered = asyncio.Event()
+        snapshots = []
+        async def blocked_publish():
+            snapshots.append(self.service.snapshot())
+            if len(snapshots) == 1:
+                publish_entered.set()
+                await asyncio.Event().wait()
+        self.service.control.publish = blocked_publish
+
+        frame = PcmFrame(b"\x10\x00" * 960, 48000)
+        await audio.handler(frame)
+        await asyncio.wait_for(publish_entered.wait(), .5)
+        publisher = self.service.level_publish_task
+        for _ in range(40):
+            await asyncio.wait_for(audio.handler(frame), .1)
+            self.assertIs(self.service.level_publish_task, publisher)
+        self.assertEqual(self.service.provider.metrics_snapshot()["input_packets"], 41)
+        self.assertEqual(sum(task is publisher for task in self.service.work), 1)
+
+        await asyncio.wait_for(self.service.end_voice(), 1)
+        await asyncio.sleep(.06)
+        self.assertIsNone(self.service.provider)
+        self.assertIsNone(self.service.level_publish_task)
+        self.assertFalse(self.service.level_publish_dirty)
+        self.assertEqual(snapshots[-1]["voice"]["state"], "disabled")
+        self.assertFalse(snapshots[-1]["voice"]["microphone"])
+        self.assertEqual(snapshots[-1]["voice"]["level"], 0)
+        self.assertEqual(len(snapshots), 2)
+
+    async def test_level_updates_coalesce_to_latest_value(self):
+        snapshots = []
+        async def publish():
+            snapshots.append(self.service.snapshot())
+        self.service.control.publish = publish
+        await self.service.provider_event({"type": "level", "level": .1})
+        publisher = self.service.level_publish_task
+        await self.service.provider_event({"type": "level", "level": .4})
+        await self.service.provider_event({"type": "level", "level": .7})
+        self.assertIs(self.service.level_publish_task, publisher)
+        self.assertEqual(snapshots, [])
+        await asyncio.sleep(.07)
+        self.assertEqual(len(snapshots), 1)
+        self.assertEqual(snapshots[0]["voice"]["level"], .7)
 
     async def test_remote_provider_close_detaches_conversation_but_preserves_task(self):
         await self.service.dispatch({"action": "start_voice", "project": str(self.project)})

@@ -91,6 +91,30 @@ class OpenAILiveTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(len(base64.b64decode(appends[1]['audio'])), 960)
         self.assertFalse(any(event['type'] in {'response.create', 'input_audio_buffer.commit'} for event in self.socket.sent))
 
+    async def test_slow_transcript_delivery_does_not_hold_microphone_input(self):
+        await self.provider.start()
+        entered, release = asyncio.Event(), asyncio.Event()
+        original_emit = self.provider._emit_callback
+        async def slow_transcript(event):
+            if event['type'] == 'transcript_delta':
+                entered.set()
+                await release.wait()
+            await original_emit(event)
+        self.provider._emit_callback = slow_transcript
+        delivery = asyncio.create_task(self.provider._handle_event({
+            'type': 'session.input_transcript.delta', 'delta': 'Known test words',
+            'start_ms': 0, 'end_ms': 40,
+        }))
+        try:
+            await asyncio.wait_for(entered.wait(), .5)
+            handler = self.audio.start.call_args.args[0]
+            await asyncio.wait_for(handler(PcmFrame(b'\x11\x00' * 960, 48000)), .5)
+            self.assertEqual(self.provider.metrics_snapshot()['input_packets'], 1)
+            self.assertFalse(delivery.done())
+        finally:
+            release.set()
+            await delivery
+
     async def test_output_only_preview_paces_zeros_and_reports_microphone_off(self):
         self.provider._input_silence = True
         await self.provider.start()

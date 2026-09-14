@@ -183,4 +183,6 @@ class VoiceProvider(ABC):
             return
         mean_square = sum(sample * sample for sample in samples) / len(samples)
         level = min(1.0, math.sqrt(mean_square) / 32768.0)
-        await self._event({"type": "level", "level": round(level, 4)})
+        # Meter readings are independent of ordered transcript/state delivery.
+        # A slow UI consumer of those events must not hold microphone ingestion.
+        await self._emit_callback({"type": "level", "level": round(level, 4)})

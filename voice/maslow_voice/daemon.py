@@ -59,6 +59,8 @@ class VoiceService:
         self.startup_task = None
         self.provider_cleanup = None
         self.work = set()
+        self.level_publish_task = None
+        self.level_publish_dirty = False
         self.offline = None
         self.offline_clients = {}
         self.offline_client_lock = asyncio.Lock()
@@ -103,6 +105,33 @@ class VoiceService:
         task.add_done_callback(self.work.discard)
         return task
 
+    def queue_level_publish(self):
+        """Coalesce level snapshots without blocking microphone ingestion."""
+
+        self.level_publish_dirty = True
+        if self.level_publish_task is None or self.level_publish_task.done():
+            self.level_publish_task = self.background(self._publish_levels())
+
+    async def _publish_levels(self):
+        current = asyncio.current_task()
+        try:
+            while self.level_publish_dirty:
+                await asyncio.sleep(0.05)
+                self.level_publish_dirty = False
+                await self.publish()
+        finally:
+            if self.level_publish_task is current:
+                self.level_publish_task = None
+
+    async def _cancel_level_publish(self):
+        self.level_publish_dirty = False
+        task = self.level_publish_task
+        if task is not None and task is not asyncio.current_task() and not task.done():
+            task.cancel()
+            await asyncio.gather(task, return_exceptions=True)
+        if self.level_publish_task is task:
+            self.level_publish_task = None
+
     async def provider_event(self, event):
         kind = event.get("type")
         if kind == "voice_state":
@@ -117,11 +146,14 @@ class VoiceService:
             # Durable tasks keep running after this provider is detached.
             if self.provider:
                 self.background(self.end_voice())
+            return  # end_voice publishes the final disabled snapshot.
         elif kind == "level":
             level = max(0, min(float(event.get("level", 0)), 1))
             self.voice["level"] = level
             if level > 0.02:
                 self.last_activity = time.monotonic()
+            self.queue_level_publish()
+            return
         elif kind == "transcript":
             text = str(event.get("text", ""))[:24000]
             role = "user" if event.get("role") == "user" else "assistant"
@@ -401,12 +433,14 @@ class VoiceService:
 
     async def _stop_provider(self):
         cleanup = self._detach_provider()
+        await self._cancel_level_publish()
         if cleanup:
             await asyncio.shield(cleanup)
 
     async def end_voice(self, preserve_error=False):
         # Do not wait for lifecycle_lock: its owner may be connecting indefinitely.
         cleanup = self._detach_provider()
+        await self._cancel_level_publish()
         current = asyncio.current_task()
         pending = set(self.conversation_requests)
         if self.startup_task:
