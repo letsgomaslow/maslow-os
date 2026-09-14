@@ -62,6 +62,22 @@ class PcmResamplingTests(unittest.TestCase):
 
 
 class PlaybackTransportTests(unittest.IsolatedAsyncioTestCase):
+    async def test_exact_playback_cursor_and_bounded_output_latency(self):
+        transport = PortAudioTransport()
+        transport._played_samples = 985
+        self.assertEqual(transport.played_samples, 985)
+        self.assertEqual(transport.played_ms, 20)
+        for reported in (None, (), (89478.464, 89478.484), float("nan"), float("inf"), -1, True):
+            with self.subTest(reported=reported):
+                transport._stream = SimpleNamespace(latency=reported)
+                self.assertEqual(transport.output_latency_seconds, 0.020)
+        transport._stream = SimpleNamespace(latency=(0.4, 0.075))
+        self.assertEqual(transport.output_latency_seconds, 0.075)
+        transport._stream = SimpleNamespace(latency=0.010)
+        self.assertEqual(transport.output_latency_seconds, 0.020)
+        await transport.clear_playback()
+        self.assertEqual(transport.played_samples, 0)
+
     async def test_output_only_preview_joins_audio_without_opening_or_processing_microphone(self):
         stream = SimpleNamespace(start=Mock(), stop=Mock(), close=Mock())
         output_factory = Mock(return_value=stream)

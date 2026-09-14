@@ -253,9 +253,15 @@ class LiveKitExpressiveProvider(VoiceProvider):
             expressive=True,
             vad=silero.VAD.load(),
             turn_detection="stt",
+            **self._agent_session_options(),
         )
         self._agent = IntentAgent()
         return session
+
+    def _agent_session_options(self) -> dict[str, Any]:
+        """Optional SDK constructor options for a specialised local transport."""
+
+        return {}
 
     def _queue_event(self, event):
         task = asyncio.create_task(self._event(event))

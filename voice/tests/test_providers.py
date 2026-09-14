@@ -11,6 +11,7 @@ from maslow_voice.audio import PCM48K, PcmFrame
 from maslow_voice.providers import create_provider
 from maslow_voice.providers.base import ProviderError, validate_intent
 from maslow_voice.providers.livekit_expressive import LiveKitExpressiveProvider
+from maslow_voice.providers.livekit_native import LiveKitNativeExpressiveProvider
 from maslow_voice.providers.openai_live import OpenAILiveProvider
 from maslow_voice.errors import VoiceError
 
@@ -86,6 +87,11 @@ class ProviderContractTests(unittest.TestCase):
         realtime = create_provider({"mode": "openai"}, {}, _async_noop, _submit)
         self.assertIsInstance(live, OpenAILiveProvider)
         self.assertNotIsInstance(realtime, OpenAILiveProvider)
+
+    def test_livekit_factory_selects_native_audio_with_shared_task_contract(self) -> None:
+        provider = create_provider({"mode": "livekit"}, {}, _async_noop, _submit)
+        self.assertIs(type(provider), LiveKitNativeExpressiveProvider)
+        self.assertIsInstance(provider, LiveKitExpressiveProvider)
 
     def test_livekit_agent_token_gets_inference_grant_without_exposing_secret(self) -> None:
         class Token:

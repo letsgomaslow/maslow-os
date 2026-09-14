@@ -8,6 +8,7 @@ real-time audio callbacks.
 from __future__ import annotations
 
 import asyncio
+import math
 from array import array
 from collections import deque
 from collections.abc import Awaitable, Callable
@@ -99,6 +100,27 @@ class PortAudioTransport:
     @property
     def played_ms(self):
         return self._played_samples * 1000 // self.sample_rate
+
+    @property
+    def played_samples(self) -> int:
+        """Exact callback-consumed samples since the last playback clear."""
+        return self._played_samples
+
+    @property
+    def output_latency_seconds(self) -> float:
+        """Bounded callback-to-speaker estimate, with one device block as fallback.
+
+        Some virtual ALSA devices report unsigned-counter underflow as a delay
+        of many hours. Such metadata must not prevent a reply from finishing.
+        This is a timing estimate, not confirmation of physical speaker output.
+        """
+        value = getattr(self._stream, "latency", None)
+        if isinstance(value, (tuple, list)):
+            value = value[-1] if value else None
+        block_seconds = self.blocksize / self.sample_rate
+        if type(value) in {int, float} and math.isfinite(value) and 0 <= value <= 1:
+            return max(block_seconds, float(value))
+        return block_seconds
 
     async def start(self, handler: AudioHandler) -> None:
         if self._running:
