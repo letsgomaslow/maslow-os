@@ -265,6 +265,69 @@ class NativeProviderTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(LiveKitExpressiveProvider._agent_session_options(provider), {})
         await provider.stop()
 
+    async def test_startup_agent_state_cannot_overwrite_ready_microphone_state(self):
+        try:
+            from maslow_voice.providers.livekit_native_audio import NativeAgentAudioInput
+        except ImportError:
+            self.skipTest("LiveKit optional SDK is not installed")
+        events = []
+
+        async def emit(event):
+            events.append(event)
+
+        audio = _Transport()
+        audio.start = AsyncMock()
+        audio.stop = AsyncMock()
+        audio.set_muted = AsyncMock()
+        provider = self.provider(audio)
+        provider._emit_callback = emit
+        session = _Session()
+        provider._imports = Mock(return_value=(None, None, SimpleNamespace()))
+        provider._settings = Mock(return_value=("wss://voice.invalid", "key", "secret"))
+        provider._create_agent_session = Mock(return_value=session)
+        provider._agent = object()
+
+        async def session_start(**_kwargs):
+            provider._agent_state(SimpleNamespace(new_state="listening"))
+
+        session.start.side_effect = session_start
+        await provider.start(audio=True)
+        self.assertIsInstance(provider._native_input, NativeAgentAudioInput)
+        self.assertTrue(events[-1]["microphone"])
+        await asyncio.gather(*provider._event_tasks)
+        listening = [event for event in events if event.get("state") == "listening"]
+        self.assertEqual([event["microphone"] for event in listening], [True])
+        await provider.stop()
+        self.assertFalse(provider._native_ready)
+
+    async def test_typed_start_publishes_agent_states_after_readiness_without_microphone(self):
+        events = []
+
+        async def emit(event):
+            events.append(event)
+
+        provider = self.provider()
+        provider._emit_callback = emit
+        session = _Session()
+        provider._imports = Mock(return_value=(None, None, SimpleNamespace()))
+        provider._settings = Mock(return_value=("wss://voice.invalid", "key", "secret"))
+        provider._create_agent_session = Mock(return_value=session)
+        provider._agent = object()
+
+        async def session_start(**_kwargs):
+            provider._agent_state(SimpleNamespace(new_state="listening"))
+
+        session.start.side_effect = session_start
+        await provider.start(audio=False)
+        await asyncio.gather(*provider._event_tasks)
+        listening = [event for event in events if event.get("state") == "listening"]
+        self.assertEqual([event["microphone"] for event in listening], [False])
+        provider._agent_state(SimpleNamespace(new_state="thinking"))
+        await asyncio.gather(*provider._event_tasks)
+        self.assertEqual(events[-1]["state"], "thinking")
+        self.assertFalse(events[-1]["microphone"])
+        await provider.stop()
+
     async def test_mute_retires_input_generation_and_notifies_agent_session(self):
         audio = SimpleNamespace(set_muted=AsyncMock())
         provider = self.provider(audio)
@@ -311,6 +374,7 @@ class NativeProviderTests(unittest.IsolatedAsyncioTestCase):
         provider._native_output.clear_buffer.assert_called_once()
         provider._session.input.set_audio_enabled.assert_called_once_with(False)
         self.assertFalse(provider._started)
+        self.assertFalse(provider._native_ready)
         await asyncio.gather(*provider._event_tasks)
 
     async def test_restart_replaces_closed_native_input_without_stale_generation(self):
@@ -330,13 +394,16 @@ class NativeProviderTests(unittest.IsolatedAsyncioTestCase):
         provider._create_agent_session = Mock(side_effect=(first, second))
         provider._agent = object()
         await provider.start(audio=True)
+        self.assertTrue(provider._native_ready)
         first_input = provider._native_input
         await provider.mute(True)
         await provider.stop()
+        self.assertFalse(provider._native_ready)
         self.assertTrue(first_input._closed)
         with self.assertRaises(asyncio.CancelledError):
             await first_input.push_frame(rtc.AudioFrame(b"\0\0" * 960, 48_000, 1, 960))
         await provider.start(audio=True)
+        self.assertTrue(provider._native_ready)
         self.assertIsInstance(provider._native_input, NativeAgentAudioInput)
         self.assertIsNot(provider._native_input, first_input)
         self.assertTrue(await provider._native_input.push_frame(rtc.AudioFrame(b"\0\0" * 960, 48_000, 1, 960)))

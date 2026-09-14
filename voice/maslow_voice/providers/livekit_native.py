@@ -20,15 +20,25 @@ class LiveKitNativeExpressiveProvider(LiveKitExpressiveProvider):
         super().__init__(**kwargs)
         self._native_input: Any = None
         self._native_output: Any = None
+        self._native_ready = False
 
     def _agent_session_options(self) -> dict[str, Any]:
         # Agents 1.8.1 documents this explicit opt-out. PortAudio still runs
         # local APM; physical acoustic-echo validation remains a separate gate.
         return {"aec_warmup_duration": 0.0}
 
+    def _agent_state(self, event: Any) -> None:
+        # AgentSession announces listening before custom device startup is
+        # complete. The provider's final startup event is authoritative until
+        # input/output readiness and the microphone flag agree.
+        if not self._native_ready:
+            return
+        super()._agent_state(event)
+
     async def start(self, audio: bool = True) -> None:
         if self._started:
             return
+        self._native_ready = False
         self._closing = False
         self._failure = None
         self._muted = False
@@ -64,6 +74,7 @@ class LiveKitNativeExpressiveProvider(LiveKitExpressiveProvider):
             if self._failure:
                 raise self._failure
             self._audio_enabled = audio
+            self._native_ready = True
             await self._state_event("listening", microphone=audio)
         except asyncio.CancelledError:
             await self.stop()
@@ -83,6 +94,7 @@ class LiveKitNativeExpressiveProvider(LiveKitExpressiveProvider):
     def _fail(self, error: ProviderError) -> None:
         if self._closing or self._failure is not None:
             return
+        self._native_ready = False
         if self._native_input is not None:
             self._native_input.close()
         if self._native_output is not None:
@@ -91,6 +103,10 @@ class LiveKitNativeExpressiveProvider(LiveKitExpressiveProvider):
         if session_input is not None:
             session_input.set_audio_enabled(False)
         super()._fail(error)
+
+    async def stop(self) -> None:
+        self._native_ready = False
+        await super().stop()
 
     async def mute(self, muted: bool) -> None:
         session_input = getattr(getattr(self, "_session", None), "input", None)
