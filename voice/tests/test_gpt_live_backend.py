@@ -283,13 +283,23 @@ class ScratchExecutionTests(unittest.IsolatedAsyncioTestCase):
             launched.set()
             await release.wait()
             return process
-        with patch('dev.gpt_live_backend.asyncio.create_subprocess_exec', side_effect=delayed):
+        # Use a portable command shape here: HermesProfile.command intentionally
+        # requires macOS sandbox-exec, while this test exercises _spawn's
+        # ownership transfer using the synthetic child above.
+        with patch.object(self.profile, 'command', return_value=[sys.executable, '-c', 'unused']), \
+             patch('dev.gpt_live_backend.asyncio.create_subprocess_exec', side_effect=delayed):
             spawning = asyncio.create_task(_spawn(self.profile, 'hermes', 'unused'))
-            await launched.wait()
-            spawning.cancel()
-            release.set()
-            with self.assertRaises(asyncio.CancelledError):
-                await spawning
+            try:
+                await asyncio.wait_for(launched.wait(), 5)
+                spawning.cancel()
+                release.set()
+                with self.assertRaises(asyncio.CancelledError):
+                    await spawning
+            finally:
+                release.set()
+                if not spawning.done():
+                    spawning.cancel()
+                await asyncio.gather(spawning, return_exceptions=True)
         self.assertIsNotNone(children[0].returncode)
 
     @unittest.skipUnless(Path('/usr/bin/sandbox-exec').exists(), 'Mac sandbox required')
