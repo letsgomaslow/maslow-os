@@ -1,5 +1,7 @@
 # LiveKit installed-system handoff verification
 
+Continuation: [native audio recovery and later package evidence](2026-09-14-livekit-native-audio.md) supersedes the remaining-audio status below; this checkpoint and its original results are preserved.
+
 Status: real typed LiveKit-to-Hermes handoff passed in installed Maslow AI-OS after two source fixes. Spoken handoff and audio quality have not passed. This is an unpublished development checkpoint, not Lenovo readiness.
 
 ## Scope and exact candidate
