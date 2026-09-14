@@ -139,9 +139,14 @@ class NativeAgentAudioOutput(voice_io.AudioOutput):
         if frame.sample_rate != PCM48K or frame.num_channels != 1:
             raise ProviderError("Native LiveKit audio requires 48 kHz mono PCM")
         if self._flush_task is not None and not self._flush_task.done():
-            await self._flush_task
+            # A newly scheduled speech can be cancelled while the previous
+            # segment is still playing. Its cancellation must not cancel the
+            # shared finisher that will release AgentSession.wait_for_playout().
+            await asyncio.shield(self._flush_task)
         if self._clear_task is not None and not self._clear_task.done():
-            await self._clear_task
+            # The transport clear belongs to the interrupted segment, not to
+            # this producer. Keep it alive if this capture is cancelled.
+            await asyncio.shield(self._clear_task)
         # aclose() may have completed while this call waited for a prior
         # segment. Do not let that stale producer start a new output segment.
         if self._closed:

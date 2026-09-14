@@ -125,6 +125,59 @@ class NativeInputOutputTests(OptionalNativeSdkTest):
         self.assertEqual(len(finished), 1)
         self.assertTrue(finished[0].interrupted)
 
+    async def test_cancelled_capture_waiter_does_not_cancel_previous_segment_finisher(self):
+        transport = _Transport()
+        output = self.NativeAgentAudioOutput(transport)
+        finished = []
+        output.on("playback_finished", finished.append)
+        await output.capture_frame(self.frame())
+        output.flush()
+        pending_next = asyncio.create_task(output.capture_frame(self.frame()))
+        await asyncio.sleep(0)
+        pending_next.cancel()
+        with self.assertRaises(asyncio.CancelledError):
+            await pending_next
+        self.assertFalse(output._flush_task.cancelled())
+        transport.played_samples = 480
+        output.clear_buffer()
+        await output._flush_task
+        await output._clear_task
+        self.assertEqual(len(finished), 1)
+        self.assertTrue(finished[0].interrupted)
+        self.assertEqual(finished[0].playback_position, 0.01)
+        self.assertEqual(output._pending_playback_count, 0)
+        await output.capture_frame(self.frame())
+        output.flush()
+        transport.played_samples = 960
+        await output._flush_task
+        self.assertEqual(len(finished), 2)
+        self.assertFalse(finished[1].interrupted)
+        self.assertEqual(finished[1].playback_position, 0.02)
+        await output.aclose()
+
+    async def test_cancelled_capture_waiter_does_not_cancel_pending_transport_clear(self):
+        transport = _BlockingClearTransport()
+        output = self.NativeAgentAudioOutput(transport)
+        finished = []
+        output.on("playback_finished", finished.append)
+        await output.capture_frame(self.frame())
+        output.clear_buffer()
+        await transport.clear_entered.wait()
+        pending_next = asyncio.create_task(output.capture_frame(self.frame()))
+        await asyncio.sleep(0)
+        pending_next.cancel()
+        with self.assertRaises(asyncio.CancelledError):
+            await pending_next
+        self.assertFalse(output._clear_task.cancelled())
+        transport.release_clear.set()
+        await output._clear_task
+        await output._flush_task
+        self.assertEqual(transport.clear_calls, 1)
+        self.assertEqual(len(finished), 1)
+        self.assertTrue(finished[0].interrupted)
+        self.assertEqual(output._pending_playback_count, 0)
+        await output.aclose()
+
 
 class _Transport:
     def __init__(self, *, clear_error: Exception | None = None) -> None:
@@ -142,6 +195,19 @@ class _Transport:
         self.played_samples = 0
         if self.clear_error is not None:
             raise self.clear_error
+
+
+class _BlockingClearTransport(_Transport):
+    def __init__(self) -> None:
+        super().__init__()
+        self.clear_entered = asyncio.Event()
+        self.release_clear = asyncio.Event()
+
+    async def clear_playback(self):
+        self.clear_calls += 1
+        self.clear_entered.set()
+        await self.release_clear.wait()
+        self.played_samples = 0
 
 
 class NativeProviderTests(unittest.IsolatedAsyncioTestCase):
