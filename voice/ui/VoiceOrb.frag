@@ -22,6 +22,14 @@ void main() {
   vec3 teal = vec3(0.427, 0.769, 0.678);
   vec3 purple = vec3(0.251, 0.094, 0.467);
   vec3 color = mix(purple, teal, clamp(qt_TexCoord0.y + sin(p.x * 4.0 + phase) * 0.13 + level * 0.2, 0.0, 1.0));
-  color = mix(color, vec3(0.42), disabled);
+  vec3 normal = normalize(vec3(p, sqrt(max(0.0, 1.0 - dot(p, p)))));
+  vec3 lightDirection = normalize(vec3(-0.45, -0.55, 0.70));
+  float diffuse = max(0.0, dot(normal, lightDirection));
+  float highlight = pow(max(0.0, dot(normal, normalize(vec3(-0.35, -0.45, 0.90)))), 14.0) * 0.20;
+  vec3 disabledShadow = vec3(0.271, 0.302, 0.357);
+  vec3 disabledLight = vec3(0.824, 0.843, 0.871);
+  vec3 disabledColor = mix(disabledShadow, disabledLight, clamp(0.17 + diffuse * 0.72, 0.0, 1.0));
+  disabledColor += vec3(highlight);
+  color = mix(color, disabledColor, disabled);
   fragColor = vec4(color * edge, edge) * qt_Opacity;
 }

@@ -25,6 +25,16 @@ Item {
       GradientStop { position: 1; color: root.disabled ? "#454D5B" : "#401877" }
     }
   }
+  Rectangle {
+    visible: root.disabled
+    width: parent.width * 0.44
+    height: parent.height * 0.17
+    x: parent.width * 0.18
+    y: parent.height * 0.14
+    radius: height / 2
+    color: "#FFFFFF"
+    opacity: 0.11
+  }
   Loader {
     id: gpuOrb
     anchors.fill: parent

@@ -328,7 +328,7 @@ Item {
       id: card
       visible: root.controllerOpen
       width: Math.min(600, panelWindow.width - 32)
-      height: Math.min(680, panelWindow.height - 32)
+      height: Math.min(720, panelWindow.height - 16)
       x: Math.max(16, Math.min(panelWindow.width - width - 16, orbButton.x + orbButton.width / 2 - width / 2))
       y: Math.max(16, panelWindow.height - height - 136)
       color: "#121D35"
@@ -453,8 +453,7 @@ Item {
                 width: settingsScroll.availableWidth - 14
                 spacing: 12
                 Text { text: "Voice settings"; color: "#FFFFFF"; font.family: "Manrope"; font.pixelSize: 22; Accessible.role: Accessible.Heading }
-                Text { text: "Choose how you connect"; color: "#FFFFFF"; font.family: "Manrope" }
-                VoiceSelect { id: connectionMode; Layout.fillWidth: true; model: ["Offline on this computer", "Your model server", "OpenAI voice", "LiveKit voice"]; currentIndex: ["offline", "server", "openai", "livekit"].indexOf(root.settings.mode || "openai"); Accessible.name: "Voice connection"; onActivated: root.configure("mode", ["offline", "server", "openai", "livekit"][currentIndex]) }
+                VoiceSelect { id: connectionMode; Layout.fillWidth: true; model: ["Offline on this computer", "Your model server", "OpenAI Realtime", "GPT-Live cloud", "LiveKit voice"]; currentIndex: ["offline", "server", "openai", "gpt_live", "livekit"].indexOf(root.settings.mode || "openai"); Accessible.name: "Voice connection"; onActivated: root.configure("mode", ["offline", "server", "openai", "gpt_live", "livekit"][currentIndex]) }
                 ColumnLayout { visible: ["offline", "server"].indexOf(root.settings.mode) >= 0; Layout.fillWidth: true
                   VoiceSelect { visible: root.settings.mode === "server"; model: ["Ollama", "LM Studio"]; currentIndex: root.settings.server_kind === "lmstudio" ? 1 : 0; Accessible.name: "Model server type"; onActivated: root.configure("server_kind", currentIndex === 1 ? "lmstudio" : "ollama") }
                 Text { visible: root.settings.mode === "server"; text: "Model server address"; color: "#D1D5DB"; font.family: "Manrope" }
@@ -475,18 +474,31 @@ Item {
                   Layout.fillWidth: true
                   spacing: 8
                   Text { text: "LiveKit setup"; color: "#FFFFFF"; font.family: "Manrope"; font.pixelSize: 18; Accessible.role: Accessible.Heading }
-                  Text { text: "Enter your project URL and credentials together. Expressive mode is included."; color: "#D1D5DB"; font.family: "Manrope"; wrapMode: Text.WordWrap; Layout.fillWidth: true }
+                  Text { text: "Enter your project URL and API credentials."; color: "#D1D5DB"; font.family: "Manrope"; wrapMode: Text.WordWrap; Layout.fillWidth: true }
                   Text { text: "Project URL"; color: "#FFFFFF"; font.family: "Manrope" }
                   VoiceField { id: livekitUrlField; Layout.fillWidth: true; placeholderText: "wss://your-project.livekit.cloud"; text: String(root.settings.livekit_url || ""); Accessible.name: "LiveKit project URL" }
-                  Text { text: "API key"; color: "#FFFFFF"; font.family: "Manrope" }
-                  VoiceField { id: livekitApiKeyField; Layout.fillWidth: true; echoMode: TextInput.Password; placeholderText: "API key"; Accessible.name: "LiveKit API key" }
-                  Text { text: "API secret"; color: "#FFFFFF"; font.family: "Manrope" }
-                  VoiceField { id: livekitApiSecretField; Layout.fillWidth: true; echoMode: TextInput.Password; placeholderText: "API secret"; Accessible.name: "LiveKit API secret" }
-                  Text { text: "Leave API key or API secret blank to keep the saved value. Existing credentials stay private and are never shown here."; color: "#D1D5DB"; font.family: "Manrope"; wrapMode: Text.WordWrap; Layout.fillWidth: true }
+                  Text { text: "API credentials"; color: "#FFFFFF"; font.family: "Manrope" }
+                  RowLayout { Layout.fillWidth: true; spacing: 8
+                    VoiceField { id: livekitApiKeyField; Layout.fillWidth: true; echoMode: TextInput.Password; placeholderText: "API key"; Accessible.name: "LiveKit API key" }
+                    VoiceField { id: livekitApiSecretField; Layout.fillWidth: true; echoMode: TextInput.Password; placeholderText: "API secret"; Accessible.name: "LiveKit API secret" }
+                  }
+                  Text { text: "Blank fields keep saved values."; color: "#D1D5DB"; font.family: "Manrope"; wrapMode: Text.WordWrap; Layout.fillWidth: true }
                   VoiceButton { text: root.livekitSetupSaving ? "Saving LiveKit setup…" : "Save LiveKit setup"; enabled: !root.livekitSetupSaving; onClicked: root.submitLiveKitSetup(livekitUrlField.text, livekitApiKeyField.text, livekitApiSecretField.text) }
                   Text { visible: root.livekitSetupStatus !== ""; text: root.livekitSetupStatus; color: root.livekitSetupSucceeded ? "#6DC4AD" : "#EE7BB3"; font.family: "Manrope"; wrapMode: Text.WordWrap; Layout.fillWidth: true; Accessible.role: root.livekitSetupSucceeded ? Accessible.StatusBar : Accessible.AlertMessage; Accessible.name: text }
+                  RowLayout { Layout.fillWidth: true; spacing: 10
+                    Text { text: "Voice"; color: "#FFFFFF"; font.family: "Manrope" }
+                    VoiceSelect { Layout.fillWidth: true; enabled: !root.conversation; model: ["Ashley", "Edward", "Olivia", "Alex", "Dennis"]; currentIndex: model.indexOf(String(root.settings.livekit_voice || "Ashley")); Accessible.name: "LiveKit voice"; onActivated: root.configure("livekit_voice", currentText) }
+                  }
+                  Text { visible: root.conversation; text: "End the conversation before choosing a different voice."; color: "#D1D5DB"; font.family: "Manrope"; wrapMode: Text.WordWrap; Layout.fillWidth: true }
+                }
+                ColumnLayout {
+                  visible: root.settings.mode === "gpt_live"
+                  Layout.fillWidth: true
+                  spacing: 8
+                  Text { text: "GPT-Live cloud"; color: "#FFFFFF"; font.family: "Manrope"; font.pixelSize: 18; Accessible.role: Accessible.Heading }
+                  Text { text: "Talk naturally, even while Maslow is speaking. It uses your saved OpenAI API key."; color: "#D1D5DB"; font.family: "Manrope"; wrapMode: Text.WordWrap; Layout.fillWidth: true }
                   Text { text: "Voice"; color: "#FFFFFF"; font.family: "Manrope" }
-                  VoiceSelect { Layout.fillWidth: true; enabled: !root.conversation; model: ["Ashley", "Edward", "Olivia", "Alex", "Dennis"]; currentIndex: model.indexOf(String(root.settings.livekit_voice || "Ashley")); Accessible.name: "LiveKit voice"; onActivated: root.configure("livekit_voice", currentText) }
+                  VoiceSelect { Layout.fillWidth: true; enabled: !root.conversation; model: ["cedar", "marin", "alloy", "ash", "ballad", "coral", "echo", "sage", "shimmer", "verse", "quartz", "ripple", "vesper", "willow", "stone", "gleam", "meridian", "bossa", "tempo", "beacon", "delta", "cinder"]; currentIndex: model.indexOf(String(root.settings.live_voice || "marin")); Accessible.name: "GPT-Live voice"; onActivated: root.configure("live_voice", currentText) }
                   Text { visible: root.conversation; text: "End the conversation before choosing a different voice."; color: "#D1D5DB"; font.family: "Manrope"; wrapMode: Text.WordWrap; Layout.fillWidth: true }
                 }
                 Text { visible: root.settings.mode === "openai"; text: "OpenAI voice model"; color: "#D1D5DB"; font.family: "Manrope" }

@@ -13,7 +13,7 @@ ShellRoot {
     Component.onCompleted: voiceController.setFixture({
       schemaVersion: 1,
       voice: { enabled: false, state: "disabled", microphone: false, speaking: false, level: 0, error: "" },
-      settings: { mode: "livekit", livekit_url: "wss://your-project.livekit.cloud", livekit_voice: "Ashley", realtime_voice: "cedar", server_kind: "ollama", server_url: "http://127.0.0.1:11434", model: "qwen3:8b", default_coder: "codex", reduced_motion: false, fixed_position: false, display: "", ollama_models: "/home/maslow/.ollama/models", speech_directory: "/home/maslow/.local/share/maslow-voice/speech" },
+      settings: { mode: "livekit", livekit_url: "wss://your-project.livekit.cloud", livekit_voice: "Ashley", realtime_voice: "cedar", live_voice: "marin", server_kind: "ollama", server_url: "http://127.0.0.1:11434", model: "qwen3:8b", default_coder: "codex", reduced_motion: false, fixed_position: false, display: "", ollama_models: "/home/maslow/.ollama/models", speech_directory: "/home/maslow/.local/share/maslow-voice/speech" },
       tasks: [], session: { id: "fixture", transcript: [] },
       readiness: { ready: true, checks: [{ name: "Speech models", ok: true, message: "Available on this computer." }], models: [{ id: "qwen3:8b", label: "Qwen 3 · 8B" }] }
     })
