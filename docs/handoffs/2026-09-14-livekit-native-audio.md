@@ -1,5 +1,7 @@
 # LiveKit native audio recovery
 
+Status update, 2026-09-14: **LiveKit is PENDING at the user's request.** The [consolidated Voice/GPT-Live checkpoint](2026-09-14-voice-checkpoint.md) is the current resume point. The experiments and next actions below are retained historical evidence, not instructions to restart testing or publish this candidate.
+
 This continues the [installed handoff checkpoint](2026-09-14-livekit-installed-handoff.md). The scope is real spoken LiveKit Expressive conversation and Hermes delegation in the existing installed Maslow AI-OS guest before Lenovo testing. No ISO rebuild, UTM, signing, publication, OTA or Lenovo change is included.
 
 ## Diagnosis and retained failures

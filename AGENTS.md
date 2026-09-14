@@ -1,7 +1,7 @@
-# Start Here: Active Maslow Hub Work
+# Start Here: Active Maslow Hub and Voice Work
 
 - Read [development status, backlog, and lessons](docs/maslow-development.md), then its dated evidence handoffs before implementation. This is the single current progress index; do not infer completion from chat summaries.
-- Run `git status --short --branch`, `git log -5 --oneline`, and `git worktree list` before editing. Hub implementation is on `codex/maslow-hub` across runtime/packages/ISO; Hub source has its own repository. Product branches are not automatically integrated.
+- Run `git status --short --branch`, `git log -5 --oneline`, and `git worktree list` before editing. Hub implementation is on `codex/maslow-hub` across runtime/packages/ISO; newer Voice work can be in a separate integration worktree named by the development index. Hub source has its own repository. Product branches and provider test results are not automatically integrated.
 - At session close, update the index and relevant handoff with commits, exact artifact evidence, tests/failures/skips, remaining gates, and one next action. Never store secrets, raw private logs, or ISO files in Git. Commit only scoped files; do not merge or publish without authorization.
 - Use at most two independent workers with disjoint ownership when useful. Route bounded inventory/docs to Luna, ordinary implementation to Terra, updater/migrations to Sol, and security/final integration review to Astra when those models are available and authorized. Report only routing actually used. Prefer compact cursor-based status; avoid full transcript reads and unchanged polling commentary.
 - Fast visual work uses Docker + headless Weston + real Quickshell/software rendering and inspected PNGs. Installed-system proof uses headless QEMU/TCG with CIDATA, SSH, and QMP screenshots/OCR; Lenovo is the final hardware target and USB is the installation medium. No UTM. Reuse installed overlays; rebuild media only for baseline/install changes or release checkpoints.
@@ -19,6 +19,7 @@ matching guide before starting:
 - [`agents/skills/acceptance-tests.md`](agents/skills/acceptance-tests.md) - writing or running graphical acceptance tests under `test/acceptance.d/`
 - [`agents/skills/visual-verification.md`](agents/skills/visual-verification.md) - verifying any change with a visual effect in the running UI
 - [`agents/skills/migrations.md`](agents/skills/migrations.md) - creating or changing migrations under `migrations/`
+- [`agents/skills/voice-development.md`](agents/skills/voice-development.md) - Voice providers, task handoff, dependencies, audio/UI acceptance and credentialed test closeout
 
 # Repository Topology
 
