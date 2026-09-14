@@ -190,6 +190,12 @@ class OpenAILiveProvider(VoiceProvider):
         self._pending_context[event_id] = kind
         try:
             await self._send({"type": f"session.{kind}.append", "event_id": event_id, "delegation_id": delegation_id, "content": content})
+        except asyncio.CancelledError:
+            self._pending_context.pop(event_id, None)
+            raise
+        except Exception as error:
+            self._pending_context.pop(event_id, None)
+            raise self._public_error(error) from error
         except BaseException:
             self._pending_context.pop(event_id, None)
             raise

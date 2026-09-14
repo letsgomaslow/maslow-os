@@ -5,6 +5,9 @@ import json
 import unittest
 from unittest.mock import AsyncMock
 
+from websockets.exceptions import ConnectionClosedError
+from websockets.frames import Close
+
 from maslow_voice.audio import PcmFrame
 from maslow_voice.providers.base import ProviderError
 from maslow_voice.providers.openai_live import OpenAILiveProvider
@@ -168,6 +171,34 @@ class OpenAILiveTests(unittest.IsolatedAsyncioTestCase):
         self.assertTrue(self.provider._started)
         self.assertFalse(self.events[-1]['accepted'])
         self.assertNotIn('private-fixture-key', json.dumps(self.events))
+
+    async def test_context_transport_failure_is_safe_and_discards_pending_command(self):
+        await self.provider.start()
+        self.socket.send = AsyncMock(side_effect=ConnectionClosedError(
+            None, Close(1011, 'private keepalive socket diagnostic'), None,
+        ))
+
+        with self.assertRaises(ProviderError) as raised:
+            await self.provider.append_context('commentary', 'The task is still running.')
+
+        self.assertEqual(raised.exception.code, 'OPENAI_SESSION_FAILED')
+        self.assertNotIn('private keepalive socket diagnostic', str(raised.exception))
+        self.assertEqual(self.provider._pending_context, {})
+        self.assertEqual(self.provider.metrics_snapshot()['context_appends'], 0)
+
+    async def test_cancelled_context_send_preserves_cancellation_and_discards_pending_command(self):
+        await self.provider.start()
+        original_send = self.socket.send
+        self.socket.send = AsyncMock(side_effect=asyncio.CancelledError())
+
+        try:
+            with self.assertRaises(asyncio.CancelledError):
+                await self.provider.append_context('thinking', 'The task is still running.')
+        finally:
+            self.socket.send = original_send
+
+        self.assertEqual(self.provider._pending_context, {})
+        self.assertEqual(self.provider.metrics_snapshot()['context_appends'], 0)
 
     async def test_playback_and_silence_do_not_call_backend_cancel_or_submit(self):
         await self.provider.start()

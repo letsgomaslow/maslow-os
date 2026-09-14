@@ -220,6 +220,26 @@ class ServiceTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(task["brief"]["tool_preference"], "hermes")
         self.assertEqual(task["source"], "User transcript: Create a harmless note")
 
+    async def test_live_task_relay_contains_safe_context_failure_and_preserves_task(self):
+        task = await self.service.tasks.submit(
+            "relay-context-failure",
+            {"objective": "Write a note", "summary": "Write a harmless note", "constraints": [],
+             "requested_output": "A note", "tool_preference": "hermes", "unresolved_questions": []},
+            str(self.project), "gpt_live", "User transcript: Write a harmless note", "hermes",
+        )
+        task = self.service.store.update(task["id"], state="completed", result="The note was verified.")
+        provider = FakeProvider(None, None, None, None, None)
+        provider.append_context = AsyncMock(side_effect=VoiceError("OPENAI_SESSION_FAILED", "Safe connection failure"))
+        epoch = self.service.provider_epoch = object()
+        self.service.provider = provider
+
+        relay = self.service.background(self.service._relay_live_task(provider, epoch, task["id"]))
+        await asyncio.wait_for(relay, 1)
+
+        self.assertIsNone(relay.exception())
+        self.assertEqual(self.service.store.get(task["id"])["state"], "completed")
+        self.assertEqual(self.service.store.get(task["id"])["result"], "The note was verified.")
+
     async def test_gpt_live_cancel_words_cancel_existing_task_without_creating_another(self):
         self.service.settings.update({"mode": "gpt_live", "default_coder": "hermes"})
         first = await self.service.dispatch({
