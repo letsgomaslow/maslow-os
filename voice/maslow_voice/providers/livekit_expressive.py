@@ -174,8 +174,11 @@ class LiveKitExpressiveProvider(VoiceProvider):
             def __init__(self) -> None:
                 super().__init__(instructions=(
                     "You are Maslow's concise English voice coordinator. "
-                    "You may only prepare a work intent with submit_intent. "
-                    "Never execute tools, commands, or permissions. "
+                    "Answer ordinary conversation, questions, advice, explanations, and requests to say or speak something directly without creating a task. "
+                    "Call submit_intent only when the user explicitly asks for external work outside this conversation, such as creating or changing a file, running code, or completing a task; delegate that request to the selected local agent. "
+                    "Never call submit_intent merely to answer the user or speak a response. "
+                    "If it is unclear whether the user wants external work, ask one concise clarifying question and do not submit yet. "
+                    "Never perform external work, run commands, grant permissions, or use other tools yourself. "
                     "Only acknowledge submission after submit_intent returns SUBMITTED. "
                     "If it returns NOT_SUBMITTED, clearly say no work was submitted or started and ask the user to clarify."
                 ))
@@ -206,6 +209,10 @@ class LiveKitExpressiveProvider(VoiceProvider):
                 tool_preference: ToolPreference,
                 unresolved_questions: list[str],
             ) -> str:
+                """Delegate an explicit external work request to the selected local agent.
+
+                Use this only when the user asks for work outside the conversation. Do not use it for ordinary conversation, questions, advice, explanations, or requests to say or speak an answer. Ask a clarifying question instead when the boundary is ambiguous.
+                """
                 try:
                     turn_id = provider._tool_turns.pop(context.function_call.call_id, None)
                     if not turn_id or context.speech_handle.interrupted:

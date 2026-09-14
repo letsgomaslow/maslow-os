@@ -117,6 +117,8 @@ class LiveKitStartupTests(unittest.IsolatedAsyncioTestCase):
         parameters = function["parameters"]
         expected = {"objective", "summary", "constraints", "requested_output", "tool_preference", "unresolved_questions"}
         self.assertEqual(function["name"], "submit_intent")
+        self.assertIsInstance(function["description"], str)
+        self.assertGreater(len(function["description"]), 100)
         self.assertTrue(function["strict"])
         self.assertEqual(set(parameters["properties"]), expected)
         self.assertEqual(set(parameters["required"]), expected)
