@@ -153,11 +153,13 @@ class ControlServer:
     async def close(self):
         if self.server:
             self.server.close()
-            await self.server.wait_closed()
         for writer in tuple(self.connections):
             writer.close()
         pending = tuple(self.requests)
         for task in pending:
             task.cancel()
         await asyncio.gather(*pending, return_exceptions=True)
+        if self.server:
+            await self.server.wait_closed()
+            self.server = None
         self.path.unlink(missing_ok=True)
