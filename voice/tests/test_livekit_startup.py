@@ -110,6 +110,18 @@ class LiveKitStartupTests(unittest.IsolatedAsyncioTestCase):
         await self.provider.start()
         self.assertEqual(self.provider._session.tts._opts.voice, "Olivia")
 
+    async def test_intent_tool_builds_strict_schema_without_injected_context(self):
+        self.provider._create_agent_session(self.agents, "a" * 32, "b" * 32)
+        schema = self.agents.ToolContext(self.provider._agent.tools).parse_function_tools("openai", strict=True)
+        function = schema[0]["function"]
+        parameters = function["parameters"]
+        expected = {"objective", "summary", "constraints", "requested_output", "tool_preference", "unresolved_questions"}
+        self.assertEqual(function["name"], "submit_intent")
+        self.assertTrue(function["strict"])
+        self.assertEqual(set(parameters["properties"]), expected)
+        self.assertEqual(set(parameters["required"]), expected)
+        self.assertFalse(parameters["additionalProperties"])
+
     async def test_fatal_sdk_error_is_actionable_safe_and_revokes_turns(self):
         from livekit.agents import APIStatusError
         self.fake_room_transport()

@@ -222,7 +222,13 @@ class LiveKitExpressiveProvider(VoiceProvider):
 
         # The SDK injects RunContext; it is deliberately absent from the model's
         # tool arguments. Bind the actual optional SDK type before decoration.
-        IntentAgent.submit_intent.__annotations__["context"] = agents.RunContext
+        # Python 3.14 evaluates annotations lazily, so update both representations
+        # before function_tool copies them onto its descriptor.
+        annotations = dict(IntentAgent.submit_intent.__annotations__)
+        annotations["context"] = agents.RunContext
+        IntentAgent.submit_intent.__annotations__ = annotations
+        if hasattr(IntentAgent.submit_intent, "__annotate__"):
+            IntentAgent.submit_intent.__annotate__ = lambda _format=1: dict(annotations)
         IntentAgent.submit_intent = function_tool(IntentAgent.submit_intent)
         import aiohttp
         from livekit.plugins import silero
