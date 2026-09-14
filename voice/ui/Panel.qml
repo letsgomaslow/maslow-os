@@ -25,17 +25,20 @@ Item {
   property string livekitSetupStatus: ""
   property bool advancedTaskSettingsOpen: false
   property bool focusedOrb: false
+  property bool uiTestInstrumentation: false
+  property int taskDelegateCreations: 0
+  property int transcriptDelegateCreations: 0
   property alias voiceController: controller
 
   readonly property var lockService: shell && typeof shell.serviceFor === "function" ? shell.serviceFor("omarchy.lock") : null
   readonly property bool sessionLocked: lockService ? lockService.locked === true : false
   onSessionLockedChanged: if (sessionLocked) { close(); send("end_voice") }
 
-  readonly property var voice: controller.snapshot.voice || ({})
-  readonly property var settings: controller.snapshot.settings || ({})
-  readonly property var readiness: controller.snapshot.readiness || ({})
-  readonly property var transcript: (controller.snapshot.session || {}).transcript || []
-  readonly property var tasks: (controller.snapshot.tasks || []).filter(function(task) { return task.dismissed !== true })
+  readonly property var voice: controller.voice || ({})
+  readonly property var settings: controller.settings || ({})
+  readonly property var readiness: controller.readiness || ({})
+  readonly property var transcript: (controller.session || {}).transcript || []
+  readonly property var tasks: controller.visibleTasks || []
   readonly property bool reducedMotion: settings.reduced_motion === true
   readonly property bool fixedPosition: settings.fixed_position === true
   readonly property bool disabled: voice.enabled !== true
@@ -404,7 +407,7 @@ Item {
                 VoiceArea { Layout.fillWidth: true; id: textDraft; placeholderText: "Describe the work to coordinate"; text: root.draft; onTextChanged: root.draft = text; Accessible.name: "Task request"; implicitHeight: 110; wrapMode: TextEdit.Wrap }
                 Text { text: "Maslow only sends the request, project, and context you enter here. It does not capture screenshots automatically."; color: "#D1D5DB"; font.family: "Manrope"; wrapMode: Text.WordWrap; Layout.fillWidth: true }
                 VoiceButton { text: "Send request"; enabled: root.draft.trim() !== ""; onClicked: root.submitText() }
-                Repeater { model: root.transcript; delegate: Text { required property var modelData; Layout.fillWidth: true; text: (modelData.role === "user" ? "You: " : "Maslow: ") + String(modelData.text || ""); color: "#FFFFFF"; font.family: "Manrope"; wrapMode: Text.WordWrap } }
+                Repeater { model: root.transcript; delegate: Text { required property var modelData; Component.onCompleted: if (root.uiTestInstrumentation) root.transcriptDelegateCreations += 1; Layout.fillWidth: true; text: (modelData.role === "user" ? "You: " : "Maslow: ") + String(modelData.text || ""); color: "#FFFFFF"; font.family: "Manrope"; wrapMode: Text.WordWrap } }
               }
             }
             ScrollView {
@@ -420,6 +423,7 @@ Item {
                   model: root.tasks
                   delegate: Rectangle {
                     required property var modelData
+                    Component.onCompleted: if (root.uiTestInstrumentation) root.taskDelegateCreations += 1
                     Layout.fillWidth: true
                     implicitHeight: taskColumn.implicitHeight + 20
                     radius: 8; color: "#1E2D47"; border.color: "#496078"
