@@ -34,14 +34,25 @@ async def run(watch=False):
             writer.write(b'{"action":"watch"}\n')
             await writer.drain()
             async def input_loop():
-                while True:
-                    line = await asyncio.to_thread(sys.stdin.buffer.readline, MAX_REQUEST + 1)
-                    if not line:
-                        return
-                    if len(line) > MAX_REQUEST:
-                        raise VoiceError("REQUEST_TOO_LARGE", "The Voice request is too large.")
-                    writer.write(line)
-                    await writer.drain()
+                stdin = asyncio.StreamReader(limit=MAX_REQUEST)
+                protocol = asyncio.StreamReaderProtocol(stdin)
+                transport, _ = await asyncio.get_running_loop().connect_read_pipe(lambda: protocol, sys.stdin.buffer)
+                try:
+                    while True:
+                        try:
+                            line = await stdin.readuntil(b"\n")
+                        except asyncio.IncompleteReadError as error:
+                            line = error.partial
+                        except asyncio.LimitOverrunError:
+                            raise VoiceError("REQUEST_TOO_LARGE", "The Voice request is too large.") from None
+                        if not line:
+                            return
+                        if len(line) > MAX_REQUEST:
+                            raise VoiceError("REQUEST_TOO_LARGE", "The Voice request is too large.")
+                        writer.write(line)
+                        await writer.drain()
+                finally:
+                    transport.close()
             async def output_loop():
                 while line := await reader.readline():
                     sys.stdout.buffer.write(line)
@@ -50,7 +61,10 @@ async def run(watch=False):
             done, pending = await asyncio.wait(tasks, return_when=asyncio.FIRST_COMPLETED)
             for task in pending:
                 task.cancel()
-            await asyncio.gather(*tasks, return_exceptions=True)
+            results = await asyncio.gather(*tasks, return_exceptions=True)
+            for result in results:
+                if isinstance(result, BaseException) and not isinstance(result, asyncio.CancelledError):
+                    raise result
         else:
             data = sys.stdin.buffer.readline(MAX_REQUEST + 1)
             if not data or len(data) > MAX_REQUEST:

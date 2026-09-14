@@ -18,19 +18,25 @@ Item {
   property string transportError: ""
   property var lastResponse: ({})
   property bool watching: watchProcess.running
+  property bool watchingRequested: false
   signal responseReceived(var response)
 
   function setFixture(next) {
+    stop()
     fixtureMode = true
     snapshot = next
     transportError = ""
   }
 
   function start() {
-    if (!fixtureMode && !watchProcess.running) watchProcess.running = true
+    if (fixtureMode) return
+    watchingRequested = true
+    if (!watchProcess.running) watchProcess.running = true
   }
 
   function stop() {
+    watchingRequested = false
+    reconnectTimer.stop()
     if (watchProcess.running) watchProcess.signal(15)
   }
 
@@ -57,15 +63,23 @@ Item {
     }
   }
 
+  Timer {
+    id: reconnectTimer
+    interval: 2000
+    onTriggered: if (root.watchingRequested && !root.fixtureMode) root.start()
+  }
+
   Process {
     id: watchProcess
     command: ["omarchy-voice-control", "--watch"]
     running: false
     stdinEnabled: true
-    onStarted: root.request({ action: "status" })
+    onStarted: { reconnectTimer.stop(); root.request({ action: "status" }) }
     onExited: function(exitCode) {
-      if (!root.fixtureMode && exitCode !== 0)
-        root.transportError = "Voice control is not available. Open settings to check local readiness."
+      if (!root.fixtureMode && root.watchingRequested) {
+        root.transportError = "Voice is reconnecting."
+        reconnectTimer.restart()
+      }
     }
     stdout: SplitParser { onRead: function(line) { root.applyLine(line) } }
     stderr: SplitParser { onRead: function(line) { if (String(line).trim() !== "") root.transportError = "Voice control needs attention." } }
