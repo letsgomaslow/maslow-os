@@ -292,9 +292,41 @@ class LiveSession(Session):
 
     async def run(self, mode):
         # Reload orchestration and provider fixes without re-entering the key.
-        module = importlib.import_module("gpt_live_session")
-        importlib.reload(module)
-        await module.run_live(self, mode)
+        try:
+            module = importlib.import_module("gpt_live_session")
+            importlib.reload(module)
+            await module.run_live(self, mode)
+        except asyncio.CancelledError:
+            raise
+        except Exception as error:
+            detail = type(error).__name__
+            if isinstance(error, ModuleNotFoundError) and error.name:
+                detail += " (" + error.name + ")"
+            frame = error.__traceback__
+            while frame and frame.tb_next:
+                frame = frame.tb_next
+            if frame:
+                detail += " at " + Path(frame.tb_frame.f_code.co_filename).name
+                detail += ":" + frame.tb_frame.f_code.co_name
+                detail += ":" + str(frame.tb_lineno)
+            self.error = {"code": "LIVE_TEST_FAILED",
+                          "message": "GPT-Live test setup failed: " + detail + "."}
+            self.state = "error"
+            self.microphone = False
+            if self.mode == "probe" and not self.result:
+                self.result = {"passed": False, "physical_microphone_tested": False}
+
+    async def end(self):
+        await super().end()
+        # A pre-session task failure used to leave the tester permanently
+        # connecting because Session.end() only waits for unfinished jobs.
+        if self.job and self.job.done() and self.state == "connecting":
+            self.error = {"code": "LIVE_TEST_FAILED",
+                          "message": "GPT-Live could not finish this test. Check account access and try again."}
+            self.state = "error"
+            self.microphone = False
+            if self.mode == "probe" and not self.result:
+                self.result = {"passed": False, "physical_microphone_tested": False}
 
     async def shutdown(self):
         for task in list(self.background):

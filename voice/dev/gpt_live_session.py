@@ -59,8 +59,13 @@ async def run_live(owner, mode):
         owner.backend_error = "Preparing the isolated local task agent. Voice checks can run now."
         owner.spawn(owner.setup_backend())
     audio_module = importlib.import_module("maslow_voice.audio")
-    provider_module = importlib.import_module("maslow_voice.providers.openai_live")
+    # Reload the shared voice catalog before the provider. The private tester
+    # stays alive across source revisions, so provider imports can otherwise
+    # retain a pre-GPT-Live catalog without the LIVE_VOICES symbol.
+    voices_module = importlib.import_module("maslow_voice.voices")
+    importlib.reload(voices_module)
     importlib.reload(audio_module)
+    provider_module = importlib.import_module("maslow_voice.providers.openai_live")
     importlib.reload(provider_module)
     owner.engine = hashlib.sha256(Path(audio_module.__file__).read_bytes() + Path(provider_module.__file__).read_bytes()).hexdigest()[:12]
     owner.playback = {"packets": 0, "played_ms": 0, "audible_samples": 0}
