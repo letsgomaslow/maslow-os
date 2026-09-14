@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import unittest
 import asyncio
+import random
 from array import array
 from types import SimpleNamespace
 from unittest.mock import AsyncMock, Mock, patch
@@ -10,6 +11,24 @@ from maslow_voice.audio import PCM16K, PCM24K, PCM48K, PcmFrame, PortAudioTransp
 
 
 class PcmResamplingTests(unittest.TestCase):
+    @staticmethod
+    def reference_resample(frame, sample_rate):
+        if frame.sample_rate == sample_rate:
+            return frame
+        if not frame.pcm:
+            return PcmFrame(b"", sample_rate)
+        source = array("h")
+        source.frombytes(frame.pcm)
+        output_count = max(1, round(len(source) * sample_rate / frame.sample_rate))
+        target = array("h")
+        for index in range(output_count):
+            position = index * frame.sample_rate / sample_rate
+            left = min(int(position), len(source) - 1)
+            right = min(left + 1, len(source) - 1)
+            fraction = position - left
+            target.append(round(source[left] + (source[right] - source[left]) * fraction))
+        return PcmFrame(target.tobytes(), sample_rate)
+
     def test_resamples_48khz_pcm_to_provider_rates(self) -> None:
         samples = array("h", range(480))
         frame = PcmFrame(samples.tobytes(), PCM48K)
@@ -22,6 +41,24 @@ class PcmResamplingTests(unittest.TestCase):
             PcmFrame(b"x", PCM48K)
         with self.assertRaises(ValueError):
             PcmFrame(b"\0\0", PCM48K, channels=2)
+
+    def test_fast_paths_match_original_resampler_for_edges_and_random_pcm(self) -> None:
+        rng = random.Random(8128)
+        lengths = [0, 1, 2, 3, 4, 5, 7, 8, 479, 480, 959, 960, 961]
+        for source_rate, target_rate in ((PCM48K, PCM24K), (PCM48K, PCM16K)):
+            for length in lengths:
+                values = array("h", (rng.randint(-32768, 32767) for _ in range(length)))
+                if length >= 2:
+                    values[0], values[-1] = -32768, 32767
+                frame = PcmFrame(values.tobytes(), source_rate)
+                with self.subTest(source_rate=source_rate, target_rate=target_rate, length=length):
+                    self.assertEqual(resample_pcm16(frame, target_rate), self.reference_resample(frame, target_rate))
+
+        for source_rate, target_rate in ((PCM24K, PCM48K), (PCM16K, PCM48K), (PCM48K, 44100)):
+            for length in lengths:
+                frame = PcmFrame(b"\0\0" * length, source_rate)
+                with self.subTest(zero=True, source_rate=source_rate, target_rate=target_rate, length=length):
+                    self.assertEqual(resample_pcm16(frame, target_rate), self.reference_resample(frame, target_rate))
 
 
 class PlaybackTransportTests(unittest.IsolatedAsyncioTestCase):

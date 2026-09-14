@@ -38,9 +38,14 @@ def resample_pcm16(frame: PcmFrame, sample_rate: int) -> PcmFrame:
         return frame
     if not frame.pcm:
         return PcmFrame(b"", sample_rate)
+    output_count = max(1, round(len(frame.pcm) // 2 * sample_rate / frame.sample_rate))
+    if not any(frame.pcm):
+        return PcmFrame(b"\0" * output_count * 2, sample_rate)
     source = array("h")
     source.frombytes(frame.pcm)
-    output_count = max(1, round(len(source) * sample_rate / frame.sample_rate))
+    ratio, remainder = divmod(frame.sample_rate, sample_rate)
+    if remainder == 0:
+        return PcmFrame(source[:output_count * ratio:ratio].tobytes(), sample_rate)
     target = array("h")
     for index in range(output_count):
         position = index * frame.sample_rate / sample_rate
