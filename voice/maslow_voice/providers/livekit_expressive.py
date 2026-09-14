@@ -14,7 +14,7 @@ from typing import Any
 
 from maslow_voice.audio import PcmFrame, resample_pcm16
 
-from .base import ProviderError, VoiceProvider
+from .base import ProviderError, ToolPreference, VoiceProvider
 
 
 class LiveKitExpressiveProvider(VoiceProvider):
@@ -175,7 +175,9 @@ class LiveKitExpressiveProvider(VoiceProvider):
                 super().__init__(instructions=(
                     "You are Maslow's concise English voice coordinator. "
                     "You may only prepare a work intent with submit_intent. "
-                    "Never execute tools, commands, or permissions."
+                    "Never execute tools, commands, or permissions. "
+                    "Only acknowledge submission after submit_intent returns SUBMITTED. "
+                    "If it returns NOT_SUBMITTED, clearly say no work was submitted or started and ask the user to clarify."
                 ))
 
             async def llm_node(self, chat_ctx, tools, model_settings):
@@ -201,7 +203,7 @@ class LiveKitExpressiveProvider(VoiceProvider):
                 summary: str,
                 constraints: list[str],
                 requested_output: str,
-                tool_preference: str,
+                tool_preference: ToolPreference,
                 unresolved_questions: list[str],
             ) -> str:
                 try:
@@ -216,9 +218,9 @@ class LiveKitExpressiveProvider(VoiceProvider):
                         "tool_preference": tool_preference,
                         "unresolved_questions": unresolved_questions,
                     }, turn_id)
-                    return "The work request was submitted for the host to review."
+                    return "SUBMITTED: The work request was submitted for the host to review."
                 except Exception:
-                    return "The work request needs clarification."
+                    return "NOT_SUBMITTED: No work was submitted or started. Ask the user to clarify the request."
 
         # The SDK injects RunContext; it is deliberately absent from the model's
         # tool arguments. Bind the actual optional SDK type before decoration.

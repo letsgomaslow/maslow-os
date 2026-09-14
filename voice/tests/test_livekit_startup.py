@@ -121,6 +121,10 @@ class LiveKitStartupTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(set(parameters["properties"]), expected)
         self.assertEqual(set(parameters["required"]), expected)
         self.assertFalse(parameters["additionalProperties"])
+        self.assertEqual(
+            parameters["properties"]["tool_preference"]["enum"],
+            ["auto", "codex", "claude", "hermes"],
+        )
 
     async def test_fatal_sdk_error_is_actionable_safe_and_revokes_turns(self):
         from livekit.agents import APIStatusError

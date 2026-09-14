@@ -102,14 +102,58 @@ class LiveKitProviderConstructionTests(LiveKitNoNetworkTest):
         handle = SpeechHandle.create()
         context = agents.RunContext(session=session, speech_handle=handle,
             function_call=agents.llm.FunctionCall(call_id="call-" + first.id, name="submit_intent", arguments="{}"))
-        await provider._agent.submit_intent(context, objective="Fix it", summary="Fix the first project", constraints=[],
+        result = await provider._agent.submit_intent(context, objective="Fix it", summary="Fix the first project", constraints=[],
             requested_output="A tested fix", tool_preference="auto", unresolved_questions=[])
+        self.assertEqual(result, "SUBMITTED: The work request was submitted for the host to review.")
         self.assertEqual(submitted, [first.id])
         self.assertEqual([event["turn_id"] for event in events], [first.id, second.id])
         interrupted = SpeechHandle.create()
         interrupted.interrupt()
         context = agents.RunContext(session=session, speech_handle=interrupted,
             function_call=agents.llm.FunctionCall(call_id="call-" + second.id, name="submit_intent", arguments="{}"))
-        await provider._agent.submit_intent(context, objective="Other", summary="Other", constraints=[],
+        result = await provider._agent.submit_intent(context, objective="Other", summary="Other", constraints=[],
             requested_output="", tool_preference="auto", unresolved_questions=[])
+        self.assertEqual(
+            result,
+            "NOT_SUBMITTED: No work was submitted or started. Ask the user to clarify the request.",
+        )
         self.assertEqual(submitted, [first.id])
+
+    async def test_invalid_tool_preference_is_truthfully_not_submitted(self):
+        try:
+            from livekit import agents
+            from livekit.agents.voice.speech_handle import SpeechHandle
+        except ImportError:
+            self.skipTest("LiveKit provider dependencies are not installed")
+        submitted = []
+        async def emit(_event):
+            return None
+        async def submit(intent, turn_id):
+            submitted.append((intent, turn_id))
+            return {"id": "task"}
+        provider = LiveKitExpressiveProvider(config={"mode": "livekit"}, secrets={}, emit=emit, submit=submit)
+        self.addAsyncCleanup(provider.stop)
+        session = provider._create_agent_session(agents, "a" * 32, "b" * 32)
+        provider._started = True
+        message = agents.llm.ChatMessage(role="user", content=["Create the report with Hermes"])
+        call_id = "call-" + message.id
+        provider._tool_turns[call_id] = message.id
+        context = agents.RunContext(
+            session=session,
+            speech_handle=SpeechHandle.create(),
+            function_call=agents.llm.FunctionCall(call_id=call_id, name="submit_intent", arguments="{}"),
+        )
+        result = await provider._agent.submit_intent(
+            context,
+            objective="Create the report",
+            summary="Create the requested report with Hermes",
+            constraints=[],
+            requested_output="A report",
+            tool_preference="Hermes",
+            unresolved_questions=[],
+        )
+        self.assertEqual(
+            result,
+            "NOT_SUBMITTED: No work was submitted or started. Ask the user to clarify the request.",
+        )
+        self.assertEqual(submitted, [])
