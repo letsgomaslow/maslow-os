@@ -36,6 +36,8 @@ class ControlServer:
         self.watchers = set()
         self.connections = set()
         self.requests = set()
+        self._watch_pending = {}
+        self._watch_senders = {}
         self.server = None
 
     async def start(self):
@@ -55,13 +57,43 @@ class ControlServer:
         if not self.watchers:
             return
         snapshot = self.snapshot()
-        async def deliver(writer):
+        for writer in tuple(self.watchers):
+            self._queue_watcher(writer, snapshot)
+
+    def _queue_watcher(self, writer, snapshot):
+        self._watch_pending[writer] = snapshot
+        sender = self._watch_senders.get(writer)
+        if sender is None or sender.done():
+            self._watch_senders[writer] = asyncio.create_task(self._deliver_watcher(writer))
+
+    async def _deliver_watcher(self, writer):
+        current = asyncio.current_task()
+        try:
+            while writer in self.watchers:
+                snapshot = self._watch_pending.pop(writer, None)
+                if snapshot is None:
+                    return
+                try:
+                    await self.send(writer, snapshot)
+                except Exception:
+                    self.watchers.discard(writer)
+                    self._watch_pending.pop(writer, None)
+                    writer.close()
+                    return
+        finally:
+            if self._watch_senders.get(writer) is current:
+                self._watch_senders.pop(writer, None)
+
+    async def _remove_watcher(self, writer):
+        self.watchers.discard(writer)
+        self._watch_pending.pop(writer, None)
+        sender = self._watch_senders.pop(writer, None)
+        if sender is not None and sender is not asyncio.current_task() and not sender.done():
+            sender.cancel()
             try:
-                await self.send(writer, snapshot)
-            except (OSError, TimeoutError, VoiceError):
-                self.watchers.discard(writer)
-                writer.close()
-        await asyncio.gather(*(deliver(writer) for writer in tuple(self.watchers)))
+                await sender
+            except asyncio.CancelledError:
+                pass
 
     async def _connection(self, reader, writer):
         self.connections.add(writer)
@@ -107,7 +139,7 @@ class ControlServer:
                         raise ValueError()
                     if request == {"action": "watch"}:
                         self.watchers.add(writer)
-                        await self.send(writer, self.snapshot())
+                        self._queue_watcher(writer, self.snapshot())
                     else:
                         action = request.get("action")
                         if request == {"action": "end_voice"}:
@@ -142,7 +174,7 @@ class ControlServer:
         finally:
             if pending:
                 await asyncio.gather(*pending, return_exceptions=True)
-            self.watchers.discard(writer)
+            await self._remove_watcher(writer)
             self.connections.discard(writer)
             writer.close()
             try:
@@ -153,12 +185,21 @@ class ControlServer:
     async def close(self):
         if self.server:
             self.server.close()
+        senders = tuple(self._watch_senders.values())
+        for sender in senders:
+            sender.cancel()
         for writer in tuple(self.connections):
             writer.close()
+            # Shutdown must not wait for an unread watcher's buffered
+            # snapshots to flush before its connection handler can exit.
+            writer.transport.abort()
         pending = tuple(self.requests)
         for task in pending:
             task.cancel()
-        await asyncio.gather(*pending, return_exceptions=True)
+        await asyncio.gather(*senders, *pending, return_exceptions=True)
+        self.watchers.clear()
+        self._watch_pending.clear()
+        self._watch_senders.clear()
         if self.server:
             await self.server.wait_closed()
             self.server = None
