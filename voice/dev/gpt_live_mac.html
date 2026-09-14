@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Maslow · GPT-Live local experiment</title>
+<style>
+:root{color-scheme:dark;font-family:Manrope,system-ui,sans-serif;background:#121d35;color:#fff}*{box-sizing:border-box}[hidden]{display:none!important}body{margin:0}main{max-width:1160px;margin:auto;padding:36px 28px}header,.row,.actions{display:flex;align-items:center;gap:12px;flex-wrap:wrap}header{justify-content:space-between}.brand{letter-spacing:.2em;font-weight:750;font-size:14px}.tag{border:1px solid #6dc4ad88;color:#8dddc8;border-radius:40px;padding:8px 12px;font-size:12px}h1{font-size:clamp(30px,4vw,44px);letter-spacing:-.04em;font-weight:550;margin:34px 0 10px}h2{font-size:20px;margin:0 0 12px}p{color:#cbd2df;line-height:1.55}.grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:22px}section{border:1px solid #40506a;background:#192740;border-radius:18px;padding:24px;margin-top:20px}.grid section{margin:0}label{display:grid;gap:8px;font-size:14px;margin-bottom:14px}input,select,textarea{font:inherit;color:#fff;background:#121d35;border:1px solid #738096;border-radius:9px;padding:12px;width:100%}textarea{resize:vertical;min-height:96px}button{font:600 14px system-ui;min-height:44px;padding:11px 16px;border:1px solid transparent;border-radius:9px;color:#121d35;background:#6dc4ad;cursor:pointer}button.secondary{background:#344660;color:#fff;border-color:#738096}button:disabled,select:disabled{opacity:.45;cursor:default}:focus-visible{outline:3px solid #ee7bb3;outline-offset:3px}.small{font-size:13px}.error{color:#ffb9ce}.success{color:#8dddc8}.muted{color:#adb9ce}.status{font-weight:600;color:#fff;min-height:24px}.orb{width:28px;height:28px;border-radius:100%;background:radial-gradient(circle at 30% 30%,#c8ccd4,#667085);flex:none}body[data-listening=true] .orb{background:radial-gradient(circle at 25% 25%,#acf0dc,#6dc4ad 35%,#386393 70%,#25364f);animation:pulse 2.5s ease-in-out infinite}body[data-speaking=true] .orb{background:radial-gradient(circle at 30% 30%,#fac9e0,#ee7bb3 25%,#6dc4ad 60%,#386393);animation:pulse .85s ease-in-out infinite}@keyframes pulse{50%{transform:scale(1.13)}}.transcript{max-height:320px;overflow:auto;font-size:14px}.transcript p{border-top:1px solid #40506a;padding-top:10px}.task{border-top:1px solid #536078;margin-top:18px;padding-top:16px}.task h3{font-size:16px;margin:0 0 8px}.task .actions{margin-top:10px}.task button{font-size:12px}.result-text{white-space:pre-wrap;overflow-wrap:anywhere;font-size:13px}details{margin-top:20px}summary{cursor:pointer;padding:8px 0}code{overflow-wrap:anywhere}@media(max-width:780px){.grid{grid-template-columns:1fr}main{padding:24px 18px}}@media(prefers-reduced-motion:reduce){.orb{animation:none!important}}
+</style>
+<main>
+<header><span class="brand">MASLOW</span><span class="tag">PRIVATE MAC EXPERIMENT</span></header>
+<h1>Keep talking. Let work continue.</h1>
+<p>Try GPT-Live with a separate local task agent. Talk through an idea, send work, then keep the conversation going.</p>
+<section>
+<h2>Connect OpenAI</h2>
+<p class="small">Your key stays in this tester’s memory. This separate page needs its own entry. Voice and the isolated task test use your OpenAI API account.</p>
+<form id="setup" autocomplete="off"><label>OpenAI API key<input id="key" type="password" autocomplete="new-password" spellcheck="false" required></label><button id="save">Save connection</button></form>
+<p id="connection" class="small" role="status">No key saved.</p><button id="change" class="secondary" hidden>Change connection</button>
+</section>
+<div class="grid">
+<section>
+<h2>Conversation</h2>
+<p class="small">Check the connection first, preview voices, then start talking. The microphone stays available while Maslow speaks.</p>
+<label>Voice<select id="voice" disabled></select></label>
+<div class="actions"><button id="probe" disabled>Check connection</button><button id="audition" class="secondary" disabled>Preview voice</button><button id="conversation" disabled>Start talking</button><button id="end" class="secondary" disabled>Stop audio</button><button id="mute" class="secondary" hidden>Mute microphone</button></div>
+<div class="row"><span class="orb" aria-hidden="true"></span><p id="state" class="status" role="status">Microphone off</p></div>
+<p id="result" class="small success" role="status"></p>
+<p id="error" class="error" role="alert"></p>
+<div id="transcript" class="transcript" aria-label="Live conversation transcript"></div>
+<p class="small muted">Transcript fragments can change as you speak. Stopping audio clears them. Accepted tasks continue independently.</p>
+</section>
+<section>
+<h2>Background work</h2>
+<p id="backend" class="small" role="status">Preparing the local task agent…</p>
+<form id="task-form"><label>Send a typed request<textarea id="task-text" maxlength="8000" placeholder="Create a small HTML page about a weekend hiking trip, with a packing list."></textarea></label><button id="send-task" disabled>Send to task agent</button></form><div class="actions"><button id="scenario" class="secondary" disabled>Test voice handoff</button></div>
+<p id="handoff" class="small" role="status"></p><p id="task-error" class="error" role="alert"></p>
+<div id="tasks"></div>
+<details><summary>Scratch workspace</summary><p class="small">Test artifacts and task history are kept here so you can verify the result. Voice recordings and API keys are not saved.</p><code id="workspace" class="small"></code></details>
+</section>
+</div>
+<details><summary>What we are testing</summary><p class="small">Continuous conversation during real task execution, voice and typed requests using the same backend, corrections, explicit cancellation, duplicate handling, and tasks continuing after voice stops. This Mac experiment does not update the Lenovo.</p><button id="forget" class="secondary">Clear connection and stop test tasks</button></details>
+</main>
+<script nonce="__NONCE__">
+const nonce='__NONCE__',$=id=>document.getElementById(id);
+let pending=false,editing=false,voicesLoaded=false,busy=false,mic=false,currentMode=null,taskSignature='',transcriptSignature='';
+async function action(name,body={}){const r=await fetch('/action/'+name,{method:'POST',headers:{'Content-Type':'application/json','X-Maslow-Test':nonce},body:JSON.stringify(body)});const d=await r.json();if(!r.ok)throw Error(d.error?.message||'This action could not finish.');return d;}
+async function run(name,body={},target='error'){pending=true;$(target).textContent='';try{await action(name,body);return true;}catch(e){$(target).textContent=e.message;return false;}finally{pending=false;}}
+$('setup').onsubmit=async e=>{e.preventDefault();const body={key:$('key').value};if(await run('save',body)){$('setup').reset();editing=false;}body.key='';};
+$('change').onclick=()=>{editing=true;$('setup').hidden=false;$('key').focus();};
+for(const id of ['probe','audition','conversation'])$(id).onclick=()=>run(id,{voice:$('voice').value});
+$('scenario').onclick=()=>run('scenario',{voice:$('voice').value});
+$('end').onclick=()=>run('end');$('forget').onclick=()=>run('clear');$('mute').onclick=()=>run('mute',{muted:mic});
+$('task-form').onsubmit=async e=>{e.preventDefault();const text=$('task-text').value;if(await run('task',{text,request_id:crypto.randomUUID()},'task-error')){$('task-text').value='';$('handoff').textContent='The local agent is preparing the request…';}};
+function renderTasks(tasks){const sig=JSON.stringify(tasks);if(sig===taskSignature)return;taskSignature=sig;$('tasks').replaceChildren(...tasks.map(task=>{const box=document.createElement('article');box.className='task';const h=document.createElement('h3');h.textContent=task.brief?.objective||'Task';const p=document.createElement('p');p.className='small';p.textContent=task.state;box.append(h,p);if(task.error){const error=document.createElement('p');error.className='error small';error.textContent=task.error.message||'This task needs attention.';box.append(error);}if(task.result){const result=document.createElement('div');result.className='result-text';result.textContent=typeof task.result==='string'?task.result:JSON.stringify(task.result);box.append(result);}const row=document.createElement('div');row.className='actions';const terminal=['completed','cancelled','failed','interrupted'].includes(task.state);if(!terminal){const stop=document.createElement('button');stop.type='button';stop.className='secondary';stop.textContent='Stop task';stop.onclick=()=>run('task-action',{id:task.id,operation:'cancel'},'task-error');row.append(stop);}const edit=document.createElement('button');edit.type='button';edit.className='secondary';edit.textContent=terminal?'Continue task':'Redirect task';edit.onclick=()=>{const text=$('task-text').value.trim();if(!text){$('task-error').textContent='Write your correction above, then use '+edit.textContent+'.';$('task-text').focus();return;}run('task-action',{id:task.id,operation:terminal?'continue':'redirect',text},'task-error').then(ok=>{if(ok)$('task-text').value='';});};row.append(edit);box.append(row);return box;}));}
+async function refresh(){try{const s=await(await fetch('/status',{cache:'no-store'})).json();busy=s.busy;mic=s.microphone;currentMode=s.mode;document.body.dataset.listening=String(mic);document.body.dataset.speaking=String(s.speaking);$('setup').hidden=s.ready&&!editing;$('change').hidden=!s.ready||editing;$('change').disabled=busy;$('save').disabled=busy||pending;$('connection').textContent=s.ready?'Key saved privately. The entry field is cleared.':'No key saved.';
+if(!voicesLoaded){$('voice').replaceChildren(...s.voices.map(v=>{const o=document.createElement('option');o.value=v.name;o.textContent=v.name[0].toUpperCase()+v.name.slice(1);return o;}));$('voice').value=s.selected_voice;voicesLoaded=true;}
+for(const id of ['probe','audition','conversation','voice'])$(id).disabled=!s.ready||busy||pending;$('end').disabled=!busy;$('mute').hidden=currentMode!=='conversation'||!busy;$('mute').textContent=mic?'Mute microphone':'Enable microphone';
+$('state').textContent=busy?(currentMode==='scenario'?'Testing voice handoff · microphone off':currentMode==='probe'?'Checking GPT-Live · microphone off':currentMode==='audition'?'Previewing voice · microphone off':s.state==='connecting'?'Connecting · microphone off':(s.speaking?'Maslow is speaking':'Conversation active')+(mic?' · microphone on':' · microphone muted')):'Microphone off';
+if(s.error)$('error').textContent=s.error.message;$('result').textContent=s.result?.scenario_complete===true?'Voice task completed. Conversation during work: '+(s.result.conversation_during_work?'observed':'not yet proven'):s.result?.scenario_complete===false?'The handoff test did not complete.':s.result?.passed?'Connection passed: speech recognized and spoken audio returned.':s.result?.audition_complete?'Voice preview finished.':s.result?.passed===false?'Connection test did not pass.':'';
+$('backend').textContent=s.backend_ready?'Task runner configured. Each task still needs a successful model response.':s.backend_error||'Preparing the local task agent…';$('send-task').disabled=!s.backend_ready||pending;$('scenario').disabled=!s.backend_ready||busy||pending;$('handoff').textContent=s.pending_handoffs?'Checking the voice request before handoff…':'';
+const v=await(await fetch('/view',{headers:{'X-Maslow-Test':nonce},cache:'no-store'})).json();$('workspace').textContent=v.workspace;renderTasks(v.tasks);const signature=JSON.stringify(v.transcript);if(signature!==transcriptSignature){transcriptSignature=signature;$('transcript').replaceChildren(...v.transcript.map(t=>{const p=document.createElement('p');p.textContent=(t.role==='user'?'You: ':'Maslow: ')+t.text;return p;}));}if(v.notes?.length)$('handoff').textContent=v.notes.at(-1);
+}catch(e){$('state').textContent='Tester disconnected · microphone will stop';for(const id of ['probe','audition','conversation','send-task'])$(id).disabled=true;}setTimeout(refresh,600);}
+addEventListener('pagehide',()=>{if(busy&&currentMode!=='probe')fetch('/action/end',{method:'POST',headers:{'Content-Type':'application/json','X-Maslow-Test':nonce},body:'{}',keepalive:true}).catch(()=>{});});refresh();
+</script></html>

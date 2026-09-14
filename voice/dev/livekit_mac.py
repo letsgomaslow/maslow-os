@@ -73,12 +73,12 @@ class ProbeAudio:
         return int(self.received_ms)
 
 
-async def synthetic_speech():
+async def synthetic_speech(text="Hello Maslow. Please say that the voice test is working."):
     # Only a fixed, non-private test sentence touches these temporary files.
     with tempfile.TemporaryDirectory(prefix="maslow-synthetic-") as folder:
         source, target = Path(folder) / "speech.aiff", Path(folder) / "speech.wav"
         for command in (
-            ["/usr/bin/say", "-o", str(source), "Hello Maslow. Please say that the voice test is working."],
+            ["/usr/bin/say", "-o", str(source), text],
             ["/usr/bin/afconvert", "-f", "WAVE", "-d", "LEI16@48000", "-c", "1", str(source), str(target)],
         ):
             process = await asyncio.create_subprocess_exec(*command, stdout=asyncio.subprocess.DEVNULL,
@@ -345,7 +345,7 @@ ORIGIN = web.AppKey("origin", str)
 TOKEN = web.AppKey("token", str)
 
 
-def create_app(session=None):
+def create_app(session=None, *, page_path=None):
     @web.middleware
     async def private_boundary(request, handler):
         origin = request.app[ORIGIN]
@@ -373,7 +373,7 @@ def create_app(session=None):
     app[TOKEN] = secrets.token_urlsafe(32)
 
     async def index(request):
-        page = Path(__file__).with_suffix(".html").read_text()
+        page = (Path(page_path) if page_path else Path(__file__).with_suffix(".html")).read_text()
         return web.Response(text=page.replace("__NONCE__", app[TOKEN]).replace("__PROVIDER__", app[SESSION].kind), content_type="text/html")
 
     async def status(request):
@@ -381,7 +381,8 @@ def create_app(session=None):
 
     async def view(request):
         app[SESSION].last_seen = time.monotonic()
-        return web.json_response(app[SESSION].transcripts)
+        private_view = getattr(app[SESSION], "private_view", None)
+        return web.json_response(private_view() if private_view else app[SESSION].transcripts)
 
     async def action(request):
         if request.content_type != "application/json":
@@ -399,9 +400,14 @@ def create_app(session=None):
             await session.end()
         elif name == "forget":
             await session.end()
+            clear_connection = getattr(session, "clear_connection", None)
+            if clear_connection:
+                await clear_connection()
             session.credentials.clear()
             session.url = ""
             session.result = None
+        elif getattr(session, "extra_action", None):
+            await session.extra_action(name, body)
         else:
             raise web.HTTPNotFound()
         return web.json_response({"ok": True})
@@ -410,6 +416,9 @@ def create_app(session=None):
         await app[SESSION].end()
         app[SESSION].credentials.clear()
         app[SESSION].url = ""
+        shutdown = getattr(app[SESSION], "shutdown", None)
+        if shutdown:
+            await shutdown()
 
     app.router.add_get("/", index)
     app.router.add_get("/status", status)

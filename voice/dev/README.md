@@ -37,3 +37,23 @@ PYTHONPATH=voice:voice/dev python -m unittest discover -s voice/dev -p 'test_*.p
 ```
 
 Keep this directory outside the installed Voice payload. This tester requires neither a new dependency nor a change to the production Linux security boundary.
+
+## GPT-Live conversation and task experiment
+
+Use the separate private Mac experiment to test full-duplex conversation with an independently owned task runner:
+
+```bash
+PYTHONPATH=voice python voice/dev/gpt_live_mac.py --port 57519
+```
+
+This uses the actual `gpt-live-1` WebSocket endpoint, client delegation, continuous PCM input, and Maslow's existing native playback. The curated picker includes Marin, Cedar, and the additional voices listed in the [Live conversation guide](https://developers.openai.com/api/docs/guides/live-conversations). It does not replace the production Realtime provider or change the Linux provider setting. LiveKit Expressive remains a separate option.
+
+Save the OpenAI key in this page; it stays in the tester's memory and the task subprocess environment. The local Hermes planner and scratch executor use `gpt-5-mini` through that same OpenAI account. Each runs with an isolated temporary home, no model tools, no inherited account settings, and a Mac write sandbox. Hermes returns a bounded JSON artifact; the host validates and writes only the approved scratch file. This is a deliberately limited test of independent agent execution, not a proof of general coding-tool routing, the Hermes HTTP Runs API, or a formal A2A protocol exchange.
+
+Check connection sends a fixed synthetic sentence without opening the microphone. Start talking opens native microphone and speakers. Test voice handoff sends two fixed synthetic utterances, asking for a scratch page and continuing an unrelated conversation while work runs. A context acknowledgment proves injection acceptance, not that the user heard a spoken completion. Returned PCM duration includes silence. Listening and speaking are independent states.
+
+GPT-Live emits transcript deltas and an opaque delegation ID; it does not emit a final task instruction. The host coalesces fragments, then the separate planner receives role-labelled context and current task state. It must choose a new task, correction, explicit cancellation, or clarification. A pause alone never grants execution authority. Task IDs, revisions, duplicate suppression, and cancellation remain host responsibilities.
+
+Typed requests use the same task backend. Redirect stops and reaps the previous scratch attempt before incrementing the same task's attempt. Cancelled, unchanged, or stale outputs cannot publish a new artifact. Stop audio and page disappearance stop voice while accepted work remains owned by the tester. Clear connection and stop test tasks ends both; stopping the tester also ends its owned workers. Scratch artifacts remain available for inspection. The task database and isolated Hermes home are temporary; persistence across tester restarts is not established by this experiment.
+
+The private `/view` endpoint includes transient conversation and task details; the public `/status` contains only bounded counters and safe state. Never save raw microphone audio, account values, or raw third-party diagnostics as evidence. Record synthetic task artifact checks, safe metrics, and the user's physical audio feedback separately. The native orb, installed Linux adapter, general app/coder execution, and Lenovo acceptance require their own later validation.
