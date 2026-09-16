@@ -2,6 +2,8 @@
 
 Read this guide before editing `voice/`, Voice launch/install integration, the `maslow.voice` plugin, or Voice acceptance helpers. Start with [the development index](../../docs/maslow-development.md) and its current Voice checkpoint. The index owns current status; this guide owns procedure.
 
+For direct Lenovo development, use [the portable repository map](../../docs/lenovo-development.md) and [the September 16 failure handoff](../../docs/handoffs/2026-09-16-lenovo-voice-development-handoff.md). Hardware failure has no confirmed root cause yet.
+
 ## Locate and scope the work
 
 1. Read the owning repository's `AGENTS.md`, inspect status/log/worktrees and locate the active Voice integration branch named in the index. Do not reimplement features missing from the saved `main` or older Hub checkout. Runtime, Hub source, package recipes and ISO harness are separate repositories.

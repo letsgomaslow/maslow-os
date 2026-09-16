@@ -1,5 +1,6 @@
 # Start Here: Active Maslow Hub and Voice Work
 
+- Read [the repository map and Lenovo development setup](docs/lenovo-development.md) before locating dependent repos. Voice is owned by this repo at `voice/`; Hub, Connect, packages, ISO and public releases have separate repositories. Keep source clones outside installed runtime paths and inspect the shipped Voice baseline separately from unpublished integration.
 - Read [development status, backlog, and lessons](docs/maslow-development.md), then its dated evidence handoffs before implementation. This is the single current progress index; do not infer completion from chat summaries.
 - Run `git status --short --branch`, `git log -5 --oneline`, and `git worktree list` before editing. Hub implementation is on `codex/maslow-hub` across runtime/packages/ISO; newer Voice work can be in a separate integration worktree named by the development index. Hub source has its own repository. Product branches and provider test results are not automatically integrated.
 - At session close, update the index and relevant handoff with commits, exact artifact evidence, tests/failures/skips, remaining gates, and one next action. Never store secrets, raw private logs, or ISO files in Git. Commit only scoped files; do not merge or publish without authorization.
