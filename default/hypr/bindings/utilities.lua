@@ -8,6 +8,11 @@ o.bind("SUPER + SHIFT + code:201", "Maslow OS menu", "omarchy-menu toggle root")
 o.bind("SUPER + ESCAPE", "System menu", "omarchy-menu toggle system")
 o.bind("XF86PowerOff", "Power menu", "omarchy-menu toggle system", { locked = true })
 o.bind("SUPER + K", "Keybindings", "omarchy-menu-keybindings")
+-- Personal bindings load after these defaults and remain authoritative. Set
+-- omarchy_voice_binding=false before the defaults to keep this chord unused.
+if _G.omarchy_voice_binding ~= false then
+  o.bind(_G.omarchy_voice_binding or "SUPER + SHIFT + V", "Maslow Voice", "omarchy-launch-voice")
+end
 o.bind("SUPER + ALT + K", "Tmux keybindings", "omarchy-menu-tmux-keybindings")
 o.bind("SUPER + CTRL + K", "Herdr keybindings", "omarchy-menu-herdr-keybindings")
 o.bind("SUPER + CTRL + Q", "Calculator", "omacalc")

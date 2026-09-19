@@ -21,6 +21,8 @@
   //                  installed instead of vanishing from the list.
 
   // Root Menu
+  "hub": {"icon":"󰚩","label":"Maslow Hub","when":"omarchy-cmd-present maslow-hubctl","action":"omarchy-launch-hub"},
+  "voice": {"icon":"󰍬","label":"Maslow Voice","when":"omarchy-cmd-present omarchy-voice-control","action":"omarchy-launch-voice"},
   "apps": {"icon":"󰀻","label":"Apps","aliases":["app","applications"],"provider":"apps"},
   "learn": {"icon":"󰧑","label":"Learn"},
   "trigger": {"icon":"󱓞","label":"Trigger"},
@@ -29,7 +31,7 @@
   "install": {"icon":"󰉉","label":"Install"},
   "remove": {"icon":"󰭌","label":"Remove","aliases":["uninstall"]},
   "update": {"icon":"","label":"Update","aliases":["restart","refresh"]},
-  "about": {"icon":"","iconFont":"omarchy","label":"About Maslow OS","action":"omarchy-launch-about"},
+  "about": {"icon":"","iconFont":"omarchy","label":"About Maslow AI-OS","action":"omarchy-launch-about"},
   "system": {"icon":"","label":"System","aliases":["power-menu"]},
 
   // System
@@ -43,7 +45,7 @@
 
   // Learn
   "learn.keybindings": {"icon":"","label":"Keybindings","action":"omarchy-menu-keybindings"},
-  "learn.omarchy": {"icon":"","iconFont":"omarchy","label":"Maslow OS Guide","action":"omarchy-launch-webapp 'https://github.com/letsgomaslow/maslow-os/tree/main/manual'"},
+  "learn.omarchy": {"icon":"","iconFont":"omarchy","label":"Maslow AI-OS Guide","action":"omarchy-launch-webapp 'https://github.com/letsgomaslow/maslow-os/tree/main/manual'"},
   "learn.hyprland": {"icon":"","label":"Hyprland","action":"omarchy-launch-webapp 'https://wiki.hypr.land/'"},
   "learn.arch": {"icon":"󰣇","label":"Arch","action":"omarchy-launch-webapp 'https://wiki.archlinux.org/title/Main_page'"},
   "learn.neovim": {"icon":"","label":"Neovim","action":"omarchy-launch-webapp 'https://www.lazyvim.org/keymaps'"},
@@ -51,7 +53,7 @@
   "learn.tmux-keybindings": {"icon":"","label":"Tmux","action":"omarchy-menu-tmux-keybindings"},
   "learn.herdr-keybindings": {"icon":"","label":"Herdr","action":"omarchy-menu-herdr-keybindings"},
   "learn.community": {"icon":"󰙯","label":"Omarchy Community — engine support","action":"omarchy-launch-discord-community"},
-  "learn.support": {"icon":"","label":"Maslow OS Support","action":"omarchy-launch-webapp 'https://github.com/letsgomaslow/maslow-os/issues'"},
+  "learn.support": {"icon":"","label":"Maslow AI-OS Support","action":"omarchy-launch-webapp 'https://github.com/letsgomaslow/maslow-os/issues'"},
 
   // Trigger
   "trigger.emoji": {"icon":"","label":"Emoji","aliases":["emoji","emojis"],"action":"omarchy-menu-emoji"},
@@ -126,7 +128,7 @@
 
   // Setup
   "setup.monitors": {"icon":"󰍹","label":"Monitors","action":"omarchy-launch-config-editor \"$HOME/.config/hypr/monitors.lua\""},
-  "setup.ai": {"icon":"󰚩","label":"AI","title":"Maslow OS AI Setup","action":"omarchy-setup-ai"},
+  "setup.ai": {"icon":"󰚩","label":"AI","title":"Maslow AI-OS Setup","action":"omarchy-setup-ai"},
   "setup.keybindings": {"icon":"","label":"Keybindings","when":"[[ -f ~/.config/hypr/bindings.lua ]]","action":"omarchy-launch-config-editor \"$HOME/.config/hypr/bindings.lua\""},
   "setup.input": {"icon":"","label":"Input","when":"[[ -f ~/.config/hypr/input.lua ]]","action":"omarchy-launch-config-editor \"$HOME/.config/hypr/input.lua\""},
   "setup.network": {"icon":"󰛳","label":"Network","aliases":["network"]},
@@ -344,7 +346,7 @@
   "remove.development.elixir.phoenix": {"icon":"","label":"Phoenix","when":"[[ -d $HOME/.local/share/mise/installs/elixir ]]","action":"omarchy-launch-floating-terminal-with-presentation 'omarchy-remove-dev-env phoenix'"},
 
   // Update
-  "update.omarchy": {"icon":"","iconFont":"omarchy","label":"Maslow OS","action":"omarchy-launch-floating-terminal-with-presentation omarchy-update"},
+  "update.omarchy": {"icon":"","iconFont":"omarchy","label":"Maslow AI-OS","action":"omarchy-launch-floating-terminal-with-presentation omarchy-update"},
   "update.channel": {"icon":"󰔫","label":"Channel"},
   "update.config": {"icon":"","label":"Config","title":"Reset to default"},
   "update.themes": {"icon":"󰸌","label":"Extra Themes","when":"omarchy-theme-extras","action":"omarchy-launch-floating-terminal-with-presentation omarchy-theme-update"},

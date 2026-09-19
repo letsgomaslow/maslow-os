@@ -33,6 +33,10 @@ A new shell test only needs the right name: drop `<area>-test.sh` into
 `test/shell.d/` and `./test/shell` picks it up automatically. Shared fixtures
 live under `test/shell.d/fixtures/`.
 
+## Voice checks
+
+`bash test/shell.d/voice-test.sh` runs the Voice Python suite and UI contract checks and participates in `./test/shell`. Use the pinned Voice environment for SDK checks; report missing SDK and platform/namespace skips separately. Source checks do not establish live account, spoken-detail, task-artifact or physical-audio acceptance. Follow [Voice development and verification](../agents/skills/voice-development.md) for the staged source, real Quickshell, installed QEMU/TCG and Lenovo route, and [the development index](maslow-development.md) for the current provider status and exact evidence.
+
 ## The base-test.sh contract
 
 Every shell test starts the same way:

@@ -149,6 +149,17 @@ tool-select)
   fi
   write_state "$state"
   ;;
+choice)
+  key=${2:?choice name required}
+  value=${3:?choice value required}
+  case "$key:$value" in
+  account:codex | account:claude | hermes:recommended | hermes:deferred | memory:builtin | memory:honcho | memory:hindsight | memory:deferred | desktop:hermes-desktop | desktop:chatgpt-desktop | desktop:none) ;;
+  *) echo "Unsupported onboarding choice." >&2; exit 1 ;;
+  esac
+  # Choices are navigation preferences, never authentication or response proof.
+  state=$(jq --arg key "$key" --arg value "$value" '.setupChoices = ((.setupChoices // {}) + {($key): $value})' <<<"$state")
+  write_state "$state"
+  ;;
 tool-status)
   tool=${2:?tool ID required}
   status=${3:?status required}
@@ -175,11 +186,11 @@ complete)
   write_state "$state"
   ;;
 reset)
-  state=$(jq --argjson tools "$(default_tools)" '.currentStep = 1 | .completedAt = null | .deferred = false | .selectedAgent = null | .tools = $tools' <<<"$state")
+  state=$(jq --argjson tools "$(default_tools)" '.currentStep = 1 | .completedAt = null | .deferred = false | .selectedAgent = null | .tools = $tools | del(.setupChoices.account, .setupChoices.hermes, .setupChoices.memory, .setupChoices.desktop)' <<<"$state")
   write_state "$state"
   ;;
 *)
-  echo "Usage: omarchy-setup-ai-state <catalog|show|open|step|select|tool-select|tool-status|defer|complete|reset> [value]" >&2
+  echo "Usage: omarchy-setup-ai-state <catalog|show|open|step|select|tool-select|tool-status|choice|defer|complete|reset> [value]" >&2
   exit 1
   ;;
 esac

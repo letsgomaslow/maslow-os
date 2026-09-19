@@ -1,0 +1,2 @@
+# Piper is invoked as a separate GPL-3.0-or-later executable.
+piper-tts==1.8.0

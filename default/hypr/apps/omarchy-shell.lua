@@ -12,3 +12,6 @@ hl.layer_rule({ match = { namespace = "^(omarchy-menu|omarchy-image-selector|oma
 -- Dev gallery is the main shell workbench; open it maximized like
 -- SUPER+ALT+F so component previews have the whole workspace.
 o.window({ class = "^org.quickshell$", title = "^Omarchy shell – dev gallery$" }, { maximize = true })
+
+-- Keep onboarding text and illustrations opaque in both Maslow themes.
+o.window({ class = "^org.quickshell$", title = "^Maslow OS AI Setup$" }, { tag = "-default-opacity", opacity = "1 1" })

@@ -974,6 +974,7 @@ ShellRoot {
           // work it out again.
           canDisable: !isBarOption,
           firstParty: !!plugins[id].__isFirstParty,
+          packageManaged: !!plugins[id].__isPackaged,
           clonedFrom: clonedFrom
         })
       }

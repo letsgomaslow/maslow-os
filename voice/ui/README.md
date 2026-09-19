@@ -1,0 +1,26 @@
+# Maslow Voice plugin
+
+The kept-loaded `maslow.voice` plugin owns one persistent layer-shell surface within the existing shell. Its transparent input mask covers only the orb, the active compact controls, and the full settings/task card. Closing the full card leaves active microphone controls present and does not end a conversation or cancel tasks.
+
+The 56-pixel ready idle orb sits at bottom right and remains colored when conversation readiness is complete. A short click immediately sends `start_voice`; it does not open a panel or require a project. Drag the orb to move it within 16-pixel display margins; the normalized position is saved so it survives restarts and display-size changes. Dragging turns off the bottom-right pin when it is enabled. If conversation readiness is incomplete, the click opens Advanced Voice settings with the exact failed checks. During a conversation, clicking the orb opens a compact strip with status, Mute or Resume, End, Captions, Tasks, and Settings. A press and hold opens Advanced Voice settings from idle. Without a saved manual position, conversation states use an 88-pixel bottom-center orb and outstanding tasks, results, and approvals use bottom left. Placement and size hold during pointer hover, press, keyboard focus, or open controls. Enabling Keep orb at bottom right clears the manual position; Reset orb position returns to automatic placement. Reduced motion freezes animation. The configured display selects one output, falling back to the first available output. The shell lock service immediately hides controls and sends `end_voice` when locking.
+
+`VoiceController.qml` owns the transport. It starts `omarchy-voice-control --watch`, accepts schema-1 snapshots, and writes JSON requests to standard input. Credentials never appear in command arguments and the form clears its value after submission. Preview mode records requests in memory without contacting the production controller.
+
+The primary connection choice is **Maslow Voice** (`gemini_live`). It uses Gemini Live with the Google AI Studio key. Its atomic setup saves that key together with optional LiveKit Expressive URL and credentials through `configure_gemini_live`; leave the Google field blank to retain a saved key. The form clears all secret fields after a confirmed save. LiveKit Expressive, model choices, and connection details remain in Advanced Voice settings. Conversation and task readiness are shown separately, because a usable conversation connection does not prove that the selected coding agent is ready. Tasks accept user-written steering and continuation instructions. Approval controls show the supplied request details and carry its request identity. Offline export first requests a review, displays its changed paths, then submits the review digest and those paths when the user chooses Export reviewed changes.
+
+Compile `VoiceOrb.frag` with the target Qt `qsb --glsl "100 es,120,150"` into `VoiceOrb.frag.qsb`; OpenGL requires those GLSL variants. The packaged shader runs by default on graphics renderers. `MASLOW_VOICE_GPU_SHADER=0` disables it; Qt software rendering selects the gradient fallback automatically. The gradient remains beneath the shader to preserve visibility if shader loading or graphics pipeline creation fails. Reduced motion freezes both variants.
+
+| State | Material and motion |
+| --- | --- |
+| Idle/ready | Slow blue glass drift with white/ice reflection and restrained teal/purple secondary accents |
+| Connecting | Faster interior motion and a moving rim highlight |
+| Listening | Microphone level gently compresses and bends the interior sheets |
+| Thinking/working | Faster sheet rotation while the silhouette stays stable |
+| Speaking | State-driven deformation until playback amplitude is available |
+| Muted | Frozen muted-blue treatment |
+| Error | Frozen warm error treatment |
+| Disabled | Frozen subdued-blue treatment that still preserves material depth |
+
+The software fallback is a Canvas glass treatment over the deep-blue gradient base, rather than only a flat gradient. It shares the shader's three-sheet structure, broad reflection and state palette but is not pixel-identical. The current blue/white direction is a functional checkpoint. The internal forms, exact blue balance and distinctive Maslow personality remain open design work; use `branding/design-tokens.json` as the palette source.
+
+Run `node voice/tests/ui-contract-test.mjs` for structural checks. For actual input-region and placement verification, use `voice/tests/ui-preview.qml` with a layer-shell compositor. Weston alone lacks that protocol; a nested Sway instance on headless Weston provides it. Copy `ui/` and the preview to a common Quickshell config root, changing the preview import to `"ui"`. Fixture IPC exposes page, state, mode, tasks, close, status, and captured requests without starting the production transport. This fixture is development-only and is not an installed entry point.

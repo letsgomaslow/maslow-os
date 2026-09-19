@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "id": "maslow.voice",
+  "name": "Maslow Voice",
+  "version": "0.1.1",
+  "author": "Maslow AI",
+  "license": "MIT",
+  "description": "A local, consent-led voice coordinator for Maslow AI-OS.",
+  "kinds": ["panel"],
+  "activation": "on-demand",
+  "entryPoints": { "panel": "Panel.qml" },
+  "keepLoaded": true
+}

@@ -60,6 +60,9 @@ update_one() {
   local dir="$PLUGINS_DIR/$id"
   local managed_parent="" rollback_head=""
 
+  [[ ! -L $dir ]] || { echo "Skipping symlinked plugin '$id'."; return 0; }
+  [[ $id != maslow.* ]] || { echo "Skipping reserved package plugin '$id'."; return 0; }
+
   if ! git -C "$dir" fetch --quiet origin HEAD; then
     echo "omarchy-plugin-update: fetch failed for '$id'" >&2
     return 1
@@ -140,6 +143,10 @@ while (( $# > 0 )); do
     ;;
   esac
 done
+
+if [[ $id == maslow.* && -e /usr/share/maslow/plugins/$id/manifest.json ]]; then
+  fail "'$id' is package-managed; use Maslow Hub Updates or the package manager"
+fi
 
 [[ -d $PLUGINS_DIR ]] || fail "no plugins installed"
 

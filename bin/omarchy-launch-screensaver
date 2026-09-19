@@ -12,6 +12,28 @@ fi
 
 focused=$(omarchy-hyprland-monitor-focused)
 terminal=$(xdg-terminal-exec --print-id)
+artwork="$HOME/.config/omarchy/branding/screensaver.txt"
+
+# The screensaver is full-screen, but a terminal's cell size still determines
+# whether its artwork fits. Keep the familiar 18pt treatment where it fits and
+# reduce it only for the current monitor and the user's actual artwork.
+# Hyprland reports physical pixels while terminal windows use logical pixels.
+readonly SCREEN_SAVER_FONT_SIZE=18
+readonly SCREEN_SAVER_MIN_FONT_SIZE=1
+readonly SCREEN_SAVER_MARGIN=32
+
+# The launcher can be started from an SSH session with LC_ALL=C. In that locale
+# wc cannot measure the block-art's display width, so pin its UTF-8 treatment.
+artwork_columns=$(LC_ALL=C.UTF-8 wc -L <"$artwork" 2>/dev/null || true)
+artwork_rows=$(awk 'END { print NR }' "$artwork" 2>/dev/null || true)
+
+if [[ ! $artwork_columns =~ ^[0-9]+$ ]] || ((artwork_columns <= 0)); then
+  artwork_columns=1
+fi
+
+if [[ ! $artwork_rows =~ ^[0-9]+$ ]] || ((artwork_rows <= 0)); then
+  artwork_rows=1
+fi
 
 case $terminal in
 *Alacritty* | *ghostty* | *foot* | *kitty*) ;;
@@ -32,6 +54,43 @@ hypr_exec() {
   hyprctl dispatch "hl.dsp.exec_cmd([[$command]])" >/dev/null 2>&1 || hyprctl dispatch exec -- bash -lc "$command" >/dev/null
 }
 
+screensaver_font_size() {
+  local monitor=$1 logical_width logical_height width_size height_size size
+
+  read -r logical_width logical_height < <(
+    jq -r '
+      (.transform // 0) as $transform |
+      [
+        ((if ($transform % 2) == 1 then .height else .width end) / .scale | floor),
+        ((if ($transform % 2) == 1 then .width else .height end) / .scale | floor)
+      ] | @tsv
+    ' <<<"$monitor"
+  )
+
+  [[ $logical_width =~ ^[0-9]+$ && $logical_height =~ ^[0-9]+$ ]] || {
+    printf '%s\n' "$SCREEN_SAVER_FONT_SIZE"
+    return
+  }
+
+  # JetBrains Mono's advance is about 0.8 times its configured size and a line
+  # is about twice that size. Reserve a small edge margin so the artwork
+  # does not land on the terminal edge when rounding differs by backend.
+  logical_width=$((logical_width - SCREEN_SAVER_MARGIN))
+  logical_height=$((logical_height - SCREEN_SAVER_MARGIN))
+  ((logical_width > 0 && logical_height > 0)) || {
+    printf '%s\n' "$SCREEN_SAVER_MIN_FONT_SIZE"
+    return
+  }
+
+  width_size=$((logical_width * 5 / (artwork_columns * 4)))
+  height_size=$((logical_height / (artwork_rows * 2)))
+  size=$width_size
+  ((height_size < size)) && size=$height_size
+  ((size > SCREEN_SAVER_FONT_SIZE)) && size=$SCREEN_SAVER_FONT_SIZE
+  ((size < SCREEN_SAVER_MIN_FONT_SIZE)) && size=$SCREEN_SAVER_MIN_FONT_SIZE
+  printf '%s\n' "$size"
+}
+
 SOCKET="$XDG_RUNTIME_DIR/hypr/$HYPRLAND_INSTANCE_SIGNATURE/.socket2.sock"
 
 # Open Hyprland's event stream before spawning anything, so a terminal that maps
@@ -49,25 +108,30 @@ wait_for_screensaver_window() {
   done
 }
 
-for m in $(hyprctl monitors -j | jq -r '.[] | .name'); do
+monitors=$(hyprctl monitors -j)
+
+while IFS= read -r m; do
+  monitor=$(jq -ce --arg name "$m" 'first(.[] | select(.name == $name))' <<<"$monitors")
+  font_size=$(screensaver_font_size "$monitor")
+
   hypr_focus_monitor "$m"
 
   case $terminal in
   *Alacritty*)
-    hypr_exec alacritty --class=org.omarchy.screensaver --config-file "$OMARCHY_PATH/default/alacritty/screensaver.toml" -e omarchy-screensaver
+    hypr_exec alacritty --class=org.omarchy.screensaver --config-file "$OMARCHY_PATH/default/alacritty/screensaver.toml" --option "font.size=$font_size" -e omarchy-screensaver
     ;;
   *ghostty*)
-    hypr_exec ghostty --class=org.omarchy.screensaver --config-file="$OMARCHY_PATH/default/ghostty/screensaver" --font-size=18 -e omarchy-screensaver
+    hypr_exec ghostty --class=org.omarchy.screensaver --config-file="$OMARCHY_PATH/default/ghostty/screensaver" --font-size="$font_size" -e omarchy-screensaver
     ;;
   *foot*)
-    hypr_exec foot --app-id=org.omarchy.screensaver --config="$OMARCHY_PATH/default/foot/screensaver.ini" -e omarchy-screensaver
+    hypr_exec foot --app-id=org.omarchy.screensaver --config="$OMARCHY_PATH/default/foot/screensaver.ini" --font="JetBrainsMono Nerd Font:size=$font_size" -e omarchy-screensaver
     ;;
   *kitty*)
-    hypr_exec kitty --class=org.omarchy.screensaver --override font_size=18 --override window_padding_width=0 -e omarchy-screensaver
+    hypr_exec kitty --class=org.omarchy.screensaver --override "font_size=$font_size" --override window_padding_width=0 -e omarchy-screensaver
     ;;
   esac
 
   wait_for_screensaver_window
-done
+done < <(jq -r '.[].name' <<<"$monitors")
 
 hypr_focus_monitor "$focused"

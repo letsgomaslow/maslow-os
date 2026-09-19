@@ -11,9 +11,22 @@ if [[ ${1:-} == "--first-login" ]]; then
 fi
 (($# == 0)) || { echo "Usage: omarchy-setup-ai [--first-login]" >&2; exit 1; }
 
+# Installed Hub owns presentation; progress remains in the existing state helper.
+if omarchy-cmd-present maslow-hubctl; then
+  if [[ $first_login == "true" ]]; then
+    state=$(omarchy-setup-ai-state show) || exit $?
+    [[ $(jq -r '.completedAt != null or .deferred' <<<"$state") == "false" ]] || exit 0
+    export OMARCHY_SHELL_IPC_TIMEOUT=60s
+  fi
+  exec omarchy-launch-hub setup
+fi
+
 if [[ $first_login == "true" ]]; then
   state=$(omarchy-setup-ai-state show) || exit $?
   [[ $(jq -r '.completedAt != null or .deferred' <<<"$state") == "false" ]] || exit 0
+  # A cold first-login shell can accept the summon before its IPC reply arrives.
+  # Wait for that one acknowledgement; never retry or hide a genuine failure.
+  export OMARCHY_SHELL_IPC_TIMEOUT=60s
 else
   state=$(omarchy-setup-ai-state show) || exit $?
   if [[ $(jq -r '.completedAt != null' <<<"$state") == "true" ]]; then

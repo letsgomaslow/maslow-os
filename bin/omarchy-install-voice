@@ -1,0 +1,31 @@
+#!/bin/bash
+# omarchy:summary=Install the optional Maslow Voice runtime
+# omarchy:args=[local]
+# omarchy:examples=omarchy install voice | omarchy install voice local
+
+set -euo pipefail
+(( $# <= 1 )) || { echo "Use only the optional 'local' argument." >&2; exit 1; }
+if [[ ${1:-} == "local" ]]; then
+  omarchy-pkg-add maslow-voice maslow-voice-local || exit 1
+elif [[ $# == 0 ]]; then
+  omarchy-pkg-add maslow-voice || exit 1
+else
+  echo "Use 'local' to include local speech and isolation tools." >&2
+  exit 1
+fi
+systemctl --user daemon-reload
+systemctl --user enable --now maslow-voice.service
+
+# The registry does not expose its loaded version. Queue one refresh even if
+# the old panel is already registered, and keep it queued while locked.
+if [[ -z ${XDG_RUNTIME_DIR:-} || ! -d $XDG_RUNTIME_DIR ]] || ! (
+  umask 077
+  exec 9>"$XDG_RUNTIME_DIR/maslow-voice-open.lock"
+  flock -w 30 9 || exit 1
+  : >"$XDG_RUNTIME_DIR/maslow-voice-refresh-pending"
+); then
+  echo "Voice is installed. Start a new desktop session, then open Voice to finish setup."
+  exit 0
+fi
+# The subshell released the discovery lock before the launcher acquires it.
+omarchy-launch-voice settings

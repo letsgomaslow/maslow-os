@@ -27,8 +27,12 @@ for file in \
   maslow-version NOTICE DOWNSTREAM.md branding/design-tokens.json branding/product.json \
   branding/logos/maslow-mark-gradient.svg branding/logos/maslow-mark-dark.svg \
   branding/fonts/manrope/Manrope-VariableFont_wght.ttf branding/fonts/manrope/OFL.txt \
+  branding/terminal/logo.txt branding/terminal/icon.txt \
   branding/wallpapers/maslow-wallpaper-collage.png \
-  branding/scripts/generate-assets logo.txt icon.png \
+  branding/wallpapers/05-gradient-bridge-quiet-field.webp \
+  branding/wallpapers/06-signal-over-water.webp \
+  branding/wallpapers/07-topographic-ascent.webp \
+  branding/scripts/generate-assets branding/scripts/generate-brand-preview logo.txt icon.txt icon.png \
   default/plymouth/omarchy.plymouth default/plymouth/omarchy.script default/plymouth/logo.png \
   default/sddm/omarchy/metadata.desktop default/sddm/omarchy/Main.qml default/sddm/omarchy/logo.png \
   install/user/first-run/welcome.sh default/omarchy/omarchy-menu.jsonc etc/fastfetch/config.jsonc \
@@ -46,14 +50,39 @@ pass "Maslow OS version is pinned"
 assert_contains README.md "Maslow OS is based on" "README preserves Omarchy attribution"
 assert_contains install/provisioning/setup-form.sh "OMARCHY_HOSTNAME_DEFAULT='maslow-os'" "setup defaults to a Maslow OS hostname"
 assert_contains install/provisioning/setup-form.sh "return for 'maslow-os'" "setup hostname hint uses Maslow OS"
-assert_contains branding/scripts/generate-assets "'.product.name'" "login artwork consumes the canonical Maslow OS product name"
+assert_contains branding/scripts/generate-assets "'.product.name'" "asset generator consumes the canonical product name"
+assert_contains branding/scripts/generate-assets '[[ $PRODUCT_NAME == "Maslow AI-OS" ]]' "asset generator validates the Maslow AI-OS product name"
 assert_contains branding/scripts/generate-assets 'branding/logos/maslow-mark-gradient.svg' "asset generator consumes the canonical gradient mark"
 assert_contains branding/scripts/generate-assets 'branding/logos/maslow-mark-dark.svg' "asset generator consumes the canonical dark mark"
 assert_contains branding/scripts/generate-assets 'branding/fonts/manrope/Manrope-VariableFont_wght.ttf' "asset generator consumes the canonical brand font"
-assert_contains branding/scripts/generate-assets 'compose_terminal_lockup' "asset generator owns the terminal lockup composition"
-assert_contains branding/scripts/generate-assets '>"$ROOT/logo.txt"' "asset generator writes the terminal logo"
+assert_contains branding/scripts/generate-assets 'cp "$TERMINAL_SOURCE_DIR/logo.txt" "$ROOT/logo.txt"' "asset generator installs the canonical terminal lockup"
+assert_contains branding/scripts/generate-assets 'cp "$TERMINAL_SOURCE_DIR/icon.txt" "$ROOT/icon.txt"' "asset generator installs the canonical About lockup"
 assert_contains branding/scripts/generate-assets '"$ROOT/default/plymouth/logo.png"' "asset generator writes the Plymouth lockup"
 assert_contains branding/scripts/generate-assets 'cp "$ROOT/default/plymouth/logo.png" "$ROOT/default/sddm/omarchy/logo.png"' "login and boot lockups share one generated source"
+bash -n "$ROOT/branding/scripts/generate-brand-preview" || fail "brand preview generator has invalid shell syntax"
+pass "brand preview generator has valid shell syntax"
+assert_contains branding/scripts/generate-brand-preview 'branding/logos/maslow-mark-gradient.svg' "brand preview consumes the approved Gradient Bridge mark"
+assert_contains branding/scripts/generate-brand-preview 'PRODUCT_LABEL="MASLOW | AI-OS"' "brand preview uses the proposed Maslow AI-OS lockup"
+assert_contains branding/scripts/generate-brand-preview '"$OUTPUT_DIR/logo.txt"' "brand preview isolates the terminal candidate in its output directory"
+assert_contains branding/scripts/generate-brand-preview '"$OUTPUT_DIR/icon.txt"' "brand preview isolates the About candidate in its output directory"
+assert_contains branding/scripts/generate-brand-preview 'validate_width "$OUTPUT_DIR/logo.txt" "$TERMINAL_WIDTH"' "brand preview enforces the 100-column terminal contract"
+assert_contains branding/design-tokens.json '"voiceBlueDeep": "#154BA8"' "voice orb deep blue is a canonical brand token"
+assert_contains branding/design-tokens.json '"voiceBlue": "#2875E5"' "voice orb blue is a canonical brand token"
+assert_contains branding/design-tokens.json '"voiceBlueLight": "#93C9FF"' "voice orb light blue is a canonical brand token"
+assert_contains branding/design-tokens.json '"voiceCloud": "#EFF8FF"' "voice orb cloud white is a canonical brand token"
+assert_contains branding/design-tokens.json '"voiceTeal": "#73C1AE"' "voice orb highlight uses the Brand OS teal token"
+assert_contains branding/design-tokens.json '"voicePurple": "#654C8F"' "voice orb depth uses the Brand OS purple token"
+if "$ROOT/branding/scripts/generate-brand-preview" "$ROOT" >/dev/null 2>&1; then
+  fail "brand preview generator accepts a shipping-tree output directory"
+fi
+pass "brand preview generator refuses shipping-tree output directories"
+preview_guard_dir=$(mktemp -d)
+touch "$preview_guard_dir/owner-file"
+if "$ROOT/branding/scripts/generate-brand-preview" "$preview_guard_dir" >/dev/null 2>&1; then
+  fail "brand preview generator overwrites an unmarked non-empty directory"
+fi
+rm -rf "$preview_guard_dir"
+pass "brand preview generator refuses unmarked non-empty output directories"
 assert_contains migrations/1788337736.sh "maslow-login-branding.hook" "updates preserve the Maslow login default"
 assert_contains migrations/1788365928.sh "maslow-login-branding.hook" "existing installations immediately register branding repair"
 assert_contains migrations/1788395901.sh "Label existing Limine boot entries as Maslow OS" "existing installations repair their visible boot entry"
@@ -69,32 +98,25 @@ from pathlib import Path
 import sys
 
 lines = Path(sys.argv[1]).read_text(encoding="utf-8").splitlines()
-blocks = "█▀▄"
-art_lines = lines[:-1]
-horizontal = bool(art_lines) and all(
-    any(char in blocks for char in line[:16])
-    and line[16:19] == "   "
-    and line[19] in blocks
-    for line in art_lines
-)
-print(max((len(line) for line in lines), default=0), len(lines), int(horizontal))
+print(max((len(line) for line in lines), default=0), len(lines))
 PY
 )
-read -r logo_width logo_height logo_is_horizontal <<<"$logo_dimensions"
-(( logo_width <= 80 )) || fail "setup logo exceeds the 80-column console contract"
-(( logo_height >= 5 && logo_height <= 8 )) || fail "setup logo height is outside its compact console contract"
-(( logo_is_horizontal == 1 )) || fail "setup logo does not use the compact horizontal lockup"
+read -r logo_width logo_height <<<"$logo_dimensions"
+(( logo_width <= 100 )) || fail "setup logo exceeds the 100-column console contract"
+(( logo_height == 9 )) || fail "setup logo is not the approved nine-row terminal lockup"
 grep -q '[█▀▄]' "$ROOT/logo.txt" || fail "setup logo is not block artwork"
-grep -Eq '^[[:space:]]*MASLOW OS$' "$ROOT/logo.txt" || fail "setup logo does not identify Maslow OS in text"
-pass "setup uses a terminal-safe Maslow Gradient Bridge lockup"
+grep -Fq 'MASLOW | AI-OS' "$ROOT/icon.txt" || fail "About logo does not identify Maslow AI-OS"
+cmp -s "$ROOT/branding/terminal/logo.txt" "$ROOT/logo.txt" || fail "setup logo differs from its approved source"
+cmp -s "$ROOT/branding/terminal/icon.txt" "$ROOT/icon.txt" || fail "About logo differs from its approved source"
+pass "setup and About use terminal-safe Maslow Gradient Bridge lockups"
 assert_contains install/user/theme.sh 'omarchy-theme-set "Maslow Dark"' "Maslow Dark is the installation default"
-assert_contains default/plymouth/omarchy.plymouth 'Name=Maslow OS' "Plymouth metadata identifies Maslow OS"
-assert_contains default/plymouth/omarchy.plymouth 'Description=Maslow OS splash screen.' "Plymouth description identifies Maslow OS"
-assert_contains default/sddm/omarchy/metadata.desktop 'Name=Maslow OS' "login theme metadata identifies Maslow OS"
-assert_contains default/sddm/omarchy/Main.qml 'Welcome to Maslow OS.' "login greeting identifies Maslow OS"
+assert_contains default/plymouth/omarchy.plymouth 'Name=Maslow AI-OS' "Plymouth metadata identifies Maslow AI-OS"
+assert_contains default/plymouth/omarchy.plymouth 'Description=Maslow AI-OS splash screen.' "Plymouth description identifies Maslow AI-OS"
+assert_contains default/sddm/omarchy/metadata.desktop 'Name=Maslow AI-OS' "login theme metadata identifies Maslow AI-OS"
+assert_contains default/sddm/omarchy/Main.qml 'Welcome to Maslow AI-OS.' "login greeting identifies Maslow AI-OS"
 assert_contains install/user/first-run/welcome.sh 'Maslow OS Menu' "first session welcome identifies the Maslow OS menu"
-assert_contains default/omarchy/omarchy-menu.jsonc '"label":"About Maslow OS"' "menu preserves the Maslow OS About entry"
-assert_contains default/omarchy/omarchy-menu.jsonc '"label":"Maslow OS Guide"' "menu preserves the Maslow OS guide entry"
+assert_contains default/omarchy/omarchy-menu.jsonc '"label":"About Maslow AI-OS"' "menu identifies the Maslow AI-OS About entry"
+assert_contains default/omarchy/omarchy-menu.jsonc '"label":"Maslow AI-OS Guide"' "menu identifies the Maslow AI-OS guide entry"
 assert_contains default/omarchy/omarchy-menu.jsonc '"label":"Reduced Motion"' "Reduced Motion is visible in the menu"
 assert_contains default/omarchy/omarchy-menu.jsonc 'omarchy-hyprland-toggle reduced-motion' "Reduced Motion uses the persistent Hyprland toggle"
 assert_contains bin/omarchy-theme-set 'background setInstant' "Reduced Motion uses instant background application"
@@ -113,7 +135,15 @@ assert_contains shell/plugins/maslow-ai-setup/manifest.json '"id": "maslow.ai-se
 assert_contains bin/omarchy-agent-trust 'disclosure_version=1' "agent permission disclosure is versioned"
 assert_contains DOWNSTREAM.md '/usr/bin/omarchy*' "Omarchy command compatibility is documented"
 
-wallpaper_names=(01-mountain-sunrise.webp 02-canyon-storm.webp 03-aurora-lake.webp 04-spiral-galaxy.webp)
+wallpaper_names=(
+  01-mountain-sunrise.webp
+  02-canyon-storm.webp
+  03-aurora-lake.webp
+  04-spiral-galaxy.webp
+  05-gradient-bridge-quiet-field.webp
+  06-signal-over-water.webp
+  07-topographic-ascent.webp
+)
 for theme in maslow-dark maslow-light; do
   for file in "${wallpaper_names[@]}"; do
     require_file "themes/$theme/backgrounds/$file"
@@ -122,12 +152,12 @@ for theme in maslow-dark maslow-light; do
     require_file "themes/$theme/$file"
   done
   background_count=$(find "$ROOT/themes/$theme/backgrounds" -maxdepth 1 -type f -name '*.webp' | wc -l)
-  (( background_count == 4 )) || fail "$theme does not contain exactly four WebP wallpapers"
+  (( background_count == 7 )) || fail "$theme does not contain exactly seven WebP wallpapers"
 done
 for file in "${wallpaper_names[@]}"; do
   cmp -s "$ROOT/themes/maslow-dark/backgrounds/$file" "$ROOT/themes/maslow-light/backgrounds/$file" || fail "$file differs between Maslow Dark and Maslow Light"
 done
-pass "both themes include the same four curated wallpapers"
+pass "both themes include the same seven curated wallpapers"
 
 for shared_asset in logo.png entry.png bullet.png lock.png; do
   cmp -s "$ROOT/default/plymouth/$shared_asset" "$ROOT/default/sddm/omarchy/$shared_asset" || fail "generated boot and login $shared_asset assets differ"
@@ -281,6 +311,9 @@ wallpapers = (
     "02-canyon-storm.webp",
     "03-aurora-lake.webp",
     "04-spiral-galaxy.webp",
+    "05-gradient-bridge-quiet-field.webp",
+    "06-signal-over-water.webp",
+    "07-topographic-ascent.webp",
 )
 for theme in ("maslow-dark", "maslow-light"):
     for name in wallpapers:
@@ -320,4 +353,4 @@ for relative in (
 print("ok - graphical lockups center their visible content")
 PY
 
-pass "Maslow OS brand validation passed"
+pass "Maslow AI-OS brand validation passed"

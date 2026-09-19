@@ -24,7 +24,11 @@ omarchy_agent_resolve() {
 }
 
 omarchy_agent_package_path() {
-  printf '/usr/bin/%s' "$OMARCHY_AGENT_ID"
+  omarchy_agent_system_command_path "$OMARCHY_AGENT_ID"
+}
+
+omarchy_agent_system_command_path() {
+  printf '/usr/bin/%s' "$1"
 }
 
 omarchy_agent_is_packaged() {
@@ -37,6 +41,98 @@ omarchy_agent_package_on_path() {
   local resolved
   resolved=$(type -P "$OMARCHY_AGENT_ID") || return 1
   [[ $resolved -ef $(omarchy_agent_package_path) ]]
+}
+
+omarchy_agent_desktop_installed() {
+  [[ $OMARCHY_AGENT_ID == "hermes" ]] && omarchy-pkg-present hermes-desktop
+}
+
+omarchy_agent_desktop_runtime_path() {
+  printf '%s/.local/bin/hermes' "$HOME"
+}
+
+omarchy_agent_desktop_runtime_claimed() {
+  local runtime
+  [[ $OMARCHY_AGENT_ID == "hermes" ]] || return 1
+  runtime=$(omarchy_agent_desktop_runtime_path)
+  [[ -f $HOME/.hermes/hermes-agent/.hermes-bootstrap-complete ]] || return 1
+  [[ -f $runtime && -x $runtime ]] || return 1
+  grep -qF "$HOME/.hermes" "$runtime"
+}
+
+omarchy_agent_desktop_runtime_on_path() {
+  local resolved runtime
+  runtime=$(omarchy_agent_desktop_runtime_path)
+  resolved=$(type -P hermes) || return 1
+  [[ $resolved -ef $runtime ]]
+}
+
+omarchy_agent_hermes_command_capable() {
+  local command_path=$1 help
+  [[ -f $command_path && -x $command_path ]] || return 1
+  timeout 15 "$command_path" --version >/dev/null 2>&1 || return 1
+  help=$(timeout 15 "$command_path" chat --help 2>/dev/null) || return 1
+  grep -qF -- '--oneshot' <<<"$help"
+}
+
+omarchy_agent_desktop_runtime_ready() {
+  local runtime
+  omarchy_agent_desktop_installed || return 1
+  [[ -x $(omarchy_agent_system_command_path hermes-desktop) ]] || return 1
+  omarchy_agent_desktop_runtime_claimed || return 1
+  omarchy_agent_desktop_runtime_on_path || return 1
+  runtime=$(omarchy_agent_desktop_runtime_path)
+  omarchy_agent_hermes_command_capable "$runtime"
+}
+
+omarchy_agent_runtime_owner() {
+  local resolved
+
+  if omarchy_agent_desktop_installed; then
+    printf '%s' "desktop"
+  elif omarchy_agent_is_packaged; then
+    if omarchy_agent_package_on_path; then
+      printf '%s' "packaged"
+    elif resolved=$(type -P "$OMARCHY_AGENT_ID"); then
+      printf '%s' "foreign"
+    else
+      printf '%s' "packaged"
+    fi
+  elif resolved=$(type -P "$OMARCHY_AGENT_ID"); then
+    printf '%s' "foreign"
+  else
+    printf '%s' "none"
+  fi
+}
+
+omarchy_agent_runtime_state() {
+  local owner runtime
+  owner=$(omarchy_agent_runtime_owner)
+
+  case "$owner" in
+  desktop)
+    runtime=$(omarchy_agent_desktop_runtime_path)
+    if [[ ! -x $(omarchy_agent_system_command_path hermes-desktop) ]]; then
+      printf '%s' "attention"
+    elif [[ ! -e $HOME/.hermes/hermes-agent/.hermes-bootstrap-complete && ! -e $runtime && ! -L $runtime ]]; then
+      # Missing bootstrap artifacts do not establish active preparation.
+      printf '%s' "attention"
+    elif omarchy_agent_desktop_runtime_ready; then
+      printf '%s' "ready"
+    else
+      printf '%s' "attention"
+    fi
+    ;;
+  packaged)
+    if omarchy_agent_package_on_path; then
+      printf '%s' "ready"
+    else
+      printf '%s' "attention"
+    fi
+    ;;
+  foreign) printf '%s' "attention" ;;
+  none) printf '%s' "none" ;;
+  esac
 }
 
 # Fresh users use the packaged binary directly. On re-finalization, retire only
@@ -88,7 +184,9 @@ omarchy_agent_launch_mode() {
 }
 
 omarchy_agent_is_installed() {
-  if omarchy_agent_is_packaged; then
+  if omarchy_agent_desktop_installed; then
+    omarchy_agent_desktop_runtime_ready
+  elif omarchy_agent_is_packaged; then
     # Bare command launches must reach the same binary we checked. Preserve
     # user overrides, but never report them as verified packaged readiness.
     omarchy_agent_package_on_path

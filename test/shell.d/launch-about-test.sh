@@ -6,6 +6,7 @@ source "$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)/base-test.sh"
 
 tmp_dir="$(mktemp -d)"
 trap 'rm -rf "$tmp_dir"' EXIT
+unset NO_COLOR
 
 # The launcher ends by taking over the process, so source it short of that line
 # and its half of the question can be asked here, without a terminal to draw on.

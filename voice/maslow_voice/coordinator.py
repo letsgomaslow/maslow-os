@@ -1,0 +1,254 @@
+"""Dedicated Hermes profiles, with explicit inference and a bounded tool plugin."""
+
+import asyncio
+import hashlib
+import json
+import os
+import secrets
+import signal
+import shutil
+import socket
+from pathlib import Path
+
+from .config import atomic_json, private_directory
+from .errors import VoiceError
+from .hermes import HermesClient
+
+PROVIDER_KEYS = {
+    "openrouter": "OPENROUTER_API_KEY", "openai": "OPENAI_API_KEY", "openai-api": "OPENAI_API_KEY", "anthropic": "ANTHROPIC_API_KEY",
+    "nous-api": "NOUS_API_KEY", "lmstudio": "LM_API_KEY", "custom": "OPENAI_API_KEY",
+}
+HERMES_START_TIMEOUT = 120
+HERMES_START_POLL_INTERVAL = 0.5
+
+
+async def _wait_for_hermes(process, probe, *, timeout=HERMES_START_TIMEOUT,
+                           poll_interval=HERMES_START_POLL_INTERVAL, clock=None, sleep=None):
+    loop = asyncio.get_running_loop()
+    clock = clock or loop.time
+    sleep = sleep or asyncio.sleep
+    deadline = clock() + timeout
+    while True:
+        if process.returncode is not None:
+            raise VoiceError("HERMES_START_FAILED", "The Hermes coordinator did not start. Check the packaged API dependencies and execution model.")
+        remaining = deadline - clock()
+        if remaining <= 0:
+            raise VoiceError("HERMES_START_TIMEOUT", "Hermes did not become ready in time. Check its setup and retry.")
+        try:
+            await asyncio.wait_for(probe(), remaining)
+            return
+        except TimeoutError:
+            if clock() >= deadline:
+                raise VoiceError("HERMES_START_TIMEOUT", "Hermes did not become ready in time. Check its setup and retry.") from None
+        except VoiceError:
+            pass
+        remaining = deadline - clock()
+        if remaining <= 0:
+            raise VoiceError("HERMES_START_TIMEOUT", "Hermes did not become ready in time. Check its setup and retry.")
+        await sleep(min(poll_interval, remaining))
+
+
+async def _terminate_hermes_process_group(process, *, force=False):
+    group = process.pid
+    try:
+        os.killpg(group, signal.SIGKILL if force else signal.SIGTERM)
+    except ProcessLookupError:
+        pass
+    try:
+        await asyncio.wait_for(process.wait(), 10)
+    except TimeoutError:
+        pass
+    if not force:
+        try:
+            # The parent can exit before a helper descendant. The group remains
+            # owned by this just-spawned session until every descendant exits.
+            os.killpg(group, signal.SIGKILL)
+        except ProcessLookupError:
+            pass
+    if process.returncode is None:
+        await process.wait()
+
+
+async def _wait_for_owned_hermes(process, probe):
+    try:
+        await _wait_for_hermes(process, probe)
+    except asyncio.CancelledError:
+        await _terminate_hermes_process_group(process, force=True)
+        raise
+    except VoiceError:
+        await _terminate_hermes_process_group(process)
+        raise
+
+
+def clean_environment():
+    allowed = ("HOME", "USER", "LOGNAME", "LANG", "LC_ALL", "TZ", "XDG_RUNTIME_DIR", "WAYLAND_DISPLAY",
+               "XDG_SESSION_TYPE", "DISPLAY", "DBUS_SESSION_BUS_ADDRESS", "TERM")
+    result = {key: os.environ[key] for key in allowed if key in os.environ}
+    result.update(PATH="/usr/local/bin:/usr/bin:/bin", PYTHONUNBUFFERED="1", HERMES_ENABLE_PROJECT_PLUGINS="false",
+                  HERMES_DISABLE_LAZY_INSTALLS="1", DO_NOT_TRACK="1", HF_HUB_OFFLINE="1", TRANSFORMERS_OFFLINE="1")
+    return result
+
+
+def read_existing_model(home: Path):
+    """Read only the selected native inference configuration, never whole profiles."""
+    try:
+        import yaml
+        config = yaml.safe_load((home / "config.yaml").read_text()) or {}
+        model = config.get("model", {})
+        if not isinstance(model, dict):
+            raise ValueError()
+        provider = model.get("provider", "auto")
+        if provider not in PROVIDER_KEYS:
+            raise VoiceError("EXECUTOR_SETUP_REQUIRED", "Select an explicit API-key or local-server model in Hermes setup before enabling Voice tasks.")
+        safe = {key: model[key] for key in ("default", "model", "provider", "base_url", "context_length", "max_tokens") if key in model}
+        if not safe.get("default", safe.get("model")):
+            raise ValueError()
+        credential_name = PROVIDER_KEYS[provider]
+        credential = model.get("api_key", "")
+        # dotenv values are data only; no interpolation, sourcing, or arbitrary shell evaluation.
+        env_file = home / ".env"
+        if not credential and env_file.is_file():
+            for line in env_file.read_text().splitlines():
+                key, separator, value = line.strip().removeprefix("export ").partition("=")
+                if separator and key.strip() == credential_name:
+                    credential = value.strip().strip("\"'")
+        return safe, {credential_name: credential} if credential else {}
+    except VoiceError:
+        raise
+    except (ImportError, OSError, ValueError, TypeError):
+        raise VoiceError("EXECUTOR_SETUP_REQUIRED", "Configure a Hermes execution model in Hub before handing off tasks.") from None
+
+
+def process_identity(pid):
+    try:
+        data = Path(f"/proc/{int(pid)}/stat").read_text()
+        # comm may contain spaces and parentheses; starttime is field22 after final ')'.
+        return data.rsplit(")", 1)[1].split()[19]
+    except (OSError, ValueError, IndexError):
+        return None
+
+
+def process_confirmed_dead(pid, expected_start):
+    path = Path(f"/proc/{int(pid)}/stat")
+    try:
+        data = path.read_text()
+    except FileNotFoundError:
+        return True
+    except (OSError, ValueError):
+        return False
+    try:
+        fields = data.rsplit(")", 1)[1].split()
+        if fields[0] == "Z":
+            return True
+        actual_start = fields[19]
+    except (IndexError, ValueError):
+        return False
+    return bool(expected_start and actual_start != expected_start)
+
+
+def hermes_configuration(model, api_token, port, project):
+    auxiliary = {kind: {"provider": "main", "model": model.get("default", model.get("model", ""))}
+                 for kind in ("compression", "title_generation", "vision", "web_extract", "curator")}
+    return {
+        "model": model, "platforms": {"api_server": {"enabled": True, "extra": {"host": "127.0.0.1", "port": port}}},
+        "platform_toolsets": {"api_server": ["terminal", "file", "maslow_voice"]},
+        "agent": {"max_turns": 60}, "terminal": {"backend": "local", "cwd": project},
+        "fallback_model": None, "fallback_models": [], "auxiliary": auxiliary,
+        "memory": {"enabled": False}, "compression": {"enabled": False},
+        "security": {"allow_lazy_installs": False},
+        "skills": {"creation_nudge_interval": 0, "external_dirs": []},
+        "plugins": {"enabled": ["maslow-voice"], "entries": {"maslow-voice": {"enabled": True}}},
+        "telemetry": {"enabled": False}, "display": {"show_reasoning": False},
+    }
+
+
+class HermesRuntime:
+    def __init__(self, directory, settings, credentials, tool_socket, tool_token):
+        self.directory = private_directory(Path(directory) / "coordinators")
+        self.settings, self.credentials = settings, credentials
+        self.tool_socket, self.tool_token = str(tool_socket), tool_token
+        self.clients, self.processes = {}, {}
+        self.lock = asyncio.Lock()
+
+    async def model_config(self, mode):
+        config = self.settings.value
+        if mode in {"offline", "server"}:
+            model = config["execution_model"] or config["model"]
+            if not model:
+                raise VoiceError("MODEL_REQUIRED", "Choose a downloaded execution model before handing off work.")
+            endpoint = "http://127.0.0.1:11434" if mode == "offline" else config["server_url"]
+            if not endpoint.endswith("/v1"):
+                endpoint += "/v1"
+            token = "local-only" if mode == "offline" else await self.credentials.get("server_token")
+            return {"default": model, "provider": "custom", "base_url": endpoint}, {"OPENAI_API_KEY": token or "local-server", "OPENAI_BASE_URL": endpoint}
+        original = Path(os.environ.get("HERMES_HOME", str(Path.home() / ".hermes")))
+        return read_existing_model(original)
+
+    async def ensure(self, task):
+        async with self.lock:
+            model, provider_env = await self.model_config(task["mode"])
+            key = hashlib.sha256(json.dumps([task["mode"], task["project"], model], sort_keys=True).encode()).hexdigest()[:24]
+            if key in self.clients:
+                client = self.clients[key]
+                if client.discard_dead_process():
+                    self.clients.pop(key, None)
+                    self.processes.pop(key, None)
+                else:
+                    return client
+            profile = private_directory(self.directory / key)
+            locator = profile / "voice-runtime.json"
+            if locator.is_file():
+                try:
+                    data = json.loads(locator.read_text())
+                    if data["start"] and process_identity(data["pid"]) == data["start"]:
+                        def discard(key=key):
+                            self.clients.pop(key, None)
+                            self.processes.pop(key, None)
+                        client = HermesClient(data["endpoint"], data["token"],
+                            process_exited=lambda pid=data["pid"], start=data["start"]: process_confirmed_dead(pid, start),
+                            discard_process=discard)
+                        await client.capabilities()
+                        self.clients[key] = client
+                        return client
+                except (OSError, ValueError, KeyError, VoiceError):
+                    pass
+            binary = shutil.which("hermes")
+            if not binary:
+                raise VoiceError("HERMES_MISSING", "Install Hermes through Hub to enable task execution.")
+            with socket.socket() as candidate:
+                candidate.bind(("127.0.0.1", 0))
+                port = candidate.getsockname()[1]
+            token = secrets.token_urlsafe(32)
+            configuration = hermes_configuration(model, token, port, task["project"])
+            atomic_json(profile / "config.yaml", configuration)  # JSON is a YAML subset.
+            plugin = private_directory(profile / "plugins" / "maslow-voice")
+            source = Path(__file__).resolve().parent.parent / "hermes_plugin"
+            for name in ("plugin.yaml", "__init__.py"):
+                shutil.copyfile(source / name, plugin / name)
+            private_directory(profile / "skills")
+            environment = clean_environment()
+            environment.update(provider_env)
+            environment.update(HERMES_HOME=str(profile), API_SERVER_HOST="127.0.0.1", API_SERVER_PORT=str(port), API_SERVER_KEY=token,
+                               MASLOW_VOICE_TOOL_SOCKET=self.tool_socket, MASLOW_VOICE_TOOL_TOKEN=self.tool_token,
+                               MASLOW_VOICE_MODE=task["mode"], TERMINAL_CWD=task["project"])
+            process = await asyncio.create_subprocess_exec(binary, "gateway", "run", cwd=task["project"], env=environment,
+                                                           stdin=asyncio.subprocess.DEVNULL, stdout=asyncio.subprocess.DEVNULL,
+                                                           stderr=asyncio.subprocess.DEVNULL, start_new_session=True)
+            endpoint = f"http://127.0.0.1:{port}"
+            atomic_json(locator, {"pid": process.pid, "start": process_identity(process.pid), "endpoint": endpoint, "token": token})
+            def discard(key=key):
+                self.clients.pop(key, None)
+                self.processes.pop(key, None)
+            client = HermesClient(endpoint, token, process_exited=lambda: process.returncode is not None,
+                                  discard_process=discard)
+            self.processes[key] = process
+            try:
+                await _wait_for_owned_hermes(process, client.capabilities)
+            except VoiceError:
+                self.processes.pop(key, None)
+                raise
+            except asyncio.CancelledError:
+                self.processes.pop(key, None)
+                raise
+            self.clients[key] = client
+            return client

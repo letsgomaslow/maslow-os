@@ -34,7 +34,7 @@ JS
 bindings="$ROOT/default/hypr/bindings/applications.lua"
 grep -Fqx 'o.bind("SUPER + A", "App Launcher", "omarchy-shell shell toggle tyrsolution.app-launcher '\''{}'\''")' "$bindings" ||
   fail 'Super+A toggles the App Launcher with the exact plugin command'
-grep -Fqx '  o.bind("SUPER + SHIFT + A", "ChatGPT", { webapp = "https://chatgpt.com" })' "$bindings" ||
+grep -Fqx '    o.bind("SUPER + SHIFT + A", "ChatGPT", { webapp = "https://chatgpt.com" })' "$bindings" ||
   fail 'Super+Shift+A remains assigned to ChatGPT'
 pass 'App Launcher binding preserves the existing ChatGPT shortcut'
 

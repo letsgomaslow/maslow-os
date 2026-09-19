@@ -1,0 +1,12 @@
+# Optional integrations are loaded only for the mode the person explicitly selects.
+livekit-agents==1.8.2
+livekit-api==1.2.1
+livekit==1.1.18
+livekit-plugins-silero==1.8.2
+livekit-plugins-google==1.8.2
+openai==2.48.0
+websockets==15.0.1
+faster-whisper==1.2.1
+sounddevice==0.5.6
+claude-agent-sdk==0.2.152
+PyYAML==6.0.3

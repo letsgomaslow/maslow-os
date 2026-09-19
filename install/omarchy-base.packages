@@ -67,7 +67,6 @@ inotify-tools
 inxi
 networkmanager
 jq
-kdenlive
 kernel-modules-hook
 lazydocker
 lazygit
@@ -82,8 +81,8 @@ lua51
 luarocks
 man-db
 mariadb-libs
+maslow-hub
 mise-bin
-moonlight-qt
 mpv
 mpv-mpris
 nautilus
@@ -94,7 +93,6 @@ noto-fonts-cjk
 noto-fonts-emoji
 nss-mdns
 nvim
-obs-studio
 obsidian
 omacalc
 omacut

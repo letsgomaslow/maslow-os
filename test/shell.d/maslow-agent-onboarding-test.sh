@@ -23,16 +23,29 @@ SH
 cat >"$mock_bin/omarchy-shell" <<'SH'
 #!/bin/bash
 printf '%s\0' "$@" >"$MASLOW_TEST_SHELL_LOG"
+printf '%s\n' "${OMARCHY_SHELL_IPC_TIMEOUT:-unset}" >"$MASLOW_TEST_TIMEOUT_LOG"
+printf 'call\n' >>"$MASLOW_TEST_CALL_LOG"
+exit "${MASLOW_TEST_SHELL_STATUS:-0}"
 SH
 cat >"$mock_bin/gum" <<'SH'
 #!/bin/bash
 exit 130
+SH
+cat >"$mock_bin/omarchy-cmd-present" <<'SH'
+#!/bin/bash
+exit 1
+SH
+cat >"$mock_bin/omarchy-pkg-present" <<'SH'
+#!/bin/bash
+exit 1
 SH
 chmod +x "$mock_bin"/*
 
 export PATH="$mock_bin:$ROOT/bin:$PATH"
 export MASLOW_TEST_MISE_LOG="$test_tmp/mise.log"
 export MASLOW_TEST_SHELL_LOG="$test_tmp/shell.log"
+export MASLOW_TEST_TIMEOUT_LOG="$test_tmp/timeout.log"
+export MASLOW_TEST_CALL_LOG="$test_tmp/calls.log"
 
 file_mode() {
   stat -c %a "$1" 2>/dev/null || stat -f %Lp "$1"
@@ -85,6 +98,18 @@ while IFS= read -r -d '' arg; do
 done <"$MASLOW_TEST_SHELL_LOG"
 [[ ${shell_args[*]} == "shell summon maslow.ai-setup {}" ]] || fail "public AI setup route opens the first-party panel"
 pass "AI onboarding defers automatic opening but remains manually available"
+
+omarchy-setup-ai-state reset
+: >"$MASLOW_TEST_CALL_LOG"
+OMARCHY_SHELL_IPC_TIMEOUT=2s omarchy-setup-ai --first-login
+launch_calls=$(wc -l <"$MASLOW_TEST_CALL_LOG")
+[[ $(<"$MASLOW_TEST_TIMEOUT_LOG") == "60s" ]] && (( launch_calls == 1 )) || fail "first login must send one summon with its bounded cold-start budget"
+OMARCHY_SHELL_IPC_TIMEOUT=7s omarchy-setup-ai
+[[ $(<"$MASLOW_TEST_TIMEOUT_LOG") == "7s" ]] || fail "manual launch must preserve its caller timeout"
+if MASLOW_TEST_SHELL_STATUS=5 omarchy-setup-ai --first-login; then
+  fail "first-login launcher must preserve IPC failure"
+fi
+pass "first-login acknowledgement is bounded, single-shot, and does not mask failures"
 
 for supported_tool in bitwarden codex claude hermes memory-builtin honcho hindsight mcp; do
   omarchy-setup-ai-state reset
@@ -198,46 +223,31 @@ grep -Fq "alias cy='omarchy-agent --inline --agent codex'" "$ROOT/default/bash/a
 grep -Fq '["omarchy-setup-ai-state", "catalog"]' "$ROOT/shell/plugins/maslow-ai-setup/Panel.qml" || fail "AI panel does not load the tool catalog"
 grep -Fq '["omarchy-setup-ai-tool", "catalog"]' "$ROOT/shell/plugins/maslow-ai-setup/Panel.qml" || fail "AI panel does not load supported adapter actions"
 grep -Fq '["omarchy-setup-ai-tool", "status", statusTool]' "$ROOT/shell/plugins/maslow-ai-setup/Panel.qml" || fail "AI panel does not verify adapter availability and installation"
-grep -Fq '["omarchy-setup-ai-state", "tool-select", toolId' "$ROOT/shell/plugins/maslow-ai-setup/Panel.qml" || fail "AI panel does not persist safe tool selection"
+grep -Fq '["omarchy-setup-ai-state", "choice", key, value]' "$ROOT/shell/plugins/maslow-ai-setup/Panel.qml" || fail "AI panel does not persist explicit choices"
+grep -Fq 'accountAuthentication === "signed-in"' "$ROOT/shell/plugins/maslow-ai-setup/Panel.qml" || fail "AI panel does not require provider-reported sign-in"
+grep -Fq 'hermesChoice === "deferred" || hermesOperational === "ready"' "$ROOT/shell/plugins/maslow-ai-setup/Panel.qml" || fail "AI panel does not distinguish deferred Hermes from operational proof"
+grep -Fq 'memoryConfirmed' "$ROOT/shell/plugins/maslow-ai-setup/Panel.qml" || fail "AI panel does not require confirmation after external memory setup"
+grep -Fq 'function legacyProgressIncomplete()' "$ROOT/shell/plugins/maslow-ai-setup/Panel.qml" || fail "AI panel ignores unfinished historical progress"
+grep -Fq '["omarchy-setup-ai-tool", "check", "hermes"]' "$ROOT/shell/plugins/maslow-ai-setup/Panel.qml" || fail "AI panel does not use the bounded Hermes check"
+grep -Fq 'if (!hermesCheckAvailable)' "$ROOT/shell/plugins/maslow-ai-setup/Panel.qml" || fail "AI panel can fabricate a Hermes check when it is unavailable"
 grep -Fq '["omarchy-setup-ai-tool", root.activeAction, root.activeTool]' "$ROOT/shell/plugins/maslow-ai-setup/Panel.qml" || fail "AI panel does not use the onboarding adapter boundary"
-grep -Fq 'entry.supported !== true' "$ROOT/shell/plugins/maslow-ai-setup/Panel.qml" || fail "AI panel enables actions without explicit adapter support"
-grep -Fq 'Authentication is not inspected; complete the action shown, then mark ready.' "$ROOT/shell/plugins/maslow-ai-setup/Panel.qml" || fail "AI panel treats process exit as verified authentication"
-grep -Fq '["omarchy-setup-ai-state", "tool-status", toolId, "ready"]' "$ROOT/shell/plugins/maslow-ai-setup/Panel.qml" || fail "AI panel does not persist explicit readiness confirmation"
-grep -Fq 'previousStatus === "not-started" || previousStatus === "selected"' "$ROOT/shell/plugins/maslow-ai-setup/Panel.qml" || fail "AI panel overwrites a meaningful saved status during refresh"
-grep -Fq 'canFinish ? "complete" : "defer"' "$ROOT/shell/plugins/maslow-ai-setup/Panel.qml" || fail "AI panel completes before every selected supported tool is ready"
-grep -Fq 'text: root.canFinish ? "Finish" : "Finish later"' "$ROOT/shell/plugins/maslow-ai-setup/Panel.qml" || fail "AI panel does not explain an incomplete exit"
+if grep -Fq '"tool-status"' "$ROOT/shell/plugins/maslow-ai-setup/Panel.qml"; then
+  fail "AI panel persists proof-like tool statuses"
+fi
 grep -Fq 'property var stateWriteQueue: []' "$ROOT/shell/plugins/maslow-ai-setup/Panel.qml" || fail "AI panel does not queue rapid state writes"
 grep -Fq 'root.startNextStateWrite()' "$ROOT/shell/plugins/maslow-ai-setup/Panel.qml" || fail "AI panel does not serialize queued state writes"
-grep -Fq 'launchTool: String(launchTool || "")' "$ROOT/shell/plugins/maslow-ai-setup/Panel.qml" || fail "AI panel launches actions before their progress is saved"
-grep -Fq 'if (!installSupported && !openSupported) return "Unavailable on this system"' "$ROOT/shell/plugins/maslow-ai-setup/Panel.qml" || fail "AI panel labels supported unavailable tools as planned"
-grep -Fq 'enabled: !root.busy && !root.closingQueued && adapterSupported && (selected || installSupported || openSupported)' "$ROOT/shell/plugins/maslow-ai-setup/Panel.qml" || fail "AI panel allows planned tools to be selected"
-grep -Fq 'property bool canFinish: false' "$ROOT/shell/plugins/maslow-ai-setup/Panel.qml" || fail "AI panel allows completion before readiness loads"
-grep -Fq 'canFinish = stateCatalogLoaded && stateLoaded && adapterCatalogLoaded && statusChecksComplete && complete' "$ROOT/shell/plugins/maslow-ai-setup/Panel.qml" || fail "AI panel does not gate completion on every catalog and status probe"
+grep -Fq 'completeEligible()' "$ROOT/shell/plugins/maslow-ai-setup/Panel.qml" || fail "AI panel does not gate completion on current choices and status"
 grep -Fq 'if (closeAfterWrite === true) closingQueued = true' "$ROOT/shell/plugins/maslow-ai-setup/Panel.qml" || fail "AI panel accepts navigation after a close write is queued"
 grep -Fq 'root.stateWriteQueue = []' "$ROOT/shell/plugins/maslow-ai-setup/Panel.qml" || fail "AI panel leaves stale writes queued after closing"
-grep -Fq 'Start with Bitwarden for secure readiness, then choose Codex, Claude Code, or Hermes.' "$ROOT/shell/plugins/maslow-ai-setup/Panel.qml" || fail "AI panel does not explain the tested starter flow"
-grep -Fq 'Hermes uses this by default. No extra provider is required.' "$ROOT/shell/plugins/maslow-ai-setup/Panel.qml" || fail "AI panel does not explain built-in memory"
-grep -Fq 'Choose this or Hindsight, not both.' "$ROOT/shell/plugins/maslow-ai-setup/Panel.qml" || fail "AI panel does not explain the single external memory choice"
-grep -Fq 'MCP connections are set up separately for each agent.' "$ROOT/shell/plugins/maslow-ai-setup/Panel.qml" || fail "AI panel presents MCP as a universal connection"
-grep -Fq 'if (planned) return "Guided setup planned"' "$ROOT/shell/plugins/maslow-ai-setup/Panel.qml" || fail "AI panel does not label unavailable future setup honestly"
-grep -Fq 'entry.setupOnly === true' "$ROOT/shell/plugins/maslow-ai-setup/Panel.qml" || fail "AI panel ignores setup-only adapter capabilities"
-grep -Fq 'item.setupOnly && item.userConfirmable ? "action-required"' "$ROOT/shell/plugins/maslow-ai-setup/Panel.qml" || fail "AI panel cannot confirm a completed official wizard"
-grep -Fq 'otherProvider = toolId === "honcho" ? "hindsight" : "honcho"' "$ROOT/shell/plugins/maslow-ai-setup/Panel.qml" || fail "AI panel does not reflect external-memory exclusivity immediately"
-grep -Fq 'statusChecksComplete = stateCatalogLoaded && adapterCatalogLoaded && !statusChecksFailed' "$ROOT/shell/plugins/maslow-ai-setup/Panel.qml" || fail "AI panel completes after a failed status probe"
-grep -Fq 'text: root.statusChecksFailed ? "Retry checks" : "Check again"' "$ROOT/shell/plugins/maslow-ai-setup/Panel.qml" || fail "AI panel has no retry for failed or stale status probes"
-grep -Fq 'result.available === true && result.installed !== true && (!setupOnly || prerequisiteInstalled)' "$ROOT/shell/plugins/maslow-ai-setup/Panel.qml" || fail "AI panel enables setup-only actions without Hermes"
-grep -Fq 'if (setupOnly && !prerequisiteInstalled) return "Set up Hermes first"' "$ROOT/shell/plugins/maslow-ai-setup/Panel.qml" || fail "AI panel does not explain the Hermes prerequisite"
-grep -Fq 'item.setupOnly && !item.prerequisiteInstalled' "$ROOT/shell/plugins/maslow-ai-setup/Panel.qml" || fail "AI panel can mark stale setup-only state ready without Hermes"
-grep -Fq 'visible: toolCard.selected && (!setupOnly || prerequisiteInstalled) && (openSupported || userConfirmable) && toolStatus === "action-required"' "$ROOT/shell/plugins/maslow-ai-setup/Panel.qml" || fail "AI panel shows Mark ready when a setup-only prerequisite is missing"
 if grep -Eq 'omarchy-agent-trust|--yolo|--auto|--approve-for-me|bypass' "$ROOT/shell/plugins/maslow-ai-setup/Panel.qml"; then
   fail "AI panel includes an automatic-permission path"
 fi
 if grep -Fq 'stderr:' "$ROOT/shell/plugins/maslow-ai-setup/Panel.qml"; then
   fail "AI panel collects adapter stderr that could include secrets"
 fi
-grep -Fq 'root.focusCurrentStep()' "$ROOT/shell/plugins/maslow-ai-setup/Panel.qml" || fail "AI panel does not focus its current step after opening"
-(( $(grep -Fc 'root.focusCurrentStep()' "$ROOT/shell/plugins/maslow-ai-setup/Panel.qml") >= 3 )) ||
-  fail "AI panel does not move focus when its current step changes"
+grep -Fq 'focusCurrentStep()' "$ROOT/shell/plugins/maslow-ai-setup/Panel.qml" || fail "AI panel does not focus its current step after opening"
+grep -Fq 'focusable: true' "$ROOT/shell/plugins/maslow-ai-setup/Panel.qml" || fail "AI panel controls are not keyboard focusable"
+grep -Fq 'reduced-motion.lua' "$ROOT/shell/plugins/maslow-ai-setup/Panel.qml" || fail "AI panel does not honor reduced motion live"
 if grep -Fq 'requestActivate()' "$ROOT/shell/plugins/maslow-ai-setup/Panel.qml"; then
   fail "AI panel calls an unsupported FloatingWindow focus method"
 fi

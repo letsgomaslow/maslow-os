@@ -7,261 +7,256 @@ const fs = require('fs')
 const vm = require('vm')
 const source = fs.readFileSync(path.join(root, 'shell/plugins/maslow-ai-setup/Panel.qml'), 'utf8')
 
-// Execute the panel's actual functions and Process exit handlers. This covers
-// asynchronous state transitions, not Qt rendering or process signal ordering.
-const functions = [...source.matchAll(/^  function (\w+)\(([^)]*)\) \{([\s\S]*?)^  }/gm)]
-const handlers = {}
-for (const match of source.matchAll(/^  Process \{([\s\S]*?)^  }/gm)) {
-  const id = match[1].match(/id: (\w+)/)[1]
-  const exit = match[1].match(/    onExited: function\(exitCode\) \{([\s\S]*)\n    }/)
-  if (exit) handlers[id] = `(function(exitCode) {${exit[1]}\n})(exitCode)`
-}
-
-// Use the panel's actual height binding with the measured footer sizes from
-// Linux rendering. The previous fixed reserve placed Check again below the
-// window when a two-line action message appeared.
-const stepHeight = source.match(/id: setupSteps[\s\S]*?\n          height: ([\s\S]*?)\n          currentIndex:/)[1]
-for (const windowHeight of [500, 620]) {
-  for (const messageHeight of [0, 40, 60]) {
-    const sizes = {
-      parent: {height: windowHeight - 48, spacing: 18},
-      productHeader: {height: 53}, progressHeader: {height: 4},
-      feedbackText: {visible: messageHeight > 0, height: messageHeight},
-      statusRefreshButton: {visible: true, height: 28}
+function balancedBlock(text, braceStart) {
+  let depth = 0
+  let quote = ''
+  let escaped = false
+  for (let index = braceStart; index < text.length; index++) {
+    const char = text[index]
+    if (quote) {
+      if (escaped) escaped = false
+      else if (char === '\\') escaped = true
+      else if (char === quote) quote = ''
+      continue
     }
-    const height = vm.runInNewContext(stepHeight, sizes)
-    const occupied = height + 53 + 4 + 36 + 28 + 18 + (messageHeight > 0 ? messageHeight + 18 : 0)
-    assert(height > 0 && occupied <= sizes.parent.height, `${windowHeight}px window keeps ${messageHeight}px feedback and refresh inside its margins`)
+    if (char === '"' || char === "'" || char === '`') { quote = char; continue }
+    if (char === '{') depth++
+    if (char === '}' && --depth === 0) return text.slice(braceStart + 1, index)
+  }
+  throw new Error('unclosed QML block')
+}
+
+function panelFunction(name) {
+  const match = new RegExp(`function ${name}\\(([^)]*)\\)\\s*\\{`).exec(source)
+  if (!match) throw new Error(`missing function ${name}`)
+  const start = match.index + match[0].lastIndexOf('{')
+  return `function ${name}(${match[1]}) {${balancedBlock(source, start)}}`
+}
+
+function processHandler(id) {
+  const marker = `id: ${id}`
+  const idOffset = source.indexOf(marker)
+  if (idOffset < 0) throw new Error(`missing process ${id}`)
+  const handlerOffset = source.indexOf('onExited: function(exitCode)', idOffset)
+  if (handlerOffset < 0) throw new Error(`missing exit handler ${id}`)
+  const braceStart = source.indexOf('{', handlerOffset)
+  return `(function(exitCode) {${balancedBlock(source, braceStart)}})(exitCode)`
+}
+
+function row(id, overrides = {}) {
+  return {
+    toolId: id, toolName: id, supported: true, available: true, installed: false,
+    desktopInstalled: false, runtimeState: 'none', authentication: 'unknown',
+    runtimeOwner: 'none', checkAvailable: false, reasonCode: '', history: 'not-started',
+    ...overrides
   }
 }
 
-// qs.Ui.Button has its own selected property. Card actions must depend on the
-// selected model card rather than that unrelated button styling property.
-const buttons = [...source.matchAll(/^                      Button \{([\s\S]*?)^                      }/gm)]
-assertEqual(buttons.length, 3, 'all three card actions have visibility coverage')
-for (const [index, button] of buttons.entries()) {
-  const visible = button[1].match(/visible: ([^\n]+)/)[1]
-  const data = {
-    selected: false, toolCard: {selected: true}, installSupported: index === 0,
-    openSupported: index !== 0, toolStatus: index === 0 ? 'selected' : 'action-required',
-    setupOnly: false, prerequisiteInstalled: true, userConfirmable: false
-  }
-  assertEqual(vm.runInNewContext(visible, data), true, `card action ${index + 1} is visible despite the button's own selected=false`)
-  data.selected = true
-  data.toolCard.selected = false
-  assertEqual(vm.runInNewContext(visible, data), false, `card action ${index + 1} hides when the card is deselected`)
-}
-
-function tool(id, overrides = {}) {
-  return {toolId: id, adapterSupported: true, selected: false, toolStatus: 'not-started',
-    setupOnly: false, userConfirmable: false, prerequisiteInstalled: false,
-    openSupported: false, installSupported: true, reasonCode: '', ...overrides}
-}
-
-function panel(rows) {
+function makePanel(rows = []) {
   const context = {
-    rows, toolModel: {count: rows.length, get: i => rows[i], setProperty: (i, key, value) => {rows[i][key] = value}},
-    stateCatalogLoaded: true, stateLoaded: true, adapterCatalogLoaded: true,
-    statusChecksComplete: true, statusChecksFailed: false, canFinish: false,
-    busy: false, closingQueued: false, statusQueue: [], statusTool: '',
-    stateWriteQueue: [], stateWriteCurrent: null, activeTool: '', activeAction: '', statusText: '',
-    statusProc: {running: false}, stateWriteProc: {running: false}, actionProc: {running: false},
-    toolStatusOutput: {text: ''}, closed: 0
+    rows,
+    window: {visible: true},
+    focusCurrentStep: () => {},
+    startStatusChecks: () => {},
+    toolModel: {
+      get count() { return rows.length },
+      append: item => rows.push(item),
+      get: index => rows[index],
+      setProperty: (index, key, value) => { rows[index][key] = value }
+    },
+    stateCatalogLoaded: true,
+    stateLoaded: true,
+    adapterCatalogLoaded: true,
+    closingQueued: false,
+    busy: false,
+    statusText: '',
+    statusQueue: [],
+    stateWriteQueue: [],
+    stateWriteCurrent: null,
+    accountChoice: '',
+    accountAuthentication: 'unknown',
+    hermesChoice: 'recommended',
+    hermesOperational: 'unverified',
+    hermesOwner: 'none',
+    hermesCheckAvailable: false,
+    memoryChoice: 'builtin',
+    memoryConfirmed: true,
+    memoryExpanded: false,
+    desktopChoice: 'none',
+    runGeneration: 1,
+    statusProcessGeneration: 1,
+    checkProcessGeneration: 1,
+    actionProcessGeneration: 1,
+    activeTool: '',
+    activeAction: '',
+    closed: 0,
+    statusProc: {running: false, signal: () => {}},
+    hermesCheckProc: {running: false, signal: () => {}},
+    actionRefresh: {restart: () => {}, stop: () => {}},
+    actionProc: {running: false, startDetached: () => {context.detached = true}},
+    stateWriteProc: {running: false},
+    toolStatusOutput: {text: ''},
+    hermesCheckOutput: {text: ''}
   }
   context.root = context
   vm.createContext(context)
-  for (const match of functions) vm.runInContext(`function ${match[1]}(${match[2]}) {${match[3]}\n}`, context)
-  context.focusCurrentStep = () => {}
-  context.requestClose = () => {context.closed++}
+  for (const name of [
+    'findTool', 'tool', 'statusFor', 'accountProofSufficient', 'hermesProofSufficient',
+    'memoryChoiceValid', 'desktopChoiceReady', 'legacyProgressIncomplete', 'completeEligible', 'choiceValue',
+    'applyToolStatus', 'applyAdapterCatalog', 'applyState', 'invalidateStatus', 'canRunToolAction', 'queueStateWrite', 'startNextStateWrite', 'runToolAction',
+    'desktopStateLabel', 'desktopActionLabel', 'checkHermes', 'finishForNow', 'resetSetup', 'checkNextStatus'
+  ]) vm.runInContext(panelFunction(name), context)
+  context.requestClose = () => { context.closed++ }
+  context.cancelReadOnlyChecks = () => { context.statusQueue = [] }
   context.exit = (id, code = 0) => {
     context[id].running = false
     context.exitCode = code
-    vm.runInContext(handlers[id], context)
-  }
-  context.probe = (id, result, code = 0) => {
-    context.statusTool = id
-    context.toolStatusOutput.text = typeof result === 'string' ? result : JSON.stringify({
-      id, supported: true, available: true, installed: false, prerequisiteInstalled: false, ...result
-    })
-    context.exit('statusProc', code)
+    vm.runInContext(processHandler(id), context)
   }
   return context
 }
 
 {
-  const p = panel([])
-  assertEqual(p.openActionLabel('codex', false, 'action-required'), 'Sign in', 'Codex keeps its separate sign-in action')
-  assertEqual(p.openActionLabel('claude', false, 'action-required'), 'Sign in', 'Claude Code keeps its separate sign-in action')
-  assertEqual(p.openActionLabel('hermes', false, 'action-required'), 'Launch & check', 'Hermes action does not imply provider sign-in')
-  assertEqual(p.openActionLabel('hermes', false, 'needs-attention'), 'Retry', 'Hermes failures remain actionable')
-  assertEqual(p.statusLabel('action-required'), 'Complete the action shown, then confirm', 'readiness requires an explicit confirmation')
-  assertEqual(p.statusLabel('needs-attention'), 'Needs attention — retry available', 'failures remain explicit')
-}
-
-for (const copy of [
-  'Core AI tools come with Maslow OS. Choose which ones you want to configure; sign-in happens separately in the supported tools.',
-  'Start with Bitwarden for secure readiness, then choose Codex, Claude Code, or Hermes. Sign-in stays in Codex and Claude Code; Maslow OS does not inspect authentication.',
-  'Ready means you completed the action shown and confirmed it; it does not prove provider authentication. Hermes uses built-in memory. External memory and MCP connections stay separate.',
-  'Mark " + toolName + " ready after completing the action shown'
-]) {
-  assert(source.includes(copy), `onboarding copy preserves readiness and authentication boundaries: ${copy}`)
+  const p = makePanel([row('codex'), row('hermes')])
+  p.accountChoice = 'codex'
+  p.applyToolStatus({schemaVersion: 1, id: 'codex', supported: true, available: true, installed: true, authentication: 'signed-in', runtimeOwner: 'packaged'})
+  p.hermesChoice = 'deferred'
+  assertEqual(p.completeEligible(), true, 'one signed-in coding account and deferred Hermes can complete')
 }
 
 {
-  const p = panel([])
-  p.Qt = {callLater: callback => callback()}
-  const viewport = {contentItem: {}, contentHeight: 802, height: 180, contentY: 360}
-  p.toolsView = {contentItem: viewport}
-  const card = top => ({height: 82, mapToItem: () => ({y: top})})
-  p.ensureToolVisible(card(90))
-  assertEqual(viewport.contentY, 90, 'Tab focus scrolls an above-viewport card into view')
-  p.ensureToolVisible(card(540))
-  assertEqual(viewport.contentY, 442, 'Tab focus scrolls a below-viewport card into view')
-  p.ensureToolVisible(card(450))
-  assertEqual(viewport.contentY, 442, 'already visible keyboard focus preserves scroll position')
-  p.ensureToolVisible(card(720))
-  assertEqual(viewport.contentY, 622, 'last card reveal remains within the content bounds')
-}
-
-for (const id of ['codex', 'honcho']) {
-  const setupOnly = id === 'honcho'
-  const p = panel([tool(id, {selected: true, toolStatus: 'ready', setupOnly, openSupported: !setupOnly, prerequisiteInstalled: true})])
-  p.probe(id, {setupOnly, installed: false, prerequisiteInstalled: false})
-  assertEqual(p.canFinish, false, `${id}: missing current installation/prerequisite blocks stale readiness`)
-  assertEqual(p.rows[0].toolStatus, 'ready', `${id}: prior user confirmation is retained`)
-  p.finishSetup()
-  assertEqual(p.stateWriteCurrent.command[1], 'defer', `${id}: incomplete current setup cannot be saved as complete`)
+  const p = makePanel([row('codex', {history: 'ready'})])
+  p.accountChoice = 'codex'
+  p.hermesChoice = 'deferred'
+  assertEqual(p.completeEligible(), false, 'historical ready never becomes current authentication proof')
 }
 
 {
-  const p = panel([tool('honcho', {selected: true, toolStatus: 'action-required', setupOnly: true, userConfirmable: true})])
-  p.markReady('honcho')
-  assertEqual(p.rows[0].toolStatus, 'action-required', 'missing Hermes prevents manual memory readiness')
-  p.probe('honcho', {setupOnly: true, prerequisiteInstalled: true})
-  assertEqual(p.rows[0].openSupported, true, 'official memory wizard remains reopenable after its first launch')
-  p.markReady('honcho')
-  assertEqual(p.canFinish, true, 'memory setup can finish after prerequisite and explicit confirmation')
+  const p = makePanel([row('codex')])
+  p.accountChoice = 'codex'
+  p.accountAuthentication = 'signed-in'
+  p.hermesChoice = 'deferred'
+  p.memoryChoice = 'honcho'
+  p.memoryConfirmed = false
+  assertEqual(p.completeEligible(), false, 'external memory blocks completion until the user confirms its wizard')
+  p.memoryConfirmed = true
+  assertEqual(p.completeEligible(), true, 'external memory may complete after explicit user confirmation')
 }
 
 {
-  const p = panel([tool('codex', {selected: true, toolStatus: 'ready', openSupported: true, installSupported: false})])
-  p.toggleTool('codex', false)
-  p.toggleTool('codex', true)
-  assertEqual(p.rows[0].toolStatus, 'action-required', 'reselecting an installed agent exposes its sign-in action')
-  assertEqual(p.canFinish, false, 'reselection does not silently confirm sign-in')
+  const p = makePanel([row('hermes', {runtimeOwner: 'packaged', installed: true, checkAvailable: true})])
+  p.hermesOperational = 'ready'
+  p.applyToolStatus({schemaVersion: 1, id: 'hermes', supported: true, available: true, installed: true, authentication: 'unknown', runtimeOwner: 'desktop', checkAvailable: false})
+  assertEqual(p.hermesOperational, 'unverified', 'a changed Hermes runtime owner invalidates earlier operational proof')
 }
 
 {
-  const p = panel([tool('hermes', {selected: true, toolStatus: 'in-progress'})])
-  p.activeTool = 'hermes'
-  p.activeAction = 'install'
-  p.busy = true
-  p.exit('actionProc')
-  assertDeepEqual([p.statusTool, ...p.statusQueue], ['hermes'], 'Hermes launch refreshes one authoritative prerequisite result')
-  assertEqual(p.statusChecksComplete, false, 'completion waits for dependent probes')
-  assertEqual(p.rows[0].toolStatus, 'selected', 'successful launcher exit does not claim installation or sign-in')
-  assert(p.statusText.includes('Check again'), 'user can refresh after a detached installer finishes')
-}
-
-{
-  const p = panel([tool('codex', {selected: true, installSupported: true, openSupported: false})])
-  assertEqual(p.availabilityLabel('codex', false, false, false, true, false, 'selected', 'missing-core'), 'Core software missing — repair required', 'missing core software is an explicit repair state')
-  assertEqual(p.primaryActionLabel('codex', false, 'selected'), 'Repair', 'missing core software never appears as a normal install')
-  p.toggleTool('codex', false)
-  assertEqual(p.rows[0].selected, false, 'deselect changes onboarding state without removing software')
-}
-
-for (const id of ['codex', 'hermes']) {
-  const p = panel([tool(id, {selected: true})])
-  p.probe(id, {installed: false, prerequisiteInstalled: false, reasonCode: 'path-shadow'})
-  assertEqual(p.rows[0].installSupported, false, `${id}: a command override disables misleading repair`)
-  assertEqual(p.availabilityLabel(id, false, false, false, false, false, 'selected', 'path-shadow'), 'Command override needs attention', `${id}: a command override is not called missing software`)
-  p.runToolAction(id, 'install')
-  assertEqual(p.actionProc.running, false, `${id}: a command override cannot launch repair`)
-}
-
-{
-  const rows = [
-    tool('hermes'),
-    tool('memory-builtin'),
-    tool('honcho'),
-    tool('hindsight'),
-    tool('mcp')
-  ]
-  const p = panel(rows)
-  p.applyAdapterCatalog({tools: [
-    {id: 'hermes', supported: true},
-    {id: 'memory-builtin', supported: true},
-    {id: 'honcho', supported: true, setupOnly: true, userConfirmable: true},
-    {id: 'hindsight', supported: true, setupOnly: true, userConfirmable: true},
-    {id: 'mcp', supported: true, setupOnly: true, userConfirmable: true}
-  ]})
-  assertDeepEqual([p.statusTool, ...p.statusQueue], ['hermes'], 'one Hermes probe supplies every dependent prerequisite')
-  p.probe('hermes', {installed: true, prerequisiteInstalled: true})
-  for (const id of ['memory-builtin', 'honcho', 'hindsight', 'mcp'])
-    assertEqual(rows.find(row => row.toolId === id).prerequisiteInstalled, true, `${id}: fresh Hermes result enables configuration`)
-}
-
-{
-  const p = panel([tool('honcho', {selected: true, setupOnly: true, userConfirmable: true, prerequisiteInstalled: true})])
-  p.activeTool = 'honcho'
-  p.activeAction = 'install'
-  p.exit('actionProc')
-  assertEqual(p.rows[0].toolStatus, 'action-required', 'wizard launch still requires explicit user confirmation')
-  assert(!p.statusText.includes('closed'), 'launcher exit never claims that the official wizard closed')
-}
-
-for (const invalid of ['{', '{}', JSON.stringify({id: 'claude', supported: true, available: true, installed: true, prerequisiteInstalled: true})]) {
-  const p = panel([tool('codex')])
-  p.probe('codex', invalid)
-  assertEqual(p.statusChecksFailed, true, 'invalid or mismatched status is a failed probe')
-  assertEqual(p.canFinish, false, 'invalid status prevents completion')
-}
-
-{
-  const p = panel([tool('codex')])
-  p.probe('codex', {}, 1)
-  assertEqual(p.canFinish, false, 'failed status command prevents completion')
-  p.statusChecksFailed = false
-  p.probe('codex', {installed: true, prerequisiteInstalled: true})
-  assertEqual(p.rows[0].selected, false, 'installation status does not select a tool for the user')
-  assertEqual(p.rows[0].toolStatus, 'not-started', 'unselected installed tool stays unconfigured')
-  p.toggleTool('codex', true)
-  assertEqual(p.rows[0].toolStatus, 'action-required', 'selecting an installed tool requires explicit sign-in confirmation')
-}
-
-{
-  const p = panel([tool('codex')])
-  p.toggleTool('codex', true)
-  p.saveStep(3)
-  p.deferSetup()
-  p.toggleTool('codex', false)
-  assertEqual(p.rows[0].selected, true, 'queued closure freezes further selections')
-  const commands = []
-  while (p.stateWriteCurrent) {
-    commands.push(p.stateWriteCurrent.command[1])
-    p.exit('stateWriteProc')
-  }
-  assertDeepEqual(commands, ['tool-select', 'step', 'defer'], 'rapid writes persist in order before closing')
-  assertEqual(p.closed, 1, 'panel closes once after the final write succeeds')
-}
-
-{
-  const p = panel([tool('codex', {installSupported: true})])
-  p.runToolAction('codex', 'install')
-  assertEqual(p.actionProc.running, false, 'installation waits for its progress write')
-  p.exit('stateWriteProc', 1)
-  assertEqual(p.actionProc.running, false, 'failed state write never launches installation')
-  assertEqual(p.busy, false, 'failed state write permits retry')
-  assertEqual(p.stateWriteQueue.length, 0, 'failed state write clears dependent writes')
-}
-
-{
-  const p = panel([tool('codex')])
-  p.runToolAction('codex', 'install')
+  const p = makePanel([row('codex', {installed: true, available: false})])
+  p.runToolAction('codex', 'launch')
+  assertEqual(p.actionProc.running, false, 'actions wait for progress to save')
   p.exit('stateWriteProc')
-  assertDeepEqual(p.actionProc.command, ['omarchy-setup-ai-tool', 'install', 'codex'], 'saved progress launches exactly the selected adapter')
-  p.exit('actionProc', 130)
-  assertEqual(p.rows[0].toolStatus, 'selected', 'canceled launcher retains selection for retry')
+  assertEqual(p.detached, true, 'an installed offline tool launches detached from onboarding lifetime')
+  assertDeepEqual(p.actionProc.command, ['omarchy-setup-ai-tool', 'launch', 'codex'], 'installed offline tool uses the plain interactive launch action')
 }
+
+{
+  const p = makePanel([row('codex', {available: true, installed: false, runtimeOwner: 'foreign', reasonCode: 'path-shadow'})])
+  p.runToolAction('codex', 'install')
+  assertEqual(p.actionProc.running, false, 'a foreign command never offers a misleading repair')
+}
+
+{
+  const p = makePanel([row('hermes', {installed: true, checkAvailable: false})])
+  p.checkHermes()
+  assertEqual(p.hermesCheckProc.running, false, 'unavailable Hermes checks never run a request')
+  assertEqual(p.hermesOperational, 'unavailable', 'unavailable Hermes checks guide rather than fabricate success')
+}
+
+{
+  const p = makePanel([row('codex', {history: 'selected'})])
+  p.finishForNow()
+  assertDeepEqual(p.stateWriteCurrent.command, ['omarchy-setup-ai-state', 'defer'], 'Finish for now queues only defer')
+  p.stateWriteQueue = [{command: ['omarchy-setup-ai-state', 'choice', 'account', 'codex']}]
+  p.exit('stateWriteProc', 1)
+  assertEqual(p.closed, 0, 'a failed state write never closes the setup flow')
+  assertEqual(p.stateWriteQueue.length, 0, 'a failed state write discards dependent queued writes')
+}
+
+{
+  const p = makePanel([row('codex', {history: 'selected'})])
+  p.resetSetup()
+  assertEqual(p.accountChoice, '', 'reset clears in-memory account choice before a later reopen')
+  assertEqual(p.memoryChoice, 'builtin', 'reset restores built-in memory preference')
+  assertEqual(p.rows[0].history, 'not-started', 'reset clears historical progress shown by this panel')
+  assertEqual(p.runGeneration, 2, 'reset invalidates outstanding asynchronous callbacks')
+}
+
+{
+  const p = makePanel([row('codex')])
+  p.statusText = 'fresh panel state'
+  p.runGeneration = 2
+  p.statusProcessGeneration = 1
+  p.exit('statusProc', 1)
+  assertEqual(p.statusText, 'fresh panel state', 'stale status exit cannot overwrite a reopened panel')
+}
+
+{
+  const p = makePanel([row('codex')])
+  p.applyAdapterCatalog({tools: [{id: 'hermes-desktop', name: 'Hermes Desktop', supported: true}, {id: 'chatgpt-desktop', name: 'ChatGPT Desktop', supported: true}]})
+  assertEqual(p.toolModel.count, 3, 'desktop capabilities are added independently of the legacy persistence catalog')
+  p.applyState({setupChoices: {memory: 'honcho'}, tools: {}})
+  assertEqual(p.memoryConfirmed, false, 'resumed external memory is not silently confirmed')
+}
+{
+  const p = makePanel([row('codex', {installed: true})])
+  p.runToolAction('codex', 'open')
+  p.exit('stateWriteProc', 1)
+  assertEqual(p.detached, undefined, 'failed progress write cannot launch a dependent login')
+}
+{
+  const p = makePanel([row('codex')])
+  p.accountChoice = 'codex'
+  p.accountAuthentication = 'signed-in'
+  p.statusTool = 'codex'
+  p.exit('statusProc', 1)
+  assertEqual(p.accountAuthentication, 'unknown', 'a failed refresh invalidates old sign-in evidence')
+  p.hermesCheckOutput.text = JSON.stringify({schemaVersion: 1, id: 'hermes', operational: 'ready'})
+  p.exit('hermesCheckProc', 1)
+  assertEqual(p.hermesOperational, 'failed', 'a failed process cannot smuggle a ready response')
+}
+
+{
+  const p = makePanel([row('codex'), row('chatgpt-desktop', {runtimeState: 'preparing'})])
+  p.accountChoice = 'codex'; p.accountAuthentication = 'signed-in'; p.hermesChoice = 'deferred'
+  p.desktopChoice = 'chatgpt-desktop'
+  assertEqual(p.completeEligible(), false, 'selected desktop preparation cannot be completed prematurely')
+  p.rows[1].runtimeState = 'ready'
+  assertEqual(p.completeEligible(), true, 'ready optional desktop can complete with the connected account')
+  p.invalidateStatus('chatgpt-desktop')
+  assertEqual(p.completeEligible(), false, 'failed desktop refresh revokes stale readiness')
+}
+{
+  const desktop = row('hermes-desktop', {desktopInstalled: true, runtimeState: 'attention', runtimeOwner: 'foreign'})
+  const p = makePanel([desktop])
+  assertEqual(p.desktopStateLabel(desktop), 'Needs attention', 'unverified bootstrap never claims active preparation')
+  assertEqual(p.desktopActionLabel(desktop), 'Open setup', 'incomplete desktop directs users into app recovery')
+  assertEqual(p.canRunToolAction(desktop, 'open'), true, 'fixed packaged desktop remains a recovery path despite foreign CLI')
+  assertEqual(p.canRunToolAction(row('hermes', {runtimeOwner: 'foreign'}), 'launch'), false, 'foreign CLI is still blocked')
+}
+for (const requirement of [
+  'Your AI.\\nReady to work.',
+  'Layout.maximumWidth: 1040',
+  'path: Quickshell.env("HOME") + "/.local/state/omarchy/toggles/hypr/reduced-motion.lua"',
+  'duration: root.reducedMotion ? 0 : 260',
+  'focusable: true',
+  'Customize setup',
+  'desktopInstalled',
+  'Qt.rgba(foreground.r, foreground.g, foreground.b, 0.74)',
+  'color: quiet ? "transparent" : root.foreground',
+  'minimumSize: Qt.size(600, 480)'
+]) assert(source.includes(requirement), `panel source retains required UI contract: ${requirement}`)
+
+assert(!source.includes('"tool-status", toolId, "ready"'), 'panel never persists proof-like ready status')
+assert(!source.includes('actionProc.signal(15)'), 'close and reset never cancel installers or launchers')
+assert(!source.includes('--yolo') && !source.includes('--auto'), 'panel never adds automatic approval flags')
 JS

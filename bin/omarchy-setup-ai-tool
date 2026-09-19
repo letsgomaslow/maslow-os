@@ -7,6 +7,15 @@ set -euo pipefail
 
 action=${1:-}
 tool=${2:-}
+script_path=${BASH_SOURCE[0]}
+probe_dir=""
+probe_pid=""
+probe_stdout=""
+probe_stderr=""
+probe_status=1
+authentication="unknown"
+
+source "$OMARCHY_PATH/install/helpers/agent.sh"
 
 fail() {
   echo "omarchy-setup-ai-tool: $*" >&2
@@ -19,6 +28,8 @@ tool_name() {
   codex) printf '%s' "Codex" ;;
   claude) printf '%s' "Claude Code" ;;
   hermes) printf '%s' "Hermes" ;;
+  hermes-desktop) printf '%s' "Hermes Desktop" ;;
+  chatgpt-desktop) printf '%s' "ChatGPT Desktop" ;;
   memory-builtin) printf '%s' "Hermes built-in memory" ;;
   honcho) printf '%s' "Honcho" ;;
   hindsight) printf '%s' "Hindsight" ;;
@@ -30,7 +41,8 @@ tool_name() {
 
 tool_supported() {
   [[ $1 == "bitwarden" || $1 == "codex" || $1 == "claude" || $1 == "hermes" ||
-    $1 == "memory-builtin" || $1 == "honcho" || $1 == "hindsight" || $1 == "mcp" ]]
+    $1 == "hermes-desktop" || $1 == "chatgpt-desktop" || $1 == "memory-builtin" ||
+    $1 == "honcho" || $1 == "hindsight" || $1 == "mcp" ]]
 }
 
 tool_planned_reason() {
@@ -45,31 +57,275 @@ require_known_tool() {
   tool_name "$tool" >/dev/null || fail "unknown tool id '$tool'"
 }
 
-installed() {
-  case "$tool" in
-  bitwarden) omarchy-pkg-present bitwarden ;;
-  codex | claude | hermes | memory-builtin)
-    source "$OMARCHY_PATH/install/helpers/agent.sh"
-    if [[ $tool == "codex" || $tool == "claude" || $tool == "hermes" ]]; then
-      omarchy_agent_resolve "$tool"
-    else
-      omarchy_agent_resolve hermes
+probe_timeout() {
+  local configured=${OMARCHY_SETUP_AI_STATUS_TIMEOUT_SECONDS:-5} whole
+  if [[ ! $configured =~ ^([0-9]+)([.][0-9]+)?$ ]]; then
+    printf '%s' "5"
+    return
+  fi
+  whole=${BASH_REMATCH[1]}
+  if [[ $configured == "0" || $configured =~ ^0[.]0*$ ]]; then
+    printf '%s' "5"
+  elif (( 10#$whole >= 8 )); then
+    printf '%s' "8"
+  else
+    printf '%s' "$configured"
+  fi
+}
+
+status_deadline() {
+  local value whole fraction
+  value=$(probe_timeout)
+  whole=${value%%.*}
+  fraction=${value#"$whole"}
+  printf '%s%s' "$((10#$whole + 1))" "$fraction"
+}
+
+terminate_probe_group() {
+  local pid=$probe_pid
+  [[ -n $pid ]] || return 0
+
+  kill -TERM -- "-$pid" 2>/dev/null || true
+  for _ in {1..5}; do
+    if ! kill -0 -- "-$pid" 2>/dev/null; then
+      break
     fi
-    omarchy_agent_is_installed
-    ;;
-  # The official setup wizard installs the selected external provider's
-  # dependencies. Without reading provider configuration, Maslow cannot prove
-  # that either provider has completed setup.
-  honcho | hindsight | mcp) return 1 ;;
+    sleep 0.1
+  done
+  kill -KILL -- "-$pid" 2>/dev/null || true
+  wait "$pid" 2>/dev/null || true
+}
+
+cleanup_probe() {
+  if [[ -n $probe_pid ]]; then
+    terminate_probe_group
+    probe_pid=""
+  fi
+  if [[ -n $probe_dir ]]; then
+    rm -rf -- "$probe_dir"
+    probe_dir=""
+  fi
+}
+
+cancel_probe() {
+  trap - HUP INT TERM
+  cleanup_probe
+  exit 130
+}
+
+trap cancel_probe HUP INT TERM
+trap cleanup_probe EXIT
+
+run_bounded_probe_with_timeout() {
+  local timeout_value=$1 status
+  shift
+  cleanup_probe
+  probe_dir=$(mktemp -d "${TMPDIR:-/tmp}/omarchy-ai-status.XXXXXX")
+  chmod 0700 "$probe_dir"
+  probe_stdout="$probe_dir/stdout"
+  probe_stderr="$probe_dir/stderr"
+  setsid timeout --signal=TERM --kill-after=1 "$timeout_value" \
+    bash -c 'ulimit -f 16; exec "$@"' bash "$@" >"$probe_stdout" 2>"$probe_stderr" &
+  probe_pid=$!
+  if wait "$probe_pid"; then
+    status=0
+  else
+    status=$?
+  fi
+  terminate_probe_group
+  probe_pid=""
+  probe_status=$status
+
+  if (( $(wc -c <"$probe_stdout") > 8192 || $(wc -c <"$probe_stderr") > 8192 )); then
+    probe_status=1
+  fi
+}
+
+run_bounded_probe() {
+  run_bounded_probe_with_timeout "$(probe_timeout)" "$@"
+}
+
+run_status_supervisor() {
+  run_bounded_probe_with_timeout "$(status_deadline)" "$@"
+}
+
+run_direct_probe() {
+  local status
+  cleanup_probe
+  probe_dir=$(mktemp -d "${TMPDIR:-/tmp}/omarchy-ai-status.XXXXXX")
+  chmod 0700 "$probe_dir"
+  probe_stdout="$probe_dir/stdout"
+  probe_stderr="$probe_dir/stderr"
+
+  if /usr/bin/timeout --foreground --signal=TERM --kill-after=1 "$(probe_timeout)" "$@" >"$probe_stdout" 2>"$probe_stderr"; then
+    status=0
+  else
+    status=$?
+  fi
+  probe_status=$status
+
+  if (( $(wc -c <"$probe_stdout") > 8192 || $(wc -c <"$probe_stderr") > 8192 )); then
+    probe_status=1
+  fi
+}
+
+run_probe() {
+  if [[ ${OMARCHY_SETUP_AI_STATUS_WORKER:-0} == "1" ]]; then
+    run_direct_probe "$@"
+  else
+    run_bounded_probe "$@"
+  fi
+}
+
+finish_probe() {
+  if [[ -n $probe_dir ]]; then
+    rm -rf -- "$probe_dir"
+    probe_dir=""
+  fi
+}
+
+codex_authentication() {
+  local command_path stdout stderr api_key_status signed_in=false
+  authentication="unknown"
+  command_path=$(omarchy_agent_package_path)
+  run_probe "$command_path" login status
+  stdout=$(cat "$probe_stdout")
+  stderr=$(cat "$probe_stderr")
+
+  if (( probe_status == 0 )) && [[ -z $stdout ]]; then
+    case "$stderr" in
+    "Logged in using workload identity" | "Logged in using ChatGPT" | "Logged in using access token" | \
+      "Logged in using personal access token" | "Logged in using Amazon Bedrock API key" | \
+      "Logged in using Amazon Bedrock AWS access keys") signed_in=true ;;
+    "Logged in using an API key - "*)
+      api_key_status=${stderr#"Logged in using an API key - "}
+      if [[ $api_key_status == "***" || $api_key_status =~ ^.{8}[*][*][*].{5}$ ]]; then
+        signed_in=true
+      fi
+      ;;
+    esac
+    if [[ $signed_in == "true" ]]; then
+      authentication="signed-in"
+    fi
+  elif (( probe_status == 1 )) && [[ -z $stdout && $stderr == "Not logged in" ]]; then
+    authentication="signed-out"
+  fi
+  finish_probe
+}
+
+claude_authentication() {
+  local command_path
+  authentication="unknown"
+  command_path=$(omarchy_agent_package_path)
+  run_probe "$command_path" auth status --json
+
+  if (( probe_status == 0 )) && [[ ! -s $probe_stderr ]] &&
+    jq -e -s 'length == 1 and ((.[0] | type) == "object") and ((.[0].loggedIn | type) == "boolean")' "$probe_stdout" >/dev/null 2>&1; then
+    if [[ $(jq -r '.loggedIn' "$probe_stdout") == "true" ]]; then
+      authentication="signed-in"
+    else
+      authentication="signed-out"
+    fi
+  fi
+  finish_probe
+}
+
+desktop_package() {
+  case "$1" in
+  hermes-desktop) printf '%s' "hermes-desktop" ;;
+  chatgpt-desktop) printf '%s' "openai-codex-desktop" ;;
   *) return 1 ;;
   esac
 }
 
-available() {
-  case "$tool" in
-  bitwarden) omarchy-pkg-available bitwarden ;;
-  codex | claude | hermes | memory-builtin | honcho | hindsight | mcp) return 0 ;;
+desktop_launcher() {
+  case "$1" in
+  hermes-desktop) omarchy_agent_system_command_path hermes-desktop ;;
+  chatgpt-desktop) omarchy_agent_system_command_path chatgpt ;;
   *) return 1 ;;
+  esac
+}
+
+hermes_desktop_capable() {
+  local runtime
+  runtime=$(omarchy_agent_desktop_runtime_path)
+  run_probe /bin/bash -c '
+    runtime=$1
+    "$runtime" --version >/dev/null 2>&1 || exit 1
+    exec "$runtime" chat --help
+  ' bash "$runtime"
+
+  if (( probe_status == 0 )) && [[ ! -s $probe_stderr ]] && grep -qF -- '--oneshot' "$probe_stdout"; then
+    finish_probe
+    return 0
+  else
+    finish_probe
+    return 1
+  fi
+}
+
+desktop_status() {
+  local package launcher
+  package=$(desktop_package "$1")
+  launcher=$(desktop_launcher "$1")
+  DESKTOP_INSTALLED=false
+  RUNTIME_OWNER="none"
+  RUNTIME_STATE="none"
+  REASON_CODE=""
+
+  if omarchy-pkg-present "$package"; then
+    DESKTOP_INSTALLED=true
+    RUNTIME_OWNER="desktop"
+    if [[ ! -x $launcher ]]; then
+      RUNTIME_STATE="attention"
+      REASON_CODE="desktop-runtime-attention"
+    elif [[ $1 == "chatgpt-desktop" ]]; then
+      RUNTIME_STATE="ready"
+    else
+      agent_runtime_status hermes
+    fi
+  elif [[ -e $launcher ]]; then
+    RUNTIME_STATE="attention"
+    REASON_CODE="desktop-runtime-attention"
+  fi
+}
+
+agent_runtime_status() {
+  local runtime
+  omarchy_agent_resolve "$1"
+  RUNTIME_OWNER=$(omarchy_agent_runtime_owner)
+  REASON_CODE=""
+
+  if [[ $RUNTIME_OWNER == "desktop" ]]; then
+    runtime=$(omarchy_agent_desktop_runtime_path)
+    if [[ ! -x $(omarchy_agent_system_command_path hermes-desktop) ]]; then
+      RUNTIME_STATE="attention"
+    elif [[ ! -e $HOME/.hermes/hermes-agent/.hermes-bootstrap-complete && ! -e $runtime && ! -L $runtime ]]; then
+      RUNTIME_STATE="attention"
+      REASON_CODE="desktop-setup-required"
+    elif omarchy_agent_desktop_runtime_claimed && omarchy_agent_desktop_runtime_on_path && hermes_desktop_capable; then
+      RUNTIME_STATE="ready"
+    else
+      RUNTIME_STATE="attention"
+    fi
+  else
+    RUNTIME_STATE=$(omarchy_agent_runtime_state)
+  fi
+
+  case "$RUNTIME_OWNER:$RUNTIME_STATE" in
+  packaged:ready | desktop:ready) ;;
+  packaged:attention) REASON_CODE="runtime-not-on-path" ;;
+  desktop:preparing) REASON_CODE="desktop-preparing" ;;
+  desktop:attention) REASON_CODE=${REASON_CODE:-desktop-runtime-attention} ;;
+  foreign:attention)
+    if omarchy_agent_is_packaged; then
+      REASON_CODE="path-shadow"
+    else
+      REASON_CODE="foreign-runtime"
+    fi
+    ;;
+  none:none) REASON_CODE="missing-core" ;;
+  *) REASON_CODE="runtime-attention" ;;
   esac
 }
 
@@ -81,6 +337,8 @@ catalog() {
       {id: "codex", name: "Codex", supported: true},
       {id: "claude", name: "Claude Code", supported: true},
       {id: "hermes", name: "Hermes", supported: true},
+      {id: "hermes-desktop", name: "Hermes Desktop", supported: true, desktop: true},
+      {id: "chatgpt-desktop", name: "ChatGPT Desktop", supported: true, desktop: true},
       {id: "memory-builtin", name: "Hermes built-in memory", supported: true},
       {id: "honcho", name: "Honcho", supported: true, setupOnly: true, userConfirmable: true},
       {id: "hindsight", name: "Hindsight", supported: true, setupOnly: true, userConfirmable: true},
@@ -92,32 +350,76 @@ catalog() {
 
 status() {
   local name is_supported=false is_planned=false is_available=false is_installed=false prerequisite_installed=false
-  local setup_only=false user_confirmable=false reason="" reason_code=""
+  local setup_only=false user_confirmable=false reason="" reason_code="" runtime_owner="none" runtime_state="none"
+  local desktop_installed="" check_available=""
   name=$(tool_name "$tool")
+  authentication="unknown"
+
   if tool_supported "$tool"; then
     is_supported=true
-    available && is_available=true
-    installed && is_installed=true
-    if [[ $tool == "codex" || $tool == "claude" || $tool == "hermes" ]] && [[ $is_installed == "false" ]]; then
-      source "$OMARCHY_PATH/install/helpers/agent.sh"
-      omarchy_agent_resolve "$tool"
-      if omarchy_agent_is_packaged && ! omarchy_agent_package_on_path; then
-        reason_code="path-shadow"
+    case "$tool" in
+    bitwarden)
+      omarchy-pkg-available bitwarden && is_available=true
+      if omarchy-pkg-present bitwarden; then
+        is_installed=true
+        prerequisite_installed=true
+        runtime_owner="packaged"
+        runtime_state="ready"
       else
         reason_code="missing-core"
       fi
-    elif [[ $tool == "bitwarden" ]] && [[ $is_installed == "false" ]]; then
-      reason_code="missing-core"
-    fi
-    if [[ $tool == "honcho" || $tool == "hindsight" || $tool == "mcp" ]]; then
-      setup_only=true
-      user_confirmable=true
-      source "$OMARCHY_PATH/install/helpers/agent.sh"
-      omarchy_agent_resolve hermes
-      omarchy_agent_is_installed && prerequisite_installed=true
-    else
-      prerequisite_installed=$is_installed
-    fi
+      ;;
+    codex | claude | hermes)
+      is_available=true
+      agent_runtime_status "$tool"
+      runtime_owner=$RUNTIME_OWNER
+      runtime_state=$RUNTIME_STATE
+      reason_code=$REASON_CODE
+      if [[ $runtime_state == "ready" && $runtime_owner != "foreign" ]]; then
+        is_installed=true
+        prerequisite_installed=true
+      fi
+      if [[ $runtime_owner == "packaged" && $runtime_state == "ready" ]]; then
+        if [[ $tool == "codex" ]]; then
+          codex_authentication
+        elif [[ $tool == "claude" ]]; then
+          claude_authentication
+        fi
+      fi
+      if [[ $tool == "hermes" ]]; then
+        desktop_installed=false
+        omarchy-pkg-present hermes-desktop && desktop_installed=true
+        check_available=false
+      fi
+      ;;
+    hermes-desktop | chatgpt-desktop)
+      omarchy-pkg-available "$(desktop_package "$tool")" && is_available=true
+      desktop_status "$tool"
+      desktop_installed=$DESKTOP_INSTALLED
+      is_installed=$DESKTOP_INSTALLED
+      prerequisite_installed=$DESKTOP_INSTALLED
+      runtime_owner=$RUNTIME_OWNER
+      runtime_state=$RUNTIME_STATE
+      reason_code=$REASON_CODE
+      ;;
+    memory-builtin | honcho | hindsight | mcp)
+      is_available=true
+      setup_only=false
+      if [[ $tool == "honcho" || $tool == "hindsight" || $tool == "mcp" ]]; then
+        setup_only=true
+        user_confirmable=true
+      fi
+      agent_runtime_status hermes
+      runtime_owner=$RUNTIME_OWNER
+      runtime_state=$RUNTIME_STATE
+      if [[ $runtime_state == "ready" && $runtime_owner != "foreign" ]]; then
+        prerequisite_installed=true
+        [[ $tool == "memory-builtin" ]] && is_installed=true
+      else
+        reason_code=$REASON_CODE
+      fi
+      ;;
+    esac
   else
     is_planned=true
     reason=$(tool_planned_reason "$tool")
@@ -126,9 +428,13 @@ status() {
   jq -n \
     --arg id "$tool" \
     --arg name "$name" \
-    --arg authentication "unknown" \
+    --arg authentication "$authentication" \
     --arg reason "$reason" \
     --arg reasonCode "$reason_code" \
+    --arg runtimeOwner "$runtime_owner" \
+    --arg runtimeState "$runtime_state" \
+    --arg desktopInstalled "$desktop_installed" \
+    --arg checkAvailable "$check_available" \
     --argjson supported "$is_supported" \
     --argjson planned "$is_planned" \
     --argjson available "$is_available" \
@@ -136,33 +442,78 @@ status() {
     --argjson prerequisiteInstalled "$prerequisite_installed" \
     --argjson setupOnly "$setup_only" \
     --argjson userConfirmable "$user_confirmable" \
-    '{schemaVersion: 1, id: $id, name: $name, supported: $supported, planned: $planned, available: $available, installed: $installed, prerequisiteInstalled: $prerequisiteInstalled, setupOnly: $setupOnly, userConfirmable: $userConfirmable, authentication: $authentication}
+    '{schemaVersion: 1, id: $id, name: $name, supported: $supported, planned: $planned, available: $available, installed: $installed, prerequisiteInstalled: $prerequisiteInstalled, setupOnly: $setupOnly, userConfirmable: $userConfirmable, authentication: $authentication, runtimeOwner: $runtimeOwner, runtimeState: $runtimeState}
       + (if $reason == "" then {} else {reason: $reason} end)
-      + (if $reasonCode == "" then {} else {reasonCode: $reasonCode} end)'
+      + (if $reasonCode == "" then {} else {reasonCode: $reasonCode} end)
+      + (if $desktopInstalled == "" then {} else {desktopInstalled: ($desktopInstalled == "true")} end)
+      + (if $checkAvailable == "" then {} else {checkAvailable: ($checkAvailable == "true")} end)'
+}
+
+status_unavailable() {
+  local name supported=false planned=false reason="" desktop_installed="" check_available=""
+  name=$(tool_name "$tool")
+  if tool_supported "$tool"; then
+    supported=true
+  else
+    planned=true
+    reason=$(tool_planned_reason "$tool")
+  fi
+  if [[ $tool == "hermes" || $tool == "hermes-desktop" || $tool == "chatgpt-desktop" ]]; then
+    desktop_installed=false
+  fi
+  [[ $tool == "hermes" ]] && check_available=false
+
+  jq -n \
+    --arg id "$tool" --arg name "$name" --arg reason "$reason" \
+    --arg desktopInstalled "$desktop_installed" --arg checkAvailable "$check_available" \
+    --argjson supported "$supported" --argjson planned "$planned" \
+    '{schemaVersion: 1, id: $id, name: $name, supported: $supported, planned: $planned, available: false, installed: false, prerequisiteInstalled: false, setupOnly: false, userConfirmable: false, authentication: "unknown", runtimeOwner: "none", runtimeState: "attention", reasonCode: "status-unavailable"}
+      + (if $reason == "" then {} else {reason: $reason} end)
+      + (if $desktopInstalled == "" then {} else {desktopInstalled: false} end)
+      + (if $checkAvailable == "" then {} else {checkAvailable: false} end)'
+}
+
+status_action() {
+  run_status_supervisor /usr/bin/env OMARCHY_SETUP_AI_STATUS_WORKER=1 /bin/bash "$script_path" __status "$tool"
+  if (( probe_status == 0 )) && [[ ! -s $probe_stderr ]] &&
+    jq -e --arg id "$tool" 'type == "object" and .schemaVersion == 1 and .id == $id' "$probe_stdout" >/dev/null 2>&1; then
+    cat "$probe_stdout"
+    finish_probe
+  else
+    finish_probe
+    status_unavailable
+  fi
+}
+
+require_ready() {
+  agent_runtime_status "$1"
+  [[ $RUNTIME_STATE == "ready" && $RUNTIME_OWNER != "foreign" ]] || fail "$(tool_name "$tool") is not ready"
 }
 
 install_tool() {
   tool_supported "$tool" || fail "$(tool_planned_reason "$tool")"
-  available || fail "$(tool_name "$tool") is not available for this system"
 
   case "$tool" in
   bitwarden)
+    omarchy-pkg-available bitwarden || fail "Bitwarden is not available for this system"
     exec omarchy-install-and-launch Bitwarden bitwarden bitwarden
     ;;
   codex | claude | hermes)
     exec omarchy-launch-floating-terminal-with-presentation omarchy-agent-install "$tool"
     ;;
+  hermes-desktop)
+    omarchy-pkg-available hermes-desktop || fail "Hermes Desktop is not available for this system"
+    exec omarchy-launch-floating-terminal-with-presentation omarchy-install-ai-hermes
+    ;;
+  chatgpt-desktop)
+    omarchy-pkg-available openai-codex-desktop || fail "ChatGPT Desktop is not available for this system"
+    exec omarchy-launch-floating-terminal-with-presentation omarchy-install-ai-chatgpt
+    ;;
   memory-builtin)
-    installed || fail "Hermes is not installed"
+    require_ready hermes
     echo "Hermes built-in memory is active by default."
     ;;
-  honcho)
-    open_tool
-    ;;
-  hindsight)
-    open_tool
-    ;;
-  mcp)
+  honcho | hindsight | mcp)
     open_tool
     ;;
   esac
@@ -170,40 +521,60 @@ install_tool() {
 
 open_tool() {
   tool_supported "$tool" || fail "$(tool_planned_reason "$tool")"
-  if [[ $tool == "honcho" || $tool == "hindsight" || $tool == "mcp" ]]; then
-    source "$OMARCHY_PATH/install/helpers/agent.sh"
-    omarchy_agent_resolve hermes
-    omarchy_agent_is_installed || fail "Hermes is not installed"
-  else
-    installed || fail "$(tool_name "$tool") is not installed"
-  fi
 
   case "$tool" in
   bitwarden)
+    omarchy-pkg-present bitwarden || fail "Bitwarden is not installed"
     exec setsid uwsm-app -- gtk-launch bitwarden
     ;;
   codex)
+    require_ready codex
     exec omarchy-launch-floating-terminal-with-presentation codex login
     ;;
   claude)
+    require_ready claude
     exec omarchy-launch-floating-terminal-with-presentation claude auth login
     ;;
   hermes)
+    require_ready hermes
     exec omarchy-launch-floating-terminal-with-presentation hermes
     ;;
+  hermes-desktop | chatgpt-desktop)
+    # Opening the packaged app is the guided recovery path even when its
+    # separately bootstrapped runtime is incomplete or a foreign CLI exists.
+    omarchy-pkg-present "$(desktop_package "$tool")" && [[ -f $(desktop_launcher "$tool") && -x $(desktop_launcher "$tool") ]] ||
+      fail "$(tool_name "$tool") is not installed"
+    exec setsid uwsm-app -- "$(desktop_launcher "$tool")"
+    ;;
   memory-builtin)
+    require_ready hermes
     exec omarchy-launch-floating-terminal-with-presentation hermes memory status
     ;;
   honcho)
+    require_ready hermes
     exec omarchy-launch-floating-terminal-with-presentation hermes memory setup honcho
     ;;
   hindsight)
+    require_ready hermes
     exec omarchy-launch-floating-terminal-with-presentation hermes memory setup hindsight
     ;;
   mcp)
+    require_ready hermes
     exec omarchy-launch-floating-terminal-with-presentation hermes mcp
     ;;
   esac
+}
+
+launch_tool() {
+  [[ $tool == "codex" || $tool == "claude" || $tool == "hermes" ]] || fail "launch accepts codex, claude, or hermes"
+  require_ready "$tool"
+  exec omarchy-launch-floating-terminal-with-presentation "$tool"
+}
+
+check_tool() {
+  [[ $tool == "hermes" ]] || fail "check accepts hermes"
+  jq -n '{schemaVersion: 1, id: "hermes", operational: "unavailable", reasonCode: "check-unavailable"}'
+  exit 2
 }
 
 case "$action" in
@@ -213,6 +584,11 @@ catalog)
   ;;
 status)
   (($# == 2)) || fail "usage: omarchy-setup-ai-tool status TOOL_ID"
+  require_known_tool
+  status_action
+  ;;
+__status)
+  (($# == 2)) && [[ ${OMARCHY_SETUP_AI_STATUS_WORKER:-0} == "1" ]] || fail "internal status worker is unavailable"
   require_known_tool
   status
   ;;
@@ -226,7 +602,17 @@ open)
   require_known_tool
   open_tool
   ;;
+launch)
+  (($# == 2)) || fail "usage: omarchy-setup-ai-tool launch TOOL_ID"
+  require_known_tool
+  launch_tool
+  ;;
+check)
+  (($# == 2)) || fail "usage: omarchy-setup-ai-tool check hermes"
+  require_known_tool
+  check_tool
+  ;;
 *)
-  fail "usage: omarchy-setup-ai-tool <catalog|status|install|open> [TOOL_ID]"
+  fail "usage: omarchy-setup-ai-tool <catalog|status|install|open|launch|check> [TOOL_ID]"
   ;;
 esac
