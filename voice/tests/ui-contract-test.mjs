@@ -63,6 +63,7 @@ assert.match(panel, /model: \["cedar", "marin", "alloy", "ash", "ballad", "coral
 assert.match(panel, /Accessible\.name: "OpenAI Realtime voice"/);
 assert.match(panel, /End the conversation before choosing a different voice/);
 assert.match(panel, /if \(voice\.error\) return "Needs attention"[\s\S]*if \(disabled\) return "Voice is off"/);
+assert.match(panel, /readonly property string orbState: voice\.error \? "error" : \(voice\.state === "listening" && voice\.microphone !== true \? "muted"/);
 assert.match(controller, /signal responseReceived\(var response\)/);
 assert.match(controller, /typeof value\.ok === "boolean"/);
 assert.match(controller, /responseReceived\(value\)/);

@@ -66,6 +66,10 @@ assert_contains branding/scripts/generate-brand-preview 'PRODUCT_LABEL="MASLOW |
 assert_contains branding/scripts/generate-brand-preview '"$OUTPUT_DIR/logo.txt"' "brand preview isolates the terminal candidate in its output directory"
 assert_contains branding/scripts/generate-brand-preview '"$OUTPUT_DIR/icon.txt"' "brand preview isolates the About candidate in its output directory"
 assert_contains branding/scripts/generate-brand-preview 'validate_width "$OUTPUT_DIR/logo.txt" "$TERMINAL_WIDTH"' "brand preview enforces the 100-column terminal contract"
+assert_contains branding/design-tokens.json '"voiceBlueDeep": "#154BA8"' "voice orb deep blue is a canonical brand token"
+assert_contains branding/design-tokens.json '"voiceBlue": "#2875E5"' "voice orb blue is a canonical brand token"
+assert_contains branding/design-tokens.json '"voiceBlueLight": "#93C9FF"' "voice orb light blue is a canonical brand token"
+assert_contains branding/design-tokens.json '"voiceCloud": "#EFF8FF"' "voice orb cloud white is a canonical brand token"
 if "$ROOT/branding/scripts/generate-brand-preview" "$ROOT" >/dev/null 2>&1; then
   fail "brand preview generator accepts a shipping-tree output directory"
 fi

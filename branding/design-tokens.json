@@ -1,7 +1,7 @@
 {
   "$schema": "https://maslow.ai/schemas/brand-tokens.schema.json",
   "name": "maslow-brand-system",
-  "version": "2026.05.27",
+  "version": "2026.09.19",
   "color": {
     "brand": {
       "teal": "#6DC4AD",
@@ -12,7 +12,14 @@
       "purpleLight": "#A070A6",
       "orange": "#F2A23A",
       "orangeAccessible": "#9C5A00",
-      "darkNavy": "#121D35"
+      "darkNavy": "#121D35",
+      "voiceBlueDeep": "#154BA8",
+      "voiceBlue": "#2875E5",
+      "voiceBlueLight": "#93C9FF",
+      "voiceCloud": "#EFF8FF",
+      "voiceOverlay": "#5C9DE7",
+      "voiceMuted": "#17467E",
+      "voiceError": "#7C341A"
     },
     "text": {
       "primary": "#333333",

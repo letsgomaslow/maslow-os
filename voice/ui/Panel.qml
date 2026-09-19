@@ -52,6 +52,7 @@ Item {
   readonly property bool fixedPosition: settings.fixed_position === true
   readonly property bool conversationReady: root.conversationReadiness().ready === true
   readonly property bool disabled: voice.enabled !== true && !conversationReady
+  readonly property string orbState: voice.error ? "error" : (voice.state === "listening" && voice.microphone !== true ? "muted" : String(voice.state || "idle"))
   property bool controllerOpen: false
   property string heldPlacement: "right"
   property int heldDiameter: 56
@@ -429,7 +430,7 @@ Item {
       background: Item {}
       contentItem: VoiceOrb {
         width: orbButton.width - 16; height: width
-        voiceState: String(root.voice.state || "idle")
+        voiceState: root.orbState
         audioLevel: root.voice.level || 0
         disabled: root.disabled
         reducedMotion: root.reducedMotion
