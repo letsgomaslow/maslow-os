@@ -1,6 +1,6 @@
 # Gemini Voice and movable Orb integration
 
-Date: 2026-09-19. Scope: record the functional Lenovo source candidate, the architecture and troubleshooting conclusions reached since the September 16 failure report, the installed local package evidence, and the remaining Voice UX and product acceptance work. This handoff supersedes the September 16 handoff as the current Voice development checkpoint. It does not replace the immutable evidence for older published GPT-Live or Hub artifacts.
+Date: 2026-09-19. Scope: record the functional Lenovo source candidate, the architecture and troubleshooting conclusions reached since the September 16 failure report, the installed local package evidence, the completed source integration, and the remaining Voice UX and product acceptance work. This handoff supersedes the September 16 handoff as the current Voice development checkpoint. It does not replace the immutable evidence for older published GPT-Live or Hub artifacts.
 
 ## Current result
 
@@ -89,9 +89,9 @@ The branch is a cumulative product integration rather than a narrow Orb change. 
 
 ### Delivery and release
 
-1. Merge the runtime pull request to `main` before treating the normal package recipe as buildable, because the recipe fetches Maslow runtime source from `main`.
-2. Merge the coordinated package pull request to `maslow` after the runtime merge. Then rebuild from the exact merged runtime/package commits if a release candidate is authorized.
-3. Do not publish, sign, promote, or describe a stable Maslow package channel from this source integration. Fresh install, installed update/rollback, ISO assembly, and itemized Lenovo acceptance remain separate gates.
+1. Runtime [pull request 12](https://github.com/letsgomaslow/maslow-os/pull/12) merged to `main` as `8a0ac0af156be0b0acb780140da1fb538e228829`.
+2. Package [pull request 3](https://github.com/letsgomaslow/maslow-os-pkgs/pull/3) then merged to `maslow` as `49c5741eceea8de089a901ec9919689daabbc580`.
+3. Rebuild from those exact merged runtime/package commits if a release candidate is authorized. Do not publish, sign, promote, or describe a stable Maslow package channel from this source integration. Fresh install, installed update/rollback, ISO assembly, and itemized Lenovo acceptance remain separate gates.
 
 ## Documentation map and next action
 
