@@ -104,7 +104,7 @@ class LiveKitProviderConstructionTests(LiveKitNoNetworkTest):
             function_call=agents.llm.FunctionCall(call_id="call-" + first.id, name="submit_intent", arguments="{}"))
         result = await provider._agent.submit_intent(context, objective="Fix it", summary="Fix the first project", constraints=[],
             requested_output="A tested fix", tool_preference="auto", unresolved_questions=[])
-        self.assertEqual(result, "SUBMITTED: The work request was submitted for the host to review.")
+        self.assertEqual(result, "SUBMITTED: The work request was submitted to the selected agent.")
         self.assertEqual(submitted, [first.id])
         self.assertEqual([event["turn_id"] for event in events], [first.id, second.id])
         interrupted = SpeechHandle.create()

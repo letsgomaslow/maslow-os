@@ -54,6 +54,7 @@ class LiveKitNativeExpressiveProvider(LiveKitExpressiveProvider):
             self._session.on("conversation_item_added", self._conversation_item)
             self._session.on("error", self._session_error)
             self._session.on("close", self._session_closed)
+            self._session.on("metrics_collected", self._metrics_collected)
             if audio:
                 if self.audio_transport is None:
                     raise ProviderError("Native LiveKit audio transport is unavailable")

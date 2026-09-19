@@ -13,6 +13,7 @@ import secrets as secure_secrets
 from typing import Any
 
 from maslow_voice.audio import PcmFrame, resample_pcm16
+from maslow_voice.errors import VoiceError
 
 from .base import ProviderError, ToolPreference, VoiceProvider
 
@@ -102,6 +103,8 @@ class LiveKitExpressiveProvider(VoiceProvider):
         # status/type only: its diagnostic text can contain endpoints or tokens.
         cause = getattr(error, "error", error)
         status = getattr(cause, "status_code", None)
+        if isinstance(cause, ImportError):
+            return ProviderError("LiveKit Voice support is incomplete. Repair Voice through Hub.", "LOCAL_DEPENDENCY_MISSING")
         if status in {401, 403}:
             return ProviderError("LiveKit denied access. Open Settings and verify the saved project account and inference permissions.", "LIVEKIT_AUTH_FAILED")
         if status in {402, 429}:
@@ -140,7 +143,7 @@ class LiveKitExpressiveProvider(VoiceProvider):
             from livekit import api, rtc
             from livekit import agents
         except ImportError as error:
-            raise ProviderError("LiveKit Voice support is not installed") from error
+            raise ProviderError("LiveKit Voice support is not installed", "LOCAL_DEPENDENCY_MISSING") from error
         return rtc, api, agents
 
     def _settings(self) -> tuple[str, str, str]:
@@ -148,7 +151,7 @@ class LiveKitExpressiveProvider(VoiceProvider):
         key = self.secrets.get("livekit_key", "")
         secret = self.secrets.get("livekit_secret", "")
         if not url or not key or not secret:
-            raise ProviderError("LiveKit project credentials are unavailable")
+            raise ProviderError("LiveKit project setup is incomplete. Open Voice Settings.", "LIVEKIT_SETUP_INCOMPLETE")
         return url, key, secret
 
     def _token(self, api: Any, key: str, secret: str, identity: str) -> str:
@@ -167,6 +170,36 @@ class LiveKitExpressiveProvider(VoiceProvider):
             inference = agents.inference
         except AttributeError as error:
             raise ProviderError("Installed LiveKit Agents version lacks inference support") from error
+        import aiohttp
+        from livekit.plugins import silero
+        # This agent runs inside the desktop daemon, outside LiveKit's job
+        # worker. Its lazy STT/TTS streams therefore need an explicitly owned
+        # HTTP session instead of relying on the worker's context variable.
+        self._http_session = aiohttp.ClientSession()
+        stt = inference.STT(model="deepgram/nova-3", language="en", api_key=key, api_secret=secret,
+                            http_session=self._http_session)
+        self._inference_clients.append(stt)
+        llm = inference.LLM(model="google/gemma-4-31b-it", api_key=key, api_secret=secret)
+        self._inference_clients.append(llm)
+        tts = inference.TTS(model="inworld/inworld-tts-2", voice=str(self.config.get("livekit_voice") or "Ashley"), api_key=key, api_secret=secret,
+                            http_session=self._http_session)
+        self._inference_clients.append(tts)
+        session_options = {
+            "turn_detection": "stt",
+            **self._agent_session_options(),
+        }
+        session = agents.AgentSession(
+            stt=stt,
+            llm=llm,
+            tts=tts,
+            expressive=True,
+            vad=silero.VAD.load(),
+            **session_options,
+        )
+        self._agent = self._create_intent_agent(agents)
+        return session
+
+    def _create_intent_agent(self, agents: Any) -> Any:
         provider = self
         function_tool = agents.function_tool
 
@@ -179,6 +212,7 @@ class LiveKitExpressiveProvider(VoiceProvider):
                     "Never call submit_intent merely to answer the user or speak a response. "
                     "If it is unclear whether the user wants external work, ask one concise clarifying question and do not submit yet. "
                     "Never perform external work, run commands, grant permissions, or use other tools yourself. "
+                    "Preserve an explicitly named Codex, Hermes, or Claude agent in tool_preference; otherwise use auto. "
                     "Only acknowledge submission after submit_intent returns SUBMITTED. "
                     "If it returns NOT_SUBMITTED, clearly say no work was submitted or started and ask the user to clarify."
                 ))
@@ -214,10 +248,10 @@ class LiveKitExpressiveProvider(VoiceProvider):
                 Use this only when the user asks for work outside the conversation. Do not use it for ordinary conversation, questions, advice, explanations, or requests to say or speak an answer. Ask a clarifying question instead when the boundary is ambiguous.
                 """
                 try:
-                    turn_id = provider._tool_turns.pop(context.function_call.call_id, None)
+                    turn_id = await provider._intent_turn(context)
                     if not turn_id or context.speech_handle.interrupted:
                         raise ProviderError("This conversation turn has ended. Please repeat the request.")
-                    await provider._submit_intent({
+                    result = await provider._submit_intent({
                         "objective": objective,
                         "summary": summary,
                         "constraints": constraints,
@@ -225,7 +259,13 @@ class LiveKitExpressiveProvider(VoiceProvider):
                         "tool_preference": tool_preference,
                         "unresolved_questions": unresolved_questions,
                     }, turn_id)
-                    return "SUBMITTED: The work request was submitted for the host to review."
+                    if result.get("state") == "proposed":
+                        return "SUBMITTED: The task proposal is waiting for the user to review and start. No work has started."
+                    return "SUBMITTED: The work request was submitted to " + str(result.get("selected_agent") or "the selected agent") + "."
+                except VoiceError as error:
+                    await provider._event({"type": "task_error", "code": error.code, "message": error.message})
+                    detail = error.message if error.code != "VOICE_PROVIDER_ERROR" else "Ask the user to clarify the request."
+                    return "NOT_SUBMITTED: No work was submitted or started. " + detail
                 except Exception:
                     return "NOT_SUBMITTED: No work was submitted or started. Ask the user to clarify the request."
 
@@ -239,39 +279,27 @@ class LiveKitExpressiveProvider(VoiceProvider):
         if hasattr(IntentAgent.submit_intent, "__annotate__"):
             IntentAgent.submit_intent.__annotate__ = lambda _format=1: dict(annotations)
         IntentAgent.submit_intent = function_tool(IntentAgent.submit_intent)
-        import aiohttp
-        from livekit.plugins import silero
-        # This agent runs inside the desktop daemon, outside LiveKit's job
-        # worker. Its lazy STT/TTS streams therefore need an explicitly owned
-        # HTTP session instead of relying on the worker's context variable.
-        self._http_session = aiohttp.ClientSession()
-        stt = inference.STT(model="deepgram/nova-3", language="en", api_key=key, api_secret=secret,
-                            http_session=self._http_session)
-        self._inference_clients.append(stt)
-        llm = inference.LLM(model="google/gemma-4-31b-it", api_key=key, api_secret=secret)
-        self._inference_clients.append(llm)
-        tts = inference.TTS(model="inworld/inworld-tts-2", voice=str(self.config.get("livekit_voice") or "Ashley"), api_key=key, api_secret=secret,
-                            http_session=self._http_session)
-        self._inference_clients.append(tts)
-        session_options = {
-            "turn_detection": "stt",
-            **self._agent_session_options(),
-        }
-        session = agents.AgentSession(
-            stt=stt,
-            llm=llm,
-            tts=tts,
-            expressive=True,
-            vad=silero.VAD.load(),
-            **session_options,
-        )
-        self._agent = IntentAgent()
-        return session
+        return IntentAgent()
+
+    async def _intent_turn(self, context: Any) -> str | None:
+        return self._tool_turns.pop(context.function_call.call_id, None)
 
     def _agent_session_options(self) -> dict[str, Any]:
         """Optional SDK constructor options for a specialised local transport."""
 
         return {}
+
+    def _metrics_collected(self, event):
+        metrics = event.metrics
+        usage = {}
+        for source, target in (("input_tokens", "input_tokens"), ("prompt_tokens", "input_tokens"),
+                               ("output_tokens", "output_tokens"), ("completion_tokens", "output_tokens"),
+                               ("total_tokens", "total_tokens")):
+            value = getattr(metrics, source, None)
+            if type(value) in {int, float} and value >= 0:
+                usage[target] = value
+        if usage:
+            self._queue_event({"type": "metrics", "usage": usage})
 
     def _queue_event(self, event):
         task = asyncio.create_task(self._event(event))

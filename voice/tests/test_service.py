@@ -407,6 +407,39 @@ class ServiceTests(unittest.IsolatedAsyncioTestCase):
             await provider.submit(brief, "turn-Fix first")
         self.assertEqual(len(self.service.store.list()), 1)
 
+    async def test_active_projectless_conversation_accepts_first_project_and_clears_resolved_error(self):
+        await self.service.dispatch({"action": "submit_text", "text": "Hello"})
+        provider = self.service.provider
+        await self.service.provider_event({"type": "task_error", "code": "PROJECT_REQUIRED", "message": "Choose a project."})
+        self.assertEqual(self.service.voice["task_error"]["code"], "PROJECT_REQUIRED")
+        await self.service.dispatch({"action": "submit_text", "text": "Create the page", "project": str(self.project)})
+        self.assertIs(self.service.provider, provider)
+        self.assertEqual(self.service.project, str(self.project.resolve()))
+        self.assertNotIn("task_error", self.service.voice)
+        self.assertEqual(self.service.turns["turn-Hello"]["project"], "")
+        self.assertEqual(self.service.turns["turn-Create the page"]["project"], str(self.project.resolve()))
+        other = self.root / "other"
+        other.mkdir()
+        with self.assertRaises(VoiceError) as caught:
+            await self.service.dispatch({"action": "submit_text", "text": "Change project", "project": str(other)})
+        self.assertEqual(caught.exception.code, "SESSION_PROJECT_FIXED")
+        self.assertIs(self.service.provider, provider)
+
+    async def test_task_error_survives_current_failure_but_clears_on_success_and_session_end(self):
+        await self.service.dispatch({"action": "submit_text", "text": "Create a page", "project": str(self.project)})
+        failure = {"type": "task_error", "code": "AGENT_UNAVAILABLE", "message": "Finish agent setup."}
+        await self.service.provider_event(failure)
+        await self.service.provider_event({"type": "level", "level": 0.2})
+        self.assertEqual(self.service.voice["task_error"]["code"], "AGENT_UNAVAILABLE")
+        await self.service.submit_intent({"objective": "Create a page", "summary": "Create the page."}, "turn-Create a page")
+        self.assertNotIn("task_error", self.service.voice)
+        await self.service.provider_event(failure)
+        await self.service.end_voice()
+        self.assertNotIn("task_error", self.service.voice)
+        self.service.voice["task_error"] = {"code": "PROJECT_REQUIRED", "message": "old failure"}
+        await self.service.dispatch({"action": "submit_text", "text": "New session"})
+        self.assertNotIn("task_error", self.service.voice)
+
     async def test_active_conversation_cannot_switch_project_for_pending_intent(self):
         await self.service.dispatch({"action": "submit_text", "text": "Fix first", "project": str(self.project)})
         other = self.root / "other"

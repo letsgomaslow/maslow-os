@@ -14,6 +14,7 @@ from maslow_voice.errors import VoiceError
 
 from .base import VoiceProvider
 from .livekit_expressive import LiveKitExpressiveProvider
+from .livekit_gemini import LiveKitGeminiProvider
 from .livekit_native import LiveKitNativeExpressiveProvider
 from .local import LocalProvider
 from .openai_live import OpenAILiveProvider
@@ -45,6 +46,8 @@ def create_provider(
         "submit": submit,
         "audio_transport": audio_transport,
     }
+    if mode == "gemini_live":
+        return LiveKitGeminiProvider(**common)
     if mode == "livekit":
         return LiveKitNativeExpressiveProvider(**common)
     if mode == "openai":

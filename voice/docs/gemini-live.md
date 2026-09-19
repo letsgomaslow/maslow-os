@@ -1,0 +1,25 @@
+# Gemini Live and Voice Lab
+
+New installations select `gemini_live`, model `gemini-3.8-live`, voice `Puck`, task policy `lab_auto`, and automatic agent selection. Existing saved provider choices remain intact. `livekit` continues to select the Deepgram/Gemma/Inworld Expressive pipeline, and `gpt_live` remains selectable.
+
+Gemini uses LiveKit Agents 1.8.2 and its Google plugin with native local microphone/speaker endpoints. The inference connection goes directly to the Google Gemini Live API using the Secret Service account `google`. This mode does not join a LiveKit room or send its LiveKit project credentials to Google. The setup action accepts a Google account alone and can also save a LiveKit project for optional Expressive use. Readiness reports the conversation account separately from task-agent setup.
+
+The `configure_gemini_live` IPC action accepts `url`, `api_key`, `api_secret`, and `google_api_key`. The Google key is required unless already saved. An entirely blank LiveKit URL/key/secret trio preserves the optional Expressive setup without reading or writing its keyring entries. If any LiveKit value is supplied, saved values may fill blank fields, but the resulting project URL/key/secret must be complete. The action validates the requested setup before stopping a session, saves account values through Secret Service, writes non-secret settings atomically, and restores prior credential values on save failure or cancellation. A blank URL never deletes a saved LiveKit URL. Its success response is `{"gemini_live_saved": true}`; credentials are absent from settings, snapshots, task prompts and audit records. A saved account indicates configuration, not a completed live authentication test.
+
+The Gemini provider explicitly enables audio responses and both input/output transcription, using Gemini's native turn detector. It reuses native playback, mute, interruption and cleanup. The provider wraps the SDK's public generation stream to bind each tool call to that generation's final user transcript before submission. A later turn cannot replace an earlier task's source. Calls without a final transcript fail closed. The real optional SDK regression tests exercise this ordering and Python 3.14 tool-schema construction.
+
+Gemini 3.8 Live does not accept `thinking_config` or `thinking_level`, so the implementation omits them. This corrects the original plan's proposed `minimal` setting using [Google's model compatibility guidance](https://ai.google.dev/gemini-api/docs/live-api/thinking). Gemini model or account failure remains visible; there is no automatic provider fallback.
+
+In `lab_auto`, an explicit external-work request becomes a validated task and starts the selected ready agent. Spoken preferences for Codex, Hermes or Claude take priority. Automatic routing considers the configured default, then Codex, Hermes and Claude. The selected agent and reason are persisted. Direct Codex/Claude runs retain their existing permission/approval behavior; after a daemon restart an unproven active direct run becomes interrupted and is never automatically submitted again.
+
+In `review`, the durable task stays `proposed` until `task_action` with `operation: "start"` explicitly starts it. Restart recovery leaves proposals untouched. Starting rechecks the recorded agent's availability without silently choosing a different agent. Cancellation can dismiss execution before it starts. Project selection is required only when a task is delegated. A task setup failure is reported in `voice.task_error` without disconnecting an otherwise usable conversation.
+
+Conversation inactivity advances on a completed assistant transcript or completed speaking turn. Raw microphone levels and nearby user transcripts cannot keep a session alive. Desktop lock ends capture, and a hard 30-minute limit applies even during speaking.
+
+`voice-audit.jsonl` records session provider/model, connection/session duration, provider token usage when supplied, selected task agent and safe error codes. It excludes audio, conversation text, credentials and raw SDK diagnostics. Storage is private and bounded to two approximately 2 MiB files. These measurements support subsequent acceptance; they do not establish measured provider cost, physical first-audible latency or Lenovo acoustic performance.
+
+## Verification
+
+Run the complete Python suite in the hash-checked Python 3.14 environment with `PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=voice python -m unittest discover -s voice/tests -p 'test_*.py'`. `test_gemini_live.py` covers real Google plugin construction/events/schema, Google-only native settings, combined setup rollback, idle/hard-limit behavior, initial ready status and review policy. Existing native audio tests cover mute, buffer invalidation, playback interruption and cleanup shared by Gemini.
+
+Account-authenticated conversations, the 20-turn latency script, continuous hardware audio, lock behavior in the running Lenovo session, selected-agent artifact creation, GPT-Live comparison and package rollback remain separate acceptance gates. Passing local tests does not satisfy those gates or authorize stable publication.

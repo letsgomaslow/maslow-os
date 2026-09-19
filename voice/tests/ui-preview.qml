@@ -16,9 +16,9 @@ ShellRoot {
     Component.onCompleted: voiceController.setFixture({
       schemaVersion: 1,
       voice: { enabled: false, state: "disabled", microphone: false, speaking: false, level: 0, error: "" },
-      settings: { mode: "livekit", livekit_url: "wss://your-project.livekit.cloud", livekit_voice: "Ashley", realtime_voice: "cedar", live_voice: "marin", server_kind: "ollama", server_url: "http://127.0.0.1:11434", model: "qwen3:8b", default_coder: "codex", reduced_motion: false, fixed_position: false, display: "", ollama_models: "/home/maslow/.ollama/models", speech_directory: "/home/maslow/.local/share/maslow-voice/speech" },
+      settings: { mode: "gemini_live", livekit_url: "wss://your-project.livekit.cloud", gemini_live_model: "gemini-3.8-live", gemini_live_voice: "Puck", livekit_voice: "Ashley", realtime_voice: "cedar", live_voice: "marin", server_kind: "ollama", server_url: "http://127.0.0.1:11434", model: "qwen3:8b", default_coder: "auto", task_policy: "lab_auto", reduced_motion: false, fixed_position: false, display: "", ollama_models: "/home/maslow/.ollama/models", speech_directory: "/home/maslow/.local/share/maslow-voice/speech" },
       tasks: [], session: { id: "fixture", transcript: [] },
-      readiness: { ready: true, checks: [{ name: "Speech models", ok: true, message: "Available on this computer." }], models: [{ id: "qwen3:8b", label: "Qwen 3 · 8B" }] }
+      readiness: { ready: true, checks: [{ name: "Speech models", ok: true, message: "Available on this computer." }], conversation: { ready: true, checks: [{ name: "Maslow Voice connection", ok: true, message: "Available on this computer." }] }, tasks: { ready: true, checks: [{ name: "Automatic routing", ok: true, message: "A coding agent will be selected for each task." }] }, models: [{ id: "qwen3:8b", label: "Qwen 3 · 8B" }] }
     })
   }
   Timer {
@@ -41,6 +41,7 @@ ShellRoot {
     target: "voice-fixture"
     function page(value: string): void { panel.open(JSON.stringify({ page: value })) }
     function close(): void { panel.close() }
+    function compact(): void { panel.compactControlsOpen = true }
     function state(value: string): void {
       var next = JSON.parse(JSON.stringify(panel.voiceController.snapshot))
       next.voice.state = value
@@ -58,6 +59,11 @@ ShellRoot {
     function tasks(): void {
       var next = JSON.parse(JSON.stringify(panel.voiceController.snapshot))
       next.tasks = [{ id: "fixture", title: "Update the welcome screen", state: "completed", mode: "offline", result: "The welcome copy is ready for your review.", export_review: { digest: "fixture-digest", changes: [{ path: "README.md", action: "modify" }, { path: "welcome.txt", action: "add" }] } }, { id: "approval", title: "Publish the reviewed update", state: "awaiting_approval", mode: "server", approval: { request_id: "fixture-approval", action: "Publish changes", destination: "Project repository", detail: "Push the reviewed welcome copy to the project branch." } }]
+      panel.voiceController.setFixture(next)
+    }
+    function taskError(code: string, message: string): void {
+      var next = JSON.parse(JSON.stringify(panel.voiceController.snapshot))
+      next.voice.task_error = { code: code, message: message }
       panel.voiceController.setFixture(next)
     }
     function stressPrepare(): void {
@@ -106,7 +112,7 @@ ShellRoot {
     function requests(): string { return JSON.stringify(panel.voiceController.fixtureRequests) }
     function setupSaved(): void { panel.voiceController.applyLine('{"ok":true,"livekit_saved":true}') }
     function setupError(): void { panel.voiceController.applyLine('{"ok":false,"error":{"message":"LiveKit setup could not be saved. Check the project URL and try again."}}') }
-    function status(): string { return JSON.stringify({ placement: panel.heldPlacement, diameter: panel.heldDiameter, desired: panel.desiredPlacement, controllerOpen: panel.controllerOpen, state: panel.voice.state }) }
+    function status(): string { return JSON.stringify({ placement: panel.heldPlacement, diameter: panel.heldDiameter, desired: panel.desiredPlacement, controllerOpen: panel.controllerOpen, compactControlsOpen: panel.compactControlsOpen, state: panel.voice.state }) }
     function stressStatus(): string { return JSON.stringify({ taskDelegateCreations: panel.taskDelegateCreations, transcriptDelegateCreations: panel.transcriptDelegateCreations, meterFramesRemaining: meterFramesRemaining, meterLevel: panel.voice.level, taskApproval: panel.tasks[0] ? panel.tasks[0].approval.detail : "", captions: panel.transcript.length }) }
   }
 }

@@ -11,7 +11,7 @@ from .config import private_directory
 from .errors import VoiceError
 
 TERMINAL = {"completed", "failed", "cancelled", "interrupted"}
-STATES = TERMINAL | {"queued", "submitting", "accepted", "running", "waiting_input", "awaiting_approval", "stopping"}
+STATES = TERMINAL | {"proposed", "queued", "submitting", "accepted", "running", "waiting_input", "awaiting_approval", "stopping"}
 
 
 class TaskStore:
@@ -50,8 +50,9 @@ class TaskStore:
             task_id = str(uuid.uuid4())
             now = time.time()
             data = dict(payload, id=task_id, request_id=request_id, title=brief["objective"][:160], summary=brief["summary"],
-                        state="queued", run_id=None, session_id=None, owner="Hermes", children=[], result="", error=None,
-                        approval=None, dismissed=False, created_at=now, updated_at=now, attempt=0)
+                        state="queued", run_id=None, session_id=None, owner="Maslow", children=[], result="", error=None,
+                        approval=None, dismissed=False, selected_agent=None, routing_reason="",
+                        created_at=now, updated_at=now, attempt=0)
             self.db.execute("INSERT INTO tasks VALUES (?,?,?,?,?,?)", (task_id, request_id, fingerprint, "queued", json.dumps(data), now))
             self._event(task_id, "queued", {"state": "queued"})
             self.db.execute("COMMIT")

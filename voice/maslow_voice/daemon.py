@@ -13,6 +13,7 @@ import uuid
 from pathlib import Path
 
 from .audio import PortAudioTransport
+from .audit import SessionAudit
 from .config import Settings, atomic_json, private_directory, runtime_directory, validate_settings
 from .coordinator import HermesRuntime, hermes_configuration
 from .hermes import HermesClient
@@ -31,6 +32,7 @@ class VoiceService:
                  audio_transport_factory=PortAudioTransport, live_planner=None):
         self.settings = Settings(directory)
         self.directory = self.settings.directory
+        self.audit = SessionAudit(self.directory)
         self.runtime = private_directory(Path(runtime)) if runtime else runtime_directory()
         self.credentials = credentials or Credentials()
         self.store = TaskStore(self.directory)
@@ -52,6 +54,7 @@ class VoiceService:
         self.live_delegations = {}
         self.provider_epoch = None
         self.last_activity = time.monotonic()
+        self.session_started = self.last_activity
         self.lifecycle_lock = asyncio.Lock()
         self.configuration_lock = asyncio.Lock()
         self.turn_lock = asyncio.Lock()
@@ -135,8 +138,15 @@ class VoiceService:
     async def provider_event(self, event):
         kind = event.get("type")
         if kind == "voice_state":
+            if self.voice["speaking"] and event.get("state") == "listening":
+                self.last_activity = time.monotonic()
             self.voice.update(state=event["state"], microphone=bool(event.get("microphone")), speaking=bool(event.get("speaking")))
+        elif kind == "metrics":
+            self.audit.record("usage", session_id=self.session["id"], provider=self.settings.value["mode"], **event.get("usage", {}))
+        elif kind == "task_error":
+            self.voice["task_error"] = {"code": event.get("code"), "message": str(event.get("message", "Task needs setup."))[:300]}
         elif kind == "error":
+            self.audit.record("error", session_id=self.session["id"], provider=self.settings.value["mode"], code=event.get("code"))
             self.voice.update(error=str(event.get("message", "Voice needs attention."))[:300], microphone=False)
             # A failed connection must release physical capture immediately.
             if self.provider:
@@ -150,8 +160,6 @@ class VoiceService:
         elif kind == "level":
             level = max(0, min(float(event.get("level", 0)), 1))
             self.voice["level"] = level
-            if level > 0.02:
-                self.last_activity = time.monotonic()
             self.queue_level_publish()
             return
         elif kind == "transcript":
@@ -166,16 +174,18 @@ class VoiceService:
             else:
                 transcript.append({"role": role, "text": text, "partial": not bool(event.get("final", True))})
             self.session["transcript"] = transcript[-100:]
+            if role == "assistant" and event.get("final", True):
+                self.last_activity = time.monotonic()
             if role == "user" and event.get("final", True):
                 identity = event.get("turn_id")
                 if isinstance(identity, str) and 0 < len(identity) <= 200 and identity not in self.turns:
                     self.turns[identity] = {"source": text, "project": self.project, "mode": self.settings.value["mode"],
                                             "context": self.context, "session_id": self.session["id"],
-                                            "preferred_coder": self.settings.value["default_coder"]}
+                                            "preferred_coder": self.settings.value["default_coder"],
+                                            "task_policy": self.settings.value["task_policy"]}
                     if len(self.turns) > 100:
                         self.turns.pop(next(iter(self.turns)))
                 self.source, self.turn_id = text, identity or ""
-                self.last_activity = time.monotonic()
         elif kind == "transcript_delta":
             role = "user" if event.get("role") == "user" else "assistant"
             raw_delta = event.get("delta")
@@ -188,7 +198,8 @@ class VoiceService:
                 else:
                     transcript.append({"role": role, "text": delta, "partial": True})
                 self.session["transcript"] = transcript[-100:]
-                self.last_activity = time.monotonic()
+        elif kind == "turn_complete":
+            self.last_activity = time.monotonic()
         elif kind == "delegation" and self.settings.value["mode"] == "gpt_live":
             identity = event.get("delegation_id")
             if isinstance(identity, str) and identity and identity not in self.live_delegations:
@@ -217,9 +228,11 @@ class VoiceService:
             transcript, context=context, preferred_coder=preferred_coder, active_tasks=active), 5)
         if plan["action"] == "new":
             request_id = live_request_id(session_id, delegation_id, plan["source"])
-            task = await self.tasks.submit(request_id, plan["brief"], project, "gpt_live", plan["source"], preferred_coder)
+            task = await self.tasks.submit(request_id, plan["brief"], project, "gpt_live", plan["source"], preferred_coder,
+                                           policy=self.settings.value["task_policy"])
         else:
             task = await self.tasks.action(plan["task_id"], plan["action"], plan.get("text", ""))
+        self.voice.pop("task_error", None)
         return task, plan["action"]
 
     async def _handle_live_delegation(self, provider, epoch, delegation_id, offset_ms, untimed_through):
@@ -288,13 +301,17 @@ class VoiceService:
         fingerprint = hashlib.sha256(json.dumps(brief, sort_keys=True).encode()).hexdigest()[:24]
         request_id = turn["session_id"] + ":" + turn_id + ":" + fingerprint
         original = turn["source"] + ("\nExplicit user context:\n" + turn["context"] if turn["context"] else "")
-        task = await self.tasks.submit(request_id, brief, turn["project"], turn["mode"], original, turn["preferred_coder"])
-        return {"id": task["id"], "state": task["state"], "title": task["title"], "owner": "Hermes"}
+        task = await self.tasks.submit(request_id, brief, turn["project"], turn["mode"], original, turn["preferred_coder"],
+                                       policy=turn.get("task_policy", "lab_auto"))
+        self.voice.pop("task_error", None)
+        self.audit.record("task", session_id=self.session["id"], task_id=task["id"], selected_agent=task.get("selected_agent"), state=task["state"])
+        return {"id": task["id"], "state": task["state"], "title": task["title"], "owner": task["owner"],
+                "selected_agent": task.get("selected_agent", task.get("preferred_coder", "auto"))}
 
     async def selected_secrets(self):
         mode = self.settings.value["mode"]
         names = {"offline": [], "server": ["server_token"], "openai": ["openai"], "gpt_live": ["openai"],
-                 "livekit": ["livekit_key", "livekit_secret"]}[mode]
+                 "livekit": ["livekit_key", "livekit_secret"], "gemini_live": ["google"]}[mode]
         return {name: await self.credentials.get(name) for name in names}
 
     async def offline_runtime(self, project=None):
@@ -318,6 +335,15 @@ class VoiceService:
         await self.offline.open_display()
         await self.offline.start(project=project)
         return self.offline
+
+    async def hermes_ready(self, task):
+        if not shutil.which("hermes"):
+            return False
+        try:
+            await self.hermes.model_config(task["mode"])
+            return True
+        except VoiceError:
+            return False
 
     async def executor_client(self, task):
         if task["mode"] == "offline":
@@ -357,6 +383,8 @@ class VoiceService:
                     self.project = str(path.resolve())
                 self.context = text_field(context, "context", 12000)
                 epoch = self.provider_epoch = object()
+                connecting_started = time.monotonic()
+                self.voice.pop("task_error", None)
                 self.voice.update(error="", state="connecting", enabled=audio, microphone=False, speaking=False)
                 await self.publish()
                 config = dict(self.settings.value)
@@ -392,7 +420,10 @@ class VoiceService:
                 await provider.start(audio=audio)
                 if self.provider_epoch is not epoch:
                     raise asyncio.CancelledError()
-                self.last_activity = time.monotonic()
+                self.session_started = self.last_activity = time.monotonic()
+                model = config.get("gemini_live_model") if config["mode"] == "gemini_live" else config.get("realtime_model") if config["mode"] == "openai" else config.get("model", "")
+                self.audit.record("session_started", session_id=self.session["id"], provider=config["mode"], model=model,
+                                  elapsed_ms=round((self.session_started - connecting_started) * 1000))
                 await self.publish()
             except BaseException:
                 if epoch is not None and self.provider_epoch is epoch:
@@ -408,6 +439,9 @@ class VoiceService:
         self.live_transcript.clear()
         self.live_delegations.clear()
         provider, self.provider = self.provider, None
+        if provider is not None:
+            self.audit.record("session_ended", session_id=self.session["id"], provider=self.settings.value["mode"],
+                              elapsed_ms=round((time.monotonic() - self.session_started) * 1000))
         self.voice.update(enabled=False, state="disabled", microphone=False, speaking=False, level=0)
         if provider:
             self.provider_cleanup = self.background(self._release_provider(provider))
@@ -449,6 +483,7 @@ class VoiceService:
             if task is not current and not task.done():
                 task.cancel()
         self.voice.update(enabled=False, state="disabled", microphone=False, speaking=False, level=0)
+        self.voice.pop("task_error", None)
         if not preserve_error:
             self.voice["error"] = ""
         self.session = {"id": str(uuid.uuid4()), "transcript": []}
@@ -459,42 +494,37 @@ class VoiceService:
 
     async def check_readiness(self, discover=False):
         config = self.settings.value
-        if config["mode"] == "gpt_live":
+        if config["mode"] in {"gpt_live", "gemini_live"}:
             conversation_checks, task_checks = [], []
-            key = (await self.selected_secrets()).get("openai", "")
-            conversation_checks.append({"name": "GPT-Live account", "ok": bool(key),
-                "message": "The OpenAI credential is saved in the desktop keyring. Start talking to test the real session."})
-            hermes_ready = bool(shutil.which("hermes"))
-            task_checks.append({"name": "Hermes coordinator", "ok": hermes_ready,
-                "message": "Install Hermes through Hub for durable task handoff."})
-            if hermes_ready:
+            gemini = config["mode"] == "gemini_live"
+            try:
+                key = (await self.selected_secrets()).get("google" if gemini else "openai", "")
+                account_message = "The account is saved in the desktop keyring. Start talking to test the real session." if key else "Connect the selected conversation account in Voice Settings."
+            except VoiceError as error:
+                key, account_message = "", error.message
+            conversation_checks.append({"name": "Google AI Studio account" if gemini else "GPT-Live account", "ok": bool(key),
+                                        "message": account_message})
+            if gemini:
                 try:
-                    await self.hermes.model_config("gpt_live")
-                    model_ready, model_message = True, "The selected native Hermes inference profile is configured."
-                except VoiceError as error:
-                    model_ready, model_message = False, error.message
-            else:
-                model_ready, model_message = False, "Configure Hermes after it is installed."
-            task_checks.append({"name": "Hermes inference", "ok": model_ready, "message": model_message})
-            coder = config["default_coder"]
-            if coder == "codex":
-                selected_ready = bool(shutil.which("codex"))
-                selected_message = "Codex is installed; its connection is checked when the task starts." if selected_ready else "Install or repair Codex before selecting it for GPT-Live tasks."
-            elif coder == "claude":
-                try:
-                    __import__("claude_agent_sdk")
-                    sdk_ready = True
+                    from livekit.plugins import google
+                    dependency_ready = True
                 except ImportError:
-                    sdk_ready = False
-                selected_ready = bool(sdk_ready and await self.credentials.get("anthropic"))
-                selected_message = "Claude is configured; its connection is checked when the task starts." if selected_ready else "Install the Claude SDK and connect its account before selecting Claude."
-            else:
-                selected_ready = hermes_ready and model_ready
-                selected_message = "Hermes will execute the task directly." if selected_ready else "Finish the Hermes setup before selecting it for GPT-Live tasks."
-            task_checks.append({"name": "Selected task agent", "ok": selected_ready, "message": selected_message})
+                    dependency_ready = False
+                conversation_checks.append({"name": "Gemini runtime", "ok": dependency_ready,
+                    "message": "Gemini native audio support is installed." if dependency_ready else "Repair Voice through Hub to install Gemini support."})
+            from .execution import ExecutionManager
+            execution = self.execution or ExecutionManager(self.store, self.publish, settings=self.settings, credentials=self.credentials,
+                                                            offline_runtime_factory=self.offline_runtime)
+            agents = await execution.readiness({"mode": config["mode"]})
+            agents["hermes"] = {"ready": await self.hermes_ready({"mode": config["mode"]}),
+                                "message": "Install and configure Hermes through Hub for Hermes tasks."}
+            coder = config["default_coder"]
+            selected_ready = any(check["ready"] for check in agents.values()) if coder == "auto" else agents[coder]["ready"]
+            task_checks.append({"name": "Task agent", "ok": selected_ready,
+                "message": "An agent is configured; authentication and permissions are checked at task start." if selected_ready else "Set up the selected task agent through Hub. Conversation is available independently."})
             conversation_ready = all(check["ok"] for check in conversation_checks)
             tasks_ready = all(check["ok"] for check in task_checks)
-            self.readiness = {"ready": conversation_ready and tasks_ready, "checks": conversation_checks + task_checks, "models": [],
+            self.readiness = {"ready": conversation_ready, "checks": conversation_checks + task_checks, "models": [],
                               "conversation": {"ready": conversation_ready, "checks": conversation_checks},
                               "tasks": {"ready": tasks_ready, "checks": task_checks}}
             await self.publish()
@@ -541,12 +571,17 @@ class VoiceService:
                 await self.offline.stop()
                 self.offline = None
                 self.offline_clients.clear()
-        self.readiness = {"ready": bool(checks) and all(check["ok"] for check in checks), "checks": checks, "models": models}
+        task_checks = [check for check in checks if check["name"] == "Hermes coordinator"]
+        conversation_checks = [check for check in checks if check not in task_checks]
+        conversation_ready = bool(conversation_checks) and all(check["ok"] for check in conversation_checks)
+        self.readiness = {"ready": conversation_ready, "checks": checks, "models": models,
+                          "conversation": {"ready": conversation_ready, "checks": conversation_checks},
+                          "tasks": {"ready": bool(task_checks) and all(check["ok"] for check in task_checks), "checks": task_checks}}
         await self.publish()
         return {"readiness": self.readiness}
 
     async def dispatch(self, request):
-        if request.get("action") in {"configure", "configure_livekit", "credential"}:
+        if request.get("action") in {"configure", "configure_livekit", "configure_gemini_live", "credential"}:
             async with self.configuration_lock:
                 return await self._dispatch(request)
         if request.get("action") not in {"start_voice", "submit_text"}:
@@ -571,16 +606,19 @@ class VoiceService:
         allowed = {
             "status": set(), "configure": {"settings"}, "credential": {"name", "value"}, "test": set(), "models": set(),
             "configure_livekit": {"url", "api_key", "api_secret"},
+            "configure_gemini_live": {"url", "api_key", "api_secret", "google_api_key"},
             "download_speech": set(), "start_voice": {"project", "context"}, "end_voice": set(), "mute": {"muted"},
             "silence": set(), "submit_text": {"text", "project", "context"},
-            "task_action": {"id", "operation", "text", "approval_id", "child_id", "review_id", "paths"},
+            "task_action": {"id", "task_id", "operation", "text", "approval_id", "child_id", "review_id", "paths"},
         }
         if action not in allowed or set(request) - allowed[action] - {"action"}:
             raise VoiceError("INVALID_REQUEST", "That Voice action or field is not supported.")
         if action == "status":
+            if not self.readiness.get("checks") and self.settings.value["mode"] in {"gemini_live", "gpt_live", "livekit", "openai"}:
+                await self.check_readiness()
             return {"snapshot": self.snapshot()}
-        if action == "configure_livekit":
-            return await self.configure_livekit(request)
+        if action in {"configure_livekit", "configure_gemini_live"}:
+            return await self.configure_livekit(request, gemini=action == "configure_gemini_live")
         if action == "configure":
             changes = request.get("settings", {})
             if not isinstance(changes, dict):
@@ -596,8 +634,12 @@ class VoiceService:
                     self.offline_clients.clear()
             self.settings.update(changes)
             self.readiness = {"ready": False, "checks": [], "models": []}
+            if self.settings.value["mode"] in {"gemini_live", "gpt_live", "livekit", "openai"}:
+                await self.check_readiness()
         elif action == "credential":
             await self.credentials.set(request.get("name"), request.get("value"))
+            if self.settings.value["mode"] in {"gemini_live", "gpt_live", "livekit", "openai"}:
+                await self.check_readiness()
         elif action in {"test", "models"}:
             return await self.check_readiness(discover=action == "models")
         elif action == "download_speech":
@@ -656,14 +698,20 @@ class VoiceService:
                         path = Path(request["project"]).expanduser()
                         if not path.is_absolute() or not path.is_dir():
                             raise VoiceError("PROJECT_REQUIRED", "Choose an existing project folder.")
-                        if str(path.resolve()) != self.project:
+                        resolved = str(path.resolve())
+                        if self.project and resolved != self.project:
                             raise VoiceError("SESSION_PROJECT_FIXED", "End this conversation before choosing a different project.")
+                        self.project = resolved
+                        if (self.voice.get("task_error") or {}).get("code") == "PROJECT_REQUIRED":
+                            self.voice.pop("task_error", None)
                     context = text_field(request.get("context", self.context), "context", 12000)
                     if context != self.context:
                         raise VoiceError("SESSION_CONTEXT_FIXED", "End this conversation before changing its context.")
                 await self.provider.text(text, self.context)
         elif action == "task_action":
-            task = self.store.get(request.get("id"))
+            if request.get("id") and request.get("task_id") and request["id"] != request["task_id"]:
+                raise VoiceError("INVALID_REQUEST", "The task action has conflicting task identities.")
+            task = self.store.get(request.get("id") or request.get("task_id"))
             operation = request.get("operation")
             approval = task.get("approval") or {}
             if operation in {"approve", "deny"} and approval.get("owner") == "child":
@@ -693,16 +741,29 @@ class VoiceService:
         await self.publish()
         return {}
 
-    async def configure_livekit(self, request):
-        """Save one complete connection, retaining blank credential fields."""
+    async def configure_livekit(self, request, *, gemini=False):
+        """Save Google and/or Expressive setup, retaining blank account fields."""
         if self.store.active():
             raise VoiceError("TASKS_ACTIVE", "Finish or stop current tasks before changing their execution connection.")
-        url = request.get("url")
-        if not isinstance(url, str) or not url.strip():
+        url = request.get("url", "" if gemini else None)
+        if not isinstance(url, str) or (not gemini and not url.strip()):
             raise VoiceError("INVALID_ENDPOINT", "Enter your LiveKit project URL.")
-        changes = {"mode": "livekit", "livekit_url": url.strip()}
+        livekit = {"livekit_key": request.get("api_key", ""), "livekit_secret": request.get("api_secret", "")}
+        if not all(isinstance(value, str) for value in livekit.values()):
+            raise VoiceError("INVALID_CREDENTIAL", "Enter an account credential or leave it blank to keep the saved value.")
+        # An untouched optional Expressive setup is independent of Google.
+        # Do not even read its keyring entries when all three fields are blank.
+        configure_project = not gemini or bool(url.strip() or any(value.strip() for value in livekit.values()))
+        changes = {"mode": "gemini_live" if gemini else "livekit"}
+        supplied = dict(livekit) if configure_project else {}
+        if configure_project:
+            project_url = url.strip() or self.settings.value["livekit_url"]
+            if not project_url:
+                raise VoiceError("LIVEKIT_SETUP_INCOMPLETE", "Complete the optional LiveKit URL, API key and API secret, or leave all three blank.")
+            changes["livekit_url"] = project_url
         validate_settings(dict(self.settings.value, **changes))
-        supplied = {"livekit_key": request.get("api_key", ""), "livekit_secret": request.get("api_secret", "")}
+        if gemini:
+            supplied["google"] = request.get("google_api_key", "")
         for value in supplied.values():
             if not isinstance(value, str):
                 raise VoiceError("INVALID_CREDENTIAL", "Enter an account credential or leave it blank to keep the saved value.")
@@ -710,8 +771,10 @@ class VoiceService:
                 Credentials.validate_value(value)
         previous = {name: await self.credentials.get(name) for name in supplied}
         values = {name: value.strip() or previous[name] for name, value in supplied.items()}
-        if not all(values.values()):
-            raise VoiceError("LIVEKIT_SETUP_INCOMPLETE", "Enter the LiveKit API key and API secret. Blank fields only keep credentials already saved.")
+        if gemini and not values["google"]:
+            raise VoiceError("GEMINI_SETUP_INCOMPLETE", "Enter the Google AI Studio API key, or leave it blank to retain a saved key.")
+        if configure_project and not all(values[name] for name in livekit):
+            raise VoiceError("LIVEKIT_SETUP_INCOMPLETE", "Complete the LiveKit API key and API secret. Blank fields only keep credentials already saved.")
         # Validate all fields before interrupting the current conversation.
         await self.end_voice()
         async with self.lifecycle_lock:
@@ -744,12 +807,13 @@ class VoiceService:
                         except Exception:
                             failed = True
                     if failed:
-                        raise VoiceError("LIVEKIT_RESTORE_FAILED", "LiveKit setup was not saved completely. Unlock the desktop keyring and save both credentials again.")
+                        raise VoiceError("GEMINI_RESTORE_FAILED" if gemini else "LIVEKIT_RESTORE_FAILED",
+                                         "Voice setup was not saved completely. Unlock the desktop keyring and save the requested account setup again.")
                 await asyncio.shield(restore())
                 raise
             self.readiness = {"ready": False, "checks": [], "models": []}
-        await self.publish()
-        return {"livekit_saved": True}
+        await self.check_readiness()
+        return {"gemini_live_saved" if gemini else "livekit_saved": True}
 
     async def tool_request(self, request):
         if not isinstance(request, dict) or set(request) - {"operation", "params", "session_id", "token"}:
@@ -780,10 +844,15 @@ class VoiceService:
         finally:
             writer.close()
 
+    def session_expired(self, now=None):
+        now = time.monotonic() if now is None else now
+        return (now - self.session_started >= 30 * 60
+                or (not self.voice["speaking"] and now - self.last_activity > self.settings.value["idle_seconds"]))
+
     async def maintenance(self):
         while True:
             await asyncio.sleep(2)
-            if self.provider and time.monotonic() - self.last_activity > self.settings.value["idle_seconds"]:
+            if self.provider and self.session_expired():
                 await self.end_voice()
             if self.provider:
                 process = await asyncio.create_subprocess_exec("omarchy-shell", "lock", "status",
@@ -800,8 +869,12 @@ class VoiceService:
 
     async def run(self):
         from .execution import ExecutionManager
+        from .routing import AgentRouter
         self.execution = ExecutionManager(self.store, self.publish, settings=self.settings, credentials=self.credentials,
                                            offline_runtime_factory=self.offline_runtime)
+        self.agent_router = AgentRouter(self.execution, self.executor_client, settings=self.settings, hermes_readiness=self.hermes_ready)
+        self.tasks.client_factory = self.agent_router.client
+        self.tasks.agent_selector = self.agent_router.select_agent
         self.tasks.children = self.execution
         lock = open(self.runtime / "service.lock", "a")
         try:

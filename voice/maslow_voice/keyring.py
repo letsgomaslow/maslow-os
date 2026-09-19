@@ -5,7 +5,7 @@ import shutil
 
 from .errors import VoiceError
 
-NAMES = {"openai", "livekit_key", "livekit_secret", "server_token", "anthropic", "hermes_api"}
+NAMES = {"google", "openai", "livekit_key", "livekit_secret", "server_token", "anthropic", "hermes_api"}
 
 
 class Credentials:

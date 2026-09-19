@@ -42,8 +42,11 @@ class TaskManager:
         self.project_locks = {}
         self.clients = {}
         self.closed = False
+        self.agent_selector = None
 
-    async def submit(self, request_id, brief, project, mode, source, preferred_coder="codex"):
+    async def submit(self, request_id, brief, project, mode, source, preferred_coder="auto", *, policy="lab_auto"):
+        if policy not in {"lab_auto", "review"}:
+            raise VoiceError("INVALID_SETTINGS", "Choose a supported task policy.")
         brief = validate_brief(brief)
         source = text_field(source, "original request", 24000, True)
         if brief["unresolved_questions"]:
@@ -52,10 +55,58 @@ class TaskManager:
         if not project or not path.is_absolute() or not path.is_dir():
             raise VoiceError("PROJECT_REQUIRED", "Choose an existing project folder before delegating work.")
         task, created = self.store.create(request_id, brief, str(path.resolve()), mode, source)
-        if created:
-            task = self.store.update(task["id"], preferred_coder=preferred_coder)
-            self._start(task)
+        if not created:
+            return task
+        # No worker starts while readiness is being resolved. This temporary state
+        # also makes an in-progress routing decision visible as non-executing.
+        task = self.store.update(task["id"], state="proposed", task_policy=policy)
+        requested = brief["tool_preference"] if brief["tool_preference"] != "auto" else preferred_coder
+        if requested == "auto" and not self.agent_selector:
+            requested = "hermes"
+        selection = {"selected_agent": requested,
+                     "routing_reason": ("The user explicitly selected " + requested.title() + "."
+                                        if brief["tool_preference"] != "auto" else requested.title() + " is the configured default.")}
+        expected_attempt = task.get("attempt", 0)
+
+        def changed_while_selecting():
+            current = self.store.get(task["id"])
+            if current["state"] != "proposed" or current.get("attempt", 0) != expected_attempt:
+                return current
+            return None
+
+        try:
+            if self.agent_selector:
+                selection = await self.agent_selector({"brief": brief, "project": str(path.resolve()), "mode": mode,
+                                                       "preferred_coder": preferred_coder})
+        except VoiceError as exc:
+            changed = changed_while_selecting()
+            if changed:
+                return changed
+            self.store.update(task["id"], state="failed", error=exc.as_dict(), preferred_coder=requested,
+                              selected_agent=requested, routing_reason="Agent selection failed.",
+                              owner={"codex": "Codex", "hermes": "Hermes", "claude": "Claude"}.get(requested, "Maslow"))
             await self.publish()
+            raise
+        except Exception:
+            changed = changed_while_selecting()
+            if changed:
+                return changed
+            error = VoiceError("AGENT_SELECTION_FAILED", "Voice could not verify a task agent. Check agent setup and try again.")
+            self.store.update(task["id"], state="failed", error=error.as_dict(), preferred_coder=requested,
+                              selected_agent=requested, routing_reason="Agent selection failed.",
+                              owner={"codex": "Codex", "hermes": "Hermes", "claude": "Claude"}.get(requested, "Maslow"))
+            await self.publish()
+            raise error from None
+        changed = changed_while_selecting()
+        if changed:
+            return changed
+        selected = selection["selected_agent"]
+        task = self.store.update(task["id"], preferred_coder=selected, **selection,
+                                 owner={"codex": "Codex", "hermes": "Hermes", "claude": "Claude"}.get(selected, "Maslow"),
+                                 state="proposed" if policy == "review" else "queued")
+        if policy == "lab_auto":
+            self._start(task)
+        await self.publish()
         return task
 
     def _start(self, task):
@@ -84,6 +135,12 @@ class TaskManager:
 
     async def recover(self):
         for task in self.store.active():
+            if task["state"] == "proposed":
+                continue
+            if task.get("selected_agent") in {"codex", "claude"} and task["state"] != "queued":
+                self.store.update(task["id"], state="interrupted", error={"code": "DIRECT_RUN_LOST",
+                    "message": "Voice restarted during this agent run. Review its changes before continuing; it was not submitted again."})
+                continue
             # A persisted submission reservation is replayed using its original key.
             # After the upstream 24h idempotency window, do not risk a second execution.
             import time
@@ -101,7 +158,7 @@ class TaskManager:
         try:
             async with lock:
                 task = self.store.get(task_id)
-                if task["state"] in TERMINAL:
+                if task["state"] in TERMINAL | {"proposed"}:
                     return
                 client = await self.client_factory(task)
                 self.clients[task_id] = client
@@ -201,7 +258,25 @@ class TaskManager:
 
     async def action(self, task_id, operation, text="", approval_id=None):
         task = self.store.get(task_id)
-        if operation == "dismiss":
+        if operation == "start" and task["state"] == "proposed":
+            expected_attempt = task.get("attempt", 0)
+            try:
+                if self.agent_selector:
+                    await self.agent_selector(task, task["selected_agent"])
+            except Exception:
+                current = self.store.get(task_id)
+                if current["state"] != "proposed" or current.get("attempt", 0) != expected_attempt:
+                    result = current
+                else:
+                    raise
+            else:
+                current = self.store.get(task_id)
+                if current["state"] != "proposed" or current.get("attempt", 0) != expected_attempt:
+                    result = current
+                else:
+                    result = self.store.update(task_id, state="queued", event="proposal_accepted")
+                    self._start(result)
+        elif operation == "dismiss":
             if task["state"] not in TERMINAL:
                 raise VoiceError("TASK_ACTIVE", "Finish or stop this task before dismissing it.")
             result = self.store.update(task_id, dismissed=True)
@@ -216,7 +291,7 @@ class TaskManager:
             brief = dict(task["brief"], summary=task["brief"]["summary"] + "\nUser continuation: " + answer)
             result = self.store.update(task_id, state="queued", run_id=None, attempt=task.get("attempt", 0) + 1, brief=brief, error=None, dismissed=False)
             self._start(result)
-        elif operation == "cancel" and task["state"] == "queued":
+        elif operation == "cancel" and task["state"] in {"queued", "proposed"}:
             result = self.store.update(task_id, state="cancelled")
         elif operation == "cancel" and not task.get("run_id") and task["state"] == "submitting":
             result = self.store.update(task_id, state="stopping")

@@ -624,12 +624,13 @@ class ExecutionManager:
 
     async def readiness(self, task=None):
         mode = task.get("mode") if task else None
-        codex = bool(self.codex_binary or shutil.which("codex"))
+        codex = "codex" in self.adapters or bool(self.codex_binary or shutil.which("codex"))
         try:
             __import__("claude_agent_sdk") if self.claude_sdk_module is None else self.claude_sdk_module
             claude_sdk = True
         except ImportError:
             claude_sdk = False
+        claude_sdk = "claude" in self.adapters or claude_sdk
         claude_key = False
         if self.credentials and mode != "offline":
             try:
@@ -645,7 +646,7 @@ class ExecutionManager:
             supported = config.get("server_kind") in {"ollama", "lmstudio"} and configured_model
             codex, claude_ready = bool(codex and supported), bool(claude_sdk and supported)
         else:
-            claude_ready = bool(claude_sdk and claude_key)
+            claude_ready = bool("claude" in self.adapters or (claude_sdk and claude_key))
         return {"codex": {"ready": codex, "message": "Configured; connection is checked when starting." if codex else "Codex or its execution model is unavailable."},
                 "claude": {"ready": claude_ready, "message": "Configured; connection is checked when starting." if claude_ready else "Claude SDK, credentials, or its execution model is unavailable."}}
 
