@@ -17,6 +17,7 @@ class LiveKitGeminiProvider(LiveKitNativeExpressiveProvider):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self._turn_registration = asyncio.Lock()
+        self._pending_typed_items = set()
 
     async def _register_turn(self, text, identity):
         async with self._turn_registration:
@@ -100,7 +101,13 @@ class LiveKitGeminiProvider(LiveKitNativeExpressiveProvider):
         role = getattr(item, "role", None)
         if role not in {"user", "assistant"}:
             return
-        if role == "user" and item.text_content and item.id not in self._known_turns:
+        if role == "user" and item.text_content in self._pending_typed_items:
+            # AgentSession creates a fresh ChatMessage when it forwards a
+            # typed turn to the realtime model. The new message ID is not the
+            # one emitted above, so identity-based turn de-duplication alone
+            # would display the typed request twice.
+            self._pending_typed_items.remove(item.text_content)
+        elif role == "user" and item.text_content and item.id not in self._known_turns:
             task = asyncio.create_task(self._register_turn(item.text_content, item.id))
             self._event_tasks.add(task)
             task.add_done_callback(self._event_tasks.discard)
@@ -117,12 +124,18 @@ class LiveKitGeminiProvider(LiveKitNativeExpressiveProvider):
         message = agents.llm.ChatMessage(role="user", content=[value if not context else f"Context: {context}\n\nUser: {value}"])
         await self._user_turn(value, message.id)
         self._known_turns.add(message.id)
+        self._pending_typed_items.add(message.raw_text_content)
         self._typed_turn = message.id
         try:
             await self._state_event("thinking", microphone=False)
             await self._session.generate_reply(user_input=message)
         finally:
             self._typed_turn = None
+            self._pending_typed_items.discard(message.raw_text_content)
+
+    async def stop(self) -> None:
+        self._pending_typed_items.clear()
+        await super().stop()
 
     @staticmethod
     def _public_error(error: Any) -> ProviderError:

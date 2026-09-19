@@ -200,6 +200,11 @@ const startContext = { conversation: false, conversationReady: true, voice: { er
 runInNewContext(`${requestVoiceStartFunction}; ${startFromOrbFunction}; startFromOrb();`, startContext);
 assert.deepEqual(startSent, [{ action: "start_voice", project: "", context: "" }]);
 assert.equal(startContext.voiceStartPending, true);
+const typedConversationContext = { conversation: true, voice: { enabled: false }, controllerOpen: true, compactControlsOpen: false, requestVoiceStart: () => { typedConversationContext.started = true; } };
+runInNewContext(`${startFromOrbFunction}; startFromOrb();`, typedConversationContext);
+assert.equal(typedConversationContext.started, true, "The orb must promote a typed-only conversation to microphone capture");
+assert.equal(typedConversationContext.compactControlsOpen, false, "Promoting typed-only conversation must not expose mute controls before capture starts");
+assert.match(panel, /if \(root\.voice\.enabled !== true\) root\.requestVoiceStart\(\)[\s\S]*else root\.send\("mute", \{ muted: root\.voice\.microphone === true \}\)/);
 const setupContext = { conversation: false, conversationReady: false, voice: { error: "Missing Google key" }, selectedProject: "", explicitContext: "", requestVoiceStart: () => assert.fail("unready orb must not start voice"), openSettings: (message) => { setupContext.message = message; } };
 runInNewContext(`${startFromOrbFunction}; startFromOrb();`, setupContext);
 assert.equal(setupContext.message, "Missing Google key");

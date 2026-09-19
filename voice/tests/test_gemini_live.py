@@ -33,6 +33,64 @@ class GeminiSdkTests(unittest.IsolatedAsyncioTestCase):
         self.provider._session = self.provider._create_agent_session(agents, "", "")
         self.addAsyncCleanup(self.provider.stop)
 
+    async def test_real_native_start_attaches_audio_and_mute_controls_capture(self):
+        from maslow_voice.audio import PcmFrame
+        from maslow_voice.providers.livekit_native_audio import NativeAgentAudioInput, NativeAgentAudioOutput
+
+        audio = SimpleNamespace(start=AsyncMock(), stop=AsyncMock(), set_muted=AsyncMock(),
+                                clear_playback=AsyncMock(), play=AsyncMock(), played_samples=0)
+        self.provider.audio_transport = audio
+        # Reuse the already constructed real AgentSession. Replace only the
+        # external Google connection; AgentSession startup and I/O stay real.
+        session = self.provider._session
+        with patch.object(self.provider, "_create_agent_session", return_value=session), \
+             patch.object(self.RealtimeSession, "_main_task", new=AsyncMock()):
+            await self.provider.start(audio=True)
+        self.assertIsInstance(session.input.audio, NativeAgentAudioInput)
+        self.assertIsInstance(session.output.audio, NativeAgentAudioOutput)
+        self.assertTrue(session.input.audio_enabled)
+        self.assertTrue(self.provider._audio_enabled)
+        self.assertTrue(self.events[-1]["microphone"])
+        audio.start.assert_awaited_once_with(self.provider._on_audio)
+
+        # Follow one transport callback through the real AgentSession into
+        # Google's realtime input without opening an external connection.
+        frame = PcmFrame(b"\x01\x00" * 960)
+        received = asyncio.Event()
+        captured = []
+
+        def capture(value):
+            captured.append(value)
+            received.set()
+
+        with patch.object(self.RealtimeSession, "push_audio", side_effect=capture):
+            await self.provider._on_audio(frame)
+            await asyncio.wait_for(received.wait(), .5)
+        self.assertEqual(b"".join(bytes(value.data) for value in captured), frame.pcm)
+        await self.provider.mute(True)
+        self.assertFalse(session.input.audio_enabled)
+        self.assertFalse(self.events[-1]["microphone"])
+        await self.provider.mute(False)
+        self.assertTrue(session.input.audio_enabled)
+        self.assertTrue(self.events[-1]["microphone"])
+
+    async def test_real_typed_session_unmute_does_not_enable_missing_input(self):
+        session = self.provider._session
+        audio = SimpleNamespace(start=AsyncMock(), stop=AsyncMock(), set_muted=AsyncMock())
+        self.provider.audio_transport = audio
+        with patch.object(self.provider, "_create_agent_session", return_value=session), \
+             patch.object(self.RealtimeSession, "_main_task", new=AsyncMock()):
+            await self.provider.start(audio=False)
+        await self.provider.mute(True)
+        with self.assertNoLogs("livekit.agents", level="WARNING"):
+            await self.provider.mute(False)
+        self.assertIsNone(session.input.audio)
+        self.assertFalse(session.input.audio_enabled)
+        self.assertFalse(self.provider._audio_enabled)
+        self.assertFalse(self.events[-1]["microphone"])
+        audio.start.assert_not_awaited()
+        audio.set_muted.assert_awaited_once_with(True)
+
     async def test_real_agent_handoff_is_ignored_and_assistant_transcript_still_emitted(self):
         from livekit.agents.voice.events import ConversationItemAddedEvent
         from maslow_voice.providers.livekit_expressive import LiveKitExpressiveProvider

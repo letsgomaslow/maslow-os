@@ -103,8 +103,12 @@ Item {
   }
   function startFromOrb() {
     if (conversation) {
-      controllerOpen = false
-      compactControlsOpen = true
+      if (voice.enabled !== true) {
+        requestVoiceStart()
+      } else {
+        controllerOpen = false
+        compactControlsOpen = true
+      }
       return
     }
     if (!conversationReady || voice.error) {
@@ -464,7 +468,13 @@ Item {
         Flow {
           Layout.fillWidth: true
           spacing: 8
-          VoiceButton { text: root.voice.microphone === true ? "Mute" : "Resume"; onClicked: root.send("mute", { muted: root.voice.microphone === true }) }
+          VoiceButton {
+            text: root.voice.microphone === true ? "Mute" : "Resume"
+            onClicked: {
+              if (root.voice.enabled !== true) root.requestVoiceStart()
+              else root.send("mute", { muted: root.voice.microphone === true })
+            }
+          }
           VoiceButton { text: "End"; onClicked: { root.compactControlsOpen = false; root.send("end_voice") } }
           VoiceButton { text: "Captions"; onClicked: { root.page = "type"; root.controllerOpen = true; root.compactControlsOpen = false; Qt.callLater(function() { textDraft.forceActiveFocus() }) } }
           VoiceButton { text: "Tasks"; onClicked: { root.page = "tasks"; root.controllerOpen = true; root.compactControlsOpen = false; Qt.callLater(function() { controlsFocus.forceActiveFocus() }) } }

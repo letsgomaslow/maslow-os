@@ -112,6 +112,10 @@ class LiveKitNativeExpressiveProvider(LiveKitExpressiveProvider):
         await super().stop()
 
     async def mute(self, muted: bool) -> None:
+        # Typed-only sessions have no capture endpoint. Unmuting is distinct
+        # from starting audio, which the daemon owns through start_voice.
+        if not muted and self._native_input is None:
+            return
         session_input = getattr(getattr(self, "_session", None), "input", None)
         if muted:
             if self._native_input is not None:
