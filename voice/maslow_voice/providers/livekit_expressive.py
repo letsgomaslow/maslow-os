@@ -320,7 +320,7 @@ class LiveKitExpressiveProvider(VoiceProvider):
         pass
 
     def _conversation_item(self, event):
-        if event.item.role == "assistant" and event.item.text_content:
+        if getattr(event.item, "role", None) == "assistant" and event.item.text_content:
             self._queue_event({"type": "transcript", "role": "assistant", "text": event.item.text_content, "final": True})
 
     async def _on_audio(self, frame: PcmFrame) -> None:

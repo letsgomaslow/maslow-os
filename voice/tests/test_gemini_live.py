@@ -33,6 +33,45 @@ class GeminiSdkTests(unittest.IsolatedAsyncioTestCase):
         self.provider._session = self.provider._create_agent_session(agents, "", "")
         self.addAsyncCleanup(self.provider.stop)
 
+    async def test_real_agent_handoff_is_ignored_and_assistant_transcript_still_emitted(self):
+        from livekit.agents.voice.events import ConversationItemAddedEvent
+        from maslow_voice.providers.livekit_expressive import LiveKitExpressiveProvider
+        handoff = ConversationItemAddedEvent(item=self.agents.llm.AgentHandoff(new_agent_id="maslow"))
+        self.provider._conversation_item(handoff)
+        # The shared Expressive callback also receives the SDK's non-chat items.
+        LiveKitExpressiveProvider._conversation_item(self.provider, handoff)
+        self.assertEqual(self.events, [])
+        assistant = ConversationItemAddedEvent(item=self.agents.llm.ChatMessage(role="assistant", content=["Ready to help."]))
+        self.provider._conversation_item(assistant)
+        await asyncio.gather(*self.provider._event_tasks)
+        self.assertEqual(self.events, [{"type": "transcript", "role": "assistant", "text": "Ready to help.", "final": True}])
+
+    async def test_real_sdk_startup_control_content_warns_without_losing_next_generation(self):
+        from google.genai import types
+        with patch.object(self.RealtimeSession, "_main_task", new=AsyncMock()):
+            realtime = self.provider._session.llm.session()
+        self.addAsyncCleanup(realtime.aclose)
+        generations = []
+        realtime.on("generation_created", generations.append)
+
+        async def responses():
+            yield types.LiveServerMessage(server_content=types.LiveServerContent(turn_complete=True))
+            yield types.LiveServerMessage(server_content=types.LiveServerContent(
+                input_transcription=types.Transcription(text="Hello"),
+                output_transcription=types.Transcription(text="Hi there"), turn_complete=True))
+            realtime._session_should_close.set()
+
+        connection = SimpleNamespace(receive=responses)
+        realtime._active_session = connection
+        try:
+            with self.assertLogs("livekit.plugins.google", level="WARNING") as captured:
+                await realtime._recv_task(connection)
+        finally:
+            realtime._active_session = None
+        self.assertTrue(any("received server content but no active generation" in entry for entry in captured.output))
+        self.assertEqual(len(generations), 1)
+        self.assertEqual([item.text_content for item in realtime.chat_ctx.items], ["Hello", "Hi there"])
+
     async def test_real_model_options_schema_and_google_only_setup(self):
         from google.genai import types
         from livekit.agents.utils import is_given

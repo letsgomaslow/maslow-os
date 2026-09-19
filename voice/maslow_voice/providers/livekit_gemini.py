@@ -95,7 +95,12 @@ class LiveKitGeminiProvider(LiveKitNativeExpressiveProvider):
 
     def _conversation_item(self, event):
         item = event.item
-        if item.role == "user" and item.text_content and item.id not in self._known_turns:
+        # AgentSession also emits AgentHandoff and other non-chat records.
+        # They have no role or transcript and must not enter turn registration.
+        role = getattr(item, "role", None)
+        if role not in {"user", "assistant"}:
+            return
+        if role == "user" and item.text_content and item.id not in self._known_turns:
             task = asyncio.create_task(self._register_turn(item.text_content, item.id))
             self._event_tasks.add(task)
             task.add_done_callback(self._event_tasks.discard)
