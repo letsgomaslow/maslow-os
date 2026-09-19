@@ -19,9 +19,22 @@ omarchy_dir="$tmp_dir/omarchy"
 auth_log="$tmp_dir/auth.log"
 child_pid_file="$tmp_dir/child.pid"
 timeout_log="$tmp_dir/timeout.log"
+type_override="$tmp_dir/type-override.sh"
 mkdir -p "$mock_bin" "$package_bin" "$shadow_bin" "$system_bin" "$home_dir/.local/bin" "$omarchy_dir/install/helpers"
 touch "$auth_log"
 touch "$timeout_log"
+
+# /usr/bin is needed for ordinary test utilities, but this host also has the
+# packaged Codex command. Hide only that command for the case which models a
+# packaged runtime missing from PATH.
+cat >"$type_override" <<'SH'
+type() {
+  if [[ ${TEST_HIDE_CODEX_FROM_PATH:-false} == "true" && ${1:-} == "-P" && ${2:-} == "codex" ]]; then
+    return 1
+  fi
+  builtin type "$@"
+}
+SH
 
 cp "$ROOT/install/helpers/agent.sh" "$omarchy_dir/install/helpers/agent.sh"
 cat >>"$omarchy_dir/install/helpers/agent.sh" <<'SH'
@@ -113,6 +126,7 @@ run_tool_with_path() {
     TEST_AVAILABLE_PACKAGES="${TEST_AVAILABLE_PACKAGES:-$available_packages}" \
     TEST_PACKAGE_BIN="$package_bin" TEST_SYSTEM_BIN="$system_bin" AUTH_LOG="$auth_log" CHILD_PID_FILE="$child_pid_file" \
     TEST_TIMEOUT_LOG="$timeout_log" \
+    TEST_HIDE_CODEX_FROM_PATH="${TEST_HIDE_CODEX_FROM_PATH:-false}" BASH_ENV="$type_override" \
     PATH="$path_value" OMARCHY_SETUP_AI_STATUS_TIMEOUT_SECONDS="${OMARCHY_SETUP_AI_STATUS_TIMEOUT_SECONDS:-1}" \
     TEST_CODEX_MODE="${TEST_CODEX_MODE:-signed-out}" TEST_CLAUDE_MODE="${TEST_CLAUDE_MODE:-signed-out}" TEST_HERMES_MODE="${TEST_HERMES_MODE:-ready}" \
     "$ROOT/bin/omarchy-setup-ai-tool" "$@"
@@ -182,7 +196,7 @@ for mode in malformed extra stderr timeout overflow; do
 done
 pass "Claude 2.1.252 status reads only the structured loggedIn boolean"
 
-status=$(run_tool_with_path "$mock_bin:/usr/bin:/bin" status codex)
+status=$(TEST_HIDE_CODEX_FROM_PATH=true run_tool_with_path "$mock_bin:/usr/bin:/bin" status codex)
 [[ $(jq -r '.installed == false and .runtimeOwner == "packaged" and .runtimeState == "attention" and .reasonCode == "runtime-not-on-path"' <<<"$status") == true ]] ||
   fail "packaged command missing from PATH is not distinguished" "$status"
 
@@ -200,7 +214,7 @@ status=$(run_tool_with_path "$shadow_bin:$package_bin:$mock_bin:/usr/bin:/bin" s
 
 status=$(TEST_PACKAGES="claude-code hermes-agent" run_tool_with_path "$shadow_bin:$mock_bin:/usr/bin:/bin" status codex)
 [[ $(jq -r '.runtimeOwner == "foreign" and .reasonCode == "foreign-runtime"' <<<"$status") == true ]] || fail "unpackaged foreign runtime is not identified" "$status"
-status=$(TEST_PACKAGES="claude-code hermes-agent" run_tool_with_path "$mock_bin:/usr/bin:/bin" status codex)
+status=$(TEST_HIDE_CODEX_FROM_PATH=true TEST_PACKAGES="claude-code hermes-agent" run_tool_with_path "$mock_bin:/usr/bin:/bin" status codex)
 [[ $(jq -r '.runtimeOwner == "none" and .runtimeState == "none" and .reasonCode == "missing-core"' <<<"$status") == true ]] || fail "absent runtime is not identified" "$status"
 pass "runtime ownership guards missing and foreign PATH states without execution"
 

@@ -54,6 +54,7 @@ chmod +x "$stub_bin/omarchy-system-reboot"
 
 run_link() {
   HOME="$test_tmp/home" \
+    MASLOW_PRODUCT_FILE="$test_tmp/missing-product.json" \
     OMARCHY_DEV_LINK_TEST_LOG="$log_file" \
     OMARCHY_DEV_LINK_TEST_CONF="$conf_file" \
     OMARCHY_DEV_LINK_TEST_SUDOERS="$sudoers_file" \

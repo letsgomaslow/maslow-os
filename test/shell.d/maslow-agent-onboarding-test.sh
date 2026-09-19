@@ -31,6 +31,14 @@ cat >"$mock_bin/gum" <<'SH'
 #!/bin/bash
 exit 130
 SH
+cat >"$mock_bin/omarchy-cmd-present" <<'SH'
+#!/bin/bash
+exit 1
+SH
+cat >"$mock_bin/omarchy-pkg-present" <<'SH'
+#!/bin/bash
+exit 1
+SH
 chmod +x "$mock_bin"/*
 
 export PATH="$mock_bin:$ROOT/bin:$PATH"

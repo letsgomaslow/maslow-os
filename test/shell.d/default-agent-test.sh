@@ -32,6 +32,13 @@ cat >"$mock_bin/omarchy-cmd-missing" <<'SH'
 [[ $1 == ${OMARCHY_TEST_MISSING_COMMAND:-} ]]
 SH
 
+# This test exercises the mise-backed default-agent choices. Do not let a
+# packaged agent installed on the development host change the fixture's branch.
+cat >"$mock_bin/omarchy-pkg-present" <<'SH'
+#!/bin/bash
+exit 1
+SH
+
 cat >"$mock_bin/omarchy-launch-tui" <<'SH'
 #!/bin/bash
 printf '%s\0' "$@" >"$OMARCHY_TEST_AGENT_LAUNCH_LOG"
