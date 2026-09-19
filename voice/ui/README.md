@@ -10,4 +10,17 @@ The primary connection choice is **Maslow Voice** (`gemini_live`). It uses Gemin
 
 Compile `VoiceOrb.frag` with the target Qt `qsb --glsl "100 es,120,150"` into `VoiceOrb.frag.qsb`; OpenGL requires those GLSL variants. The packaged shader runs by default on graphics renderers. `MASLOW_VOICE_GPU_SHADER=0` disables it; Qt software rendering selects the gradient fallback automatically. The gradient remains beneath the shader to preserve visibility if shader loading or graphics pipeline creation fails. Reduced motion freezes both variants.
 
+| State | Material and motion |
+| --- | --- |
+| Idle/ready | Slow blue glass drift with white/ice reflection and restrained teal/purple secondary accents |
+| Connecting | Faster interior motion and a moving rim highlight |
+| Listening | Microphone level gently compresses and bends the interior sheets |
+| Thinking/working | Faster sheet rotation while the silhouette stays stable |
+| Speaking | State-driven deformation until playback amplitude is available |
+| Muted | Frozen muted-blue treatment |
+| Error | Frozen warm error treatment |
+| Disabled | Frozen subdued-blue treatment that still preserves material depth |
+
+The software fallback is a Canvas glass treatment over the deep-blue gradient base, rather than only a flat gradient. It shares the shader's three-sheet structure, broad reflection and state palette but is not pixel-identical. The current blue/white direction is a functional checkpoint. The internal forms, exact blue balance and distinctive Maslow personality remain open design work; use `branding/design-tokens.json` as the palette source.
+
 Run `node voice/tests/ui-contract-test.mjs` for structural checks. For actual input-region and placement verification, use `voice/tests/ui-preview.qml` with a layer-shell compositor. Weston alone lacks that protocol; a nested Sway instance on headless Weston provides it. Copy `ui/` and the preview to a common Quickshell config root, changing the preview import to `"ui"`. Fixture IPC exposes page, state, mode, tasks, close, status, and captured requests without starting the production transport. This fixture is development-only and is not an installed entry point.

@@ -2,7 +2,7 @@
 
 Read this guide before editing `voice/`, Voice launch/install integration, the `maslow.voice` plugin, or Voice acceptance helpers. Start with [the development index](../../docs/maslow-development.md) and its current Voice checkpoint. The index owns current status; this guide owns procedure.
 
-For direct Lenovo development, use [the portable repository map](../../docs/lenovo-development.md) and [the September 16 failure handoff](../../docs/handoffs/2026-09-16-lenovo-voice-development-handoff.md). Hardware failure has no confirmed root cause yet.
+For direct Lenovo development, use [the portable repository map](../../docs/lenovo-development.md) and [the September 19 integration handoff](../../docs/handoffs/2026-09-19-gemini-voice-orb-integration.md). The September 16 failure report remains historical evidence for the older installed package.
 
 ## Locate and scope the work
 
@@ -21,7 +21,7 @@ For direct Lenovo development, use [the portable repository map](../../docs/leno
 ## Verify in stages
 
 1. Source and protocol regressions: use real SDK/socket/process contracts where the defect depends on lifecycle or backpressure. Do not infer a live account result from mocks or structural assertions.
-2. Fast visual iteration: Docker, headless Weston, real Quickshell/software rendering, inspected PNGs. Cover the single orb's listening/speaking/working/idle/disabled states, positions, microphone indicator, settings, keyboard control and task state. Fixtures prove rendering, not accounts or real task state changes.
+2. Fast visual iteration: Docker, headless Weston, real Quickshell/software rendering, inspected PNGs. Cover the single Orb at 56 and 88 pixels in idle, connecting, listening, thinking/working, speaking, muted, error and disabled states. Exercise the GPU shader and software fallback, reduced motion, manual drag bounds, reset, automatic placement, microphone indicator, settings, keyboard control and task state. Record whether evidence includes a display resize or scale change. Fixtures prove rendering, not accounts, physical pointer interaction or real task state changes.
 3. Installed-system proof: reuse the ISO repository's headless QEMU/TCG harness with CIDATA, SSH and QMP screenshots/OCR. No UTM keyboard/clipboard. Reuse the installed overlay for package changes; rebuild media only when the installation baseline changes or a release checkpoint requires it.
 4. Physical acceptance: Lenovo microphone, speaker, echo, perceived responsiveness and actual desktop interactions remain separate. Never present TCG timing, synthetic WAV input or virtual speaker samples as hardware proof.
 

@@ -2,6 +2,8 @@
 
 Date: 2026-09-16. Scope: preserve source on GitHub, organize a portable workspace, and record the tester-reported failure. Troubleshooting is deferred by the user. This handoff supersedes the September 14 instruction to install and test; it does not change released bytes.
 
+This handoff predates the Gemini Voice Lab, glass Orb and movable-Orb commits. Its failure report and source-backup table remain historical evidence for the older installed package. Use the [September 19 integration handoff](2026-09-19-gemini-voice-orb-integration.md) for current source and local-package behavior.
+
 ## Current result and evidence boundary
 
 The user reports completing the Voice update on Lenovo, saving the GPT-Live OpenAI key, and properly setting up Hermes, but says it is not working. Update arrival and setup completion are tester-reported. Exact installed versions, the visible error, microphone behavior, provider connection, and whether conversation or task execution fails have not been collected. Do not describe Hermes as independently verified or infer an authentication, audio, networking, or routing root cause.
