@@ -11,62 +11,75 @@ layout(std140, binding = 0) uniform buf {
   float stateMode;
 };
 
-float hash(vec3 p) {
-  p = fract(p * 0.3183099 + vec3(0.11, 0.17, 0.23));
-  p *= 17.0;
-  return fract(p.x * p.y * p.z * (p.x + p.y + p.z));
+mat2 rotation(float angle) {
+  return mat2(cos(angle), -sin(angle), sin(angle), cos(angle));
 }
 
-float noise(vec3 p) {
-  vec3 i = floor(p);
-  vec3 f = fract(p);
-  f = f * f * (3.0 - 2.0 * f);
-  return mix(mix(mix(hash(i), hash(i + vec3(1, 0, 0)), f.x),
-                 mix(hash(i + vec3(0, 1, 0)), hash(i + vec3(1, 1, 0)), f.x), f.y),
-             mix(mix(hash(i + vec3(0, 0, 1)), hash(i + vec3(1, 0, 1)), f.x),
-                 mix(hash(i + vec3(0, 1, 1)), hash(i + vec3(1, 1, 1)), f.x), f.y), f.z);
-}
-
-float clouds(vec3 p) {
-  float density = 0.0;
-  float weight = 0.57;
-  for (int i = 0; i < 4; i++) {
-    density += weight * noise(p);
-    p = p * 2.03 + vec3(3.7, 7.1, 2.9);
-    weight *= 0.48;
-  }
-  return density;
+// A curved translucent sheet inside the shell. Depth changes both its
+// projected shape and edge softness; no texture or noise is needed.
+vec2 ribbon(vec3 point, float turn, float offset) {
+  point.xz = rotation(turn) * point.xz;
+  point.xy = rotation(offset) * point.xy;
+  float curve = point.y + 0.32 * sin(point.x * 2.6 + point.z * 1.8);
+  float distanceToSheet = abs(curve - offset * 0.22);
+  float front = smoothstep(-0.65, 0.8, point.z);
+  float width = 0.16 + level * 0.055;
+  float softness = mix(0.16, 0.035, front);
+  float body = 1.0 - smoothstep(width, width + softness, distanceToSheet);
+  float lipDistance = (distanceToSheet - width) / (0.028 + softness * 0.35);
+  float lip = exp(-(lipDistance * lipDistance));
+  return vec2(body * mix(0.28, 0.78, front), lip * front);
 }
 
 void main() {
   vec2 p = qt_TexCoord0 * 2.0 - 1.0;
   float radius = length(p);
-  float edge = 1.0 - smoothstep(0.965, 1.0, radius);
+  float edge = 1.0 - smoothstep(0.975, 1.0, radius);
   float depth = sqrt(max(0.0, 1.0 - dot(p, p)));
   vec3 normal = vec3(p, depth);
-  float drift = phase * 0.23;
-  float turn = stateMode == 3.0 ? phase * 0.2 : sin(phase * 0.3) * 0.12;
-  vec2 flow = mat2(cos(turn), -sin(turn), sin(turn), cos(turn)) * p;
-  vec3 cloudPosition = vec3(flow * (2.1 - level * 0.35), depth * 1.7);
-  cloudPosition += vec3(drift, -drift * 0.5, phase * 0.1);
-  if (stateMode == 1.0) {
-    cloudPosition.y *= 0.7;
-    cloudPosition.y += phase * 0.2;
-  } else if (stateMode == 2.0) {
-    cloudPosition.xy += p * sin(radius * 7.0 - phase * 2.0) * level * 0.12;
+  float turn = phase * 0.31;
+  if (stateMode == 3.0) turn += phase * 0.21;
+
+  // Refraction-like compression keeps motion inside a stable glass silhouette.
+  vec3 interior = vec3(p * (0.72 + depth * 0.28), depth * 0.8);
+  if (stateMode == 2.0) {
+    interior.xy *= 1.0 - level * 0.12;
+    interior.y += sin(p.x * 2.8 + phase) * level * 0.12;
   } else if (stateMode == 4.0) {
-    cloudPosition.x += sin(p.y * 3.0 + phase * 2.5) * (0.1 + level * 0.25);
-    cloudPosition.y -= phase * 0.18;
+    interior.x *= 1.0 + level * 0.18;
+    interior.y *= 1.0 - level * 0.14;
   }
-  float density = clouds(cloudPosition);
-  float cloud = smoothstep(0.31, 0.64, density + level * 0.065);
-  float light = clamp(dot(normal, normalize(vec3(-0.4, -0.5, 0.9))), 0.0, 1.0);
+
   // Canonical Maslow Voice palette from branding/design-tokens.json.
-  vec3 blue = mix(vec3(21.0, 75.0, 168.0) / 255.0, vec3(40.0, 117.0, 229.0) / 255.0, light);
-  vec3 white = mix(vec3(147.0, 201.0, 255.0) / 255.0, vec3(239.0, 248.0, 255.0) / 255.0, light);
-  vec3 color = mix(blue, white, cloud);
-  // Cool edge light gives depth while preserving the circular silhouette.
-  color += vec3(0.12, 0.20, 0.27) * pow(1.0 - depth, 3.0) * 0.5;
-  color += vec3(0.08) * pow(light, 12.0);
-  fragColor = vec4(color * edge, edge) * qt_Opacity;
+  vec3 blueDeep = vec3(21.0, 75.0, 168.0) / 255.0;
+  vec3 blue = vec3(40.0, 117.0, 229.0) / 255.0;
+  vec3 ice = vec3(147.0, 201.0, 255.0) / 255.0;
+  vec3 white = vec3(239.0, 248.0, 255.0) / 255.0;
+  vec3 teal = vec3(115.0, 193.0, 174.0) / 255.0;
+  vec3 purple = vec3(101.0, 76.0, 143.0) / 255.0;
+  float light = max(0.0, dot(normal, normalize(vec3(-0.48, -0.6, 0.8))));
+  vec3 color = mix(blueDeep * 0.38, blue, 0.24 + light * 0.35);
+
+  // Three broad sheets overlap at different orientations and drift rates.
+  vec2 back = ribbon(interior, -turn * 0.62 + 1.7, -0.8);
+  vec2 middle = ribbon(interior, turn + 0.3, 0.55);
+  vec2 front = ribbon(interior, -turn * 0.77 - 0.6, 1.9);
+  color = mix(color, mix(blue, teal, 0.26), back.x);
+  color = mix(color, mix(ice, teal, 0.12), middle.x * 0.82);
+  color = mix(color, mix(mix(blue, white, 0.46), purple, 0.12), front.x * 0.72);
+  color += white * (back.y * 0.035 + middle.y * 0.16 + front.y * 0.12);
+
+  // Uneven Fresnel reflection and a localized softbox highlight establish
+  // thickness without adding a second circular outline over the material.
+  float fresnel = pow(1.0 - depth, 3.1);
+  float rimLight = 0.18 + 0.68 * max(0.0, dot(normal.xy, normalize(vec2(-0.7, -0.9))));
+  if (stateMode == 1.0) {
+    rimLight += 0.48 * pow(max(0.0, dot(normal.xy, vec2(cos(phase * 1.8), sin(phase * 1.8)))), 6.0);
+  }
+  color = mix(color, ice, fresnel * rimLight);
+  vec2 reflection = (p - vec2(-0.34, -0.56)) / vec2(0.38, 0.12);
+  float specular = exp(-dot(reflection, reflection) * 1.8);
+  color = mix(color, white, specular * 0.8);
+  color += ice * pow(max(0.0, dot(normal, normalize(vec3(0.68, 0.56, 0.28)))), 24.0) * 0.24;
+  fragColor = vec4(clamp(color, 0.0, 1.0) * edge, edge) * qt_Opacity;
 }

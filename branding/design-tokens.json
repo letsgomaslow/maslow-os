@@ -17,6 +17,8 @@
       "voiceBlue": "#2875E5",
       "voiceBlueLight": "#93C9FF",
       "voiceCloud": "#EFF8FF",
+      "voiceTeal": "#73C1AE",
+      "voicePurple": "#654C8F",
       "voiceOverlay": "#5C9DE7",
       "voiceMuted": "#17467E",
       "voiceError": "#7C341A"

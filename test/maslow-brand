@@ -70,6 +70,8 @@ assert_contains branding/design-tokens.json '"voiceBlueDeep": "#154BA8"' "voice 
 assert_contains branding/design-tokens.json '"voiceBlue": "#2875E5"' "voice orb blue is a canonical brand token"
 assert_contains branding/design-tokens.json '"voiceBlueLight": "#93C9FF"' "voice orb light blue is a canonical brand token"
 assert_contains branding/design-tokens.json '"voiceCloud": "#EFF8FF"' "voice orb cloud white is a canonical brand token"
+assert_contains branding/design-tokens.json '"voiceTeal": "#73C1AE"' "voice orb highlight uses the Brand OS teal token"
+assert_contains branding/design-tokens.json '"voicePurple": "#654C8F"' "voice orb depth uses the Brand OS purple token"
 if "$ROOT/branding/scripts/generate-brand-preview" "$ROOT" >/dev/null 2>&1; then
   fail "brand preview generator accepts a shipping-tree output directory"
 fi

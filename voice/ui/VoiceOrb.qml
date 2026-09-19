@@ -28,53 +28,102 @@ Item {
     onTriggered: root.phase += 0.04 * root.motionSpeed
   }
 
-  // This blue/white base remains visible if a graphics pipeline cannot load.
+  // This deep blue base remains visible if a graphics pipeline cannot load.
   Rectangle {
     anchors.fill: parent
     radius: width / 2
     gradient: Gradient {
-      GradientStop { position: 0; color: "#EFF8FF" }
-      GradientStop { position: 0.32; color: "#93C9FF" }
-      GradientStop { position: 0.7; color: "#2875E5" }
+      GradientStop { position: 0; color: "#2875E5" }
+      GradientStop { position: 0.45; color: "#154BA8" }
       GradientStop { position: 1; color: "#154BA8" }
     }
   }
 
-  // Canvas also works with Qt's software renderer; a few soft cloud lobes keep
-  // the same visual identity without a GPU or an external texture asset.
+  // Software rendering uses three broad curved sheets and glass reflections.
+  // Keep it beneath the shader so a failed graphics pipeline is still visible.
   Canvas {
-    id: cloudFallback
+    id: glassFallback
     anchors.fill: parent
     onWidthChanged: requestPaint()
     onHeightChanged: requestPaint()
     Component.onCompleted: requestPaint()
     Connections {
       target: root
-      function onPhaseChanged() { if (!gpuOrb.active) cloudFallback.requestPaint() }
-      function onResponseLevelChanged() { if (!gpuOrb.active) cloudFallback.requestPaint() }
-      function onStateModeChanged() { cloudFallback.requestPaint() }
+      function onPhaseChanged() { if (!gpuOrb.active) glassFallback.requestPaint() }
+      function onResponseLevelChanged() { if (!gpuOrb.active) glassFallback.requestPaint() }
+      function onStateModeChanged() { glassFallback.requestPaint() }
     }
     onPaint: {
       const ctx = getContext("2d")
       ctx.reset()
       ctx.clearRect(0, 0, width, height)
       ctx.save()
+      ctx.translate(width / 2, height / 2)
+      ctx.scale(width / 2, height / 2)
       ctx.beginPath()
-      ctx.arc(width / 2, height / 2, Math.min(width, height) / 2, 0, Math.PI * 2)
+      ctx.arc(0, 0, 0.985, 0, Math.PI * 2)
       ctx.clip()
-      const travel = root.phase
-      for (let i = 0; i < 7; i++) {
-        const angle = i * 2.4 + travel * 0.35
-        const x = width * (0.45 + Math.sin(angle) * 0.29)
-        const y = height * (0.41 + Math.cos(angle * 0.8) * 0.26)
-        const radius = width * (0.25 + Math.sin(i + travel * 0.7) * 0.045 + root.responseLevel * 0.065)
-        const cloud = ctx.createRadialGradient(x, y, 0, x, y, radius)
-        cloud.addColorStop(0, "rgba(255,255,255,0.88)")
-        cloud.addColorStop(0.46, "rgba(239,248,255,0.58)")
-        cloud.addColorStop(1, "rgba(239,248,255,0)")
-        ctx.fillStyle = cloud
-        ctx.fillRect(x - radius, y - radius, radius * 2, radius * 2)
+      const body = ctx.createRadialGradient(-0.3, -0.4, 0.05, 0, 0, 1)
+      body.addColorStop(0, "#2875E5")
+      body.addColorStop(0.68, "#154BA8")
+      body.addColorStop(1, "#154BA8")
+      ctx.fillStyle = body
+      ctx.fillRect(-1, -1, 2, 2)
+      const travel = root.phase * (root.stateMode === 3 ? 0.52 : 0.31)
+      for (let i = 0; i < 3; i++) {
+        ctx.save()
+        ctx.rotate(i * 1.9 + travel * (i === 1 ? -0.62 : 0.77))
+        ctx.translate((i - 1) * 0.09, Math.sin(travel + i * 2.1) * 0.07)
+        ctx.scale(1, 0.8 + Math.sin(travel + i) * 0.12 + root.responseLevel * 0.12)
+        const sheet = ctx.createLinearGradient(-0.6, -0.55, 0.4, 0.5)
+        sheet.addColorStop(0, i === 0 ? "rgba(115,193,174,0.12)" : i === 2 ? "rgba(101,76,143,0.10)" : "rgba(147,201,255,0.12)")
+        sheet.addColorStop(0.43, i === 0 ? "rgba(115,193,174,0.54)" : i === 2 ? "rgba(101,76,143,0.38)" : "rgba(147,201,255,0.65)")
+        sheet.addColorStop(0.5, "rgba(239,248,255,0.75)")
+        sheet.addColorStop(0.59, "rgba(40,117,229,0.48)")
+        sheet.addColorStop(1, "rgba(21,75,168,0.08)")
+        ctx.fillStyle = sheet
+        ctx.beginPath()
+        ctx.moveTo(-1.15, -0.2)
+        ctx.bezierCurveTo(-0.5, -1, 0.45, 0.85, 1.15, -0.45)
+        ctx.bezierCurveTo(0.72, 1.05, -0.42, -0.08, -1.15, 0.35)
+        ctx.closePath()
+        ctx.fill()
+        ctx.restore()
       }
+      // Broad asymmetric reflection stays anchored while the interior turns.
+      const rim = ctx.createLinearGradient(-0.8, -0.9, 0.7, 0.9)
+      rim.addColorStop(0, "rgba(239,248,255,0.85)")
+      rim.addColorStop(0.4, "rgba(147,201,255,0.12)")
+      rim.addColorStop(0.7, "rgba(147,201,255,0)")
+      rim.addColorStop(1, "rgba(147,201,255,0.52)")
+      ctx.strokeStyle = rim
+      ctx.lineWidth = 0.045
+      ctx.beginPath()
+      ctx.arc(0, 0, 0.96, 0, Math.PI * 2)
+      ctx.stroke()
+      if (root.stateMode === 1) {
+        ctx.save()
+        ctx.rotate(root.phase * 1.8)
+        const connection = ctx.createLinearGradient(0.55, -0.65, 1, 0.1)
+        connection.addColorStop(0, "rgba(239,248,255,0)")
+        connection.addColorStop(0.5, "rgba(239,248,255,0.6)")
+        connection.addColorStop(1, "rgba(239,248,255,0)")
+        ctx.strokeStyle = connection
+        ctx.lineWidth = 0.065
+        ctx.beginPath()
+        ctx.arc(0, 0, 0.95, -0.9, 0.15)
+        ctx.stroke()
+        ctx.restore()
+      }
+      ctx.save()
+      ctx.translate(-0.34, -0.56)
+      ctx.scale(0.38, 0.12)
+      const reflection = ctx.createRadialGradient(0, 0, 0, 0, 0, 1)
+      reflection.addColorStop(0, "rgba(239,248,255,0.9)")
+      reflection.addColorStop(1, "rgba(239,248,255,0)")
+      ctx.fillStyle = reflection
+      ctx.fillRect(-1, -1, 2, 2)
+      ctx.restore()
       ctx.restore()
     }
   }
@@ -83,7 +132,7 @@ Item {
     id: gpuOrb
     anchors.fill: parent
     active: root.gpuShaderAvailable && root.GraphicsInfo.api !== GraphicsInfo.Software
-    onActiveChanged: cloudFallback.requestPaint()
+    onActiveChanged: glassFallback.requestPaint()
     sourceComponent: Component {
       ShaderEffect {
         anchors.fill: parent
@@ -95,32 +144,13 @@ Item {
     }
   }
 
-  // Distinct state cues survive reduced motion and software rendering.
+  // Muted/error/disabled states keep their calm tint and explicit glyphs.
   Rectangle {
+    visible: root.stateMode >= 5
     anchors.fill: parent
     radius: width / 2
-    color: root.stateMode >= 5 ? "#5C9DE7" : "transparent"
-    opacity: root.stateMode >= 5 ? 0.22 : 1
-    border.width: 1
-    border.color: "#80D8EDFF"
-  }
-  Rectangle {
-    visible: root.stateMode === 1 || root.stateMode === 3
-    width: parent.width * 0.09
-    height: width
-    radius: width / 2
-    color: "#FFFFFF"
-    x: parent.width * (0.5 + Math.sin(root.phase * 1.8) * 0.41) - width / 2
-    y: parent.height * (0.5 - Math.cos(root.phase * 1.8) * 0.41) - height / 2
-  }
-  Rectangle {
-    visible: root.stateMode === 2 || root.stateMode === 4
-    anchors.fill: parent
-    anchors.margins: parent.width * (0.045 + (1 - root.responseLevel) * 0.025)
-    radius: width / 2
-    color: "transparent"
-    border.width: root.stateMode === 4 ? 2 : 1
-    border.color: root.stateMode === 4 ? "#CCFFFFFF" : "#99FFFFFF"
+    color: "#93C9FF"
+    opacity: 0.32
   }
   Text {
     anchors.centerIn: parent
