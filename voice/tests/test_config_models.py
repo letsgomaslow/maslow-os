@@ -33,6 +33,18 @@ class ConfigurationTests(unittest.TestCase):
             self.assertEqual(Settings(root).value["realtime_voice"], "marin")
             self.assertEqual(Settings(root).value["livekit_voice"], "Olivia")
 
+    def test_orb_position_is_normalized_and_persistent(self):
+        with tempfile.TemporaryDirectory() as root:
+            settings = Settings(root)
+            position = {"x": 0.25, "y": 0.75}
+            settings.update({"orb_position": position})
+            self.assertEqual(Settings(root).value["orb_position"], position)
+            settings.update({"orb_position": None})
+            self.assertIsNone(Settings(root).value["orb_position"])
+        for position in ({}, {"x": 0.5}, {"x": 0.5, "y": 0.5, "z": 0}, {"x": -0.1, "y": 0.5}, {"x": 0.5, "y": 1.1}, {"x": True, "y": 0.5}, {"x": float("nan"), "y": 0.5}, "center"):
+            with self.subTest(position=position), self.assertRaises(VoiceError):
+                validate_settings({"orb_position": position})
+
     def test_cloud_voice_defaults_and_validation_follow_the_curated_lists(self):
         self.assertEqual(validate_settings({})["realtime_voice"], "cedar")
         self.assertEqual(validate_settings({})["live_voice"], "marin")

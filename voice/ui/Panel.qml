@@ -56,7 +56,13 @@ Item {
   property bool controllerOpen: false
   property string heldPlacement: "right"
   property int heldDiameter: 56
-  readonly property bool interactionHeld: orbButton.hovered || orbButton.down || orbButton.activeFocus || controllerOpen || compactControlsOpen
+  property bool localOrbPositionActive: false
+  property real localOrbPositionX: 0.5
+  property real localOrbPositionY: 0.5
+  readonly property var configuredOrbPosition: settings.orb_position && isFinite(Number(settings.orb_position.x)) && isFinite(Number(settings.orb_position.y)) ? settings.orb_position : null
+  readonly property var effectiveOrbPosition: localOrbPositionActive ? ({ x: localOrbPositionX, y: localOrbPositionY }) : configuredOrbPosition
+  readonly property bool orbManuallyPositioned: effectiveOrbPosition !== null
+  readonly property bool interactionHeld: orbPointer.containsMouse || orbPointer.pressed || orbButton.activeFocus || controllerOpen || compactControlsOpen
   readonly property string desiredPlacement: fixedPosition ? "right" : (conversation ? "center" : (working ? "left" : "right"))
   onDesiredPlacementChanged: if (!interactionHeld) heldPlacement = desiredPlacement
   onInteractionHeldChanged: if (!interactionHeld) { heldPlacement = desiredPlacement; heldDiameter = conversation ? 88 : 56 }
@@ -121,6 +127,48 @@ Item {
   function requestVoiceStart() {
     voiceStartPending = true
     send("start_voice", { project: selectedProject, context: explicitContext })
+  }
+  function boundedOrbCoordinate(value) {
+    return Math.max(0, Math.min(1, Number(value)))
+  }
+  function orbPixel(normalized, extent, size) {
+    var margin = 16
+    var available = Math.max(0, extent - size - margin * 2)
+    return margin + boundedOrbCoordinate(normalized) * available
+  }
+  function orbNormalized(pixel, extent, size) {
+    var margin = 16
+    var available = Math.max(0, extent - size - margin * 2)
+    return available > 0 ? boundedOrbCoordinate((pixel - margin) / available) : 0.5
+  }
+  function setOrbPixelPosition(x, y) {
+    localOrbPositionActive = true
+    localOrbPositionX = orbNormalized(x, panelWindow.width, orbButton.width)
+    localOrbPositionY = orbNormalized(y, panelWindow.height, orbButton.height)
+  }
+  function persistOrbPosition() {
+    var changes = { orb_position: { x: localOrbPositionX, y: localOrbPositionY } }
+    if (fixedPosition) changes.fixed_position = false
+    send("configure", { settings: changes })
+  }
+  function clearOrbPosition() {
+    localOrbPositionActive = false
+    configure("orb_position", null)
+  }
+  function setFixedPosition(value) {
+    if (value) {
+      localOrbPositionActive = false
+      send("configure", { settings: { fixed_position: true, orb_position: null } })
+    } else {
+      configure("fixed_position", false)
+    }
+  }
+  function attachedPanelY(itemHeight) {
+    var margin = 16
+    var gap = 12
+    var above = orbButton.y - itemHeight - gap
+    if (above >= margin) return above
+    return Math.max(margin, Math.min(panelWindow.height - itemHeight - margin, orbButton.y + orbButton.height + gap))
   }
 
   function stateText() {
@@ -423,10 +471,11 @@ Item {
       padding: 8
       width: root.heldDiameter + 16
       height: width
-      x: root.heldPlacement === "left" ? 20 : (root.heldPlacement === "center" ? (parent.width - width) / 2 : parent.width - width - 20)
-      y: parent.height - height - 20
+      x: root.orbManuallyPositioned ? root.orbPixel(root.effectiveOrbPosition.x, panelWindow.width, width) : (root.heldPlacement === "left" ? 20 : (root.heldPlacement === "center" ? (parent.width - width) / 2 : parent.width - width - 20))
+      y: root.orbManuallyPositioned ? root.orbPixel(root.effectiveOrbPosition.y, panelWindow.height, height) : parent.height - height - 20
       focusPolicy: Qt.StrongFocus
       Accessible.name: "Maslow Voice, " + root.stateText() + ". Start talking or open conversation controls"
+      Accessible.description: "Drag to move the Voice Orb. Press Space or Enter to activate it."
       background: Item {}
       contentItem: VoiceOrb {
         width: orbButton.width - 16; height: width
@@ -434,17 +483,85 @@ Item {
         audioLevel: root.voice.level || 0
         disabled: root.disabled
         reducedMotion: root.reducedMotion
-        interactive: orbButton.hovered || orbButton.down || orbButton.activeFocus
+        interactive: orbPointer.containsMouse || orbPointer.pressed || orbButton.activeFocus
         gpuShaderAvailable: Quickshell.env("MASLOW_VOICE_GPU_SHADER") !== "0"
       }
-      onClicked: {
-        if (root.orbLongPress) {
+      onClicked: root.startFromOrb()
+
+      MouseArea {
+        id: orbPointer
+        anchors.fill: parent
+        enabled: !root.controllerOpen && !root.sessionLocked
+        acceptedButtons: Qt.LeftButton
+        hoverEnabled: true
+        cursorShape: dragging ? Qt.ClosedHandCursor : Qt.OpenHandCursor
+        pressAndHoldInterval: 650
+        property bool dragging: false
+        property bool suppressClick: false
+        property real pressSceneX: 0
+        property real pressSceneY: 0
+        property real startOrbX: 0
+        property real startOrbY: 0
+        property bool startLocalPositionActive: false
+        property real startLocalPositionX: 0.5
+        property real startLocalPositionY: 0.5
+        readonly property real dragThreshold: 6
+
+        onPressed: function(mouse) {
+          var point = mapToItem(orbButton.parent, Qt.point(mouse.x, mouse.y))
+          dragging = false
+          suppressClick = false
           root.orbLongPress = false
-          return
+          pressSceneX = point.x
+          pressSceneY = point.y
+          startOrbX = orbButton.x
+          startOrbY = orbButton.y
+          startLocalPositionActive = root.localOrbPositionActive
+          startLocalPositionX = root.localOrbPositionX
+          startLocalPositionY = root.localOrbPositionY
         }
-        root.startFromOrb()
+        onPositionChanged: function(mouse) {
+          if (!(mouse.buttons & Qt.LeftButton)) return
+          var point = mapToItem(orbButton.parent, Qt.point(mouse.x, mouse.y))
+          var deltaX = point.x - pressSceneX
+          var deltaY = point.y - pressSceneY
+          if (!dragging && Math.abs(deltaX) + Math.abs(deltaY) < dragThreshold) return
+          dragging = true
+          root.orbLongPress = false
+          root.setOrbPixelPosition(startOrbX + deltaX, startOrbY + deltaY)
+        }
+        onReleased: function(mouse) {
+          if (!dragging) return
+          dragging = false
+          suppressClick = true
+          root.persistOrbPosition()
+          mouse.accepted = true
+        }
+        onPressAndHold: function(mouse) {
+          if (dragging) return
+          root.orbLongPress = true
+          suppressClick = true
+          root.openSettings("Advanced Voice settings")
+          mouse.accepted = true
+        }
+        onCanceled: {
+          dragging = false
+          suppressClick = false
+          root.localOrbPositionActive = startLocalPositionActive
+          root.localOrbPositionX = startLocalPositionX
+          root.localOrbPositionY = startLocalPositionY
+        }
+        onClicked: function(mouse) {
+          if (suppressClick || root.orbLongPress) {
+            suppressClick = false
+            root.orbLongPress = false
+            mouse.accepted = true
+            return
+          }
+          root.startFromOrb()
+          mouse.accepted = true
+        }
       }
-      onPressAndHold: { root.orbLongPress = true; root.openSettings("Advanced Voice settings") }
     }
 
     Rectangle {
@@ -453,7 +570,7 @@ Item {
       width: Math.min(600, panelWindow.width - 32)
       implicitHeight: compactControls.implicitHeight + 24
       x: Math.max(16, Math.min(panelWindow.width - width - 16, orbButton.x + orbButton.width / 2 - width / 2))
-      y: Math.max(16, orbButton.y - height - 12)
+      y: root.attachedPanelY(height)
       color: "#121D35"
       radius: 14
       border.color: "#6DC4AD"
@@ -708,7 +825,8 @@ Item {
                 }
                 VoiceButton { text: root.settings.mode === "openai" ? "Check setup" : "Check connection and readiness"; onClicked: root.send("test") }
                 VoiceCheck { text: "Reduce voice motion"; checked: root.reducedMotion; onToggled: root.configure("reduced_motion", checked); Accessible.name: text }
-                VoiceCheck { text: "Keep orb at a fixed position"; checked: root.fixedPosition; onToggled: root.configure("fixed_position", checked); Accessible.name: text }
+                VoiceCheck { text: "Keep orb at bottom right"; checked: root.fixedPosition; onToggled: root.setFixedPosition(checked); Accessible.name: text }
+                VoiceButton { visible: root.orbManuallyPositioned; text: "Reset orb position"; onClicked: root.clearOrbPosition() }
                 VoiceField { Layout.fillWidth: true; placeholderText: "Display name or connector"; text: String(settings.display || ""); Accessible.name: "Voice display"; onEditingFinished: root.configure("display", text) }
                 Text { text: "Conversation readiness: " + (root.conversationReadiness().ready === true ? "Ready" : "Needs attention"); color: root.conversationReadiness().ready === true ? "#6DC4AD" : "#EE7BB3"; font.family: "Manrope"; wrapMode: Text.WordWrap; Layout.fillWidth: true; Accessible.role: Accessible.StatusBar; Accessible.name: text }
                 Repeater { model: root.conversationReadiness().checks || []; delegate: Text { required property var modelData; text: (modelData.ok === true ? "Ready: " : "Needs attention: ") + String(modelData.name || "Check") + " — " + String(modelData.message || ""); color: modelData.ok === true ? "#6DC4AD" : "#EE7BB3"; font.family: "Manrope"; wrapMode: Text.WordWrap; Layout.fillWidth: true } }

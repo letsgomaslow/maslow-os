@@ -623,7 +623,7 @@ class VoiceService:
             changes = request.get("settings", {})
             if not isinstance(changes, dict):
                 raise VoiceError("INVALID_SETTINGS", "Settings must be an object.")
-            connection = set(changes) - {"reduced_motion", "fixed_position", "display", "retention_days", "idle_seconds"}
+            connection = set(changes) - {"reduced_motion", "fixed_position", "orb_position", "display", "retention_days", "idle_seconds"}
             if connection and self.store.active():
                 raise VoiceError("TASKS_ACTIVE", "Finish or stop current tasks before changing their execution connection.")
             if connection:

@@ -1,6 +1,7 @@
 """Non-secret preferences. Credentials live exclusively in Secret Service."""
 
 import json
+import math
 import os
 import tempfile
 from pathlib import Path
@@ -15,7 +16,7 @@ DEFAULTS = {
     "realtime_model": "gpt-realtime-2.1", "realtime_voice": "cedar", "live_voice": "marin",
     "livekit_url": "", "livekit_voice": "Ashley",
     "gemini_live_model": "gemini-3.8-live", "gemini_live_voice": "Puck", "task_policy": "lab_auto",
-    "reduced_motion": False, "fixed_position": False, "display": "",
+    "reduced_motion": False, "fixed_position": False, "orb_position": None, "display": "",
     "idle_seconds": 60, "retention_days": 30, "microphone_device": "",
     "speaker_device": "", "ollama_models": "", "speech_directory": "",
 }
@@ -66,6 +67,13 @@ def validate_settings(settings: dict) -> dict:
     for key in ("reduced_motion", "fixed_position"):
         if type(result[key]) is not bool:
             raise VoiceError("INVALID_SETTINGS", "The motion preferences must be on or off.")
+    position = result["orb_position"]
+    if position is not None:
+        if type(position) is not dict or set(position) != {"x", "y"}:
+            raise VoiceError("INVALID_SETTINGS", "The saved Orb position is invalid.")
+        for coordinate in position.values():
+            if type(coordinate) not in {int, float} or not math.isfinite(coordinate) or not 0 <= coordinate <= 1:
+                raise VoiceError("INVALID_SETTINGS", "The saved Orb position is invalid.")
     for key, bounds in {"idle_seconds": (15, 300), "retention_days": (1, 365)}.items():
         if type(result[key]) is not int or not bounds[0] <= result[key] <= bounds[1]:
             raise VoiceError("INVALID_SETTINGS", "The timeout or history duration is outside the supported range.")

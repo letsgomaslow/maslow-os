@@ -12,7 +12,7 @@ Item {
   property var snapshot: ({
     schemaVersion: 1,
     voice: { enabled: false, state: "disabled", microphone: "muted", speaking: false, level: 0, error: "" },
-    settings: { mode: "offline", server_kind: "ollama", server_url: "", model: "", execution_model: "", default_coder: "", reduced_motion: false, fixed_position: false, display: "" },
+    settings: { mode: "offline", server_kind: "ollama", server_url: "", model: "", execution_model: "", default_coder: "", reduced_motion: false, fixed_position: false, orb_position: null, display: "" },
     tasks: [], session: { id: "", transcript: [] }, readiness: { ready: false, checks: [], models: [] }
   })
   // Keep long-lived snapshot branches stable while the 20 Hz voice meter
