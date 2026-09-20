@@ -74,6 +74,7 @@ The initial source calculator run and the final installed tracker run are differ
 | A focus generation changed after the request signal | Event order matters in QML. Add a regression for ordering and validate it in the actual renderer, not only source-pattern tests. |
 | File approvals arrived before their matching lifecycle detail | Match thread/turn/item identities and allow only a bounded wait for detail. Decline unusable requests rather than presenting vague approval text. |
 | A long command was silently truncated at 4,000 characters | Never ask someone to authorize an undisclosed command tail. Decline oversized command detail; use shorter commands or a reviewable script. Mark file-preview truncation explicitly. |
+| Delayed conversation controls followed a later UI task selection | Bind controls to the daemon-selected task at final-transcript capture. Only a submission receipt can associate a new same-turn task. Recheck provider generation after waiting for the action lock. |
 | Queued direct work could restart and approvals could survive daemon loss | Reconcile all active direct states on startup. Preserve history and thread identity, clear stale approvals and require explicit Continue. |
 | Codex automatically persisted Trusted for a writable explicit thread cwd | Test configuration side effects, not only requested policies. Omit redundant thread/start cwd because the dedicated process already owns the exact directory; preserve existing trust and verify against the installed protocol. |
 | The first post-install readiness request failed | Keep the failure record. A clean post-install restart resolved it, but the proposed package-replacement race is not a confirmed root cause. Do not upgrade hypotheses into facts. |
@@ -96,3 +97,5 @@ Universal memory, meetings, dictation, Composio expansion, automatic agent insta
 ## Definition of success for the next iteration
 
 A person can state a reasonable outcome, understand whether Maslow is listening or working, make one correction, inspect useful output and stop or recover work without managing project bookkeeping. Measure successful completion, unnecessary questions, correct correction delivery, perceived responsiveness and honest result verification on a frozen scenario. No latency target, accessibility claim, uniqueness claim or complete hardware acceptance is established by this MVP yet.
+
+The [September 20 integration closeout](handoffs/2026-09-20-voice-merge.md) records the later task-binding correction, source/package integration and CI limitations separately from the installed 0.1.5-12 evidence above.
