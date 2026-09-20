@@ -1,5 +1,7 @@
 # Voice: remove routine intake and verify the actual delegation path
 
+Historical record with dated follow-ups. For the current product scope and acceptance limits, read [the product and lessons reference](../maslow-voice-product.md) and [development index](../maslow-development.md). Earlier statements about pending installation or missing capabilities apply to their recorded checkpoint, not necessarily the final installed candidate.
+
 This follow-up addresses the reported gap between automatic workspace support and a UI that still looked like a task form. It remains local development, not an installed or publicly released acceptance result. The installed Lenovo packages are Voice `0.1.5-7` and Codex `0.152.0-2`.
 
 ## Changes and scope
