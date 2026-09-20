@@ -192,10 +192,18 @@ class VoiceService:
             if role == "user" and event.get("final", True):
                 identity = event.get("turn_id")
                 if isinstance(identity, str) and 0 < len(identity) <= 200 and identity not in self.turns:
+                    # Typed and spoken requests share this capture boundary.
+                    # A delayed tool call must not follow a later UI selection.
+                    task_id, task_error = None, None
+                    try:
+                        task_id = self.current_task()["id"]
+                    except VoiceError as error:
+                        task_error = error.as_dict()
                     self.turns[identity] = {"source": text, "project": self.project, "mode": self.settings.value["mode"],
                                             "context": self.context, "session_id": self.session["id"],
                                             "preferred_coder": self.settings.value["default_coder"],
-                                            "task_policy": self.settings.value["task_policy"]}
+                                            "task_policy": self.settings.value["task_policy"],
+                                            "task_id": task_id, "task_error": task_error}
                     if len(self.turns) > 100:
                         self.turns.pop(next(iter(self.turns)))
                 self.source, self.turn_id = text, identity or ""
@@ -337,8 +345,10 @@ class VoiceService:
             "verification": "File existence checks do not verify the requested behavior. Agent-reported tests require review.",
         }
 
-    async def conversation_action(self, intent, turn_id):
+    async def conversation_action(self, intent, turn_id, *, epoch=None):
         async with self.action_lock:
+            if epoch is not None and self.provider_epoch is not epoch:
+                raise VoiceError("TURN_ENDED", "This conversation has ended. Please repeat the request.")
             turn = self._captured_turn(turn_id)
             if not isinstance(intent, dict):
                 raise VoiceError("INVALID_REQUEST", "The Voice action is invalid.")
@@ -364,7 +374,10 @@ class VoiceService:
                 result = await self.submit_intent(intent.get("brief"), turn_id,
                     project_name=intent.get("project_name", ""), new_project=intent.get("new_project", False))
             else:
-                task = self.current_task()
+                if not turn["task_id"]:
+                    error = turn["task_error"]
+                    raise VoiceError(error["code"], error["message"])
+                task = self.store.get(turn["task_id"])
                 action = intent.get("action")
                 if action in {"show", "show_result"}:
                     await self.request_task_view(task["id"])
@@ -441,6 +454,7 @@ class VoiceService:
             request_id = hashlib.sha256((turn["session_id"] + ":" + turn_id).encode()).hexdigest()
             existing = next((t for t in self.store.list(10000) if t["request_id"] == request_id), None)
             if existing:
+                turn.update(task_id=existing["id"], task_error=None)
                 return self.task_summary(existing)
             if brief["unresolved_questions"]:
                 raise VoiceError("CLARIFICATION_REQUIRED", " ".join(brief["unresolved_questions"]))
@@ -456,9 +470,13 @@ class VoiceService:
             if turn["mode"] == "gemini_live":
                 failed = next((t for t in self.store.list(10000) if t["request_id"] == request_id), None)
                 if failed:
+                    turn.update(task_id=failed["id"], task_error=None)
                     await self.request_task_view(failed["id"])
             raise
         if turn["mode"] == "gemini_live":
+            # Only the daemon's submission receipt can associate a newly created
+            # job with this turn; provider payloads cannot choose task identities.
+            turn.update(task_id=task["id"], task_error=None)
             self.project = project
             await self.request_task_view(task["id"])
             self.watch_gemini_task(task["id"])
@@ -571,9 +589,7 @@ class VoiceService:
                 transport = self.audio_transport_factory(microphone_device=config["microphone_device"],
                                                          speaker_device=config["speaker_device"], on_error=audio_error)
                 async def submit(intent, turn_id):
-                    if self.provider_epoch is not epoch:
-                        raise VoiceError("TURN_ENDED", "This conversation has ended. Please repeat the request.")
-                    return await self.conversation_action(intent, turn_id)
+                    return await self.conversation_action(intent, turn_id, epoch=epoch)
                 provider = self.provider_factory(config, values, emit, submit, transport)
                 self.provider = provider
                 await provider.start(audio=audio)

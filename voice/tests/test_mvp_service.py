@@ -118,6 +118,89 @@ class MvpServiceTests(unittest.IsolatedAsyncioTestCase):
         await self.service.dispatch({"action": "task_action", "id": result["id"], "operation": "select"})
         self.assertEqual(self.service.current_task_id, result["id"])
 
+    async def two_completed_tasks(self):
+        first = await self.service.conversation_action(BRIEF, "first")
+        first = self.service.store.update(first["id"], state="completed")
+        second, _ = self.service.store.create("other-task", BRIEF, first["project"], "gemini_live", "Another request")
+        second = self.service.store.update(second["id"], state="completed")
+        return first, second
+
+    async def test_delayed_typed_and_spoken_actions_keep_captured_task(self):
+        first, second = await self.two_completed_tasks()
+        self.service.tasks.action = AsyncMock(return_value=first)
+        for source in ("typed", "spoken"):
+            for action in ("status", "show", "show_result", "steer", "cancel", "continue"):
+                with self.subTest(source=source, action=action):
+                    await self.service.dispatch({"action": "task_action", "id": first["id"], "operation": "select"})
+                    words = source + " " + action
+                    identity = "turn-" + words
+                    if source == "typed":
+                        await self.service.dispatch({"action": "submit_text", "text": words})
+                    else:
+                        await self.service.provider.emit({"type": "transcript", "role": "user", "text": words,
+                                                          "turn_id": identity, "final": True})
+                    await self.service.dispatch({"action": "task_action", "id": second["id"], "operation": "select"})
+                    # A repeated transcript callback must not recapture selection.
+                    await self.turn(identity, words)
+                    result = await self.service.provider.submit({"operation": "task", "action": action, "text": words}, identity)
+                    self.assertEqual(result["id"], first["id"])
+                    if action in {"steer", "cancel", "continue"}:
+                        self.service.tasks.action.assert_awaited_with(first["id"], action, words)
+
+    async def test_ambiguous_target_cannot_follow_later_selection(self):
+        first, second = await self.two_completed_tasks()
+        self.service.current_task_id = ""
+        self.service.store.update(first["id"], state="queued")
+        self.service.store.update(second["id"], state="queued")
+        await self.turn("ambiguous", "Stop the task")
+        await self.service.dispatch({"action": "task_action", "id": second["id"], "operation": "select"})
+        self.service.tasks.action = AsyncMock()
+        with self.assertRaises(VoiceError) as raised:
+            await self.service.provider.submit({"operation": "task", "action": "cancel"}, "ambiguous")
+        self.assertEqual(raised.exception.code, "TASK_AMBIGUOUS")
+        self.service.tasks.action.assert_not_awaited()
+
+    async def test_task_created_by_another_turn_does_not_bind_empty_capture(self):
+        await self.turn("earlier", "Stop the task")
+        await self.service.conversation_action(BRIEF, "first")
+        self.service.tasks.action = AsyncMock()
+        with self.assertRaises(VoiceError) as raised:
+            await self.service.provider.submit({"operation": "task", "action": "cancel"}, "earlier")
+        self.assertEqual(raised.exception.code, "TASK_NOT_FOUND")
+        self.service.tasks.action.assert_not_awaited()
+
+    async def test_same_turn_submission_receipt_binds_new_task_despite_selection(self):
+        first, second = await self.two_completed_tasks()
+        await self.service.request_task_view(first["id"])
+        await self.turn("new-task", "Build another app, then show its status")
+        payload = {"operation": "submit", "brief": BRIEF, "new_project": True}
+        created = await self.service.provider.submit(payload, "new-task")
+        await self.service.request_task_view(second["id"])
+        # Exercise both cached and paraphrased submission retries.
+        await self.service.provider.submit(payload, "new-task")
+        await self.service.provider.submit(dict(BRIEF, summary="Paraphrased"), "new-task")
+        result = await self.service.provider.submit({"operation": "task", "action": "status"}, "new-task")
+        self.assertEqual(result["id"], created["id"])
+        self.assertNotIn(result["id"], (first["id"], second["id"]))
+        self.assertEqual(len(self.service.store.list()), 3)
+
+    async def test_old_provider_action_waiting_on_lock_cannot_use_new_turn(self):
+        first, second = await self.two_completed_tasks()
+        await self.service.request_task_view(first["id"])
+        await self.turn("reused-id", "Stop the task")
+        self.service.tasks.action = AsyncMock()
+        async with self.service.action_lock:
+            pending = asyncio.create_task(self.service.provider.submit({"operation": "task", "action": "cancel"}, "reused-id"))
+            await asyncio.sleep(0)
+            await self.service.end_voice()
+            await self.service.start_voice(audio=False)
+            await self.service.request_task_view(second["id"])
+            await self.turn("reused-id", "Stop the task")
+        with self.assertRaises(VoiceError) as raised:
+            await pending
+        self.assertEqual(raised.exception.code, "TURN_ENDED")
+        self.service.tasks.action.assert_not_awaited()
+
     async def test_old_completion_notice_expires_without_speech(self):
         result = await self.service.conversation_action(BRIEF, "first")
         provider = self.service.provider
