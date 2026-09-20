@@ -1,10 +1,11 @@
+import asyncio
 import json
 import tempfile
 import unittest
 from pathlib import Path
 from unittest.mock import AsyncMock, patch
 
-from maslow_voice.desktop import DesktopActions
+from maslow_voice.desktop import DesktopActions, command
 from maslow_voice.errors import VoiceError
 
 
@@ -70,3 +71,17 @@ class DesktopTests(unittest.IsolatedAsyncioTestCase):
             with self.assertRaises(VoiceError):
                 await desktop.open_path(task, "index.html")
             self.assertEqual(runner.await_count, 1)
+
+    async def test_detached_launcher_does_not_capture_child_output(self):
+        process = AsyncMock()
+        process.communicate.return_value = (None, None)
+        process.returncode = 0
+        with patch("maslow_voice.desktop.asyncio.create_subprocess_exec", return_value=process) as spawn:
+            self.assertEqual(await command("setsid", "-f", "xdg-open", "file:///tmp/result.html"), "")
+            self.assertEqual(spawn.call_args.kwargs["stdout"], asyncio.subprocess.DEVNULL)
+
+    async def test_offline_artifacts_never_open_on_host(self):
+        runner = AsyncMock()
+        with self.assertRaisesRegex(VoiceError, "isolated workspace"):
+            await DesktopActions(runner).open_path({"mode": "offline", "project": "/project"})
+        runner.assert_not_awaited()

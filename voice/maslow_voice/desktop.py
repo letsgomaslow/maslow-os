@@ -14,7 +14,10 @@ from .errors import VoiceError
 
 async def command(*argv):
     try:
-        process = await asyncio.create_subprocess_exec(*argv, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.DEVNULL)
+        # Detached applications must not inherit a capture pipe that keeps
+        # communicate() waiting for the lifetime of their window.
+        stdout = asyncio.subprocess.DEVNULL if argv[0] == "setsid" else asyncio.subprocess.PIPE
+        process = await asyncio.create_subprocess_exec(*argv, stdout=stdout, stderr=asyncio.subprocess.DEVNULL)
         try:
             output, _ = await asyncio.wait_for(process.communicate(), 5)
         except TimeoutError:
@@ -23,7 +26,7 @@ async def command(*argv):
             raise VoiceError("DESKTOP_TIMEOUT", "The desktop did not answer in time.") from None
         if process.returncode:
             raise VoiceError("DESKTOP_FAILED", "The desktop could not complete that action.")
-        return output.decode(errors="replace")
+        return (output or b"").decode(errors="replace")
     except FileNotFoundError:
         raise VoiceError("APPLICATION_UNAVAILABLE", "The desktop application or helper is unavailable.") from None
 
@@ -116,6 +119,8 @@ class DesktopActions:
         await self.run("hyprctl", "dispatch", "focuswindow", "address:" + address)
 
     async def open_path(self, task, relative=None):
+        if task.get("mode") == "offline":
+            raise VoiceError("OFFLINE_ACTION_UNAVAILABLE", "Open offline results through their isolated workspace.")
         root = Path(task["project"]).resolve()
         if relative is None:
             path = root
