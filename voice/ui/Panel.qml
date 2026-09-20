@@ -41,8 +41,17 @@ Item {
   property string selectedTaskId: ""
   property int handledTaskViewSequence: -1
   property int taskInputFocusRequest: 0
+  property int taskInputFocusGeneration: 0
   property string taskInputFocusTaskId: ""
   property string focusedTaskInputId: ""
+  property string pendingTaskInputRestoreId: ""
+  property string focusedTaskActionTaskId: ""
+  property string focusedTaskActionName: ""
+  property string pendingTaskActionRestoreTaskId: ""
+  property string pendingTaskActionRestoreName: ""
+  property int taskActionFocusRequest: 0
+  property var taskInstructionDrafts: ({})
+  property var taskInstructionSelections: ({})
   readonly property bool messageInputFocused: textDraft.activeFocus
   property alias voiceController: controller
 
@@ -88,8 +97,15 @@ Item {
   })
 
   onTasksChanged: {
+    var restoreTaskId = focusedTaskInputId
+    var restoreActionTaskId = focusedTaskActionTaskId
+    var restoreActionName = focusedTaskActionName
     if (selectedTaskId !== "" && !selectedTask) selectedTaskId = ""
     if (selectedTaskId === "" && tasks.length > 0) selectedTaskId = String(tasks[0].id || "")
+    if (restoreActionTaskId !== "" && restoreActionTaskId === selectedTaskId)
+      restoreTaskActionFocusAfterRefresh(restoreActionTaskId, restoreActionName)
+    else if (restoreTaskId !== "" && restoreTaskId === selectedTaskId)
+      restoreTaskInstructionFocusAfterRefresh(restoreTaskId)
   }
   onTaskViewRequestChanged: {
     var request = taskViewRequest || ({})
@@ -263,7 +279,93 @@ Item {
   function focusSelectedTaskInstruction() {
     if (selectedTaskId === "") return
     taskInputFocusTaskId = selectedTaskId
+    taskInputFocusGeneration += 1
     taskInputFocusRequest += 1
+  }
+  function taskInstructionDraft(taskId) {
+    var id = String(taskId || "")
+    return id === "" ? "" : String(taskInstructionDrafts[id] || "")
+  }
+  function setTaskInstructionDraft(taskId, text) {
+    var id = String(taskId || "")
+    if (id === "") return
+    var value = String(text || "")
+    if (taskInstructionDraft(id) === value) return
+    var next = {}
+    for (var key in taskInstructionDrafts) next[key] = taskInstructionDrafts[key]
+    if (value === "") delete next[id]
+    else next[id] = value
+    taskInstructionDrafts = next
+  }
+  function taskInstructionSelection(taskId) {
+    var id = String(taskId || "")
+    return taskInstructionSelections[id] || ({ cursorPosition: 0, selectionStart: 0, selectionEnd: 0 })
+  }
+  function setTaskInstructionSelection(taskId, cursorPosition, selectionStart, selectionEnd) {
+    var id = String(taskId || "")
+    if (id === "") return
+    var nextValue = { cursorPosition: Number(cursorPosition), selectionStart: Number(selectionStart), selectionEnd: Number(selectionEnd) }
+    var previous = taskInstructionSelection(id)
+    if (previous.cursorPosition === nextValue.cursorPosition && previous.selectionStart === nextValue.selectionStart && previous.selectionEnd === nextValue.selectionEnd) return
+    var next = {}
+    for (var key in taskInstructionSelections) next[key] = taskInstructionSelections[key]
+    next[id] = nextValue
+    taskInstructionSelections = next
+  }
+  function restoreTaskInstructionSelection(taskId, input) {
+    var selection = taskInstructionSelection(taskId)
+    var length = String(input.text || "").length
+    var start = Math.max(0, Math.min(length, Number(selection.selectionStart)))
+    var end = Math.max(0, Math.min(length, Number(selection.selectionEnd)))
+    if (start !== end) {
+      if (Number(selection.cursorPosition) === start) input.select(end, start)
+      else input.select(start, end)
+    }
+    else input.cursorPosition = Math.max(0, Math.min(length, Number(selection.cursorPosition)))
+  }
+  function clearPendingTaskInputRestore() {
+    pendingTaskInputRestoreId = ""
+    taskInputFocusGeneration += 1
+  }
+  function clearTaskActionFocus() {
+    focusedTaskActionTaskId = ""
+    focusedTaskActionName = ""
+    pendingTaskActionRestoreTaskId = ""
+    pendingTaskActionRestoreName = ""
+  }
+  function setTaskActionFocus(taskId, action) {
+    focusedTaskActionTaskId = String(taskId || "")
+    focusedTaskActionName = String(action || "")
+    pendingTaskActionRestoreTaskId = ""
+    pendingTaskActionRestoreName = ""
+    clearPendingTaskInputRestore()
+  }
+  function restoreTaskInstructionFocusAfterRefresh(taskId) {
+    var id = String(taskId || "")
+    if (id === "") return
+    pendingTaskInputRestoreId = id
+    Qt.callLater(function() {
+      if (pendingTaskInputRestoreId !== id) return
+      pendingTaskInputRestoreId = ""
+      if (!controllerOpen || page !== "tasks" || selectedTaskId !== id) return
+      taskInputFocusTaskId = id
+      taskInputFocusGeneration += 1
+      taskInputFocusRequest += 1
+    })
+  }
+  function restoreTaskActionFocusAfterRefresh(taskId, action) {
+    var id = String(taskId || "")
+    var name = String(action || "")
+    if (id === "" || name === "") return
+    pendingTaskActionRestoreTaskId = id
+    pendingTaskActionRestoreName = name
+    Qt.callLater(function() {
+      if (pendingTaskActionRestoreTaskId !== id || pendingTaskActionRestoreName !== name) return
+      pendingTaskActionRestoreTaskId = ""
+      pendingTaskActionRestoreName = ""
+      if (!controllerOpen || page !== "tasks" || selectedTaskId !== id) return
+      taskActionFocusRequest += 1
+    })
   }
   function taskCapability(task, capability) {
     var capabilities = (task || {}).capabilities
@@ -448,6 +550,7 @@ Item {
     font.family: "Manrope"
     font.pixelSize: 14
     leftPadding: 12
+    onActiveFocusChanged: if (activeFocus) { root.clearPendingTaskInputRestore(); root.clearTaskActionFocus() }
     background: Rectangle { radius: 8; color: "#1E2D47"; border.width: parent.activeFocus ? 2 : 1; border.color: parent.activeFocus ? "#6DC4AD" : "#75879D" }
   }
   component VoiceArea: TextArea {
@@ -459,6 +562,7 @@ Item {
     font.family: "Manrope"
     font.pixelSize: 14
     padding: 12
+    onActiveFocusChanged: if (activeFocus) { root.clearPendingTaskInputRestore(); root.clearTaskActionFocus() }
     background: Rectangle { radius: 8; color: "#1E2D47"; border.width: parent.activeFocus ? 2 : 1; border.color: parent.activeFocus ? "#6DC4AD" : "#75879D" }
   }
   component VoiceSelect: ComboBox {
@@ -469,6 +573,7 @@ Item {
     font.pixelSize: 14
     leftPadding: 12
     rightPadding: 36
+    onActiveFocusChanged: if (activeFocus) { root.clearPendingTaskInputRestore(); root.clearTaskActionFocus() }
     palette.text: "#FFFFFF"
     palette.buttonText: "#FFFFFF"
     palette.highlightedText: "#121D35"
@@ -533,12 +638,14 @@ Item {
   }
   component VoiceCheck: CheckBox {
     implicitHeight: 44
+    onActiveFocusChanged: if (activeFocus) { root.clearPendingTaskInputRestore(); root.clearTaskActionFocus() }
     contentItem: Text { text: parent.text; leftPadding: parent.indicator.width + parent.spacing; color: "#FFFFFF"; font.family: "Manrope"; verticalAlignment: Text.AlignVCenter }
     background: Rectangle { color: "transparent"; radius: 6; border.width: parent.activeFocus ? 2 : 0; border.color: "#6DC4AD" }
   }
 
   component VoiceButton: Button {
     focusPolicy: Qt.StrongFocus
+    onActiveFocusChanged: if (activeFocus) { root.clearPendingTaskInputRestore(); root.clearTaskActionFocus() }
     implicitHeight: 44
     horizontalPadding: 14
     Accessible.role: Accessible.Button
@@ -848,8 +955,31 @@ Item {
                       property bool reportOpen: false
                       function focusInstructionIfRequested() {
                         if (!selected || root.taskInputFocusTaskId !== String(modelData.id || "")) return
+                        var taskId = String(modelData.id || "")
+                        var generation = root.taskInputFocusGeneration
                         root.taskInputFocusTaskId = ""
-                        Qt.callLater(function() { taskInstruction.forceActiveFocus() })
+                        Qt.callLater(function() {
+                          if (root.taskInputFocusGeneration === generation && root.focusedTaskActionTaskId === "" && root.controllerOpen && root.page === "tasks" && root.selectedTaskId === taskId) {
+                            root.restoreTaskInstructionSelection(taskId, taskInstruction)
+                            taskInstruction.forceActiveFocus()
+                          }
+                        })
+                      }
+                      function focusActionIfRequested() {
+                        if (!selected || root.focusedTaskActionTaskId !== String(modelData.id || "")) return
+                        var buttons = {
+                          approve: approveButton, deny: denyButton, steer: steerButton, start: startButton,
+                          cancel: cancelButton, continueTask: continueButton, openFolder: openFolderButton,
+                          setup: setupButton, review: reviewButton, exportTask: exportButton, dismiss: dismissButton
+                        }
+                        var button = buttons[root.focusedTaskActionName]
+                        var taskId = String(modelData.id || "")
+                        var action = root.focusedTaskActionName
+                        var request = root.taskActionFocusRequest
+                        if (button && button.visible && button.enabled) Qt.callLater(function() {
+                          if (root.taskActionFocusRequest === request && root.focusedTaskActionTaskId === taskId && root.focusedTaskActionName === action && button.visible && button.enabled)
+                            button.forceActiveFocus()
+                        })
                       }
                       onSelectedChanged: {
                         focusInstructionIfRequested()
@@ -858,6 +988,9 @@ Item {
                         target: root
                         function onTaskInputFocusRequestChanged() {
                           taskColumn.focusInstructionIfRequested()
+                        }
+                        function onTaskActionFocusRequestChanged() {
+                          taskColumn.focusActionIfRequested()
                         }
                       }
                       Text { text: String(modelData.title || "Task") + (taskColumn.selected ? " · selected" : ""); color: "#FFFFFF"; font.family: "Manrope"; font.weight: Font.DemiBold; wrapMode: Text.WordWrap; Layout.fillWidth: true }
@@ -870,23 +1003,24 @@ Item {
                         Layout.preferredHeight: 112
                         Layout.maximumHeight: 112
                         clip: true
+                        onActiveFocusChanged: if (activeFocus) { root.clearPendingTaskInputRestore(); root.clearTaskActionFocus() }
                         ScrollBar.vertical.policy: ScrollBar.AsNeeded
                         Text { width: approvalScroll.availableWidth; text: "Approval needed:\n" + root.approvalSummary(modelData); wrapMode: Text.Wrap; color: "#EE7BB3"; font.family: "Manrope"; Accessible.role: Accessible.AlertMessage }
                       }
                       Text { visible: taskColumn.selected && root.taskHasCodexSetupError(modelData); text: String((modelData.error || {}).message || "Codex needs setup before this task can run."); color: "#EE7BB3"; font.family: "Manrope"; wrapMode: Text.Wrap; Layout.fillWidth: true; Accessible.role: Accessible.AlertMessage }
-                      VoiceArea { id: taskInstruction; visible: taskColumn.selected; Layout.fillWidth: true; placeholderText: "Tell the agent what to change or do next"; wrapMode: TextEdit.Wrap; Accessible.name: "Instructions for " + String(modelData.title || "task"); onActiveFocusChanged: { if (activeFocus) root.focusedTaskInputId = String(modelData.id || ""); else if (root.focusedTaskInputId === String(modelData.id || "")) root.focusedTaskInputId = "" } }
+                      VoiceArea { id: taskInstruction; visible: taskColumn.selected; Layout.fillWidth: true; placeholderText: "Tell the agent what to change or do next"; text: root.taskInstructionDraft(modelData.id); onTextChanged: root.setTaskInstructionDraft(modelData.id, text); onCursorPositionChanged: if (activeFocus) root.setTaskInstructionSelection(modelData.id, cursorPosition, selectionStart, selectionEnd); onSelectionStartChanged: if (activeFocus) root.setTaskInstructionSelection(modelData.id, cursorPosition, selectionStart, selectionEnd); onSelectionEndChanged: if (activeFocus) root.setTaskInstructionSelection(modelData.id, cursorPosition, selectionStart, selectionEnd); wrapMode: TextEdit.Wrap; Accessible.name: "Instructions for " + String(modelData.title || "task"); onActiveFocusChanged: { if (activeFocus) { root.focusedTaskInputId = String(modelData.id || ""); root.setTaskInstructionSelection(modelData.id, cursorPosition, selectionStart, selectionEnd); root.clearTaskActionFocus(); root.clearPendingTaskInputRestore() } else if (root.focusedTaskInputId === String(modelData.id || "")) root.focusedTaskInputId = "" } }
                       Flow { Layout.fillWidth: true; spacing: 8
-                        VoiceButton { text: "Approve"; visible: taskColumn.selected && root.needsApproval(modelData); enabled: !!((modelData.approval || ({})).request_id || modelData.approval_request_id); onClicked: root.taskAction(modelData, "approve") }
-                        VoiceButton { text: "Deny"; visible: taskColumn.selected && root.needsApproval(modelData); enabled: !!((modelData.approval || ({})).request_id || modelData.approval_request_id); onClicked: root.taskAction(modelData, "deny") }
-                        VoiceButton { text: "Send update"; visible: taskColumn.selected && root.taskCapability(modelData, "steer") && ["accepted", "running", "waiting_input", "awaiting_approval"].indexOf(modelData.state) >= 0; enabled: taskInstruction.text.trim() !== ""; onClicked: root.taskAction(modelData, "steer", taskInstruction.text) }
-                        VoiceButton { text: "Start"; visible: taskColumn.selected && modelData.state === "proposed"; onClicked: root.taskAction(modelData, "start") }
-                        VoiceButton { text: "Stop"; visible: taskColumn.selected && ["completed", "failed", "cancelled", "interrupted"].indexOf(modelData.state) < 0; onClicked: root.taskAction(modelData, "cancel") }
-                        VoiceButton { text: "Continue"; visible: taskColumn.selected && root.taskCapability(modelData, "continue") && ["completed", "failed", "cancelled", "interrupted", "waiting_input"].indexOf(modelData.state) >= 0; enabled: taskInstruction.text.trim() !== ""; onClicked: root.taskAction(modelData, "continue", taskInstruction.text) }
-                        VoiceButton { text: "Open folder"; visible: taskColumn.selected && String(modelData.project || "") !== ""; onClicked: root.taskAction(modelData, "open_folder") }
-                        VoiceButton { text: "Open Codex setup"; visible: taskColumn.selected && root.taskHasCodexSetupError(modelData); onClicked: root.send("desktop_action", { application: "hub" }) }
-                        VoiceButton { text: "Review changes"; visible: taskColumn.selected && modelData.mode === "offline" && ["completed", "failed", "cancelled", "interrupted"].indexOf(modelData.state) >= 0; onClicked: root.taskAction(modelData, "review") }
-                        VoiceButton { text: "Export reviewed changes"; visible: taskColumn.selected && !!(modelData.export_review || ({})).digest; onClicked: root.taskAction(modelData, "export") }
-                        VoiceButton { text: "Dismiss"; visible: taskColumn.selected && ["completed", "failed", "cancelled", "interrupted"].indexOf(modelData.state) >= 0; onClicked: root.taskAction(modelData, "dismiss") }
+                        VoiceButton { id: approveButton; text: "Approve"; visible: taskColumn.selected && root.needsApproval(modelData); enabled: !!((modelData.approval || ({})).request_id || modelData.approval_request_id); onActiveFocusChanged: if (activeFocus) root.setTaskActionFocus(modelData.id, "approve"); onClicked: root.taskAction(modelData, "approve") }
+                        VoiceButton { id: denyButton; text: "Deny"; visible: taskColumn.selected && root.needsApproval(modelData); enabled: !!((modelData.approval || ({})).request_id || modelData.approval_request_id); onActiveFocusChanged: if (activeFocus) root.setTaskActionFocus(modelData.id, "deny"); onClicked: root.taskAction(modelData, "deny") }
+                        VoiceButton { id: steerButton; text: "Send update"; visible: taskColumn.selected && root.taskCapability(modelData, "steer") && ["accepted", "running", "waiting_input", "awaiting_approval"].indexOf(modelData.state) >= 0; enabled: taskInstruction.text.trim() !== ""; onActiveFocusChanged: if (activeFocus) root.setTaskActionFocus(modelData.id, "steer"); onClicked: root.taskAction(modelData, "steer", taskInstruction.text) }
+                        VoiceButton { id: startButton; text: "Start"; visible: taskColumn.selected && modelData.state === "proposed"; onActiveFocusChanged: if (activeFocus) root.setTaskActionFocus(modelData.id, "start"); onClicked: root.taskAction(modelData, "start") }
+                        VoiceButton { id: cancelButton; text: "Stop"; visible: taskColumn.selected && ["completed", "failed", "cancelled", "interrupted"].indexOf(modelData.state) < 0; onActiveFocusChanged: if (activeFocus) root.setTaskActionFocus(modelData.id, "cancel"); onClicked: root.taskAction(modelData, "cancel") }
+                        VoiceButton { id: continueButton; text: "Continue"; visible: taskColumn.selected && root.taskCapability(modelData, "continue") && ["completed", "failed", "cancelled", "interrupted", "waiting_input"].indexOf(modelData.state) >= 0; enabled: taskInstruction.text.trim() !== ""; onActiveFocusChanged: if (activeFocus) root.setTaskActionFocus(modelData.id, "continueTask"); onClicked: root.taskAction(modelData, "continue", taskInstruction.text) }
+                        VoiceButton { id: openFolderButton; text: "Open folder"; visible: taskColumn.selected && String(modelData.project || "") !== ""; onActiveFocusChanged: if (activeFocus) root.setTaskActionFocus(modelData.id, "openFolder"); onClicked: root.taskAction(modelData, "open_folder") }
+                        VoiceButton { id: setupButton; text: "Open Codex setup"; visible: taskColumn.selected && root.taskHasCodexSetupError(modelData); onActiveFocusChanged: if (activeFocus) root.setTaskActionFocus(modelData.id, "setup"); onClicked: root.send("desktop_action", { application: "hub" }) }
+                        VoiceButton { id: reviewButton; text: "Review changes"; visible: taskColumn.selected && modelData.mode === "offline" && ["completed", "failed", "cancelled", "interrupted"].indexOf(modelData.state) >= 0; onActiveFocusChanged: if (activeFocus) root.setTaskActionFocus(modelData.id, "review"); onClicked: root.taskAction(modelData, "review") }
+                        VoiceButton { id: exportButton; text: "Export reviewed changes"; visible: taskColumn.selected && !!(modelData.export_review || ({})).digest; onActiveFocusChanged: if (activeFocus) root.setTaskActionFocus(modelData.id, "exportTask"); onClicked: root.taskAction(modelData, "export") }
+                        VoiceButton { id: dismissButton; text: "Dismiss"; visible: taskColumn.selected && ["completed", "failed", "cancelled", "interrupted"].indexOf(modelData.state) >= 0; onActiveFocusChanged: if (activeFocus) root.setTaskActionFocus(modelData.id, "dismiss"); onClicked: root.taskAction(modelData, "dismiss") }
                       }
                       VoiceButton { visible: taskColumn.selected && String(modelData.result || "") !== ""; text: taskColumn.reportOpen ? "Hide agent report" : "Show agent report"; onClicked: taskColumn.reportOpen = !taskColumn.reportOpen }
                       ScrollView {

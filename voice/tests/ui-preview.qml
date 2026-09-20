@@ -78,6 +78,13 @@ ShellRoot {
       next.task_view_request = { task_id: "approval", sequence: 1 }
       panel.voiceController.setFixture(next)
     }
+    function taskActivity(): void {
+      var next = JSON.parse(JSON.stringify(panel.voiceController.snapshot))
+      if (!next.tasks || next.tasks.length === 0) return
+      next.tasks[0].activity = (next.tasks[0].activity || []).concat([{ kind: "assistant", text: "A fixture activity update arrived." }])
+      panel.voiceController.setFixture(next)
+    }
+    function taskDraft(taskId: string, text: string): void { panel.setTaskInstructionDraft(taskId, text) }
     function repair(): void { panel.openProjectRepair() }
     function stressPrepare(): void {
       var next = JSON.parse(JSON.stringify(panel.voiceController.snapshot))
@@ -124,7 +131,8 @@ ShellRoot {
     }
     function requests(): string { return JSON.stringify(panel.voiceController.fixtureRequests) }
     function typeStatus(): string { return JSON.stringify({ page: panel.page, messageFocused: panel.messageInputFocused, advancedOptionsOpen: panel.advancedRequestOptionsOpen }) }
-    function taskFocusStatus(): string { return JSON.stringify({ page: panel.page, selectedTaskId: panel.selectedTaskId, focusedTaskInputId: panel.focusedTaskInputId, taskInputFocusTaskId: panel.taskInputFocusTaskId, taskInputFocusRequest: panel.taskInputFocusRequest }) }
+    function taskFocusStatus(): string { return JSON.stringify({ page: panel.page, selectedTaskId: panel.selectedTaskId, focusedTaskInputId: panel.focusedTaskInputId, taskInputFocusTaskId: panel.taskInputFocusTaskId, taskInputFocusRequest: panel.taskInputFocusRequest, focusedTaskActionTaskId: panel.focusedTaskActionTaskId, focusedTaskActionName: panel.focusedTaskActionName, taskActionFocusRequest: panel.taskActionFocusRequest }) }
+    function taskDraftStatus(taskId: string): string { return JSON.stringify({ taskId: taskId, draft: panel.taskInstructionDraft(taskId), selection: panel.taskInstructionSelection(taskId), pendingTaskInputRestoreId: panel.pendingTaskInputRestoreId }) }
     function repairStatus(): string { return JSON.stringify({ page: panel.page, settingsOpen: panel.settingsOpen, projectRepairOpen: panel.projectRepairOpen, advancedRequestOptionsOpen: panel.advancedRequestOptionsOpen }) }
     function setupSaved(): void { panel.voiceController.applyLine('{"ok":true,"livekit_saved":true}') }
     function setupError(): void { panel.voiceController.applyLine('{"ok":false,"error":{"message":"LiveKit setup could not be saved. Check the project URL and try again."}}') }
