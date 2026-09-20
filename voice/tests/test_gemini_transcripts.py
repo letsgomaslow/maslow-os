@@ -67,3 +67,27 @@ class GeminiTypedTranscriptTests(unittest.IsolatedAsyncioTestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class GeminiGenerationIdentityTests(unittest.IsolatedAsyncioTestCase):
+    async def test_late_final_transcript_stays_with_its_original_generation(self):
+        provider = LiveKitGeminiProvider(config=dict(DEFAULTS), secrets={}, emit=AsyncMock(), submit=AsyncMock())
+        handlers = {}
+        session = SimpleNamespace(on=lambda name, callback: handlers.__setitem__(name, callback))
+        provider._bind_realtime_session(session)
+
+        async def calls(identity):
+            yield SimpleNamespace(call_id=identity)
+
+        events = []
+        for response_id, input_id, call_id in (("A", "input-A", "call-A"), ("B", "input-B", "call-B")):
+            session._current_generation = SimpleNamespace(response_id=response_id, input_id=input_id)
+            event = SimpleNamespace(response_id=response_id, user_initiated=False, function_stream=calls(call_id))
+            handlers["generation_created"](event)
+            events.append(event)
+        handlers["input_audio_transcription_completed"](SimpleNamespace(item_id="input-A", transcript="Open browser", is_final=True))
+        for event in events:
+            async for _call in event.function_stream:
+                pass
+        self.assertEqual(provider._tool_turns, {"call-A": "input-A"})
+        self.assertNotIn("call-B", provider._tool_turns)

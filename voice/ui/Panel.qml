@@ -36,6 +36,8 @@ Item {
   property bool uiTestInstrumentation: false
   property int taskDelegateCreations: 0
   property int transcriptDelegateCreations: 0
+  property string selectedTaskId: ""
+  property int handledTaskViewSequence: -1
   property alias voiceController: controller
 
   readonly property var lockService: shell && typeof shell.serviceFor === "function" ? shell.serviceFor("omarchy.lock") : null
@@ -48,8 +50,11 @@ Item {
   readonly property var readiness: controller.readiness || ({})
   readonly property var transcript: (controller.session || {}).transcript || []
   readonly property var tasks: controller.visibleTasks || []
+  readonly property var taskViewRequest: controller.taskViewRequest || null
+  readonly property var selectedTask: tasks.find(function(task) { return String(task.id || "") === selectedTaskId }) || null
   readonly property bool reducedMotion: settings.reduced_motion === true
   readonly property bool fixedPosition: settings.fixed_position === true
+  readonly property bool automaticWorkspaces: String(settings.mode || "") === "gemini_live"
   readonly property bool conversationReady: root.conversationReadiness().ready === true
   readonly property bool disabled: voice.enabled !== true && !conversationReady
   readonly property string orbState: voice.error ? "error" : (voice.state === "listening" && voice.microphone !== true ? "muted" : String(voice.state || "idle"))
@@ -71,7 +76,26 @@ Item {
     compactControlsOpen = conversation
   }
   readonly property bool conversation: ["connecting", "thinking", "listening", "speaking", "talking", "conversation"].indexOf(String(voice.state || "")) >= 0
-  readonly property bool working: tasks.some(function(task) { return task.state !== "dismissed" && task.dismissed !== true })
+  readonly property bool working: tasks.some(function(task) {
+    return ["queued", "submitting", "accepted", "running", "waiting_input", "awaiting_approval", "stopping"].indexOf(String(task.state || "")) >= 0
+  })
+
+  onTasksChanged: {
+    if (selectedTaskId !== "" && !selectedTask) selectedTaskId = ""
+    if (selectedTaskId === "" && tasks.length > 0) selectedTaskId = String(tasks[0].id || "")
+  }
+  onTaskViewRequestChanged: {
+    var request = taskViewRequest || ({})
+    var sequence = Number(request.sequence)
+    var taskId = String(request.task_id || "")
+    if (taskId === "" || !isFinite(sequence) || sequence <= handledTaskViewSequence) return
+    handledTaskViewSequence = sequence
+    selectedTaskId = taskId
+    page = "tasks"
+    controllerOpen = true
+    compactControlsOpen = false
+    Qt.callLater(function() { controlsFocus.forceActiveFocus() })
+  }
 
   onTaskErrorChanged: {
     if (shouldHandleTaskError(taskError) && taskError.code === "PROJECT_REQUIRED") {
@@ -209,6 +233,47 @@ Item {
       request.paths = (review.changes || []).map(function(change) { return change.path })
     }
     send("task_action", request)
+  }
+  function selectTask(task) {
+    selectedTaskId = String((task || {}).id || "")
+    taskAction(task, "select")
+  }
+  function taskCapability(task, capability) {
+    var capabilities = (task || {}).capabilities
+    if (capabilities && Object.prototype.hasOwnProperty.call(capabilities, capability))
+      return capabilities[capability] === true
+    // Codex is intentionally opt-in for its new session controls. Existing
+    // Hermes and Claude records retain their established controls until their
+    // adapters publish a capability map.
+    return String((task || {}).selected_agent || "") !== "codex"
+  }
+  function taskHasCodexSetupError(task) {
+    var code = String((((task || {}).error || {}).code) || "")
+    return String((task || {}).selected_agent || "") === "codex" && ["CODEX_MISSING", "CODEX_UPDATE_REQUIRED", "CODEX_AUTH_REQUIRED", "AGENT_UNAVAILABLE"].indexOf(code) >= 0
+  }
+  function artifactVerificationText(artifact) {
+    var verification = (artifact || {}).verification
+    if (verification === "exists") return "File exists; behavior not verified"
+    if (verification === "missing") return "File not found"
+    if (verification === true) return "Maslow verified"
+    if (verification === false) return "Verification pending"
+    if (typeof verification === "string" && verification !== "") return verification
+    return (artifact || {}).exists === true ? "File exists; verification pending" : "Unavailable"
+  }
+  function taskSessionIdentity(task) {
+    var current = task || ({})
+    var thread = current.thread_id || current.threadId || ""
+    var turn = current.turn_id || current.turnId || ""
+    var children = current.children || []
+    for (var index = children.length - 1; index >= 0 && (!thread || !turn); index--) {
+      var child = children[index] || ({})
+      if (!thread) thread = child.thread_id || child.threadId || ""
+      if (!turn) turn = child.turn_id || child.turnId || ""
+    }
+    var identity = []
+    if (thread) identity.push("Thread " + String(thread))
+    if (turn) identity.push("Turn " + String(turn))
+    return identity.join(" · ")
   }
   function needsApproval(task) {
     var approval = task ? task.approval : null
@@ -486,6 +551,22 @@ Item {
         interactive: orbPointer.containsMouse || orbPointer.pressed || orbButton.activeFocus
         gpuShaderAvailable: Quickshell.env("MASLOW_VOICE_GPU_SHADER") !== "0"
       }
+      // This sits outside the Orb material so a background task remains
+      // visible without changing the single-action Orb design.
+      Rectangle {
+        visible: root.working
+        width: 11
+        height: width
+        radius: width / 2
+        anchors.right: parent.right
+        anchors.top: parent.top
+        anchors.rightMargin: 4
+        anchors.topMargin: 4
+        color: "#6DC4AD"
+        border.color: "#121D35"
+        border.width: 2
+        Accessible.ignored: true
+      }
       onClicked: root.startFromOrb()
 
       MouseArea {
@@ -600,6 +681,7 @@ Item {
         }
         Text { visible: String(root.taskError.message || "") !== ""; text: String(root.taskError.message || ""); color: "#EE7BB3"; font.family: "Manrope"; wrapMode: Text.WordWrap; Layout.fillWidth: true; Accessible.role: Accessible.AlertMessage; Accessible.name: text }
         VoiceButton { visible: root.taskError.code === "PROJECT_REQUIRED"; text: "Choose project"; onClicked: { root.page = "type"; root.controllerOpen = true; Qt.callLater(function() { projectField.forceActiveFocus() }) } }
+        VoiceButton { visible: ["CODEX_MISSING", "CODEX_UPDATE_REQUIRED", "CODEX_AUTH_REQUIRED"].indexOf(root.taskError.code) >= 0; text: "Open Codex setup"; onClicked: root.send("desktop_action", { application: "hub" }) }
       }
     }
 
@@ -664,7 +746,7 @@ Item {
                 Text { visible: root.voice.error || controller.transportError; Layout.alignment: Qt.AlignHCenter; text: root.voice.error || controller.transportError; color: "#EE7BB3"; font.family: "Manrope"; wrapMode: Text.WordWrap; Accessible.role: Accessible.AlertMessage; Accessible.name: text }
                 Text { Layout.alignment: Qt.AlignHCenter; text: root.conversation ? root.stateText() : "What would you like to work on?"; color: "#FFFFFF"; font.family: "Manrope"; font.pixelSize: 24 }
                 VoiceButton { id: talkAction; Layout.alignment: Qt.AlignHCenter; text: root.conversation ? "End conversation" : "Start talking"; onClicked: root.conversation ? root.send("end_voice") : root.requestVoiceStart() }
-                VoiceField { Layout.fillWidth: true; placeholderText: "Project folder for tasks (optional for conversation)"; text: root.selectedProject; onTextEdited: root.selectedProject = text; Accessible.name: "Project folder" }
+                VoiceField { Layout.fillWidth: true; placeholderText: root.automaticWorkspaces ? "Project folder (optional — Maslow creates a workspace)" : "Project folder for tasks (optional for conversation)"; text: root.selectedProject; onTextEdited: root.selectedProject = text; Accessible.name: "Project folder" }
                 Text { Layout.alignment: Qt.AlignHCenter; text: "Talk through an idea, or ask Maslow to hand work to your agents."; color: "#D1D5DB"; font.family: "Manrope"; font.pixelSize: 15; wrapMode: Text.WordWrap; horizontalAlignment: Text.AlignHCenter; Layout.maximumWidth: 520 }
                 Text { Layout.alignment: Qt.AlignHCenter; text: root.microphoneText() + (root.transcript.length > 0 ? "  ·  Captions: " + String(root.transcript[root.transcript.length - 1].text || "") : ""); color: "#D1D5DB"; font.family: "Manrope"; font.pixelSize: 13; wrapMode: Text.WordWrap; horizontalAlignment: Text.AlignHCenter; Layout.maximumWidth: 520; Accessible.role: Accessible.StatusBar; Accessible.name: text }
                 Item { Layout.fillHeight: true }
@@ -679,7 +761,8 @@ Item {
                 spacing: 12
                 Text { text: "Send a clear request"; color: "#FFFFFF"; font.family: "Manrope"; font.pixelSize: 22; Accessible.role: Accessible.Heading }
                 Text { visible: String(root.taskError.message || "") !== ""; text: String(root.taskError.message || ""); color: "#EE7BB3"; font.family: "Manrope"; wrapMode: Text.WordWrap; Layout.fillWidth: true; Accessible.role: Accessible.AlertMessage; Accessible.name: text }
-                VoiceField { Layout.fillWidth: true; id: projectField; placeholderText: "Project folder (required to hand off work)"; text: root.selectedProject; onTextEdited: root.selectedProject = text; Accessible.name: "Selected project" }
+                VoiceField { Layout.fillWidth: true; id: projectField; placeholderText: root.automaticWorkspaces ? "Project folder (optional — Maslow creates a workspace)" : "Project folder (required to hand off work)"; text: root.selectedProject; onTextEdited: root.selectedProject = text; Accessible.name: "Selected project" }
+                Text { visible: root.automaticWorkspaces; text: "Leave this blank to create a workspace for this request."; color: "#D1D5DB"; font.family: "Manrope"; wrapMode: Text.WordWrap; Layout.fillWidth: true }
                 VoiceArea { Layout.fillWidth: true; id: contextField; placeholderText: "Context you choose to share (optional)"; text: root.explicitContext; onTextChanged: root.explicitContext = text; Accessible.name: "Explicit context"; implicitHeight: 80; wrapMode: TextEdit.Wrap }
                 VoiceArea { Layout.fillWidth: true; id: textDraft; placeholderText: "Describe the work to coordinate"; text: root.draft; onTextChanged: root.draft = text; Accessible.name: "Task request"; implicitHeight: 110; wrapMode: TextEdit.Wrap }
                 Text { text: "Maslow only sends the request, project, and context you enter here. It does not capture screenshots automatically."; color: "#D1D5DB"; font.family: "Manrope"; wrapMode: Text.WordWrap; Layout.fillWidth: true }
@@ -706,21 +789,54 @@ Item {
                     radius: 8; color: "#1E2D47"; border.color: "#496078"
                     ColumnLayout {
                       id: taskColumn; anchors.fill: parent; anchors.margins: 10; spacing: 7
-                      Text { text: String(modelData.title || "Task"); color: "#FFFFFF"; font.family: "Manrope"; font.weight: Font.DemiBold; wrapMode: Text.WordWrap; Layout.fillWidth: true }
-                      Text { text: String(modelData.state || "unknown").replace(/_/g, " ") + " · " + String(modelData.result || (modelData.error || ({})).message || modelData.summary || ""); color: "#D1D5DB"; font.family: "Manrope"; wrapMode: Text.WordWrap; Layout.fillWidth: true }
-                      Text { visible: root.needsApproval(modelData); text: "Approval requested: " + JSON.stringify(modelData.approval || ({}), null, 2); wrapMode: Text.Wrap; Layout.fillWidth: true; color: "#EE7BB3"; font.family: "Manrope"; Accessible.role: Accessible.AlertMessage }
-                      VoiceArea { id: taskInstruction; Layout.fillWidth: true; placeholderText: "Tell the agent what to change or do next"; wrapMode: TextEdit.Wrap; Accessible.name: "Instructions for " + String(modelData.title || "task") }
-                      Repeater { model: (modelData.export_review || ({})).changes || []; delegate: Text { required property var modelData; text: String(modelData.action) + ": " + String(modelData.path); color: "#FFFFFF"; Layout.fillWidth: true; wrapMode: Text.Wrap } }
+                      property var task: modelData
+                      readonly property bool selected: root.selectedTaskId === String(modelData.id || "")
+                      Text { text: String(modelData.title || "Task") + (taskColumn.selected ? " · selected" : ""); color: "#FFFFFF"; font.family: "Manrope"; font.weight: Font.DemiBold; wrapMode: Text.WordWrap; Layout.fillWidth: true }
+                      Text { text: String(modelData.state || "unknown").replace(/_/g, " ") + " · " + String(modelData.result ? "Agent report: " + modelData.result : (modelData.error || ({})).message || modelData.summary || ""); color: "#D1D5DB"; font.family: "Manrope"; wrapMode: Text.WordWrap; Layout.fillWidth: true }
+                      VoiceButton { visible: !taskColumn.selected; text: "View task"; onClicked: root.selectTask(modelData) }
+                      Text { visible: taskColumn.selected && String(modelData.project || "") !== ""; text: "Workspace: " + String(modelData.project || ""); color: "#D1D5DB"; font.family: "Manrope"; wrapMode: Text.Wrap; Layout.fillWidth: true; Accessible.name: text }
+                      Text { visible: taskColumn.selected && root.taskSessionIdentity(modelData) !== ""; text: root.taskSessionIdentity(modelData); color: "#D1D5DB"; font.family: "Manrope"; font.pixelSize: 12; wrapMode: Text.Wrap; Layout.fillWidth: true; Accessible.name: text }
+                      Text { visible: taskColumn.selected && root.needsApproval(modelData); text: "Approval requested: " + JSON.stringify(modelData.approval || ({}), null, 2); wrapMode: Text.Wrap; Layout.fillWidth: true; color: "#EE7BB3"; font.family: "Manrope"; Accessible.role: Accessible.AlertMessage }
+                      Text { visible: taskColumn.selected && root.taskHasCodexSetupError(modelData); text: String((modelData.error || {}).message || "Codex needs setup before this task can run."); color: "#EE7BB3"; font.family: "Manrope"; wrapMode: Text.Wrap; Layout.fillWidth: true; Accessible.role: Accessible.AlertMessage }
+                      ColumnLayout {
+                        visible: taskColumn.selected && ((modelData.activity || []).length > 0)
+                        Layout.fillWidth: true
+                        spacing: 4
+                        Text { text: "Live activity"; color: "#FFFFFF"; font.family: "Manrope"; font.weight: Font.DemiBold; Accessible.role: Accessible.Heading }
+                        Repeater {
+                          model: modelData.activity || []
+                          delegate: Text { required property var modelData; text: String(modelData.kind || "Activity") + ": " + String(modelData.text || ""); color: "#D1D5DB"; font.family: "Manrope"; wrapMode: Text.Wrap; Layout.fillWidth: true }
+                        }
+                      }
+                      ColumnLayout {
+                        visible: taskColumn.selected && ((modelData.artifacts || []).length > 0)
+                        Layout.fillWidth: true
+                        spacing: 4
+                        Text { text: "Artifacts"; color: "#FFFFFF"; font.family: "Manrope"; font.weight: Font.DemiBold; Accessible.role: Accessible.Heading }
+                        Repeater {
+                          model: modelData.artifacts || []
+                          delegate: RowLayout {
+                            required property var modelData
+                            Layout.fillWidth: true
+                            Text { text: String(modelData.path || "") + " · " + root.artifactVerificationText(modelData); color: modelData.exists === true ? "#FFFFFF" : "#D1D5DB"; font.family: "Manrope"; wrapMode: Text.Wrap; Layout.fillWidth: true }
+                            VoiceButton { text: "Open"; visible: modelData.exists === true; onClicked: root.taskAction(taskColumn.task, "open_artifact", String(modelData.path || "")) }
+                          }
+                        }
+                      }
+                      VoiceArea { id: taskInstruction; visible: taskColumn.selected; Layout.fillWidth: true; placeholderText: "Tell the agent what to change or do next"; wrapMode: TextEdit.Wrap; Accessible.name: "Instructions for " + String(modelData.title || "task") }
+                      Repeater { visible: taskColumn.selected; model: (modelData.export_review || ({})).changes || []; delegate: Text { required property var modelData; text: String(modelData.action) + ": " + String(modelData.path); color: "#FFFFFF"; Layout.fillWidth: true; wrapMode: Text.Wrap } }
                       Flow { Layout.fillWidth: true; spacing: 8
-                        VoiceButton { text: "Approve"; visible: root.needsApproval(modelData); enabled: !!((modelData.approval || ({})).request_id || modelData.approval_request_id); onClicked: root.taskAction(modelData, "approve") }
-                        VoiceButton { text: "Deny"; visible: root.needsApproval(modelData); enabled: !!((modelData.approval || ({})).request_id || modelData.approval_request_id); onClicked: root.taskAction(modelData, "deny") }
-                        VoiceButton { text: "Steer"; visible: ["accepted", "running", "waiting_input", "awaiting_approval"].indexOf(modelData.state) >= 0; enabled: taskInstruction.text.trim() !== ""; onClicked: root.taskAction(modelData, "steer", taskInstruction.text) }
-                        VoiceButton { text: "Start"; visible: modelData.state === "proposed"; onClicked: root.taskAction(modelData, "start") }
-                        VoiceButton { text: "Cancel"; visible: ["completed", "failed", "cancelled", "interrupted"].indexOf(modelData.state) < 0; onClicked: root.taskAction(modelData, "cancel") }
-                        VoiceButton { text: "Continue"; visible: ["completed", "failed", "cancelled", "interrupted", "waiting_input"].indexOf(modelData.state) >= 0; enabled: taskInstruction.text.trim() !== ""; onClicked: root.taskAction(modelData, "continue", taskInstruction.text) }
-                        VoiceButton { text: "Review changes"; visible: modelData.mode === "offline" && ["completed", "failed", "cancelled", "interrupted"].indexOf(modelData.state) >= 0; onClicked: root.taskAction(modelData, "review") }
-                        VoiceButton { text: "Export reviewed changes"; visible: !!(modelData.export_review || ({})).digest; onClicked: root.taskAction(modelData, "export") }
-                        VoiceButton { text: "Dismiss"; visible: ["completed", "failed", "cancelled", "interrupted"].indexOf(modelData.state) >= 0; onClicked: root.taskAction(modelData, "dismiss") }
+                        VoiceButton { text: "Approve"; visible: taskColumn.selected && root.needsApproval(modelData); enabled: !!((modelData.approval || ({})).request_id || modelData.approval_request_id); onClicked: root.taskAction(modelData, "approve") }
+                        VoiceButton { text: "Deny"; visible: taskColumn.selected && root.needsApproval(modelData); enabled: !!((modelData.approval || ({})).request_id || modelData.approval_request_id); onClicked: root.taskAction(modelData, "deny") }
+                        VoiceButton { text: "Steer"; visible: taskColumn.selected && root.taskCapability(modelData, "steer") && ["accepted", "running", "waiting_input", "awaiting_approval"].indexOf(modelData.state) >= 0; enabled: taskInstruction.text.trim() !== ""; onClicked: root.taskAction(modelData, "steer", taskInstruction.text) }
+                        VoiceButton { text: "Start"; visible: taskColumn.selected && modelData.state === "proposed"; onClicked: root.taskAction(modelData, "start") }
+                        VoiceButton { text: "Stop"; visible: taskColumn.selected && ["completed", "failed", "cancelled", "interrupted"].indexOf(modelData.state) < 0; onClicked: root.taskAction(modelData, "cancel") }
+                        VoiceButton { text: "Continue"; visible: taskColumn.selected && root.taskCapability(modelData, "continue") && ["completed", "failed", "cancelled", "interrupted", "waiting_input"].indexOf(modelData.state) >= 0; enabled: taskInstruction.text.trim() !== ""; onClicked: root.taskAction(modelData, "continue", taskInstruction.text) }
+                        VoiceButton { text: "Open folder"; visible: taskColumn.selected && String(modelData.project || "") !== ""; onClicked: root.taskAction(modelData, "open_folder") }
+                        VoiceButton { text: "Open Codex setup"; visible: taskColumn.selected && root.taskHasCodexSetupError(modelData); onClicked: root.send("desktop_action", { application: "hub" }) }
+                        VoiceButton { text: "Review changes"; visible: taskColumn.selected && modelData.mode === "offline" && ["completed", "failed", "cancelled", "interrupted"].indexOf(modelData.state) >= 0; onClicked: root.taskAction(modelData, "review") }
+                        VoiceButton { text: "Export reviewed changes"; visible: taskColumn.selected && !!(modelData.export_review || ({})).digest; onClicked: root.taskAction(modelData, "export") }
+                        VoiceButton { text: "Dismiss"; visible: taskColumn.selected && ["completed", "failed", "cancelled", "interrupted"].indexOf(modelData.state) >= 0; onClicked: root.taskAction(modelData, "dismiss") }
                       }
                     }
                   }

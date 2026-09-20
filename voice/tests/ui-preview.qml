@@ -58,7 +58,12 @@ ShellRoot {
     }
     function tasks(): void {
       var next = JSON.parse(JSON.stringify(panel.voiceController.snapshot))
-      next.tasks = [{ id: "fixture", title: "Update the welcome screen", state: "completed", mode: "offline", result: "The welcome copy is ready for your review.", export_review: { digest: "fixture-digest", changes: [{ path: "README.md", action: "modify" }, { path: "welcome.txt", action: "add" }] } }, { id: "approval", title: "Publish the reviewed update", state: "awaiting_approval", mode: "server", approval: { request_id: "fixture-approval", action: "Publish changes", destination: "Project repository", detail: "Push the reviewed welcome copy to the project branch." } }]
+      next.tasks = [{ id: "fixture", title: "Build the task tracker", state: "running", selected_agent: "codex", mode: "server", project: "/home/maslow/Projects/Maslow Voice/task-tracker", summary: "Create a dependency-free task tracker.", capabilities: { steer: true, continue: true }, children: [{ id: "codex-attempt", thread_id: "thread-fixture", turn_id: "turn-fixture" }], activity: [{ kind: "assistant", text: "I created the page structure." }, { kind: "command", text: "Checking the local HTML output." }], artifacts: [{ path: "index.html", exists: true, verification: "Maslow verified the file exists." }, { path: "notes.txt", exists: false, verification: "Agent-reported only." }] }, { id: "approval", title: "Publish the reviewed update", state: "awaiting_approval", mode: "server", selected_agent: "hermes", project: "/home/maslow/Projects/Maslow Voice/task-tracker", approval: { request_id: "fixture-approval", action: "Publish changes", destination: "Project repository", detail: "Push the reviewed welcome copy to the project branch." } }]
+      panel.voiceController.setFixture(next)
+    }
+    function taskView(taskId: string, sequence: int): void {
+      var next = JSON.parse(JSON.stringify(panel.voiceController.snapshot))
+      next.task_view_request = { task_id: taskId, sequence: sequence }
       panel.voiceController.setFixture(next)
     }
     function taskError(code: string, message: string): void {
@@ -112,7 +117,7 @@ ShellRoot {
     function requests(): string { return JSON.stringify(panel.voiceController.fixtureRequests) }
     function setupSaved(): void { panel.voiceController.applyLine('{"ok":true,"livekit_saved":true}') }
     function setupError(): void { panel.voiceController.applyLine('{"ok":false,"error":{"message":"LiveKit setup could not be saved. Check the project URL and try again."}}') }
-    function status(): string { return JSON.stringify({ placement: panel.heldPlacement, diameter: panel.heldDiameter, desired: panel.desiredPlacement, controllerOpen: panel.controllerOpen, compactControlsOpen: panel.compactControlsOpen, state: panel.voice.state }) }
+    function status(): string { return JSON.stringify({ placement: panel.heldPlacement, diameter: panel.heldDiameter, desired: panel.desiredPlacement, controllerOpen: panel.controllerOpen, compactControlsOpen: panel.compactControlsOpen, state: panel.voice.state, selectedTaskId: panel.selectedTaskId, working: panel.working }) }
     function stressStatus(): string { return JSON.stringify({ taskDelegateCreations: panel.taskDelegateCreations, transcriptDelegateCreations: panel.transcriptDelegateCreations, meterFramesRemaining: meterFramesRemaining, meterLevel: panel.voice.level, taskApproval: panel.tasks[0] ? panel.tasks[0].approval.detail : "", captions: panel.transcript.length }) }
   }
 }

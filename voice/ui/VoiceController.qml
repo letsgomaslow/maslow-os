@@ -13,7 +13,7 @@ Item {
     schemaVersion: 1,
     voice: { enabled: false, state: "disabled", microphone: "muted", speaking: false, level: 0, error: "" },
     settings: { mode: "offline", server_kind: "ollama", server_url: "", model: "", execution_model: "", default_coder: "", reduced_motion: false, fixed_position: false, orb_position: null, display: "" },
-    tasks: [], session: { id: "", transcript: [] }, readiness: { ready: false, checks: [], models: [] }
+    tasks: [], session: { id: "", transcript: [] }, readiness: { ready: false, checks: [], models: [] }, task_view_request: null
   })
   // Keep long-lived snapshot branches stable while the 20 Hz voice meter
   // changes. QML repeaters treat a replacement JavaScript array as a new
@@ -24,6 +24,9 @@ Item {
   property var visibleTasks: snapshot.tasks
   property var session: snapshot.session
   property var readiness: snapshot.readiness
+  // A monotonically sequenced request lets the daemon bring the matching task
+  // into view without reopening the panel for every status snapshot.
+  property var taskViewRequest: snapshot.task_view_request || null
   property string transportError: ""
   property var lastResponse: ({})
   property bool watching: watchProcess.running
@@ -93,6 +96,7 @@ Item {
     var nextTasks = reconcileTasks(tasks, Array.isArray(value.tasks) ? value.tasks : [])
     var nextSession = reuseUnchanged(session, value.session)
     var nextReadiness = reuseUnchanged(readiness, value.readiness)
+    var nextTaskViewRequest = reuseUnchanged(taskViewRequest, value.task_view_request || null)
     if (voice !== nextVoice) voice = nextVoice
     if (settings !== nextSettings) settings = nextSettings
     if (tasks !== nextTasks) {
@@ -101,13 +105,15 @@ Item {
     }
     if (session !== nextSession) session = nextSession
     if (readiness !== nextReadiness) readiness = nextReadiness
+    if (taskViewRequest !== nextTaskViewRequest) taskViewRequest = nextTaskViewRequest
     snapshot = {
       schemaVersion: value.schemaVersion,
       voice: voice,
       settings: settings,
       tasks: tasks,
       session: session,
-      readiness: readiness
+      readiness: readiness,
+      task_view_request: taskViewRequest
     }
   }
 

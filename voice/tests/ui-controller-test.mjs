@@ -24,7 +24,38 @@ runInNewContext([
   qmlFunction("reuseUnchanged"),
   qmlFunction("reconcileTasks"),
   qmlFunction("visibleTaskList"),
+  qmlFunction("applySnapshot"),
 ].join("\n"), context);
+
+context.voice = { enabled: false, state: "disabled" };
+context.settings = {};
+context.tasks = [];
+context.visibleTasks = [];
+context.session = { id: "", transcript: [] };
+context.readiness = { ready: false, checks: [] };
+context.taskViewRequest = null;
+context.snapshot = {};
+context.applySnapshot({
+  schemaVersion: 1,
+  voice: context.voice,
+  settings: context.settings,
+  tasks: [],
+  session: context.session,
+  readiness: context.readiness,
+  task_view_request: { task_id: "codex-task", sequence: 4 },
+});
+assert.deepEqual(context.taskViewRequest, { task_id: "codex-task", sequence: 4 }, "task view requests survive controller snapshot reconciliation");
+const firstTaskViewRequest = context.taskViewRequest;
+context.applySnapshot({
+  schemaVersion: 1,
+  voice: context.voice,
+  settings: context.settings,
+  tasks: [],
+  session: context.session,
+  readiness: context.readiness,
+  task_view_request: { task_id: "codex-task", sequence: 4 },
+});
+assert.strictEqual(context.taskViewRequest, firstTaskViewRequest, "unchanged view requests do not retrigger the panel");
 
 const prior = [
   {
