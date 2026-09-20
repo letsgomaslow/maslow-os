@@ -6,7 +6,10 @@ from pathlib import Path
 from types import SimpleNamespace
 
 from maslow_voice.errors import VoiceError
-from maslow_voice.execution import ClaudeSdkAdapter, CodexAppServerAdapter, ExecutionManager, OfflineCodexAdapter, OfflineClaudeAdapter, JsonRpcProcess, validate_url
+from maslow_voice.execution import (
+    ClaudeSdkAdapter, CodexAppServerAdapter, ExecutionManager, OfflineCodexAdapter,
+    OfflineClaudeAdapter, JsonRpcProcess, _codex_file_change_detail, validate_url,
+)
 from maslow_voice.store import TaskStore
 
 
@@ -96,6 +99,13 @@ class ExecutionManagerTests(unittest.IsolatedAsyncioTestCase):
             await manager.handle(self.store.get(self.task["id"]), "approve",
                                  {"approval_id": approval["request_id"], "child_id": approval["child_id"]})
 
+    async def test_activity_coalesces_only_chunks_of_the_same_message(self):
+        manager = ExecutionManager(self.store, self.publish)
+        for stream, text in [("turn-1:message-1", "Building "), ("turn-1:message-1", "a calculator."), ("turn-1:message-2", "Now testing.")]:
+            await manager._record_activity(self.task["id"], {"kind": "assistant", "text": text, "stream_id": stream})
+        activity = self.store.get(self.task["id"])["activity"]
+        self.assertEqual([event["text"] for event in activity], ["Building a calculator.", "Now testing."])
+
     async def test_cancel_cascades_and_leaves_child_cancelled(self):
         adapter = BlockingAdapter()
         manager = ExecutionManager(self.store, self.publish, adapters={"codex": adapter})
@@ -184,6 +194,14 @@ class FakeRpc:
 
 
 class CodexAdapterTests(unittest.IsolatedAsyncioTestCase):
+    def test_file_change_preview_marks_truncation_and_omitted_changes(self):
+        detail = _codex_file_change_detail({"changes": [
+            {"path": f"src/file-{index}.py", "diff": "x" * 181, "kind": {"type": "update", "move_path": None}}
+            for index in range(7)
+        ]}, None)
+        self.assertIn("diff preview truncated", detail)
+        self.assertIn("1 additional file changes omitted from preview", detail)
+
     async def test_model_cli_mismatch_is_actionable_without_raw_server_error(self):
         import sys
         from unittest.mock import AsyncMock
@@ -327,6 +345,151 @@ class CodexAdapterTests(unittest.IsolatedAsyncioTestCase):
 
         artifacts = [change["artifact"] for change in changes if "artifact" in change]
         self.assertEqual(artifacts, [{"path": "result.html", "exists": True, "verification": "exists"}] * 2)
+
+    async def test_file_change_approval_uses_only_the_exact_observed_item(self):
+        class ApprovalDetailRpc(FakeRpc):
+            async def next_notification(self):
+                count = getattr(self, "notification_count", 0)
+                self.notification_count = count + 1
+                if count == 0:
+                    return {"method": "item/started", "params": {
+                        "threadId": "wrong-thread", "turnId": "turn-1",
+                        "item": {"id": "wrong-file", "type": "fileChange", "changes": [
+                            {"path": "private/secret.txt", "diff": "+ secret", "kind": {"type": "add"}},
+                        ]},
+                    }}
+                if count == 1:
+                    return {"method": "item/started", "params": {
+                        "threadId": "thread-1", "turnId": "turn-1",
+                        "item": {"id": "other-file", "type": "fileChange", "changes": [
+                            {"path": "wrong-item.py", "diff": "+ wrong", "kind": {"type": "add"}},
+                        ]},
+                    }}
+                if count == 2:
+                    self.request_started = asyncio.Event()
+                    async def request_approval():
+                        self.request_started.set()
+                        return await self.kwargs["server_request"]("item/fileChange/requestApproval", {
+                            "threadId": "thread-1", "turnId": "turn-1", "itemId": "approved-file",
+                        }, "right-request")
+                    self.server_request_task = asyncio.create_task(request_approval())
+                    await self.request_started.wait()
+                    return {"method": "item/started", "params": {
+                        "threadId": "thread-1", "turnId": "turn-1",
+                        "item": {"id": "approved-file", "type": "fileChange", "changes": [
+                            {"path": "src/app.py", "diff": "@@ -1 +1 @@\n-old\n+new", "kind": {"type": "update", "move_path": None}},
+                        ]},
+                    }}
+                if count == 3:
+                    return {"method": "item/started", "params": {
+                        "threadId": "thread-1", "turnId": "turn-1",
+                        "item": {"id": "malformed-file", "type": "fileChange", "changes": [
+                            {"path": "", "diff": "+ hidden", "kind": {"type": "add"}},
+                        ]},
+                    }}
+                return {"method": "turn/completed", "params": {
+                    "threadId": "thread-1", "turn": {"id": "turn-1", "status": "completed"},
+                }}
+
+        requests, progress = [], []
+        async def approve(**request):
+            requests.append(request)
+            return False
+        async def update(**change):
+            progress.append(change)
+
+        adapter = CodexAppServerAdapter(sys.executable, rpc_factory=ApprovalDetailRpc)
+        with tempfile.TemporaryDirectory() as project:
+            await adapter.run({"id": "task", "project": project}, {"id": "child"}, "Make it", approve, update)
+
+        callback = FakeRpc.instance.kwargs["server_request"]
+        with self.assertRaisesRegex(VoiceError, "different task turn"):
+            await callback("item/fileChange/requestApproval", {
+                "threadId": "wrong-thread", "turnId": "turn-1", "itemId": "wrong-file",
+            }, "wrong-request")
+        self.assertEqual(await FakeRpc.instance.server_request_task, {"decision": "decline"})
+        self.assertEqual(await callback("item/fileChange/requestApproval", {
+            "threadId": "thread-1", "turnId": "turn-1", "itemId": "unobserved-file",
+        }, "unobserved-request"), {"decision": "decline"})
+        self.assertEqual(await callback("item/fileChange/requestApproval", {
+            "threadId": "thread-1", "turnId": "turn-1", "itemId": "malformed-file",
+        }, "malformed-request"), {"decision": "decline"})
+
+        self.assertEqual(len(requests), 1)
+        self.assertEqual(requests[-1]["provider_context"]["itemId"], "approved-file")
+        self.assertIn("update: src/app.py", requests[-1]["message"])
+        self.assertIn("+new", requests[-1]["message"])
+        self.assertNotIn("secret.txt", requests[-1]["message"])
+        self.assertNotIn("wrong-item.py", requests[-1]["message"])
+        self.assertTrue(any("details were unavailable" in change.get("activity", {}).get("text", "") for change in progress))
+
+    async def test_final_agent_message_is_preferred(self):
+        class PhasedMessageRpc(FakeRpc):
+            async def next_notification(self):
+                count = getattr(self, "notification_count", 0)
+                self.notification_count = count + 1
+                if count == 0:
+                    return {"method": "item/started", "params": {
+                        "threadId": "thread-1", "turnId": "turn-1",
+                        "item": {"id": "commentary", "type": "agentMessage", "phase": "commentary"},
+                    }}
+                if count == 1:
+                    return {"method": "item/agentMessage/delta", "params": {
+                        "threadId": "thread-1", "turnId": "turn-1", "itemId": "commentary", "delta": "I built the browser.",
+                    }}
+                if count == 2:
+                    return {"method": "item/started", "params": {
+                        "threadId": "thread-1", "turnId": "turn-1",
+                        "item": {"id": "final", "type": "agentMessage", "phase": "final_answer"},
+                    }}
+                if count == 3:
+                    return {"method": "item/agentMessage/delta", "params": {
+                        "threadId": "thread-1", "turnId": "turn-1", "itemId": "final", "delta": "The project is ready.",
+                    }}
+                return {"method": "turn/completed", "params": {
+                    "threadId": "thread-1", "turn": {"id": "turn-1", "status": "completed"},
+                }}
+
+        adapter = CodexAppServerAdapter(sys.executable, rpc_factory=PhasedMessageRpc)
+        async def callback(**changes):
+            return False
+
+        result = await adapter.run({"id": "task", "project": "/work"}, {"id": "child"}, "Make it", callback, callback)
+        self.assertEqual(result["result"], "The project is ready.")
+
+    async def test_unknown_message_phases_preserve_item_boundaries(self):
+        class UnphasedMessageRpc(FakeRpc):
+            async def next_notification(self):
+                count = getattr(self, "notification_count", 0)
+                self.notification_count = count + 1
+                if count == 0:
+                    return {"method": "item/started", "params": {
+                        "threadId": "thread-1", "turnId": "turn-1",
+                        "item": {"id": "first", "type": "agentMessage", "phase": None},
+                    }}
+                if count == 1:
+                    return {"method": "item/agentMessage/delta", "params": {
+                        "threadId": "thread-1", "turnId": "turn-1", "itemId": "first", "delta": "First message.",
+                    }}
+                if count == 2:
+                    return {"method": "item/started", "params": {
+                        "threadId": "thread-1", "turnId": "turn-1",
+                        "item": {"id": "second", "type": "agentMessage", "phase": None},
+                    }}
+                if count == 3:
+                    return {"method": "item/agentMessage/delta", "params": {
+                        "threadId": "thread-1", "turnId": "turn-1", "itemId": "second", "delta": "Second message.",
+                    }}
+                return {"method": "turn/completed", "params": {
+                    "threadId": "thread-1", "turn": {"id": "turn-1", "status": "completed"},
+                }}
+
+        adapter = CodexAppServerAdapter(sys.executable, rpc_factory=UnphasedMessageRpc)
+        async def callback(**changes):
+            return False
+
+        result = await adapter.run({"id": "task", "project": "/work"}, {"id": "child"}, "Make it", callback, callback)
+        self.assertEqual(result["result"], "First message.\n\nSecond message.")
 
 
 class FakeOfflineRuntime:
