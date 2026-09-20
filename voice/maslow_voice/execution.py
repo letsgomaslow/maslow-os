@@ -406,6 +406,13 @@ class CodexAppServerAdapter:
                           or (observed or {}).get("command")
                           or params.get("reason")
                           or "Codex requests permission to run a command.")
+                if isinstance(detail, str) and len(detail) > 4000:
+                    await progress(activity={
+                        "kind": "approval",
+                        "text": "Codex requested a command whose full details exceed the 4,000-character review limit. "
+                                "The request was declined without approval. Codex can split it into shorter commands for review.",
+                    })
+                    return {"decision": "decline"}
                 detail = _codex_display_text(detail, 4000, multiline=True)
             await progress(activity={"kind": "approval", "text": str(detail)[:4000]})
             allowed = await approval(

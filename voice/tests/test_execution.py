@@ -282,6 +282,52 @@ class CodexAdapterTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(raised.exception.code, "CODEX_REQUEST_UNSUPPORTED")
         self.assertTrue(FakeRpc.instance.closed)
 
+    async def test_command_approval_never_offers_a_truncated_detail(self):
+        from unittest.mock import AsyncMock
+
+        for source in ("command", "observed", "reason"):
+            for length in (20, 4000, 4001):
+                with self.subTest(source=source, length=length):
+                    detail = "printf '" + "x" * (length - 9) + "'"
+
+                    class CommandRpc(FakeRpc):
+                        async def next_notification(self):
+                            if source == "observed" and not getattr(self, "sent_command", False):
+                                self.sent_command = True
+                                return {"method": "item/started", "params": {
+                                    "threadId": "thread-1", "turnId": "turn-1",
+                                    "item": {"id": "command-1", "type": "commandExecution", "command": detail},
+                                }}
+                            return await super().next_notification()
+
+                    approve, progress = AsyncMock(return_value=True), AsyncMock()
+                    adapter = CodexAppServerAdapter(sys.executable, rpc_factory=CommandRpc)
+                    await adapter.run({"project": "/work"}, {}, "Run tests", approve, progress)
+                    params = {"threadId": "thread-1", "turnId": "turn-1", "itemId": "command-1"}
+                    if source != "observed":
+                        params[source] = detail
+                    callback = FakeRpc.instance.kwargs["server_request"]
+                    result = await callback("item/commandExecution/requestApproval", params, "request-1")
+
+                    activity = progress.call_args.kwargs["activity"]
+                    self.assertEqual(activity["kind"], "approval")
+                    if length > 4000:
+                        self.assertEqual(result, {"decision": "decline"})
+                        approve.assert_not_awaited()
+                        self.assertIn("full details exceed the 4,000-character review limit", activity["text"])
+                        self.assertIn("declined without approval", activity["text"])
+                        self.assertIn("shorter commands", activity["text"])
+                        self.assertNotIn("printf", activity["text"])
+                    else:
+                        self.assertEqual(result, {"decision": "accept"})
+                        approve.assert_awaited_once_with(
+                            provider_request_id="request-1", tool_name="command", message=detail,
+                            provider_context={
+                                "threadId": "thread-1", "turnId": "turn-1", "itemId": "command-1", "approvalId": None,
+                            },
+                        )
+                        self.assertEqual(activity["text"], detail)
+
     async def test_steer_uses_the_active_thread_and_expected_turn_identity(self):
         adapter = CodexAppServerAdapter(sys.executable, rpc_factory=FakeRpc)
         rpc = FakeRpc([], "/work")
