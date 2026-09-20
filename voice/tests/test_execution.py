@@ -164,7 +164,7 @@ class FakeRpc:
         self.calls.append((method, params))
         if method == "initialize":
             return {"userAgent": "test"}
-        if method == "thread/start":
+        if method in {"thread/start", "thread/resume"}:
             return {"thread": {"id": "thread-1", "sessionId": "session-1"}}
         if method == "turn/start":
             return {"turn": {"id": "turn-1"}}
@@ -184,6 +184,21 @@ class FakeRpc:
 
 
 class CodexAdapterTests(unittest.IsolatedAsyncioTestCase):
+    async def test_model_cli_mismatch_is_actionable_without_raw_server_error(self):
+        import sys
+        from unittest.mock import AsyncMock
+        class FailedRpc(FakeRpc):
+            async def next_notification(self):
+                return {"method": "turn/completed", "params": {"threadId": "thread-1", "turn": {
+                    "id": "turn-1", "status": "failed", "error": {"codexErrorInfo": "other",
+                    "message": "The configured model requires a newer version of Codex. private-server-detail"}}}}
+        adapter = CodexAppServerAdapter(sys.executable, rpc_factory=FailedRpc)
+        with tempfile.TemporaryDirectory() as directory:
+            with self.assertRaises(VoiceError) as error:
+                await adapter.run({"project": directory}, {}, "Create index.html", AsyncMock(), AsyncMock())
+        self.assertEqual(error.exception.code, "CODEX_UPDATE_REQUIRED")
+        self.assertNotIn("private-server-detail", error.exception.message)
+
     async def test_cancel_during_initialize_terminates_peer_and_unblocks_run(self):
         import sys
         spawned = []
@@ -242,7 +257,76 @@ class CodexAdapterTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(calls["turn/start"]["input"][0]["text"], "Fix navigation")
         self.assertEqual((result["provider_session_id"], result["thread_id"], result["turn_id"]),
                          ("session-1", "thread-1", "turn-1"))
+        with self.assertRaises(VoiceError) as raised:
+            await FakeRpc.instance.kwargs["server_request"]("item/commandExecution/requestApproval", {
+                "threadId": "another-thread", "turnId": "turn-1", "command": "false",
+            }, "approval-1")
+        self.assertEqual(raised.exception.code, "CODEX_REQUEST_UNSUPPORTED")
         self.assertTrue(FakeRpc.instance.closed)
+
+    async def test_steer_uses_the_active_thread_and_expected_turn_identity(self):
+        adapter = CodexAppServerAdapter(sys.executable, rpc_factory=FakeRpc)
+        rpc = FakeRpc([], "/work")
+        adapter.rpc, adapter.thread_id, adapter.turn_id = rpc, "thread-1", "turn-1"
+
+        await adapter.steer("Use three columns instead")
+
+        self.assertIn(("turn/steer", {
+            "threadId": "thread-1", "expectedTurnId": "turn-1",
+            "input": [{"type": "text", "text": "Use three columns instead", "text_elements": []}],
+        }), rpc.calls)
+
+    async def test_resume_uses_saved_thread_without_starting_a_new_one(self):
+        adapter = CodexAppServerAdapter(sys.executable, rpc_factory=FakeRpc)
+        progress = []
+
+        async def update(**changes):
+            progress.append(changes)
+
+        async def approve(**request):
+            return False
+
+        task = {"id": "d8e6ef43-5d27-47df-b9f4-4d21c5ad13c5", "project": "/work"}
+        result = await adapter.run(task, {"id": "child", "resume_thread_id": "thread-1"}, "Continue", approve, update)
+
+        methods = [method for method, _params in FakeRpc.instance.calls]
+        self.assertIn("thread/resume", methods)
+        self.assertNotIn("thread/start", methods)
+        calls = dict(FakeRpc.instance.calls)
+        self.assertEqual(calls["thread/resume"]["cwd"], "/work")
+        self.assertEqual(calls["thread/resume"]["approvalPolicy"], "untrusted")
+        self.assertEqual(calls["thread/resume"]["approvalsReviewer"], "user")
+        self.assertEqual(calls["thread/resume"]["sandbox"], "workspace-write")
+        self.assertEqual(result["thread_id"], "thread-1")
+        self.assertTrue(any(change.get("activity", {}).get("kind") == "thread" for change in progress))
+
+    async def test_file_change_activity_only_records_verified_workspace_artifacts(self):
+        class FileChangeRpc(FakeRpc):
+            async def next_notification(self):
+                count = getattr(self, "notification_count", 0)
+                self.notification_count = count + 1
+                if count == 0:
+                    return {"method": "item/completed", "params": {
+                        "threadId": "thread-1", "turnId": "turn-1", "itemId": "file-1",
+                        "item": {"id": "file-1", "type": "fileChange", "status": "completed",
+                                 "changes": [{"path": "result.html", "diff": "", "kind": {"type": "add"}},
+                                             {"path": "../../outside", "diff": "", "kind": {"type": "add"}}]},
+                    }}
+                return {"method": "turn/completed", "params": {"threadId": "thread-1", "turn": {"id": "turn-1", "status": "completed"}}}
+
+        with tempfile.TemporaryDirectory() as project:
+            Path(project, "result.html").write_text("<title>Result</title>", encoding="utf-8")
+            adapter = CodexAppServerAdapter(sys.executable, rpc_factory=FileChangeRpc)
+            changes = []
+            async def update(**change):
+                changes.append(change)
+            async def approve(**request):
+                return False
+
+            await adapter.run({"id": "task", "project": project}, {"id": "child"}, "Make it", approve, update)
+
+        artifacts = [change["artifact"] for change in changes if "artifact" in change]
+        self.assertEqual(artifacts, [{"path": "result.html", "exists": True, "verification": "exists"}] * 2)
 
 
 class FakeOfflineRuntime:

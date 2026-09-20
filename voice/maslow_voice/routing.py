@@ -110,6 +110,8 @@ class DirectExecutionClient:
             "cancelled": "cancelled",
         }.get(status, "interrupted")
         result = {"status": mapped, "run_id": run_id, "session_id": task["id"], "output": child.get("result", "")}
+        if child.get("error"):
+            result["error"] = child["error"]
         if mapped == "waiting_for_approval":
             result["approval"] = task.get("approval") or child.get("approval")
         return result
@@ -129,7 +131,10 @@ class DirectExecutionClient:
 
     async def steer(self, run_id, text):
         self._require_run(run_id)
-        raise VoiceError("STEERING_UNAVAILABLE", "Direct Codex and Claude tasks cannot be redirected while running. Stop the task, then continue with revised instructions.")
+        if self.agent != "codex" or not self.child_id:
+            raise VoiceError("STEERING_UNAVAILABLE", "Only the active Codex task can accept a correction.")
+        task, _child = self._child()
+        return await self.execution.handle(task, "steer", {"child_id": self.child_id, "text": text})
 
     async def approve(self, run_id, request_id, allow):
         self._require_run(run_id)

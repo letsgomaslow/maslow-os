@@ -49,6 +49,96 @@ class StoreTests(unittest.TestCase):
 
 
 class HermesTests(unittest.IsolatedAsyncioTestCase):
+    async def test_codex_continue_reuses_the_saved_thread_on_a_new_attempt(self):
+        class Client:
+            def __init__(self):
+                self.submitted = None
+
+            async def submit(self, task):
+                self.submitted = task
+                return {"run_id": "continued"}
+
+            async def status(self, run_id):
+                return {"status": "completed", "run_id": run_id, "output": "continued"}
+
+            async def events(self, run_id):
+                if False:
+                    yield {}
+
+        with tempfile.TemporaryDirectory() as root:
+            store = TaskStore(root)
+            task, _ = store.create("continue-codex", BRIEF, root, "gemini_live", "Fix navigation")
+            task = store.update(task["id"], state="completed", selected_agent="codex", capabilities={"steer": True, "continue": True},
+                                children=[{"id": "child-1", "tool": "codex", "thread_id": "thread-saved", "status": "completed"}])
+            client = Client()
+            manager = TaskManager(store, AsyncMock(return_value=client), AsyncMock())
+
+            await manager.action(task["id"], "continue", "Also add a filter")
+            await asyncio.gather(*list(manager.monitors.values()))
+
+            self.assertEqual(client.submitted["attempt"], 1)
+            self.assertEqual(client.submitted["resume_thread_id"], "thread-saved")
+            self.assertTrue(client.submitted["resume_required"])
+            self.assertEqual(store.get(task["id"])["result"], "continued")
+            await manager.close()
+            store.close()
+
+    async def test_second_codex_task_is_rejected_while_the_first_is_active(self):
+        with tempfile.TemporaryDirectory() as root:
+            store = TaskStore(root)
+            manager = TaskManager(store, AsyncMock(), AsyncMock())
+            manager.agent_selector = AsyncMock(return_value={"selected_agent": "codex", "routing_reason": "Codex is ready."})
+
+            first = await manager.submit("first-codex", BRIEF, root, "gemini_live", "Fix navigation", policy="review")
+            with self.assertRaises(VoiceError) as raised:
+                await manager.submit("second-codex", BRIEF, root, "gemini_live", "Build tracker", policy="review")
+
+            self.assertEqual(raised.exception.code, "CODEX_TASK_ACTIVE")
+            self.assertEqual(store.get(first["id"])["state"], "proposed")
+            self.assertEqual(store.list()[0]["error"]["code"], "CODEX_TASK_ACTIVE")
+            await manager.close()
+            store.close()
+
+    async def test_codex_start_and_continue_are_blocked_by_another_active_codex_task(self):
+        with tempfile.TemporaryDirectory() as root:
+            store = TaskStore(root)
+            active, _ = store.create("active-codex", BRIEF, root, "gemini_live", "Active work")
+            store.update(active["id"], state="running", selected_agent="codex")
+            proposed, _ = store.create("proposed-codex", BRIEF, root, "gemini_live", "Later work")
+            store.update(proposed["id"], state="proposed", selected_agent="codex")
+            completed, _ = store.create("completed-codex", BRIEF, root, "gemini_live", "Earlier work")
+            store.update(completed["id"], state="completed", selected_agent="codex",
+                         children=[{"id": "child", "tool": "codex", "thread_id": "saved", "status": "completed"}])
+            manager = TaskManager(store, AsyncMock(), AsyncMock())
+
+            with self.assertRaisesRegex(VoiceError, "already working"):
+                await manager.action(proposed["id"], "start")
+            with self.assertRaisesRegex(VoiceError, "already working"):
+                await manager.action(completed["id"], "continue", "Try again")
+
+            self.assertEqual(store.get(proposed["id"])["state"], "proposed")
+            self.assertEqual(store.get(completed["id"])["state"], "completed")
+            await manager.close()
+            store.close()
+
+    async def test_existing_hermes_and_claude_controls_remain_advertised(self):
+        with tempfile.TemporaryDirectory() as root:
+            store = TaskStore(root)
+            selector = AsyncMock(side_effect=[
+                {"selected_agent": "hermes", "routing_reason": "Hermes is ready."},
+                {"selected_agent": "claude", "routing_reason": "Claude is ready."},
+            ])
+            manager = TaskManager(store, AsyncMock(), AsyncMock())
+            manager.agent_selector = selector
+
+            hermes = await manager.submit("hermes-controls", BRIEF, root, "gemini_live", "Use Hermes", policy="review")
+            claude = await manager.submit("claude-controls", BRIEF, root, "gemini_live", "Use Claude", policy="review")
+
+            self.assertEqual(hermes["capabilities"], {"steer": True, "continue": True})
+            self.assertEqual(claude["capabilities"], {"steer": False, "continue": True})
+            await manager.close()
+            store.close()
+
     async def test_submission_uses_authoritative_context_and_idempotency(self):
         calls = []
         async def request(*args, **kwargs):

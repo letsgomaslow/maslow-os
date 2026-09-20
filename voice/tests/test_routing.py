@@ -44,6 +44,24 @@ class BlockingAdapter:
         self.release.set()
 
 
+class SteerableAdapter:
+    def __init__(self):
+        self.started = asyncio.Event()
+        self.release = asyncio.Event()
+        self.instructions = []
+
+    async def run(self, task, child, instructions, approval, progress):
+        self.started.set()
+        await self.release.wait()
+        return {"result": "redirected"}
+
+    async def steer(self, text):
+        self.instructions.append(text)
+
+    async def cancel(self):
+        self.release.set()
+
+
 class ApprovalAdapter:
     def __init__(self):
         self.started = asyncio.Event()
@@ -308,6 +326,38 @@ class RoutingTests(unittest.IsolatedAsyncioTestCase):
 
         self.assertTrue(adapter.allowed)
         self.assertEqual((await client.status(submitted["run_id"]))["status"], "completed")
+
+    async def test_direct_codex_steer_persists_the_outcome_and_activity(self):
+        adapter = SteerableAdapter()
+        execution = ExecutionManager(self.store, self.publish, adapters={"codex": adapter})
+        created = self.task()
+        task = self.store.update(created["id"], selected_agent="codex", routing_reason="Codex is ready.")
+        client = DirectExecutionClient(execution, "codex")
+        submitted = await client.submit(task)
+        await adapter.started.wait()
+
+        await client.steer(submitted["run_id"], "Make it simpler")
+
+        saved = self.store.get(task["id"])
+        self.assertEqual(adapter.instructions, ["Make it simpler"])
+        self.assertEqual(saved["instruction_outcomes"][-1]["outcome"], "accepted")
+        self.assertEqual(saved["activity"][-1], {"kind": "instruction", "text": "Correction sent to Codex."})
+        adapter.release.set()
+        await client.job
+
+    async def test_direct_status_exposes_the_child_error(self):
+        execution = ExecutionManager(self.store, self.publish, adapters={"codex": CompletingAdapter()})
+        created = self.task()
+        task = self.store.update(created["id"], children=[{
+            "id": "child-1", "tool": "codex", "status": "failed", "result": "",
+            "error": {"code": "CODEX_RESUME_FAILED", "message": "Resume failed"},
+        }])
+        client = DirectExecutionClient(execution, "codex")
+        client.task_id, client.child_id, client.run_id = task["id"], "child-1", "direct:failed"
+
+        status = await client.status("direct:failed")
+
+        self.assertEqual(status["error"]["code"], "CODEX_RESUME_FAILED")
 
 
 if __name__ == "__main__":
