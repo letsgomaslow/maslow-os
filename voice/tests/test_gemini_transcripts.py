@@ -57,6 +57,30 @@ class GeminiTypedTranscriptTests(unittest.IsolatedAsyncioTestCase):
 
         self.assertEqual(self.provider._pending_typed_items, set())
 
+    async def test_typed_reply_never_claims_speaker_playback_and_returns_ready(self):
+        self.provider._native_ready = True
+        self.provider._agent_state(SimpleNamespace(new_state="speaking"))
+        self.provider._conversation_item(SimpleNamespace(item=SimpleNamespace(role="assistant", id="reply", text_content="Four.")))
+        await asyncio.gather(*self.provider._event_tasks)
+        states = [event for event in self.events if event["type"] == "voice_state"]
+        self.assertEqual([event["state"] for event in states], ["thinking", "listening"])
+        self.assertTrue(all(not event["speaking"] and not event["microphone"] for event in states))
+
+    async def test_typed_notice_uses_finished_handle_instead_of_stale_sdk_state(self):
+        self.provider._started = True
+        reply = AsyncMock()
+        self.provider._session = SimpleNamespace(agent_state="speaking", current_speech=None, generate_reply=reply)
+        self.assertTrue(await self.provider.notify_task("Completed"))
+        self.provider._typed_turn = "active-input"
+        self.assertFalse(await self.provider.notify_task("Completed"))
+        self.assertEqual(reply.await_count, 1)
+        self.provider._typed_turn = None
+        self.provider._session.current_speech = SimpleNamespace(done=lambda: False)
+        self.assertFalse(await self.provider.notify_task("Completed"))
+        self.provider._session.current_speech = SimpleNamespace(done=lambda: True)
+        self.assertTrue(await self.provider.notify_task("Completed"))
+        self.assertEqual(reply.await_count, 2)
+
     async def test_stop_clears_unconsumed_typed_item_marker(self):
         self.provider._pending_typed_items.add("typed request")
         with patch("maslow_voice.providers.livekit_native.LiveKitNativeExpressiveProvider.stop", new=AsyncMock()):

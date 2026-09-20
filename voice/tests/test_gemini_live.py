@@ -56,6 +56,7 @@ class GeminiSdkTests(unittest.IsolatedAsyncioTestCase):
 
     async def test_completion_speech_has_no_action_tools_and_waits_for_user(self):
         self.provider._started = True
+        self.provider._audio_enabled = True
         original = self.provider._session
         fake = SimpleNamespace(user_state="speaking", agent_state="listening", generate_reply=AsyncMock())
         self.provider._session = fake
@@ -137,7 +138,8 @@ class GeminiSdkTests(unittest.IsolatedAsyncioTestCase):
         assistant = ConversationItemAddedEvent(item=self.agents.llm.ChatMessage(role="assistant", content=["Ready to help."]))
         self.provider._conversation_item(assistant)
         await asyncio.gather(*self.provider._event_tasks)
-        self.assertEqual(self.events, [{"type": "transcript", "role": "assistant", "text": "Ready to help.", "final": True}])
+        self.assertEqual(self.events, [{"type": "transcript", "role": "assistant", "text": "Ready to help.", "final": True},
+                                       {"type": "voice_state", "state": "listening", "microphone": False, "speaking": False}])
 
     async def test_real_sdk_startup_control_content_warns_without_losing_next_generation(self):
         from google.genai import types
