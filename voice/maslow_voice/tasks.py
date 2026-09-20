@@ -10,6 +10,18 @@ from .store import TERMINAL
 DEAD_COORDINATOR_ERRORS = {"OFFLINE_UNAVAILABLE", "OFFLINE_HERMES_EXITED"}
 
 
+def _capabilities(agent, mode=None):
+    return {"steer": agent in {"codex", "hermes"} and not (agent == "codex" and mode == "offline"),
+            "continue": agent in {"codex", "claude", "hermes"}}
+
+
+def _last_codex_thread(task):
+    for child in reversed(task.get("children", [])):
+        if child.get("tool") == "codex" and isinstance(child.get("thread_id"), str) and child["thread_id"]:
+            return child["thread_id"]
+    return task.get("resume_thread_id") if isinstance(task.get("resume_thread_id"), str) else None
+
+
 def text_field(value, name, maximum=12000, required=False):
     if not isinstance(value, str) or len(value) > maximum or "\x00" in value or (required and not value.strip()):
         raise VoiceError("INVALID_BRIEF", "The task's " + name + " is missing or too long.")
@@ -43,6 +55,10 @@ class TaskManager:
         self.clients = {}
         self.closed = False
         self.agent_selector = None
+
+    def _active_codex_task(self, task_id):
+        return next((other for other in self.store.active()
+                     if other["id"] != task_id and other.get("selected_agent") == "codex"), None)
 
     async def submit(self, request_id, brief, project, mode, source, preferred_coder="auto", *, policy="lab_auto"):
         if policy not in {"lab_auto", "review"}:
@@ -101,9 +117,18 @@ class TaskManager:
         if changed:
             return changed
         selected = selection["selected_agent"]
+        if selected == "codex":
+            active = self._active_codex_task(task["id"])
+            if active:
+                error = VoiceError("CODEX_TASK_ACTIVE", "Codex is already working on another task. Finish or stop it before starting a second Codex task.")
+                self.store.update(task["id"], state="failed", error=error.as_dict(), preferred_coder=selected,
+                                  selected_agent=selected, routing_reason="Another Codex task is active.",
+                                  owner="Codex", capabilities=_capabilities(selected, mode))
+                await self.publish()
+                raise error
         task = self.store.update(task["id"], preferred_coder=selected, **selection,
                                  owner={"codex": "Codex", "hermes": "Hermes", "claude": "Claude"}.get(selected, "Maslow"),
-                                 state="proposed" if policy == "review" else "queued")
+                                 capabilities=_capabilities(selected, mode), state="proposed" if policy == "review" else "queued")
         if policy == "lab_auto":
             self._start(task)
         await self.publish()
@@ -137,9 +162,13 @@ class TaskManager:
         for task in self.store.active():
             if task["state"] == "proposed":
                 continue
-            if task.get("selected_agent") in {"codex", "claude"} and task["state"] != "queued":
-                self.store.update(task["id"], state="interrupted", error={"code": "DIRECT_RUN_LOST",
-                    "message": "Voice restarted during this agent run. Review its changes before continuing; it was not submitted again."})
+            if task.get("selected_agent") in {"codex", "claude"}:
+                error = {"code": "DIRECT_RUN_LOST",
+                         "message": "Voice restarted during this agent run. Review its changes before continuing; it was not submitted again."}
+                children = [dict(child, status="interrupted", approval=None, error=error)
+                            if child.get("status") in {"queued", "running", "awaiting_approval", "stopping"}
+                            else child for child in task.get("children", [])]
+                self.store.update(task["id"], state="interrupted", approval=None, children=children, error=error)
                 continue
             # A persisted submission reservation is replayed using its original key.
             # After the upstream 24h idempotency window, do not risk a second execution.
@@ -180,6 +209,12 @@ class TaskManager:
                     try:
                         status = await client.status(task["run_id"])
                         update = normalized_status(status)
+                        # Direct adapters persist safe local error messages; the
+                        # remote Hermes status continues through its sanitizer.
+                        if task.get("selected_agent") in {"codex", "claude"} and update["state"] in {"failed", "interrupted"}:
+                            error = status.get("error")
+                            if isinstance(error, dict) and isinstance(error.get("code"), str) and isinstance(error.get("message"), str):
+                                update["error"] = {"code": error["code"][:80], "message": error["message"][:1000]}
                         if not update.get("session_id"):
                             update.pop("session_id", None)
                         previous = self.store.get(task_id)
@@ -259,6 +294,8 @@ class TaskManager:
     async def action(self, task_id, operation, text="", approval_id=None):
         task = self.store.get(task_id)
         if operation == "start" and task["state"] == "proposed":
+            if task.get("selected_agent") == "codex" and self._active_codex_task(task_id):
+                raise VoiceError("CODEX_TASK_ACTIVE", "Codex is already working on another task. Finish or stop it before starting this task.")
             expected_attempt = task.get("attempt", 0)
             try:
                 if self.agent_selector:
@@ -284,12 +321,21 @@ class TaskManager:
             if task["state"] not in TERMINAL | {"waiting_input"}:
                 raise VoiceError("TASK_ACTIVE", "Use Redirect while this task is running.")
             answer = text_field(text, "continuation", required=True)
+            if task.get("selected_agent") == "codex" and self._active_codex_task(task_id):
+                raise VoiceError("CODEX_TASK_ACTIVE", "Codex is already working on another task. Finish or stop it before continuing this task.")
             client = self.clients.get(task_id)
             discard = getattr(client, "discard_dead_process", None)
             if discard and discard():
                 self.clients.pop(task_id, None)
             brief = dict(task["brief"], summary=task["brief"]["summary"] + "\nUser continuation: " + answer)
-            result = self.store.update(task_id, state="queued", run_id=None, attempt=task.get("attempt", 0) + 1, brief=brief, error=None, dismissed=False)
+            resume_thread_id = None
+            if task.get("selected_agent") == "codex" and task.get("mode") != "offline":
+                resume_thread_id = _last_codex_thread(task)
+                if not resume_thread_id:
+                    raise VoiceError("CODEX_RESUME_UNAVAILABLE", "This Codex task has no saved thread to continue. Start a new task instead.")
+            result = self.store.update(task_id, state="queued", run_id=None, attempt=task.get("attempt", 0) + 1, brief=brief,
+                                       error=None, dismissed=False, resume_thread_id=resume_thread_id,
+                                       resume_required=bool(resume_thread_id))
             self._start(result)
         elif operation == "cancel" and task["state"] in {"queued", "proposed"}:
             result = self.store.update(task_id, state="cancelled")

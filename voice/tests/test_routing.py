@@ -44,6 +44,24 @@ class BlockingAdapter:
         self.release.set()
 
 
+class SteerableAdapter:
+    def __init__(self):
+        self.started = asyncio.Event()
+        self.release = asyncio.Event()
+        self.instructions = []
+
+    async def run(self, task, child, instructions, approval, progress):
+        self.started.set()
+        await self.release.wait()
+        return {"result": "redirected"}
+
+    async def steer(self, text):
+        self.instructions.append(text)
+
+    async def cancel(self):
+        self.release.set()
+
+
 class ApprovalAdapter:
     def __init__(self):
         self.started = asyncio.Event()
@@ -238,6 +256,39 @@ class RoutingTests(unittest.IsolatedAsyncioTestCase):
         self.assertFalse(manager.monitors)
         await manager.close()
 
+    async def test_restart_clears_dead_approvals_and_never_starts_queued_direct_work(self):
+        pending = {"owner": "child", "child_id": "active", "request_id": "old-approval"}
+        history = [{"kind": "assistant", "text": "Created the calculator."}]
+        cases = []
+        for agent in ("codex", "claude"):
+            for state in ("queued", "submitting", "running", "awaiting_approval", "stopping"):
+                task = self.task(agent + "-" + state)
+                prior = {"id": "previous", "tool": agent, "status": "completed", "result": "Earlier work"}
+                current = {"id": "active", "tool": agent, "status": "awaiting_approval",
+                           "thread_id": "saved-thread", "turn_id": "saved-turn", "approval": pending}
+                self.store.update(task["id"], selected_agent=agent, state=state,
+                                  children=[prior, current], approval=pending, activity=history)
+                cases.append((task["id"], prior))
+        self.store.close()
+        self.store = TaskStore(self.temp.name)
+        factory = AsyncMock()
+        manager = TaskManager(self.store, factory, self.publish)
+        await manager.recover()
+        for task_id, prior in cases:
+            recovered = self.store.get(task_id)
+            self.assertEqual(recovered["state"], "interrupted")
+            self.assertIsNone(recovered["approval"])
+            self.assertEqual(recovered["activity"], history)
+            self.assertEqual(recovered["children"][0], prior)
+            child = recovered["children"][1]
+            self.assertEqual(child["status"], "interrupted")
+            self.assertIsNone(child["approval"])
+            self.assertEqual((child["thread_id"], child["turn_id"]), ("saved-thread", "saved-turn"))
+            self.assertTrue(any(event["data"].get("approval") == pending for event in self.store.events(task_id)))
+        factory.assert_not_awaited()
+        self.assertFalse(manager.monitors)
+        await manager.close()
+
     async def test_explicit_routing_failure_is_persisted_without_hermes_fallback(self):
         execution = ExecutionManager(self.store, self.publish, adapters={"codex": CompletingAdapter()})
         router = AgentRouter(execution, AsyncMock(), hermes_readiness=AsyncMock(return_value=False))
@@ -308,6 +359,38 @@ class RoutingTests(unittest.IsolatedAsyncioTestCase):
 
         self.assertTrue(adapter.allowed)
         self.assertEqual((await client.status(submitted["run_id"]))["status"], "completed")
+
+    async def test_direct_codex_steer_persists_the_outcome_and_activity(self):
+        adapter = SteerableAdapter()
+        execution = ExecutionManager(self.store, self.publish, adapters={"codex": adapter})
+        created = self.task()
+        task = self.store.update(created["id"], selected_agent="codex", routing_reason="Codex is ready.")
+        client = DirectExecutionClient(execution, "codex")
+        submitted = await client.submit(task)
+        await adapter.started.wait()
+
+        await client.steer(submitted["run_id"], "Make it simpler")
+
+        saved = self.store.get(task["id"])
+        self.assertEqual(adapter.instructions, ["Make it simpler"])
+        self.assertEqual(saved["instruction_outcomes"][-1]["outcome"], "accepted")
+        self.assertEqual(saved["activity"][-1], {"kind": "instruction", "text": "Correction sent to Codex."})
+        adapter.release.set()
+        await client.job
+
+    async def test_direct_status_exposes_the_child_error(self):
+        execution = ExecutionManager(self.store, self.publish, adapters={"codex": CompletingAdapter()})
+        created = self.task()
+        task = self.store.update(created["id"], children=[{
+            "id": "child-1", "tool": "codex", "status": "failed", "result": "",
+            "error": {"code": "CODEX_RESUME_FAILED", "message": "Resume failed"},
+        }])
+        client = DirectExecutionClient(execution, "codex")
+        client.task_id, client.child_id, client.run_id = task["id"], "child-1", "direct:failed"
+
+        status = await client.status("direct:failed")
+
+        self.assertEqual(status["error"]["code"], "CODEX_RESUME_FAILED")
 
 
 if __name__ == "__main__":

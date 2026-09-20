@@ -33,6 +33,42 @@ class GeminiSdkTests(unittest.IsolatedAsyncioTestCase):
         self.provider._session = self.provider._create_agent_session(agents, "", "")
         self.addAsyncCleanup(self.provider.stop)
 
+    async def test_desktop_tool_binds_final_transcript_and_rejects_stale_retry(self):
+        self.provider._started = True
+        self.provider._tool_turns["desktop-call"] = "final-turn"
+        context = SimpleNamespace(function_call=SimpleNamespace(call_id="desktop-call"),
+                                  speech_handle=SimpleNamespace(interrupted=False))
+        await self.provider._agent.desktop_action(context, "codex")
+        self.provider._submit_callback.assert_awaited_once_with(
+            {"operation": "desktop", "application": "codex"}, "final-turn")
+        response = await self.provider._agent.desktop_action(context, "codex")
+        self.assertEqual(json.loads(response)["status"], "not_performed")
+        self.assertEqual(self.provider._submit_callback.await_count, 1)
+
+    async def test_interrupted_task_control_cannot_mutate_job(self):
+        self.provider._started = True
+        self.provider._tool_turns["control-call"] = "final-turn"
+        context = SimpleNamespace(function_call=SimpleNamespace(call_id="control-call"),
+                                  speech_handle=SimpleNamespace(interrupted=True))
+        response = await self.provider._agent.task_control(context, "cancel")
+        self.assertEqual(json.loads(response)["status"], "not_performed")
+        self.provider._submit_callback.assert_not_awaited()
+
+    async def test_completion_speech_has_no_action_tools_and_waits_for_user(self):
+        self.provider._started = True
+        self.provider._audio_enabled = True
+        original = self.provider._session
+        fake = SimpleNamespace(user_state="speaking", agent_state="listening", generate_reply=AsyncMock())
+        self.provider._session = fake
+        try:
+            self.assertFalse(await self.provider.notify_task("Completed"))
+            fake.generate_reply.assert_not_awaited()
+            fake.user_state = "listening"
+            self.assertTrue(await self.provider.notify_task("Completed"))
+            self.assertEqual(fake.generate_reply.call_args.kwargs["tools"], [])
+        finally:
+            self.provider._session = original
+
     async def test_real_native_start_attaches_audio_and_mute_controls_capture(self):
         from maslow_voice.audio import PcmFrame
         from maslow_voice.providers.livekit_native_audio import NativeAgentAudioInput, NativeAgentAudioOutput
@@ -102,7 +138,8 @@ class GeminiSdkTests(unittest.IsolatedAsyncioTestCase):
         assistant = ConversationItemAddedEvent(item=self.agents.llm.ChatMessage(role="assistant", content=["Ready to help."]))
         self.provider._conversation_item(assistant)
         await asyncio.gather(*self.provider._event_tasks)
-        self.assertEqual(self.events, [{"type": "transcript", "role": "assistant", "text": "Ready to help.", "final": True}])
+        self.assertEqual(self.events, [{"type": "transcript", "role": "assistant", "text": "Ready to help.", "final": True},
+                                       {"type": "voice_state", "state": "listening", "microphone": False, "speaking": False}])
 
     async def test_real_sdk_startup_control_content_warns_without_losing_next_generation(self):
         from google.genai import types
@@ -141,8 +178,11 @@ class GeminiSdkTests(unittest.IsolatedAsyncioTestCase):
         self.assertFalse(is_given(model._opts.thinking_config))
         self.assertIsNotNone(model._opts.output_audio_transcription)
         schema = self.agents.ToolContext(self.provider._agent.tools).parse_function_tools("openai", strict=True)
-        self.assertEqual(set(schema[0]["function"]["parameters"]["properties"]), set(BRIEF))
-        self.assertNotIn("context", schema[0]["function"]["parameters"]["properties"])
+        tools = {item["function"]["name"]: item["function"]["parameters"]["properties"] for item in schema}
+        self.assertEqual(set(tools), {"submit_intent", "desktop_action", "task_control"})
+        self.assertEqual(set(tools["submit_intent"]), set(BRIEF) | {"project_name", "new_project"})
+        for parameters in tools.values():
+            self.assertNotIn("context", parameters)
         with patch.object(self.RealtimeSession, "_main_task", new=AsyncMock()):
             realtime = model.session()
             try:

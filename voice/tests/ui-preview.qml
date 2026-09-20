@@ -58,7 +58,12 @@ ShellRoot {
     }
     function tasks(): void {
       var next = JSON.parse(JSON.stringify(panel.voiceController.snapshot))
-      next.tasks = [{ id: "fixture", title: "Update the welcome screen", state: "completed", mode: "offline", result: "The welcome copy is ready for your review.", export_review: { digest: "fixture-digest", changes: [{ path: "README.md", action: "modify" }, { path: "welcome.txt", action: "add" }] } }, { id: "approval", title: "Publish the reviewed update", state: "awaiting_approval", mode: "server", approval: { request_id: "fixture-approval", action: "Publish changes", destination: "Project repository", detail: "Push the reviewed welcome copy to the project branch." } }]
+      next.tasks = [{ id: "fixture", title: "Build the task tracker", state: "running", selected_agent: "codex", mode: "server", project: "/home/maslow/Projects/Maslow Voice/task-tracker", summary: "Create a dependency-free task tracker.", capabilities: { steer: true, continue: true }, children: [{ id: "codex-attempt", thread_id: "thread-fixture", turn_id: "turn-fixture" }], activity: [{ kind: "assistant", text: "I created the page structure." }, { kind: "command", text: "Checking the local HTML output." }], artifacts: [{ path: "index.html", exists: true, verification: "Maslow verified the file exists." }, { path: "notes.txt", exists: false, verification: "Agent-reported only." }] }, { id: "approval", title: "Run a reviewed command", state: "awaiting_approval", mode: "server", selected_agent: "codex", project: "/home/maslow/Projects/Maslow Voice/task-tracker", approval: { request_id: "fixture-approval", tool_name: "shell", message: "Codex requests permission to run: git status --short", action: "Run command", destination: "Project workspace" } }]
+      panel.voiceController.setFixture(next)
+    }
+    function taskView(taskId: string, sequence: int): void {
+      var next = JSON.parse(JSON.stringify(panel.voiceController.snapshot))
+      next.task_view_request = { task_id: taskId, sequence: sequence }
       panel.voiceController.setFixture(next)
     }
     function taskError(code: string, message: string): void {
@@ -66,6 +71,21 @@ ShellRoot {
       next.voice.task_error = { code: code, message: message }
       panel.voiceController.setFixture(next)
     }
+    function longApproval(): void {
+      tasks()
+      var next = JSON.parse(JSON.stringify(panel.voiceController.snapshot))
+      next.tasks[1].approval.message = Array(4001).join("x")
+      next.task_view_request = { task_id: "approval", sequence: 1 }
+      panel.voiceController.setFixture(next)
+    }
+    function taskActivity(): void {
+      var next = JSON.parse(JSON.stringify(panel.voiceController.snapshot))
+      if (!next.tasks || next.tasks.length === 0) return
+      next.tasks[0].activity = (next.tasks[0].activity || []).concat([{ kind: "assistant", text: "A fixture activity update arrived." }])
+      panel.voiceController.setFixture(next)
+    }
+    function taskDraft(taskId: string, text: string): void { panel.setTaskInstructionDraft(taskId, text) }
+    function repair(): void { panel.openProjectRepair() }
     function stressPrepare(): void {
       var next = JSON.parse(JSON.stringify(panel.voiceController.snapshot))
       next.tasks = []
@@ -110,9 +130,13 @@ ShellRoot {
       panel.voiceController.setFixture(next)
     }
     function requests(): string { return JSON.stringify(panel.voiceController.fixtureRequests) }
+    function typeStatus(): string { return JSON.stringify({ page: panel.page, messageFocused: panel.messageInputFocused, advancedOptionsOpen: panel.advancedRequestOptionsOpen }) }
+    function taskFocusStatus(): string { return JSON.stringify({ page: panel.page, selectedTaskId: panel.selectedTaskId, focusedTaskInputId: panel.focusedTaskInputId, taskInputFocusTaskId: panel.taskInputFocusTaskId, taskInputFocusRequest: panel.taskInputFocusRequest, focusedTaskActionTaskId: panel.focusedTaskActionTaskId, focusedTaskActionName: panel.focusedTaskActionName, taskActionFocusRequest: panel.taskActionFocusRequest }) }
+    function taskDraftStatus(taskId: string): string { return JSON.stringify({ taskId: taskId, draft: panel.taskInstructionDraft(taskId), selection: panel.taskInstructionSelection(taskId), pendingTaskInputRestoreId: panel.pendingTaskInputRestoreId }) }
+    function repairStatus(): string { return JSON.stringify({ page: panel.page, settingsOpen: panel.settingsOpen, projectRepairOpen: panel.projectRepairOpen, advancedRequestOptionsOpen: panel.advancedRequestOptionsOpen }) }
     function setupSaved(): void { panel.voiceController.applyLine('{"ok":true,"livekit_saved":true}') }
     function setupError(): void { panel.voiceController.applyLine('{"ok":false,"error":{"message":"LiveKit setup could not be saved. Check the project URL and try again."}}') }
-    function status(): string { return JSON.stringify({ placement: panel.heldPlacement, diameter: panel.heldDiameter, desired: panel.desiredPlacement, controllerOpen: panel.controllerOpen, compactControlsOpen: panel.compactControlsOpen, state: panel.voice.state }) }
+    function status(): string { return JSON.stringify({ placement: panel.heldPlacement, diameter: panel.heldDiameter, desired: panel.desiredPlacement, controllerOpen: panel.controllerOpen, compactControlsOpen: panel.compactControlsOpen, state: panel.voice.state, selectedTaskId: panel.selectedTaskId, working: panel.working }) }
     function stressStatus(): string { return JSON.stringify({ taskDelegateCreations: panel.taskDelegateCreations, transcriptDelegateCreations: panel.transcriptDelegateCreations, meterFramesRemaining: meterFramesRemaining, meterLevel: panel.voice.level, taskApproval: panel.tasks[0] ? panel.tasks[0].approval.detail : "", captions: panel.transcript.length }) }
   }
 }

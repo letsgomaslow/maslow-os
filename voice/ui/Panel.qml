@@ -27,6 +27,8 @@ Item {
   property bool geminiLiveSetupSucceeded: false
   property string geminiLiveSetupStatus: ""
   property bool advancedTaskSettingsOpen: false
+  property bool advancedRequestOptionsOpen: false
+  property bool projectRepairOpen: false
   property bool compactControlsOpen: false
   property bool orbLongPress: false
   property bool voiceStartPending: false
@@ -36,6 +38,21 @@ Item {
   property bool uiTestInstrumentation: false
   property int taskDelegateCreations: 0
   property int transcriptDelegateCreations: 0
+  property string selectedTaskId: ""
+  property int handledTaskViewSequence: -1
+  property int taskInputFocusRequest: 0
+  property int taskInputFocusGeneration: 0
+  property string taskInputFocusTaskId: ""
+  property string focusedTaskInputId: ""
+  property string pendingTaskInputRestoreId: ""
+  property string focusedTaskActionTaskId: ""
+  property string focusedTaskActionName: ""
+  property string pendingTaskActionRestoreTaskId: ""
+  property string pendingTaskActionRestoreName: ""
+  property int taskActionFocusRequest: 0
+  property var taskInstructionDrafts: ({})
+  property var taskInstructionSelections: ({})
+  readonly property bool messageInputFocused: textDraft.activeFocus
   property alias voiceController: controller
 
   readonly property var lockService: shell && typeof shell.serviceFor === "function" ? shell.serviceFor("omarchy.lock") : null
@@ -48,8 +65,12 @@ Item {
   readonly property var readiness: controller.readiness || ({})
   readonly property var transcript: (controller.session || {}).transcript || []
   readonly property var tasks: controller.visibleTasks || []
+  readonly property var taskViewRequest: controller.taskViewRequest || null
+  readonly property var selectedTask: tasks.find(function(task) { return String(task.id || "") === selectedTaskId }) || null
   readonly property bool reducedMotion: settings.reduced_motion === true
   readonly property bool fixedPosition: settings.fixed_position === true
+  readonly property bool automaticWorkspaces: String(settings.mode || "") === "gemini_live"
+  readonly property bool offlineMode: String(settings.mode || "") === "offline"
   readonly property bool conversationReady: root.conversationReadiness().ready === true
   readonly property bool disabled: voice.enabled !== true && !conversationReady
   readonly property string orbState: voice.error ? "error" : (voice.state === "listening" && voice.microphone !== true ? "muted" : String(voice.state || "idle"))
@@ -71,14 +92,37 @@ Item {
     compactControlsOpen = conversation
   }
   readonly property bool conversation: ["connecting", "thinking", "listening", "speaking", "talking", "conversation"].indexOf(String(voice.state || "")) >= 0
-  readonly property bool working: tasks.some(function(task) { return task.state !== "dismissed" && task.dismissed !== true })
+  readonly property bool working: tasks.some(function(task) {
+    return ["queued", "submitting", "accepted", "running", "waiting_input", "awaiting_approval", "stopping"].indexOf(String(task.state || "")) >= 0
+  })
+
+  onTasksChanged: {
+    var restoreTaskId = focusedTaskInputId
+    var restoreActionTaskId = focusedTaskActionTaskId
+    var restoreActionName = focusedTaskActionName
+    if (selectedTaskId !== "" && !selectedTask) selectedTaskId = ""
+    if (selectedTaskId === "" && tasks.length > 0) selectedTaskId = String(tasks[0].id || "")
+    if (restoreActionTaskId !== "" && restoreActionTaskId === selectedTaskId)
+      restoreTaskActionFocusAfterRefresh(restoreActionTaskId, restoreActionName)
+    else if (restoreTaskId !== "" && restoreTaskId === selectedTaskId)
+      restoreTaskInstructionFocusAfterRefresh(restoreTaskId)
+  }
+  onTaskViewRequestChanged: {
+    var request = taskViewRequest || ({})
+    var sequence = Number(request.sequence)
+    var taskId = String(request.task_id || "")
+    if (taskId === "" || !isFinite(sequence) || sequence <= handledTaskViewSequence) return
+    handledTaskViewSequence = sequence
+    selectedTaskId = taskId
+    page = "tasks"
+    controllerOpen = true
+    compactControlsOpen = false
+    Qt.callLater(function() { focusSelectedTaskInstruction() })
+  }
 
   onTaskErrorChanged: {
     if (shouldHandleTaskError(taskError) && taskError.code === "PROJECT_REQUIRED") {
-      page = "type"
-      controllerOpen = true
-      compactControlsOpen = true
-      Qt.callLater(function() { projectField.forceActiveFocus() })
+      feedback = String(taskError.message || "This work needs an existing project folder. Add one in Advanced request options.")
     }
   }
 
@@ -127,6 +171,23 @@ Item {
   function requestVoiceStart() {
     voiceStartPending = true
     send("start_voice", { project: selectedProject, context: explicitContext })
+  }
+  function openProjectRepair() {
+    if (automaticWorkspaces) {
+      page = "settings"
+      settingsOpen = true
+      advancedRequestOptionsOpen = true
+    } else {
+      page = "type"
+      settingsOpen = false
+      projectRepairOpen = true
+    }
+    controllerOpen = true
+    compactControlsOpen = false
+    Qt.callLater(function() {
+      if (automaticWorkspaces) projectOverrideField.forceActiveFocus()
+      else projectRepairField.forceActiveFocus()
+    })
   }
   function boundedOrbCoordinate(value) {
     return Math.max(0, Math.min(1, Number(value)))
@@ -210,9 +271,161 @@ Item {
     }
     send("task_action", request)
   }
+  function selectTask(task) {
+    selectedTaskId = String((task || {}).id || "")
+    taskAction(task, "select")
+    Qt.callLater(function() { focusSelectedTaskInstruction() })
+  }
+  function focusSelectedTaskInstruction() {
+    if (selectedTaskId === "") return
+    taskInputFocusTaskId = selectedTaskId
+    taskInputFocusGeneration += 1
+    taskInputFocusRequest += 1
+  }
+  function taskInstructionDraft(taskId) {
+    var id = String(taskId || "")
+    return id === "" ? "" : String(taskInstructionDrafts[id] || "")
+  }
+  function setTaskInstructionDraft(taskId, text) {
+    var id = String(taskId || "")
+    if (id === "") return
+    var value = String(text || "")
+    if (taskInstructionDraft(id) === value) return
+    var next = {}
+    for (var key in taskInstructionDrafts) next[key] = taskInstructionDrafts[key]
+    if (value === "") delete next[id]
+    else next[id] = value
+    taskInstructionDrafts = next
+  }
+  function taskInstructionSelection(taskId) {
+    var id = String(taskId || "")
+    return taskInstructionSelections[id] || ({ cursorPosition: 0, selectionStart: 0, selectionEnd: 0 })
+  }
+  function setTaskInstructionSelection(taskId, cursorPosition, selectionStart, selectionEnd) {
+    var id = String(taskId || "")
+    if (id === "") return
+    var nextValue = { cursorPosition: Number(cursorPosition), selectionStart: Number(selectionStart), selectionEnd: Number(selectionEnd) }
+    var previous = taskInstructionSelection(id)
+    if (previous.cursorPosition === nextValue.cursorPosition && previous.selectionStart === nextValue.selectionStart && previous.selectionEnd === nextValue.selectionEnd) return
+    var next = {}
+    for (var key in taskInstructionSelections) next[key] = taskInstructionSelections[key]
+    next[id] = nextValue
+    taskInstructionSelections = next
+  }
+  function restoreTaskInstructionSelection(taskId, input) {
+    var selection = taskInstructionSelection(taskId)
+    var length = String(input.text || "").length
+    var start = Math.max(0, Math.min(length, Number(selection.selectionStart)))
+    var end = Math.max(0, Math.min(length, Number(selection.selectionEnd)))
+    if (start !== end) {
+      if (Number(selection.cursorPosition) === start) input.select(end, start)
+      else input.select(start, end)
+    }
+    else input.cursorPosition = Math.max(0, Math.min(length, Number(selection.cursorPosition)))
+  }
+  function clearPendingTaskInputRestore() {
+    pendingTaskInputRestoreId = ""
+    taskInputFocusGeneration += 1
+  }
+  function clearTaskActionFocus() {
+    focusedTaskActionTaskId = ""
+    focusedTaskActionName = ""
+    pendingTaskActionRestoreTaskId = ""
+    pendingTaskActionRestoreName = ""
+  }
+  function setTaskActionFocus(taskId, action) {
+    focusedTaskActionTaskId = String(taskId || "")
+    focusedTaskActionName = String(action || "")
+    pendingTaskActionRestoreTaskId = ""
+    pendingTaskActionRestoreName = ""
+    clearPendingTaskInputRestore()
+  }
+  function restoreTaskInstructionFocusAfterRefresh(taskId) {
+    var id = String(taskId || "")
+    if (id === "") return
+    pendingTaskInputRestoreId = id
+    Qt.callLater(function() {
+      if (pendingTaskInputRestoreId !== id) return
+      pendingTaskInputRestoreId = ""
+      if (!controllerOpen || page !== "tasks" || selectedTaskId !== id) return
+      taskInputFocusTaskId = id
+      taskInputFocusGeneration += 1
+      taskInputFocusRequest += 1
+    })
+  }
+  function restoreTaskActionFocusAfterRefresh(taskId, action) {
+    var id = String(taskId || "")
+    var name = String(action || "")
+    if (id === "" || name === "") return
+    pendingTaskActionRestoreTaskId = id
+    pendingTaskActionRestoreName = name
+    Qt.callLater(function() {
+      if (pendingTaskActionRestoreTaskId !== id || pendingTaskActionRestoreName !== name) return
+      pendingTaskActionRestoreTaskId = ""
+      pendingTaskActionRestoreName = ""
+      if (!controllerOpen || page !== "tasks" || selectedTaskId !== id) return
+      taskActionFocusRequest += 1
+    })
+  }
+  function taskCapability(task, capability) {
+    var capabilities = (task || {}).capabilities
+    if (capabilities && Object.prototype.hasOwnProperty.call(capabilities, capability))
+      return capabilities[capability] === true
+    // Codex is intentionally opt-in for its new session controls. Existing
+    // Hermes and Claude records retain their established controls until their
+    // adapters publish a capability map.
+    return String((task || {}).selected_agent || "") !== "codex"
+  }
+  function taskHasCodexSetupError(task) {
+    var code = String((((task || {}).error || {}).code) || "")
+    return String((task || {}).selected_agent || "") === "codex" && ["CODEX_MISSING", "CODEX_UPDATE_REQUIRED", "CODEX_AUTH_REQUIRED", "AGENT_UNAVAILABLE"].indexOf(code) >= 0
+  }
+  function artifactVerificationText(artifact) {
+    var verification = (artifact || {}).verification
+    if (verification === "exists") return "File exists; behavior not verified"
+    if (verification === "missing") return "File not found"
+    if (verification === true) return "Maslow verified"
+    if (verification === false) return "Verification pending"
+    if (typeof verification === "string" && verification !== "") return verification
+    return (artifact || {}).exists === true ? "File exists; verification pending" : "Unavailable"
+  }
+  function taskSessionIdentity(task) {
+    var current = task || ({})
+    var thread = current.thread_id || current.threadId || ""
+    var turn = current.turn_id || current.turnId || ""
+    var children = current.children || []
+    for (var index = children.length - 1; index >= 0 && (!thread || !turn); index--) {
+      var child = children[index] || ({})
+      if (!thread) thread = child.thread_id || child.threadId || ""
+      if (!turn) turn = child.turn_id || child.turnId || ""
+    }
+    var identity = []
+    if (thread) identity.push("Thread " + String(thread))
+    if (turn) identity.push("Turn " + String(turn))
+    return identity.join(" · ")
+  }
+  function taskSummaryText(task) {
+    var current = task || ({})
+    var error = String((current.error || ({})).message || "")
+    if (error !== "") return error
+    if (String(current.state || "") === "completed")
+      return String(current.result || "") !== "" ? "Agent finished. Review the agent report below." : "Agent finished. Review the task details below."
+    return String(current.summary || "")
+  }
   function needsApproval(task) {
     var approval = task ? task.approval : null
     return !!(approval === true || approval === "required" || (approval && typeof approval === "object" && String(approval.request_id || "") !== ""))
+  }
+  function approvalSummary(task) {
+    var approval = task ? task.approval || ({}) : ({})
+    var details = []
+    if (String(approval.message || "") !== "") details.push(String(approval.message))
+    else if (String(approval.detail || "") !== "") details.push(String(approval.detail))
+    else if (String(approval.action || "") !== "") details.push(String(approval.action))
+    if (String(approval.action || "") !== "" && String(approval.action) !== String(approval.message || "") && String(approval.action) !== String(approval.detail || "")) details.push("Action: " + String(approval.action))
+    if (String(approval.destination || "") !== "") details.push("Destination: " + String(approval.destination))
+    if (String(approval.tool_name || "") !== "") details.push("Tool: " + String(approval.tool_name))
+    return details.length > 0 ? details.join("\n") : "Review this request before continuing."
   }
   function configure(key, value) {
     var next = {}
@@ -310,7 +523,7 @@ Item {
     controller.start()
     Qt.callLater(function() {
       if (root.page === "talk") talkAction.forceActiveFocus()
-      else if (root.page === "type") projectField.forceActiveFocus()
+      else if (root.page === "type") textDraft.forceActiveFocus()
       else if (root.page === "settings") connectionMode.forceActiveFocus()
       else controlsFocus.forceActiveFocus()
     })
@@ -337,6 +550,7 @@ Item {
     font.family: "Manrope"
     font.pixelSize: 14
     leftPadding: 12
+    onActiveFocusChanged: if (activeFocus) { root.clearPendingTaskInputRestore(); root.clearTaskActionFocus() }
     background: Rectangle { radius: 8; color: "#1E2D47"; border.width: parent.activeFocus ? 2 : 1; border.color: parent.activeFocus ? "#6DC4AD" : "#75879D" }
   }
   component VoiceArea: TextArea {
@@ -348,6 +562,7 @@ Item {
     font.family: "Manrope"
     font.pixelSize: 14
     padding: 12
+    onActiveFocusChanged: if (activeFocus) { root.clearPendingTaskInputRestore(); root.clearTaskActionFocus() }
     background: Rectangle { radius: 8; color: "#1E2D47"; border.width: parent.activeFocus ? 2 : 1; border.color: parent.activeFocus ? "#6DC4AD" : "#75879D" }
   }
   component VoiceSelect: ComboBox {
@@ -358,6 +573,7 @@ Item {
     font.pixelSize: 14
     leftPadding: 12
     rightPadding: 36
+    onActiveFocusChanged: if (activeFocus) { root.clearPendingTaskInputRestore(); root.clearTaskActionFocus() }
     palette.text: "#FFFFFF"
     palette.buttonText: "#FFFFFF"
     palette.highlightedText: "#121D35"
@@ -422,12 +638,14 @@ Item {
   }
   component VoiceCheck: CheckBox {
     implicitHeight: 44
+    onActiveFocusChanged: if (activeFocus) { root.clearPendingTaskInputRestore(); root.clearTaskActionFocus() }
     contentItem: Text { text: parent.text; leftPadding: parent.indicator.width + parent.spacing; color: "#FFFFFF"; font.family: "Manrope"; verticalAlignment: Text.AlignVCenter }
     background: Rectangle { color: "transparent"; radius: 6; border.width: parent.activeFocus ? 2 : 0; border.color: "#6DC4AD" }
   }
 
   component VoiceButton: Button {
     focusPolicy: Qt.StrongFocus
+    onActiveFocusChanged: if (activeFocus) { root.clearPendingTaskInputRestore(); root.clearTaskActionFocus() }
     implicitHeight: 44
     horizontalPadding: 14
     Accessible.role: Accessible.Button
@@ -436,8 +654,8 @@ Item {
       radius: 8
       opacity: parent.enabled ? 1 : 0.55
       color: parent.down ? "#A070A6" : (parent.hovered ? "#6DC4AD" : "#F6F7F9")
-      border.color: parent.activeFocus ? "#247967" : "#121D35"
-      border.width: parent.activeFocus ? 2 : 1
+      border.color: parent.activeFocus ? "#EE7BB3" : "#121D35"
+      border.width: parent.activeFocus ? 3 : 1
     }
     contentItem: Text {
       text: parent.text
@@ -485,6 +703,22 @@ Item {
         reducedMotion: root.reducedMotion
         interactive: orbPointer.containsMouse || orbPointer.pressed || orbButton.activeFocus
         gpuShaderAvailable: Quickshell.env("MASLOW_VOICE_GPU_SHADER") !== "0"
+      }
+      // This sits outside the Orb material so a background task remains
+      // visible without changing the single-action Orb design.
+      Rectangle {
+        visible: root.working
+        width: 11
+        height: width
+        radius: width / 2
+        anchors.right: parent.right
+        anchors.top: parent.top
+        anchors.rightMargin: 4
+        anchors.topMargin: 4
+        color: "#6DC4AD"
+        border.color: "#121D35"
+        border.width: 2
+        Accessible.ignored: true
       }
       onClicked: root.startFromOrb()
 
@@ -599,7 +833,8 @@ Item {
           VoiceButton { text: "Settings"; onClicked: root.openSettings("Advanced Voice settings") }
         }
         Text { visible: String(root.taskError.message || "") !== ""; text: String(root.taskError.message || ""); color: "#EE7BB3"; font.family: "Manrope"; wrapMode: Text.WordWrap; Layout.fillWidth: true; Accessible.role: Accessible.AlertMessage; Accessible.name: text }
-        VoiceButton { visible: root.taskError.code === "PROJECT_REQUIRED"; text: "Choose project"; onClicked: { root.page = "type"; root.controllerOpen = true; Qt.callLater(function() { projectField.forceActiveFocus() }) } }
+        VoiceButton { visible: root.taskError.code === "PROJECT_REQUIRED"; text: "Add folder"; onClicked: root.openProjectRepair() }
+        VoiceButton { visible: ["CODEX_MISSING", "CODEX_UPDATE_REQUIRED", "CODEX_AUTH_REQUIRED"].indexOf(root.taskError.code) >= 0; text: "Open Codex setup"; onClicked: root.send("desktop_action", { application: "hub" }) }
       }
     }
 
@@ -646,7 +881,11 @@ Item {
                 required property var modelData
                 text: modelData.label
                 Accessible.name: text + (root.page === modelData.id ? ", current section" : "")
-                onClicked: { root.page = modelData.id; root.settingsOpen = modelData.id === "settings" }
+                onClicked: {
+                  root.page = modelData.id
+                  root.settingsOpen = modelData.id === "settings"
+                  if (modelData.id === "type") Qt.callLater(function() { textDraft.forceActiveFocus() })
+                }
               }
             }
           }
@@ -664,8 +903,7 @@ Item {
                 Text { visible: root.voice.error || controller.transportError; Layout.alignment: Qt.AlignHCenter; text: root.voice.error || controller.transportError; color: "#EE7BB3"; font.family: "Manrope"; wrapMode: Text.WordWrap; Accessible.role: Accessible.AlertMessage; Accessible.name: text }
                 Text { Layout.alignment: Qt.AlignHCenter; text: root.conversation ? root.stateText() : "What would you like to work on?"; color: "#FFFFFF"; font.family: "Manrope"; font.pixelSize: 24 }
                 VoiceButton { id: talkAction; Layout.alignment: Qt.AlignHCenter; text: root.conversation ? "End conversation" : "Start talking"; onClicked: root.conversation ? root.send("end_voice") : root.requestVoiceStart() }
-                VoiceField { Layout.fillWidth: true; placeholderText: "Project folder for tasks (optional for conversation)"; text: root.selectedProject; onTextEdited: root.selectedProject = text; Accessible.name: "Project folder" }
-                Text { Layout.alignment: Qt.AlignHCenter; text: "Talk through an idea, or ask Maslow to hand work to your agents."; color: "#D1D5DB"; font.family: "Manrope"; font.pixelSize: 15; wrapMode: Text.WordWrap; horizontalAlignment: Text.AlignHCenter; Layout.maximumWidth: 520 }
+                Text { Layout.alignment: Qt.AlignHCenter; text: "Talk through an idea, ask a question, or ask Maslow to hand work to your agents."; color: "#D1D5DB"; font.family: "Manrope"; font.pixelSize: 15; wrapMode: Text.WordWrap; horizontalAlignment: Text.AlignHCenter; Layout.maximumWidth: 520 }
                 Text { Layout.alignment: Qt.AlignHCenter; text: root.microphoneText() + (root.transcript.length > 0 ? "  ·  Captions: " + String(root.transcript[root.transcript.length - 1].text || "") : ""); color: "#D1D5DB"; font.family: "Manrope"; font.pixelSize: 13; wrapMode: Text.WordWrap; horizontalAlignment: Text.AlignHCenter; Layout.maximumWidth: 520; Accessible.role: Accessible.StatusBar; Accessible.name: text }
                 Item { Layout.fillHeight: true }
               }
@@ -677,13 +915,18 @@ Item {
               ColumnLayout {
                 width: typeScroll.availableWidth - 14
                 spacing: 12
-                Text { text: "Send a clear request"; color: "#FFFFFF"; font.family: "Manrope"; font.pixelSize: 22; Accessible.role: Accessible.Heading }
+                Text { text: root.automaticWorkspaces ? "Message Maslow" : "Send a clear request"; color: "#FFFFFF"; font.family: "Manrope"; font.pixelSize: 22; Accessible.role: Accessible.Heading }
                 Text { visible: String(root.taskError.message || "") !== ""; text: String(root.taskError.message || ""); color: "#EE7BB3"; font.family: "Manrope"; wrapMode: Text.WordWrap; Layout.fillWidth: true; Accessible.role: Accessible.AlertMessage; Accessible.name: text }
-                VoiceField { Layout.fillWidth: true; id: projectField; placeholderText: "Project folder (required to hand off work)"; text: root.selectedProject; onTextEdited: root.selectedProject = text; Accessible.name: "Selected project" }
-                VoiceArea { Layout.fillWidth: true; id: contextField; placeholderText: "Context you choose to share (optional)"; text: root.explicitContext; onTextChanged: root.explicitContext = text; Accessible.name: "Explicit context"; implicitHeight: 80; wrapMode: TextEdit.Wrap }
-                VoiceArea { Layout.fillWidth: true; id: textDraft; placeholderText: "Describe the work to coordinate"; text: root.draft; onTextChanged: root.draft = text; Accessible.name: "Task request"; implicitHeight: 110; wrapMode: TextEdit.Wrap }
-                Text { text: "Maslow only sends the request, project, and context you enter here. It does not capture screenshots automatically."; color: "#D1D5DB"; font.family: "Manrope"; wrapMode: Text.WordWrap; Layout.fillWidth: true }
-                VoiceButton { text: "Send request"; enabled: root.draft.trim() !== ""; onClicked: root.submitText() }
+                VoiceArea { Layout.fillWidth: true; id: textDraft; placeholderText: root.automaticWorkspaces ? "Type a message" : "Describe the work to coordinate"; text: root.draft; onTextChanged: root.draft = text; Accessible.name: "Message"; implicitHeight: 110; wrapMode: TextEdit.Wrap }
+                ColumnLayout {
+                  visible: root.offlineMode || root.projectRepairOpen
+                  Layout.fillWidth: true
+                  spacing: 8
+                  Text { text: root.offlineMode ? "Offline work needs an existing project folder before it can run." : "Choose the existing folder for this work."; color: "#D1D5DB"; font.family: "Manrope"; wrapMode: Text.WordWrap; Layout.fillWidth: true }
+                  VoiceField { id: projectRepairField; Layout.fillWidth: true; placeholderText: "Project folder (required)"; text: root.selectedProject; onTextEdited: root.selectedProject = text; Accessible.name: "Project folder" }
+                  VoiceArea { Layout.fillWidth: true; visible: root.offlineMode; placeholderText: "Context you choose to share (optional)"; text: root.explicitContext; onTextChanged: root.explicitContext = text; Accessible.name: "Explicit context"; implicitHeight: 76; wrapMode: TextEdit.Wrap }
+                }
+                VoiceButton { text: root.automaticWorkspaces ? "Send message" : "Send request"; enabled: root.draft.trim() !== ""; onClicked: root.submitText() }
                 Repeater { model: root.transcript; delegate: Text { required property var modelData; Component.onCompleted: if (root.uiTestInstrumentation) root.transcriptDelegateCreations += 1; Layout.fillWidth: true; text: (modelData.role === "user" ? "You: " : "Maslow: ") + String(modelData.text || ""); color: "#FFFFFF"; font.family: "Manrope"; wrapMode: Text.WordWrap } }
               }
             }
@@ -706,22 +949,139 @@ Item {
                     radius: 8; color: "#1E2D47"; border.color: "#496078"
                     ColumnLayout {
                       id: taskColumn; anchors.fill: parent; anchors.margins: 10; spacing: 7
-                      Text { text: String(modelData.title || "Task"); color: "#FFFFFF"; font.family: "Manrope"; font.weight: Font.DemiBold; wrapMode: Text.WordWrap; Layout.fillWidth: true }
-                      Text { text: String(modelData.state || "unknown").replace(/_/g, " ") + " · " + String(modelData.result || (modelData.error || ({})).message || modelData.summary || ""); color: "#D1D5DB"; font.family: "Manrope"; wrapMode: Text.WordWrap; Layout.fillWidth: true }
-                      Text { visible: root.needsApproval(modelData); text: "Approval requested: " + JSON.stringify(modelData.approval || ({}), null, 2); wrapMode: Text.Wrap; Layout.fillWidth: true; color: "#EE7BB3"; font.family: "Manrope"; Accessible.role: Accessible.AlertMessage }
-                      VoiceArea { id: taskInstruction; Layout.fillWidth: true; placeholderText: "Tell the agent what to change or do next"; wrapMode: TextEdit.Wrap; Accessible.name: "Instructions for " + String(modelData.title || "task") }
-                      Repeater { model: (modelData.export_review || ({})).changes || []; delegate: Text { required property var modelData; text: String(modelData.action) + ": " + String(modelData.path); color: "#FFFFFF"; Layout.fillWidth: true; wrapMode: Text.Wrap } }
-                      Flow { Layout.fillWidth: true; spacing: 8
-                        VoiceButton { text: "Approve"; visible: root.needsApproval(modelData); enabled: !!((modelData.approval || ({})).request_id || modelData.approval_request_id); onClicked: root.taskAction(modelData, "approve") }
-                        VoiceButton { text: "Deny"; visible: root.needsApproval(modelData); enabled: !!((modelData.approval || ({})).request_id || modelData.approval_request_id); onClicked: root.taskAction(modelData, "deny") }
-                        VoiceButton { text: "Steer"; visible: ["accepted", "running", "waiting_input", "awaiting_approval"].indexOf(modelData.state) >= 0; enabled: taskInstruction.text.trim() !== ""; onClicked: root.taskAction(modelData, "steer", taskInstruction.text) }
-                        VoiceButton { text: "Start"; visible: modelData.state === "proposed"; onClicked: root.taskAction(modelData, "start") }
-                        VoiceButton { text: "Cancel"; visible: ["completed", "failed", "cancelled", "interrupted"].indexOf(modelData.state) < 0; onClicked: root.taskAction(modelData, "cancel") }
-                        VoiceButton { text: "Continue"; visible: ["completed", "failed", "cancelled", "interrupted", "waiting_input"].indexOf(modelData.state) >= 0; enabled: taskInstruction.text.trim() !== ""; onClicked: root.taskAction(modelData, "continue", taskInstruction.text) }
-                        VoiceButton { text: "Review changes"; visible: modelData.mode === "offline" && ["completed", "failed", "cancelled", "interrupted"].indexOf(modelData.state) >= 0; onClicked: root.taskAction(modelData, "review") }
-                        VoiceButton { text: "Export reviewed changes"; visible: !!(modelData.export_review || ({})).digest; onClicked: root.taskAction(modelData, "export") }
-                        VoiceButton { text: "Dismiss"; visible: ["completed", "failed", "cancelled", "interrupted"].indexOf(modelData.state) >= 0; onClicked: root.taskAction(modelData, "dismiss") }
+                      property var task: modelData
+                      readonly property bool selected: root.selectedTaskId === String(modelData.id || "")
+                      property bool technicalDetailsOpen: false
+                      property bool reportOpen: false
+                      function focusInstructionIfRequested() {
+                        if (!selected || root.taskInputFocusTaskId !== String(modelData.id || "")) return
+                        var taskId = String(modelData.id || "")
+                        var generation = root.taskInputFocusGeneration
+                        root.taskInputFocusTaskId = ""
+                        Qt.callLater(function() {
+                          if (root.taskInputFocusGeneration === generation && root.focusedTaskActionTaskId === "" && root.controllerOpen && root.page === "tasks" && root.selectedTaskId === taskId) {
+                            root.restoreTaskInstructionSelection(taskId, taskInstruction)
+                            taskInstruction.forceActiveFocus()
+                          }
+                        })
                       }
+                      function focusActionIfRequested() {
+                        if (!selected || root.focusedTaskActionTaskId !== String(modelData.id || "")) return
+                        var buttons = {
+                          approve: approveButton, deny: denyButton, steer: steerButton, start: startButton,
+                          cancel: cancelButton, continueTask: continueButton, openFolder: openFolderButton,
+                          setup: setupButton, review: reviewButton, exportTask: exportButton, dismiss: dismissButton
+                        }
+                        var button = buttons[root.focusedTaskActionName]
+                        var taskId = String(modelData.id || "")
+                        var action = root.focusedTaskActionName
+                        var request = root.taskActionFocusRequest
+                        if (button && button.visible && button.enabled) Qt.callLater(function() {
+                          if (root.taskActionFocusRequest === request && root.focusedTaskActionTaskId === taskId && root.focusedTaskActionName === action && button.visible && button.enabled)
+                            button.forceActiveFocus()
+                        })
+                      }
+                      onSelectedChanged: {
+                        focusInstructionIfRequested()
+                      }
+                      Connections {
+                        target: root
+                        function onTaskInputFocusRequestChanged() {
+                          taskColumn.focusInstructionIfRequested()
+                        }
+                        function onTaskActionFocusRequestChanged() {
+                          taskColumn.focusActionIfRequested()
+                        }
+                      }
+                      Text { text: String(modelData.title || "Task") + (taskColumn.selected ? " · selected" : ""); color: "#FFFFFF"; font.family: "Manrope"; font.weight: Font.DemiBold; wrapMode: Text.WordWrap; Layout.fillWidth: true }
+                      Text { text: String(modelData.state || "unknown").replace(/_/g, " ") + " · " + root.taskSummaryText(modelData); color: "#D1D5DB"; font.family: "Manrope"; wrapMode: Text.WordWrap; Layout.fillWidth: true }
+                      VoiceButton { visible: !taskColumn.selected; text: "View task"; onClicked: root.selectTask(modelData) }
+                      ScrollView {
+                        id: approvalScroll
+                        visible: taskColumn.selected && root.needsApproval(modelData)
+                        Layout.fillWidth: true
+                        Layout.preferredHeight: 112
+                        Layout.maximumHeight: 112
+                        clip: true
+                        onActiveFocusChanged: if (activeFocus) { root.clearPendingTaskInputRestore(); root.clearTaskActionFocus() }
+                        ScrollBar.vertical.policy: ScrollBar.AsNeeded
+                        Text { width: approvalScroll.availableWidth; text: "Approval needed:\n" + root.approvalSummary(modelData); wrapMode: Text.Wrap; color: "#EE7BB3"; font.family: "Manrope"; Accessible.role: Accessible.AlertMessage }
+                      }
+                      Text { visible: taskColumn.selected && root.taskHasCodexSetupError(modelData); text: String((modelData.error || {}).message || "Codex needs setup before this task can run."); color: "#EE7BB3"; font.family: "Manrope"; wrapMode: Text.Wrap; Layout.fillWidth: true; Accessible.role: Accessible.AlertMessage }
+                      VoiceArea { id: taskInstruction; visible: taskColumn.selected; Layout.fillWidth: true; placeholderText: "Tell the agent what to change or do next"; text: root.taskInstructionDraft(modelData.id); onTextChanged: root.setTaskInstructionDraft(modelData.id, text); onCursorPositionChanged: if (activeFocus) root.setTaskInstructionSelection(modelData.id, cursorPosition, selectionStart, selectionEnd); onSelectionStartChanged: if (activeFocus) root.setTaskInstructionSelection(modelData.id, cursorPosition, selectionStart, selectionEnd); onSelectionEndChanged: if (activeFocus) root.setTaskInstructionSelection(modelData.id, cursorPosition, selectionStart, selectionEnd); wrapMode: TextEdit.Wrap; Accessible.name: "Instructions for " + String(modelData.title || "task"); onActiveFocusChanged: { if (activeFocus) { root.focusedTaskInputId = String(modelData.id || ""); root.setTaskInstructionSelection(modelData.id, cursorPosition, selectionStart, selectionEnd); root.clearTaskActionFocus(); root.clearPendingTaskInputRestore() } else if (root.focusedTaskInputId === String(modelData.id || "")) root.focusedTaskInputId = "" } }
+                      Flow { Layout.fillWidth: true; spacing: 8
+                        VoiceButton { id: approveButton; text: "Approve"; visible: taskColumn.selected && root.needsApproval(modelData); enabled: !!((modelData.approval || ({})).request_id || modelData.approval_request_id); onActiveFocusChanged: if (activeFocus) root.setTaskActionFocus(modelData.id, "approve"); onClicked: root.taskAction(modelData, "approve") }
+                        VoiceButton { id: denyButton; text: "Deny"; visible: taskColumn.selected && root.needsApproval(modelData); enabled: !!((modelData.approval || ({})).request_id || modelData.approval_request_id); onActiveFocusChanged: if (activeFocus) root.setTaskActionFocus(modelData.id, "deny"); onClicked: root.taskAction(modelData, "deny") }
+                        VoiceButton { id: steerButton; text: "Send update"; visible: taskColumn.selected && root.taskCapability(modelData, "steer") && ["accepted", "running", "waiting_input", "awaiting_approval"].indexOf(modelData.state) >= 0; enabled: taskInstruction.text.trim() !== ""; onActiveFocusChanged: if (activeFocus) root.setTaskActionFocus(modelData.id, "steer"); onClicked: root.taskAction(modelData, "steer", taskInstruction.text) }
+                        VoiceButton { id: startButton; text: "Start"; visible: taskColumn.selected && modelData.state === "proposed"; onActiveFocusChanged: if (activeFocus) root.setTaskActionFocus(modelData.id, "start"); onClicked: root.taskAction(modelData, "start") }
+                        VoiceButton { id: cancelButton; text: "Stop"; visible: taskColumn.selected && ["completed", "failed", "cancelled", "interrupted"].indexOf(modelData.state) < 0; onActiveFocusChanged: if (activeFocus) root.setTaskActionFocus(modelData.id, "cancel"); onClicked: root.taskAction(modelData, "cancel") }
+                        VoiceButton { id: continueButton; text: "Continue"; visible: taskColumn.selected && root.taskCapability(modelData, "continue") && ["completed", "failed", "cancelled", "interrupted", "waiting_input"].indexOf(modelData.state) >= 0; enabled: taskInstruction.text.trim() !== ""; onActiveFocusChanged: if (activeFocus) root.setTaskActionFocus(modelData.id, "continueTask"); onClicked: root.taskAction(modelData, "continue", taskInstruction.text) }
+                        VoiceButton { id: openFolderButton; text: "Open folder"; visible: taskColumn.selected && String(modelData.project || "") !== ""; onActiveFocusChanged: if (activeFocus) root.setTaskActionFocus(modelData.id, "openFolder"); onClicked: root.taskAction(modelData, "open_folder") }
+                        VoiceButton { id: setupButton; text: "Open Codex setup"; visible: taskColumn.selected && root.taskHasCodexSetupError(modelData); onActiveFocusChanged: if (activeFocus) root.setTaskActionFocus(modelData.id, "setup"); onClicked: root.send("desktop_action", { application: "hub" }) }
+                        VoiceButton { id: reviewButton; text: "Review changes"; visible: taskColumn.selected && modelData.mode === "offline" && ["completed", "failed", "cancelled", "interrupted"].indexOf(modelData.state) >= 0; onActiveFocusChanged: if (activeFocus) root.setTaskActionFocus(modelData.id, "review"); onClicked: root.taskAction(modelData, "review") }
+                        VoiceButton { id: exportButton; text: "Export reviewed changes"; visible: taskColumn.selected && !!(modelData.export_review || ({})).digest; onActiveFocusChanged: if (activeFocus) root.setTaskActionFocus(modelData.id, "exportTask"); onClicked: root.taskAction(modelData, "export") }
+                        VoiceButton { id: dismissButton; text: "Dismiss"; visible: taskColumn.selected && ["completed", "failed", "cancelled", "interrupted"].indexOf(modelData.state) >= 0; onActiveFocusChanged: if (activeFocus) root.setTaskActionFocus(modelData.id, "dismiss"); onClicked: root.taskAction(modelData, "dismiss") }
+                      }
+                      VoiceButton { visible: taskColumn.selected && String(modelData.result || "") !== ""; text: taskColumn.reportOpen ? "Hide agent report" : "Show agent report"; onClicked: taskColumn.reportOpen = !taskColumn.reportOpen }
+                      ScrollView {
+                        id: reportScroll
+                        visible: taskColumn.selected && taskColumn.reportOpen && String(modelData.result || "") !== ""
+                        Layout.fillWidth: true
+                        Layout.preferredHeight: 112
+                        Layout.maximumHeight: 112
+                        clip: true
+                        ScrollBar.vertical.policy: ScrollBar.AsNeeded
+                        Text { width: reportScroll.availableWidth; text: String(modelData.result || ""); color: "#D1D5DB"; font.family: "Manrope"; wrapMode: Text.Wrap }
+                      }
+                      ColumnLayout {
+                        visible: taskColumn.selected && ((modelData.artifacts || []).length > 0)
+                        Layout.fillWidth: true
+                        spacing: 4
+                        Text { text: "Artifacts"; color: "#FFFFFF"; font.family: "Manrope"; font.weight: Font.DemiBold; Accessible.role: Accessible.Heading }
+                        Repeater {
+                          model: modelData.artifacts || []
+                          delegate: RowLayout {
+                            required property var modelData
+                            Layout.fillWidth: true
+                            Text { text: String(modelData.path || "") + " · " + root.artifactVerificationText(modelData); color: modelData.exists === true ? "#FFFFFF" : "#D1D5DB"; font.family: "Manrope"; wrapMode: Text.Wrap; Layout.fillWidth: true }
+                            VoiceButton { text: "Open"; visible: modelData.exists === true; onClicked: root.taskAction(taskColumn.task, "open_artifact", String(modelData.path || "")) }
+                          }
+                        }
+                      }
+                      ColumnLayout {
+                        visible: taskColumn.selected && ((modelData.activity || []).length > 0)
+                        Layout.fillWidth: true
+                        spacing: 4
+                        Text { text: "Live activity"; color: "#FFFFFF"; font.family: "Manrope"; font.weight: Font.DemiBold; Accessible.role: Accessible.Heading }
+                        ScrollView {
+                          id: activityScroll
+                          Layout.fillWidth: true
+                          Layout.preferredHeight: 112
+                          Layout.maximumHeight: 112
+                          clip: true
+                          ScrollBar.vertical.policy: ScrollBar.AsNeeded
+                          Column {
+                            width: activityScroll.availableWidth
+                            spacing: 4
+                            Repeater {
+                              model: (modelData.activity || []).slice(Math.max(0, (modelData.activity || []).length - 8))
+                              delegate: Text { required property var modelData; text: String(modelData.kind || "Activity") + ": " + String(modelData.text || ""); color: "#D1D5DB"; font.family: "Manrope"; wrapMode: Text.Wrap; width: parent.width }
+                            }
+                          }
+                        }
+                      }
+                      VoiceButton { visible: taskColumn.selected; text: taskColumn.technicalDetailsOpen ? "Hide technical details" : "Technical details"; onClicked: taskColumn.technicalDetailsOpen = !taskColumn.technicalDetailsOpen }
+                      ColumnLayout {
+                        visible: taskColumn.selected && taskColumn.technicalDetailsOpen
+                        Layout.fillWidth: true
+                        spacing: 4
+                        Text { text: "Task ID: " + String(modelData.id || ""); color: "#D1D5DB"; font.family: "Manrope"; font.pixelSize: 12; wrapMode: Text.Wrap; Layout.fillWidth: true }
+                        Text { visible: String(modelData.project || "") !== ""; text: "Workspace: " + String(modelData.project || ""); color: "#D1D5DB"; font.family: "Manrope"; font.pixelSize: 12; wrapMode: Text.Wrap; Layout.fillWidth: true }
+                        Text { visible: root.taskSessionIdentity(modelData) !== ""; text: root.taskSessionIdentity(modelData); color: "#D1D5DB"; font.family: "Manrope"; font.pixelSize: 12; wrapMode: Text.Wrap; Layout.fillWidth: true }
+                        Text { visible: root.needsApproval(modelData); text: "Approval request ID: " + String((modelData.approval || ({})).request_id || modelData.approval_request_id || ""); color: "#D1D5DB"; font.family: "Manrope"; font.pixelSize: 12; wrapMode: Text.Wrap; Layout.fillWidth: true }
+                        Text { visible: root.needsApproval(modelData); text: "Approval payload:\n" + JSON.stringify(modelData.approval || ({}), null, 2); color: "#D1D5DB"; font.family: "Manrope"; font.pixelSize: 12; wrapMode: Text.Wrap; Layout.fillWidth: true }
+                      }
+                      Repeater { visible: taskColumn.selected; model: (modelData.export_review || ({})).changes || []; delegate: Text { required property var modelData; text: String(modelData.action) + ": " + String(modelData.path); color: "#FFFFFF"; Layout.fillWidth: true; wrapMode: Text.Wrap } }
                     }
                   }
                 }
@@ -816,6 +1176,16 @@ Item {
                 VoiceSelect { visible: ["livekit", "gemini_live"].indexOf(root.settings.mode) < 0; model: ["Automatic routing", "Codex", "Claude Code", "Hermes"]; currentIndex: ["auto", "codex", "claude", "hermes"].indexOf(root.settings.default_coder || "auto"); Accessible.name: "Default coding agent"; onActivated: root.configure("default_coder", ["auto", "codex", "claude", "hermes"][currentIndex]) }
                 Text { visible: root.settings.mode === "gpt_live"; text: "Set up Hermes in Hub before sending tasks. Codex and Claude also need their own connections when selected."; color: "#D1D5DB"; font.family: "Manrope"; wrapMode: Text.WordWrap; Layout.fillWidth: true }
                 VoiceField { visible: ["livekit", "gemini_live"].indexOf(root.settings.mode) < 0 && (["offline", "server"].indexOf(root.settings.mode) >= 0 || root.settings.default_coder === "claude"); Layout.fillWidth: true; placeholderText: "Task model (optional)"; text: String(root.settings.execution_model || ""); Accessible.name: "Task model"; onEditingFinished: root.configure("execution_model", text) }
+                VoiceButton { visible: root.settings.mode === "gemini_live"; text: root.advancedRequestOptionsOpen ? "Hide request overrides" : "Request overrides"; onClicked: root.advancedRequestOptionsOpen = !root.advancedRequestOptionsOpen }
+                ColumnLayout {
+                  visible: root.settings.mode === "gemini_live" && root.advancedRequestOptionsOpen
+                  Layout.fillWidth: true
+                  spacing: 8
+                  Text { text: "Request overrides"; color: "#FFFFFF"; font.family: "Manrope"; font.pixelSize: 18; Accessible.role: Accessible.Heading }
+                  Text { text: "Use these only when a message needs an existing folder or extra context."; color: "#D1D5DB"; font.family: "Manrope"; wrapMode: Text.WordWrap; Layout.fillWidth: true }
+                  VoiceField { id: projectOverrideField; Layout.fillWidth: true; placeholderText: "Existing project folder (optional)"; text: root.selectedProject; onTextEdited: root.selectedProject = text; Accessible.name: "Existing project folder" }
+                  VoiceArea { Layout.fillWidth: true; placeholderText: "Extra context (optional)"; text: root.explicitContext; onTextChanged: root.explicitContext = text; Accessible.name: "Extra context"; implicitHeight: 76; wrapMode: TextEdit.Wrap }
+                }
                 VoiceButton { visible: ["livekit", "gemini_live"].indexOf(root.settings.mode) >= 0; text: root.advancedTaskSettingsOpen ? "Hide task settings" : "Task settings"; onClicked: root.advancedTaskSettingsOpen = !root.advancedTaskSettingsOpen }
                 ColumnLayout { visible: ["livekit", "gemini_live"].indexOf(root.settings.mode) >= 0 && root.advancedTaskSettingsOpen; Layout.fillWidth: true; spacing: 8
                   Text { text: "Task settings"; color: "#FFFFFF"; font.family: "Manrope"; font.pixelSize: 18; Accessible.role: Accessible.Heading }

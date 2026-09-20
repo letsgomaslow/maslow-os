@@ -14,6 +14,7 @@ import os
 import re
 import shutil
 import tempfile
+import time
 import uuid
 from pathlib import Path
 from urllib.parse import urlsplit
@@ -23,6 +24,12 @@ from .errors import VoiceError
 
 ACTIVE_CHILD_STATES = {"queued", "running", "awaiting_approval", "stopping"}
 CODER_NAMES = {"auto", "codex", "claude"}
+MAX_ACTIVITY = 80
+MAX_INSTRUCTION_OUTCOMES = 40
+MAX_CODEX_OBSERVED_ITEMS = 160
+MAX_CODEX_APPROVAL_CHANGES = 6
+MAX_CODEX_APPROVAL_PATH = 160
+MAX_CODEX_APPROVAL_DIFF = 180
 APPLICATION_NAME = re.compile(r"^[A-Za-z0-9][A-Za-z0-9 ._+-]{0,79}$")
 DESKTOP_ID = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._+-]{0,159}\.desktop$")
 
@@ -72,6 +79,75 @@ def _safe_result(value, maximum=200000):
     if not isinstance(value, str):
         value = json.dumps(value, ensure_ascii=False, default=str)
     return value[:maximum]
+
+
+def _codex_display_text(value, maximum, *, multiline=False):
+    """Bound protocol-provided detail before it becomes a human approval prompt."""
+    if not isinstance(value, str):
+        return ""
+    value = "".join(character if character >= " " or (multiline and character == "\n") else " " for character in value)
+    if not multiline:
+        value = " ".join(value.split())
+    return value[:maximum]
+
+
+def _codex_change_kind(change):
+    kind = change.get("kind") if isinstance(change, dict) else None
+    if not isinstance(kind, dict):
+        return "change"
+    change_type = kind.get("type")
+    if change_type == "update":
+        move_to = _codex_display_text(kind.get("move_path"), 120)
+        return f"move to {move_to}" if move_to else "update"
+    return change_type if change_type in {"add", "delete"} else "change"
+
+
+def _codex_file_change_detail(item, reason):
+    """Summarize the exact observed file-change item without widening approval."""
+    lines = ["Codex requests permission to apply file changes."]
+    valid_changes = 0
+    changes = item.get("changes") if isinstance(item, dict) else None
+    if isinstance(changes, list):
+        for change in changes[:MAX_CODEX_APPROVAL_CHANGES]:
+            if not isinstance(change, dict):
+                continue
+            raw_path = change.get("path")
+            path = _codex_display_text(raw_path, MAX_CODEX_APPROVAL_PATH)
+            if not path:
+                continue
+            path_notice = " … path preview truncated." if len(raw_path) > MAX_CODEX_APPROVAL_PATH else ""
+            lines.append(f"- {_codex_change_kind(change)}: {path}{path_notice}")
+            valid_changes += 1
+            raw_diff = change.get("diff")
+            diff = _codex_display_text(raw_diff, MAX_CODEX_APPROVAL_DIFF, multiline=True)
+            if diff:
+                lines.append("  Diff preview: " + diff.replace("\n", "\n  "))
+                if len(raw_diff) > MAX_CODEX_APPROVAL_DIFF:
+                    lines.append("  … diff preview truncated.")
+        if len(changes) > MAX_CODEX_APPROVAL_CHANGES:
+            lines.append(f"- … {len(changes) - MAX_CODEX_APPROVAL_CHANGES} additional file changes omitted from preview.")
+    detail = "\n".join(lines)
+    reason = _codex_display_text(reason, 600, multiline=True)
+    if reason:
+        detail += "\nReason: " + reason
+    return detail[:4000] if valid_changes else ""
+
+
+def _workspace_artifact(task, path):
+    """Return a verified workspace-relative artifact, or None for unsafe paths."""
+    if not isinstance(path, str) or not path or "\x00" in path:
+        return None
+    try:
+        workspace = Path(task["project"]).resolve(strict=True)
+        candidate = Path(path)
+        candidate = candidate.resolve(strict=False) if candidate.is_absolute() else (workspace / candidate).resolve(strict=False)
+        relative = candidate.relative_to(workspace)
+    except (KeyError, OSError, RuntimeError, ValueError):
+        return None
+    if not relative.parts or relative == Path("."):
+        return None
+    return {"path": relative.as_posix(), "exists": candidate.exists(),
+            "verification": "exists" if candidate.exists() else "missing"}
 
 
 async def _default_process(argv, *, cwd=None, env=None):
@@ -261,6 +337,7 @@ class CodexAppServerAdapter:
         self.thread_id = None
         self.turn_id = None
         self.cancel_requested = False
+        self.steer_lock = asyncio.Lock()
 
     def ready(self):
         return bool(self.binary and (self.isolated or (Path(self.binary).is_file() and os.access(self.binary, os.X_OK))))
@@ -271,11 +348,73 @@ class CodexAppServerAdapter:
         if not self.ready():
             raise VoiceError("CODEX_MISSING", "Install or repair Codex before delegating coding work to it.")
 
+        observed_items, observed_item_events = {}, {}
+
+        def item_identity(params, item_id=None):
+            thread_id = params.get("threadId") if isinstance(params, dict) else None
+            turn_id = params.get("turnId") if isinstance(params, dict) else None
+            item_id = item_id if item_id is not None else params.get("itemId") if isinstance(params, dict) else None
+            if not all(isinstance(value, str) and value for value in (thread_id, turn_id, item_id)):
+                return None
+            return thread_id, turn_id, item_id
+
+        def remember_item(params, item):
+            identity = item_identity(params, item.get("id") if isinstance(item, dict) else None)
+            if not identity:
+                return
+            observed_items[identity] = item
+            observed_item_events.setdefault(identity, asyncio.Event()).set()
+            if len(observed_items) > MAX_CODEX_OBSERVED_ITEMS:
+                removed = next(iter(observed_items))
+                observed_items.pop(removed)
+                observed_item_events.pop(removed, None)
+
         async def server_request(method, params, request_id):
             if method not in {"item/commandExecution/requestApproval", "item/fileChange/requestApproval"}:
                 raise VoiceError("CODEX_REQUEST_UNSUPPORTED", "Codex requested an interaction this bridge cannot safely provide.")
+            identity = item_identity(params)
+            if not identity or identity[0] != self.thread_id or identity[1] != self.turn_id:
+                raise VoiceError("CODEX_REQUEST_UNSUPPORTED", "Codex requested approval for a different task turn.")
             kind = "command" if "commandExecution" in method else "file_change"
-            detail = params.get("command") or params.get("reason") or "Codex requests permission to continue."
+            observed = observed_items.get(identity)
+            if kind == "file_change":
+                if observed is None:
+                    ready = observed_item_events.get(identity)
+                    created_waiter = ready is None
+                    if created_waiter:
+                        ready = asyncio.Event()
+                        observed_item_events[identity] = ready
+                    try:
+                        await asyncio.wait_for(ready.wait(), 0.5)
+                    except TimeoutError:
+                        pass
+                    finally:
+                        if created_waiter and identity not in observed_items:
+                            observed_item_events.pop(identity, None)
+                    observed = observed_items.get(identity)
+                if observed is None or observed.get("type") != "fileChange":
+                    detail = "Codex requested a file change, but the exact file-change details were unavailable. The request was declined."
+                    await progress(activity={"kind": "approval", "text": detail})
+                    return {"decision": "decline"}
+                detail = _codex_file_change_detail(observed, params.get("reason"))
+                if not detail:
+                    detail = "Codex requested a file change, but no valid file-change path was available for review. The request was declined."
+                    await progress(activity={"kind": "approval", "text": detail})
+                    return {"decision": "decline"}
+            else:
+                detail = (params.get("command")
+                          or (observed or {}).get("command")
+                          or params.get("reason")
+                          or "Codex requests permission to run a command.")
+                if isinstance(detail, str) and len(detail) > 4000:
+                    await progress(activity={
+                        "kind": "approval",
+                        "text": "Codex requested a command whose full details exceed the 4,000-character review limit. "
+                                "The request was declined without approval. Codex can split it into shorter commands for review.",
+                    })
+                    return {"decision": "decline"}
+                detail = _codex_display_text(detail, 4000, multiline=True)
+            await progress(activity={"kind": "approval", "text": str(detail)[:4000]})
             allowed = await approval(
                 provider_request_id=str(request_id),
                 tool_name=kind,
@@ -308,43 +447,157 @@ class CodexAppServerAdapter:
             await self.rpc.request("initialize", {"clientInfo": {"name": "maslow-voice", "title": "Maslow Voice", "version": "0.1.0"},
                                                   "capabilities": {"experimentalApi": False, "requestAttestation": False}})
             await self.rpc.notify("initialized")
-            started = await self.rpc.request("thread/start", {
-                "cwd": task["project"], "approvalPolicy": "untrusted",
-                "approvalsReviewer": "user", "sandbox": "workspace-write", "ephemeral": False,
-                "threadSource": "appServer",
-                **({"model": self.model} if self.model else {}),
-                **({"modelProvider": "maslow"} if self.base_url else {}),
-            })
+            resume_thread_id = child.get("resume_thread_id")
+            if resume_thread_id:
+                started = await self.rpc.request("thread/resume", {
+                    "threadId": _text(resume_thread_id, "Codex thread identity", 200),
+                    "cwd": task["project"], "approvalPolicy": "untrusted", "approvalsReviewer": "user",
+                    "sandbox": "workspace-write",
+                    **({"model": self.model} if self.model else {}),
+                    **({"modelProvider": "maslow"} if self.base_url else {}),
+                })
+            else:
+                # The dedicated app-server already runs in task["project"]. Codex
+                # treats an explicit start cwd plus workspace-write as consent
+                # to persist project trust, independently of approvalPolicy.
+                started = await self.rpc.request("thread/start", {
+                    "approvalPolicy": "untrusted",
+                    "approvalsReviewer": "user", "sandbox": "workspace-write", "ephemeral": False,
+                    "threadSource": "appServer",
+                    **({"model": self.model} if self.model else {}),
+                    **({"modelProvider": "maslow"} if self.base_url else {}),
+                })
             thread = (started or {}).get("thread") or {}
             self.thread_id = _text(thread.get("id"), "Codex thread identity", 200)
+            if resume_thread_id and self.thread_id != resume_thread_id:
+                raise VoiceError("CODEX_RESUME_FAILED", "Codex did not resume the saved task thread. No new task was started.")
             provider_session = _text(thread.get("sessionId"), "Codex session identity", 200)
-            await progress(status="running", provider_session_id=provider_session, thread_id=self.thread_id)
+            await progress(status="running", provider_session_id=provider_session, thread_id=self.thread_id,
+                           activity={"kind": "thread", "text": "Resumed Codex thread." if resume_thread_id else "Started Codex thread."})
             turn = await self.rpc.request("turn/start", {
                 "threadId": self.thread_id,
                 "input": [{"type": "text", "text": instructions, "text_elements": []}],
                 "approvalPolicy": "untrusted", "approvalsReviewer": "user",
             })
             self.turn_id = _text(((turn or {}).get("turn") or {}).get("id"), "Codex turn identity", 200)
-            await progress(status="running", turn_id=self.turn_id)
-            output = []
+            await progress(status="running", turn_id=self.turn_id, activity={"kind": "turn", "text": "Codex is working."})
+            output, assistant_delta, artifact_paths = [], "", set()
+            assistant_item_id = ""
+            last_assistant_flush = time.monotonic()
+
+            async def flush_assistant():
+                nonlocal assistant_delta, last_assistant_flush
+                if assistant_delta:
+                    await progress(activity={"kind": "assistant", "text": assistant_delta,
+                                             "stream_id": self.thread_id + ":" + self.turn_id + ":" + assistant_item_id})
+                    assistant_delta = ""
+                last_assistant_flush = time.monotonic()
+
+            async def record_item(params, phase):
+                item = params.get("item")
+                if not isinstance(item, dict):
+                    return
+                remember_item(params, item)
+                if item.get("type") == "commandExecution":
+                    command = item.get("command")
+                    if isinstance(command, str) and command:
+                        status = item.get("status") if phase == "completed" else "running"
+                        await progress(activity={"kind": "command", "text": (str(status) + ": " + command)[:4000]})
+                elif item.get("type") == "fileChange":
+                    changed = []
+                    for change in item.get("changes") or []:
+                        if isinstance(change, dict):
+                            artifact = _workspace_artifact(task, change.get("path"))
+                            if artifact:
+                                artifact_paths.add(artifact["path"])
+                                changed.append(artifact["path"])
+                                await progress(artifact=artifact)
+                    if changed:
+                        await progress(activity={"kind": "file_change", "text": (phase.title() + ": " + ", ".join(changed))[:4000]})
+
             while True:
-                event = await self.rpc.next_notification()
+                try:
+                    event = await asyncio.wait_for(self.rpc.next_notification(), 0.1)
+                except TimeoutError:
+                    await flush_assistant()
+                    continue
                 params = event.get("params") or {}
                 if event.get("method") == "item/agentMessage/delta" and params.get("threadId") == self.thread_id and params.get("turnId") == self.turn_id:
-                    output.append(str(params.get("delta", "")))
+                    item_id = str(params.get("itemId", ""))[:200]
+                    if item_id != assistant_item_id:
+                        await flush_assistant()
+                        assistant_item_id = item_id
+                    delta = str(params.get("delta", ""))[:4000]
+                    if delta:
+                        if output and output[-1][0] == item_id:
+                            output[-1][1] += delta
+                        else:
+                            output.append([item_id, delta])
+                        assistant_delta = (assistant_delta + delta)[:4000]
+                        if len(assistant_delta) == 4000 or time.monotonic() - last_assistant_flush >= 0.1:
+                            await flush_assistant()
+                elif event.get("method") == "item/commandExecution/outputDelta" and params.get("threadId") == self.thread_id and params.get("turnId") == self.turn_id:
+                    await flush_assistant()
+                elif event.get("method") == "item/fileChange/patchUpdated" and params.get("threadId") == self.thread_id and params.get("turnId") == self.turn_id:
+                    await flush_assistant()
+                    changes = params.get("changes")
+                    if isinstance(changes, list):
+                        for change in changes[:40]:
+                            if not isinstance(change, dict):
+                                continue
+                            artifact = _workspace_artifact(task, change.get("path"))
+                            if artifact:
+                                artifact_paths.add(artifact["path"])
+                                await progress(activity={"kind": "file_change", "text": artifact["path"]}, artifact=artifact)
+                elif event.get("method") in {"item/started", "item/completed"} and params.get("threadId") == self.thread_id and params.get("turnId") == self.turn_id:
+                    await flush_assistant()
+                    await record_item(params, "started" if event.get("method") == "item/started" else "completed")
                 elif event.get("method") == "turn/completed" and params.get("threadId") == self.thread_id:
                     completed = params.get("turn") or {}
                     if completed.get("id") != self.turn_id:
                         continue
+                    await flush_assistant()
                     status = completed.get("status")
                     if status == "completed":
-                        return {"status": "completed", "result": "".join(output), "provider_session_id": provider_session,
+                        for path in artifact_paths:
+                            artifact = _workspace_artifact(task, path)
+                            if artifact:
+                                await progress(artifact=artifact)
+                        final_output = [text for item_id, text in output
+                                        if (observed_items.get((self.thread_id, self.turn_id, item_id)) or {}).get("phase") == "final_answer"]
+                        return {"status": "completed", "result": "\n\n".join(final_output or [text for _item_id, text in output]), "provider_session_id": provider_session,
                                 "thread_id": self.thread_id, "turn_id": self.turn_id}
                     if status == "interrupted":
                         raise VoiceError("EXECUTION_INTERRUPTED", "Codex stopped before it completed the task.")
+                    failure = completed.get("error") or {}
+                    detail = str(failure.get("message", "")).lower()
+                    category = failure.get("codexErrorInfo")
+                    if "requires a newer version of codex" in detail:
+                        raise VoiceError("CODEX_UPDATE_REQUIRED", "The configured model requires a newer Codex CLI. Update Codex through its supported setup flow, then Continue this task.")
+                    if category == "usageLimitExceeded":
+                        raise VoiceError("CODEX_USAGE_LIMIT", "Codex usage is unavailable. Check your account limits before continuing.")
+                    if category == "unauthorized" or "not authenticated" in detail or "authentication required" in detail:
+                        raise VoiceError("CODEX_AUTH_REQUIRED", "Sign in to Codex, then Continue this task.")
                     raise VoiceError("EXECUTION_FAILED", "Codex could not complete the task. Review its task for details.")
         finally:
             await self.rpc.close()
+
+    async def steer(self, text):
+        text = _text(text, "redirect", 12000)
+        async with self.steer_lock:
+            if self.cancel_requested or not self.rpc or not self.thread_id or not self.turn_id:
+                raise VoiceError("STEERING_UNAVAILABLE", "Codex has no active task turn to redirect.")
+            expected_turn_id = self.turn_id
+            try:
+                await self.rpc.request("turn/steer", {
+                    "threadId": self.thread_id,
+                    "expectedTurnId": expected_turn_id,
+                    "input": [{"type": "text", "text": text, "text_elements": []}],
+                })
+            except VoiceError as exc:
+                if exc.code in {"CODEX_REQUEST_FAILED", "CODEX_DISCONNECTED"}:
+                    raise VoiceError("STEERING_UNAVAILABLE", "Codex could not accept that correction. The task may have already finished; use Continue if needed.") from None
+                raise
 
     async def cancel(self):
         self.cancel_requested = True
@@ -560,9 +813,47 @@ class ExecutionManager:
 
     async def _new_child(self, task, tool, instructions):
         child = {"id": str(uuid.uuid4()), "kind": "coding", "tool": tool, "status": "queued", "instructions": instructions,
-                 "provider_session_id": None, "thread_id": None, "turn_id": None, "result": "", "error": None, "approval": None}
+                 "provider_session_id": None, "thread_id": None, "turn_id": None, "result": "", "error": None, "approval": None,
+                 "capabilities": {"steer": tool == "codex" and task.get("mode") != "offline", "continue": True},
+                 "resume_thread_id": task.get("resume_thread_id") if tool == "codex" and task.get("resume_required") else None}
         await self._published_update(task["id"], children=[*task.get("children", []), child])
         return child
+
+    async def _record_activity(self, task_id, activity):
+        if not isinstance(activity, dict):
+            return
+        kind, text = activity.get("kind"), activity.get("text")
+        if not isinstance(kind, str) or not isinstance(text, str) or not kind or not text:
+            return
+        entry = {"kind": kind[:64], "text": text[:4000]}
+        stream_id = activity.get("stream_id")
+        if isinstance(stream_id, str) and stream_id:
+            entry["stream_id"] = stream_id[:640]
+        task = self.store.get(task_id)
+        activity = list(task.get("activity") or [])
+        if (kind == "assistant" and entry.get("stream_id") and activity
+                and activity[-1].get("kind") == "assistant"
+                and activity[-1].get("stream_id") == entry["stream_id"]
+                and len(activity[-1]["text"]) + len(entry["text"]) <= 4000):
+            activity[-1] = dict(entry, text=activity[-1]["text"] + entry["text"])
+        else:
+            activity.append(entry)
+        activity = activity[-MAX_ACTIVITY:]
+        await self._published_update(task_id, event="activity", activity=activity)
+
+    async def _record_artifact(self, task_id, artifact):
+        if not isinstance(artifact, dict) or set(artifact) != {"path", "exists", "verification"}:
+            return
+        task = self.store.get(task_id)
+        artifacts = [item for item in task.get("artifacts", []) if item.get("path") != artifact["path"]]
+        artifacts.append(artifact)
+        await self._published_update(task_id, event="artifact", artifacts=artifacts[-80:])
+
+    async def _record_instruction(self, task_id, text, outcome, message=""):
+        task = self.store.get(task_id)
+        entries = list(task.get("instruction_outcomes") or [])[-(MAX_INSTRUCTION_OUTCOMES - 1):]
+        entries.append({"text": text[:12000], "outcome": outcome[:64], "message": message[:1000]})
+        await self._published_update(task_id, event="instruction", instruction_outcomes=entries)
 
     async def _approval(self, task_id, child_id, **request):
         async with self.approval_locks.setdefault(task_id, asyncio.Lock()):
@@ -659,6 +950,8 @@ class ExecutionManager:
             return await self.readiness(task)
         if operation in {"coding", "delegate_coding"}:
             return await self._delegate(task, params)
+        if operation == "steer":
+            return await self._steer(task, params)
         if operation == "open_application":
             application = _text(params.get("application"), "application", 80)
             if task["mode"] == "offline":
@@ -697,11 +990,23 @@ class ExecutionManager:
             tool = task.get("preferred_coder", "codex")
             if tool not in {"codex", "claude"}:
                 tool = "codex"
+        await self._published_update(task["id"], capabilities={"steer": tool == "codex" and task.get("mode") != "offline", "continue": True},
+                                     activity=list(task.get("activity") or [])[-MAX_ACTIVITY:],
+                                     artifacts=list(task.get("artifacts") or [])[-80:],
+                                     instruction_outcomes=list(task.get("instruction_outcomes") or [])[-MAX_INSTRUCTION_OUTCOMES:])
+        task = self.store.get(task["id"])
         child = await self._new_child(task, tool, instructions)
         key = (task["id"], child["id"])
 
         async def progress(**changes):
-            await self._child_update(task["id"], child["id"], **changes)
+            activity = changes.pop("activity", None)
+            artifact = changes.pop("artifact", None)
+            if changes:
+                await self._child_update(task["id"], child["id"], **changes)
+            if activity:
+                await self._record_activity(task["id"], activity)
+            if artifact:
+                await self._record_artifact(task["id"], artifact)
 
         async def approval(**request):
             return await self._approval(task["id"], child["id"], **request)
@@ -717,6 +1022,8 @@ class ExecutionManager:
                                              result=_safe_result(result.get("result")),
                                              provider_session_id=result.get("provider_session_id"), thread_id=result.get("thread_id"),
                                              turn_id=result.get("turn_id"))
+            if tool == "codex" and final.get("thread_id"):
+                await self._published_update(task["id"], resume_thread_id=final["thread_id"], resume_required=False)
             return {"status": "completed", "child": final, "result": final["result"]}
         except asyncio.CancelledError:
             await self._child_update(task["id"], child["id"], status="cancelled", approval=None)
@@ -733,6 +1040,25 @@ class ExecutionManager:
         finally:
             self.active.pop(key, None)
             self.cancelled.discard(key)
+
+    async def _steer(self, task, params):
+        child_id = _text(params.get("child_id"), "coding task identity", 200)
+        text = _text(params.get("text"), "redirect", 12000)
+        child = next((item for item in task.get("children", []) if item.get("id") == child_id), None)
+        if not child or child.get("tool") != "codex":
+            raise VoiceError("STEERING_UNAVAILABLE", "Only the active Codex task can accept a correction.")
+        adapter = self.active.get((task["id"], child_id))
+        if not adapter or not hasattr(adapter, "steer"):
+            await self._record_instruction(task["id"], text, "rejected", "Codex is no longer running.")
+            raise VoiceError("STEERING_UNAVAILABLE", "Codex has already finished. Use Continue to give it another instruction.")
+        try:
+            await adapter.steer(text)
+        except VoiceError as exc:
+            await self._record_instruction(task["id"], text, "rejected", exc.message)
+            raise
+        await self._record_instruction(task["id"], text, "accepted")
+        await self._record_activity(task["id"], {"kind": "instruction", "text": "Correction sent to Codex."})
+        return {"status": "accepted", "child_id": child_id}
 
     async def _answer_approval(self, task, allow, params):
         approval_id = _text(params.get("approval_id"), "approval identity", 200)

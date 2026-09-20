@@ -16,6 +16,8 @@ from .audio import PortAudioTransport
 from .audit import SessionAudit
 from .config import Settings, atomic_json, private_directory, runtime_directory, validate_settings
 from .coordinator import HermesRuntime, hermes_configuration
+from .desktop import DesktopActions
+from .workspaces import WorkspaceResolver
 from .hermes import HermesClient
 from .errors import VoiceError
 from .ipc import ControlServer, MAX_REQUEST, peer_is_owner, remove_stale_socket
@@ -25,6 +27,9 @@ from .models import discover_models, download_speech, test_model, verify_speech
 from .providers import create_provider
 from .store import TaskStore, TERMINAL
 from .tasks import TaskManager, text_field, validate_brief
+
+
+TASK_NOTICE_SECONDS = 30
 
 
 class VoiceService:
@@ -45,6 +50,13 @@ class VoiceService:
         self.voice = {"enabled": False, "state": "disabled", "microphone": False, "speaking": False, "level": 0, "error": ""}
         self.readiness = {"ready": False, "checks": [], "models": [],
                           "conversation": {"ready": False, "checks": []}, "tasks": {"ready": False, "checks": []}}
+        self.desktop = DesktopActions()
+        self.workspaces = WorkspaceResolver(self.directory, self.store)
+        self.action_lock = asyncio.Lock()
+        self.action_receipts = {}
+        self.task_view_request = {"task_id": "", "sequence": time.time_ns() // 1_000_000}
+        self.current_task_id = ""
+        self.task_relays = set()
         self.project = ""
         self.context = ""
         self.turn_id = ""
@@ -92,7 +104,8 @@ class VoiceService:
             tasks.append(dict(task, result=task.get("result", "")[:12000], source=task.get("source", "")[:12000], children=children))
         session = dict(self.session, transcript=[dict(turn, text=turn["text"][-4000:]) for turn in self.session["transcript"][-40:]])
         snapshot = {"schemaVersion": 1, "voice": dict(self.voice), "settings": dict(self.settings.value),
-                    "tasks": tasks, "session": session, "readiness": self.readiness}
+                    "tasks": tasks, "session": session, "readiness": self.readiness,
+                    "task_view_request": dict(self.task_view_request)}
         # Keep a busy task history within the IPC frame. Full results remain in
         # the store; approval details are never shortened for an approval decision.
         while len(tasks) > 1 and len(json.dumps(snapshot).encode()) > 3 * 1024 * 1024:
@@ -179,10 +192,18 @@ class VoiceService:
             if role == "user" and event.get("final", True):
                 identity = event.get("turn_id")
                 if isinstance(identity, str) and 0 < len(identity) <= 200 and identity not in self.turns:
+                    # Typed and spoken requests share this capture boundary.
+                    # A delayed tool call must not follow a later UI selection.
+                    task_id, task_error = None, None
+                    try:
+                        task_id = self.current_task()["id"]
+                    except VoiceError as error:
+                        task_error = error.as_dict()
                     self.turns[identity] = {"source": text, "project": self.project, "mode": self.settings.value["mode"],
                                             "context": self.context, "session_id": self.session["id"],
                                             "preferred_coder": self.settings.value["default_coder"],
-                                            "task_policy": self.settings.value["task_policy"]}
+                                            "task_policy": self.settings.value["task_policy"],
+                                            "task_id": task_id, "task_error": task_error}
                     if len(self.turns) > 100:
                         self.turns.pop(next(iter(self.turns)))
                 self.source, self.turn_id = text, identity or ""
@@ -291,22 +312,178 @@ class VoiceService:
                 return
             await asyncio.sleep(0.25)
 
-    async def submit_intent(self, intent, turn_id=None):
-        brief = validate_brief(intent)
+    def _captured_turn(self, turn_id):
         turn = self.turns.get(turn_id)
         if not self.provider or not turn or not turn["source"]:
-            raise VoiceError("TRANSCRIPT_PENDING", "Wait for the request transcript before handing off work.")
-        # Identity comes from the captured user turn. The model cannot replace
-        # the project, execution mode, original words, or authorization policy.
+            raise VoiceError("TRANSCRIPT_PENDING", "Wait for the request transcript before performing an action.")
+        return turn
+
+    async def request_task_view(self, task_id):
+        self.current_task_id = task_id
+        self.task_view_request = {"task_id": task_id, "sequence": self.task_view_request["sequence"] + 1}
+        await self.publish()
+
+    def current_task(self):
+        active = self.store.active()
+        if self.current_task_id:
+            return self.store.get(self.current_task_id)
+        if len(active) == 1:
+            return active[0]
+        if len(active) > 1:
+            raise VoiceError("TASK_AMBIGUOUS", "Choose the task in Voice before changing it.")
+        recent = self.store.list(1)
+        if recent:
+            return recent[0]
+        raise VoiceError("TASK_NOT_FOUND", "There is no Voice task yet.")
+
+    @staticmethod
+    def task_summary(task):
+        return {key: task.get(key) for key in ("id", "title", "state", "project", "selected_agent", "capabilities", "artifacts")} | {
+            "result": str(task.get("result") or "")[:2000],
+            "activity": task.get("activity", [])[-5:],
+            "error": task.get("error"),
+            "verification": "File existence checks do not verify the requested behavior. Agent-reported tests require review.",
+        }
+
+    async def conversation_action(self, intent, turn_id, *, epoch=None):
+        async with self.action_lock:
+            if epoch is not None and self.provider_epoch is not epoch:
+                raise VoiceError("TURN_ENDED", "This conversation has ended. Please repeat the request.")
+            turn = self._captured_turn(turn_id)
+            if not isinstance(intent, dict):
+                raise VoiceError("INVALID_REQUEST", "The Voice action is invalid.")
+            if "operation" not in intent:
+                return await self.submit_intent(intent, turn_id)
+            if turn["mode"] != "gemini_live":
+                raise VoiceError("ACTION_UNAVAILABLE", "These conversation controls are available in Gemini Voice.")
+            operation = intent.get("operation")
+            fields = {"desktop": {"operation", "application"}, "task": {"operation", "action", "text"},
+                      "submit": {"operation", "brief", "project_name", "new_project"}}
+            if operation not in fields or set(intent) - fields[operation]:
+                raise VoiceError("INVALID_REQUEST", "The Voice action contains unsupported fields.")
+            key = turn_id + ":" + hashlib.sha256(json.dumps(intent, sort_keys=True).encode()).hexdigest()
+            # Status is a fresh read; all mutating tool retries reuse their receipt.
+            cacheable = not (operation == "task" and intent.get("action") == "status")
+            if cacheable and key in self.action_receipts:
+                return self.action_receipts[key]
+            if operation == "desktop":
+                result = await self.desktop.open(intent.get("application"))
+            elif operation == "submit":
+                if type(intent.get("new_project", False)) is not bool:
+                    raise VoiceError("INVALID_REQUEST", "New project must be true or false.")
+                result = await self.submit_intent(intent.get("brief"), turn_id,
+                    project_name=intent.get("project_name", ""), new_project=intent.get("new_project", False))
+            else:
+                if not turn["task_id"]:
+                    error = turn["task_error"]
+                    raise VoiceError(error["code"], error["message"])
+                task = self.store.get(turn["task_id"])
+                action = intent.get("action")
+                if action in {"show", "show_result"}:
+                    await self.request_task_view(task["id"])
+                    if action == "show_result":
+                        files = [a for a in task.get("artifacts", []) if a.get("exists")]
+                        if len(files) == 1:
+                            await self.desktop.open_path(task, files[0]["path"])
+                elif action in {"steer", "cancel", "continue"}:
+                    task = await self.tasks.action(task["id"], action, intent.get("text", ""))
+                    self.watch_gemini_task(task["id"])
+                elif action != "status":
+                    raise VoiceError("INVALID_TASK_ACTION", "That spoken task action is not supported. Answer approvals in the task view.")
+                result = self.task_summary(task)
+            self.voice.pop("task_error", None)
+            if cacheable:
+                self.action_receipts[key] = result
+                if len(self.action_receipts) > 200:
+                    self.action_receipts.pop(next(iter(self.action_receipts)))
+            await self.publish()
+            return result
+
+    def watch_gemini_task(self, task_id):
+        if not self.provider or self.settings.value["mode"] != "gemini_live" or not hasattr(self.provider, "notify_task"):
+            return
+        epoch = self.provider_epoch
+        key = (epoch, task_id)
+        if key in self.task_relays:
+            return
+        self.task_relays.add(key)
+        self.background(self._relay_gemini_task(self.provider, epoch, task_id, key))
+
+    async def _relay_gemini_task(self, provider, epoch, task_id, key):
+        announced = set()
+        deadlines = {}
+        try:
+            while self.provider is provider and self.provider_epoch is epoch:
+                task = self.store.get(task_id)
+                state = task["state"]
+                identity = (task.get("attempt", 0), state, (task.get("approval") or {}).get("request_id"))
+                if identity not in announced and state in TERMINAL | {"awaiting_approval", "waiting_input"}:
+                    deadline = deadlines.setdefault(identity, time.monotonic() + TASK_NOTICE_SECONDS)
+                    if time.monotonic() >= deadline:
+                        announced.add(identity)
+                        if state in TERMINAL:
+                            return  # The task view retains the result without a stale spoken notice.
+                        continue
+                    # Two quiet observations avoid speaking during the transition
+                    # between a user's last audio frame and provider thinking.
+                    await asyncio.sleep(0.4)
+                    if self.provider is not provider or self.provider_epoch is not epoch:
+                        return
+                    current = self.store.get(task_id)
+                    if (current.get("attempt", 0), current["state"], (current.get("approval") or {}).get("request_id")) != identity:
+                        continue
+                    if await provider.notify_task(json.dumps(self.task_summary(current))):
+                        announced.add(identity)
+                        if state in TERMINAL:
+                            return
+                await asyncio.sleep(0.25)
+        except Exception:
+            self.audit.record("error", session_id=self.session["id"], code="TASK_NOTICE_FAILED")
+        finally:
+            self.task_relays.discard(key)
+
+    async def submit_intent(self, intent, turn_id=None, *, project_name="", new_project=False):
+        brief = validate_brief(intent)
+        turn = self._captured_turn(turn_id)
         fingerprint = hashlib.sha256(json.dumps(brief, sort_keys=True).encode()).hexdigest()[:24]
         request_id = turn["session_id"] + ":" + turn_id + ":" + fingerprint
+        project = turn["project"]
+        if turn["mode"] == "gemini_live":
+            # One explicit work request per captured turn. Tool retries cannot
+            # allocate a second folder or a second job after paraphrasing a brief.
+            request_id = hashlib.sha256((turn["session_id"] + ":" + turn_id).encode()).hexdigest()
+            existing = next((t for t in self.store.list(10000) if t["request_id"] == request_id), None)
+            if existing:
+                turn.update(task_id=existing["id"], task_error=None)
+                return self.task_summary(existing)
+            if brief["unresolved_questions"]:
+                raise VoiceError("CLARIFICATION_REQUIRED", " ".join(brief["unresolved_questions"]))
+            requested = brief.get("tool_preference", "auto")
+            if requested in {"auto", "codex"} and any(t.get("selected_agent") == "codex" for t in self.store.active()):
+                raise VoiceError("TASK_ACTIVE", "Finish or stop the current Codex job before starting another. Corrections can go to the current task.")
+            project = self.workspaces.resolve(request_id, brief["objective"], selected=project, name=project_name, new=new_project)
         original = turn["source"] + ("\nExplicit user context:\n" + turn["context"] if turn["context"] else "")
-        task = await self.tasks.submit(request_id, brief, turn["project"], turn["mode"], original, turn["preferred_coder"],
-                                       policy=turn.get("task_policy", "lab_auto"))
+        try:
+            task = await self.tasks.submit(request_id, brief, project, turn["mode"], original, turn["preferred_coder"],
+                                           policy=turn.get("task_policy", "lab_auto"))
+        except VoiceError:
+            if turn["mode"] == "gemini_live":
+                failed = next((t for t in self.store.list(10000) if t["request_id"] == request_id), None)
+                if failed:
+                    turn.update(task_id=failed["id"], task_error=None)
+                    await self.request_task_view(failed["id"])
+            raise
+        if turn["mode"] == "gemini_live":
+            # Only the daemon's submission receipt can associate a newly created
+            # job with this turn; provider payloads cannot choose task identities.
+            turn.update(task_id=task["id"], task_error=None)
+            self.project = project
+            await self.request_task_view(task["id"])
+            self.watch_gemini_task(task["id"])
         self.voice.pop("task_error", None)
         self.audit.record("task", session_id=self.session["id"], task_id=task["id"], selected_agent=task.get("selected_agent"), state=task["state"])
         return {"id": task["id"], "state": task["state"], "title": task["title"], "owner": task["owner"],
-                "selected_agent": task.get("selected_agent", task.get("preferred_coder", "auto"))}
+                "project": task["project"], "selected_agent": task.get("selected_agent", task.get("preferred_coder", "auto"))}
 
     async def selected_secrets(self):
         mode = self.settings.value["mode"]
@@ -412,9 +589,7 @@ class VoiceService:
                 transport = self.audio_transport_factory(microphone_device=config["microphone_device"],
                                                          speaker_device=config["speaker_device"], on_error=audio_error)
                 async def submit(intent, turn_id):
-                    if self.provider_epoch is not epoch:
-                        raise VoiceError("TURN_ENDED", "This conversation has ended. Please repeat the request.")
-                    return await self.submit_intent(intent, turn_id)
+                    return await self.conversation_action(intent, turn_id, epoch=epoch)
                 provider = self.provider_factory(config, values, emit, submit, transport)
                 self.provider = provider
                 await provider.start(audio=audio)
@@ -436,6 +611,7 @@ class VoiceService:
     def _detach_provider(self):
         self.provider_epoch = None
         self.turns.clear()
+        self.action_receipts.clear()
         self.live_transcript.clear()
         self.live_delegations.clear()
         provider, self.provider = self.provider, None
@@ -608,7 +784,7 @@ class VoiceService:
             "configure_livekit": {"url", "api_key", "api_secret"},
             "configure_gemini_live": {"url", "api_key", "api_secret", "google_api_key"},
             "download_speech": set(), "start_voice": {"project", "context"}, "end_voice": set(), "mute": {"muted"},
-            "silence": set(), "submit_text": {"text", "project", "context"},
+            "silence": set(), "desktop_action": {"application"}, "submit_text": {"text", "project", "context"},
             "task_action": {"id", "task_id", "operation", "text", "approval_id", "child_id", "review_id", "paths"},
         }
         if action not in allowed or set(request) - allowed[action] - {"action"}:
@@ -660,6 +836,10 @@ class VoiceService:
                     await self.provider.mute(request["muted"])
                 else:
                     await self.provider.silence()
+        elif action == "desktop_action":
+            if self.settings.value["mode"] == "offline":
+                raise VoiceError("OFFLINE_ACTION_UNAVAILABLE", "Host desktop actions are unavailable in offline mode.")
+            return await self.desktop.open(request.get("application"))
         elif action == "submit_text":
             text = text_field(request.get("text"), "message", 12000, True)
             async with self.turn_lock:
@@ -713,7 +893,15 @@ class VoiceService:
                 raise VoiceError("INVALID_REQUEST", "The task action has conflicting task identities.")
             task = self.store.get(request.get("id") or request.get("task_id"))
             operation = request.get("operation")
+            self.current_task_id = task["id"]
+            if operation == "select":
+                await self.request_task_view(task["id"])
+                return {}
             approval = task.get("approval") or {}
+            if operation in {"open_folder", "open_artifact"}:
+                if task["mode"] == "offline":
+                    raise VoiceError("NOT_EXPORTED", "Review and export offline changes before opening them on the host.")
+                return await self.desktop.open_path(task, request.get("text", "") if operation == "open_artifact" else None)
             if operation in {"approve", "deny"} and approval.get("owner") == "child":
                 await self.execution.handle(task, operation, {"approval_id": request.get("approval_id"), "child_id": approval.get("child_id")})
             elif operation in {"review", "export"}:
@@ -738,6 +926,7 @@ class VoiceService:
                     self.store.update(task["id"], export_review=await asyncio.to_thread(self.offline.workspace.review))
             else:
                 await self.tasks.action(task["id"], operation, request.get("text", ""), request.get("approval_id"))
+                self.watch_gemini_task(task["id"])
         await self.publish()
         return {}
 
