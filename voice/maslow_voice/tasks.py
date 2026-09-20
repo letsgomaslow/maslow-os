@@ -162,9 +162,13 @@ class TaskManager:
         for task in self.store.active():
             if task["state"] == "proposed":
                 continue
-            if task.get("selected_agent") in {"codex", "claude"} and task["state"] != "queued":
-                self.store.update(task["id"], state="interrupted", error={"code": "DIRECT_RUN_LOST",
-                    "message": "Voice restarted during this agent run. Review its changes before continuing; it was not submitted again."})
+            if task.get("selected_agent") in {"codex", "claude"}:
+                error = {"code": "DIRECT_RUN_LOST",
+                         "message": "Voice restarted during this agent run. Review its changes before continuing; it was not submitted again."}
+                children = [dict(child, status="interrupted", approval=None, error=error)
+                            if child.get("status") in {"queued", "running", "awaiting_approval", "stopping"}
+                            else child for child in task.get("children", [])]
+                self.store.update(task["id"], state="interrupted", approval=None, children=children, error=error)
                 continue
             # A persisted submission reservation is replayed using its original key.
             # After the upstream 24h idempotency window, do not risk a second execution.

@@ -256,6 +256,39 @@ class RoutingTests(unittest.IsolatedAsyncioTestCase):
         self.assertFalse(manager.monitors)
         await manager.close()
 
+    async def test_restart_clears_dead_approvals_and_never_starts_queued_direct_work(self):
+        pending = {"owner": "child", "child_id": "active", "request_id": "old-approval"}
+        history = [{"kind": "assistant", "text": "Created the calculator."}]
+        cases = []
+        for agent in ("codex", "claude"):
+            for state in ("queued", "submitting", "running", "awaiting_approval", "stopping"):
+                task = self.task(agent + "-" + state)
+                prior = {"id": "previous", "tool": agent, "status": "completed", "result": "Earlier work"}
+                current = {"id": "active", "tool": agent, "status": "awaiting_approval",
+                           "thread_id": "saved-thread", "turn_id": "saved-turn", "approval": pending}
+                self.store.update(task["id"], selected_agent=agent, state=state,
+                                  children=[prior, current], approval=pending, activity=history)
+                cases.append((task["id"], prior))
+        self.store.close()
+        self.store = TaskStore(self.temp.name)
+        factory = AsyncMock()
+        manager = TaskManager(self.store, factory, self.publish)
+        await manager.recover()
+        for task_id, prior in cases:
+            recovered = self.store.get(task_id)
+            self.assertEqual(recovered["state"], "interrupted")
+            self.assertIsNone(recovered["approval"])
+            self.assertEqual(recovered["activity"], history)
+            self.assertEqual(recovered["children"][0], prior)
+            child = recovered["children"][1]
+            self.assertEqual(child["status"], "interrupted")
+            self.assertIsNone(child["approval"])
+            self.assertEqual((child["thread_id"], child["turn_id"]), ("saved-thread", "saved-turn"))
+            self.assertTrue(any(event["data"].get("approval") == pending for event in self.store.events(task_id)))
+        factory.assert_not_awaited()
+        self.assertFalse(manager.monitors)
+        await manager.close()
+
     async def test_explicit_routing_failure_is_persisted_without_hermes_fallback(self):
         execution = ExecutionManager(self.store, self.publish, adapters={"codex": CompletingAdapter()})
         router = AgentRouter(execution, AsyncMock(), hermes_readiness=AsyncMock(return_value=False))
