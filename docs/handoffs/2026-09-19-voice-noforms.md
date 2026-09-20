@@ -69,3 +69,23 @@ Local candidate:
 Outstanding gates: compatible installed Codex, separately scoped local package rollout, real microphone/speaker interaction and recording, concurrent conversation and spoken correction, browser artifact behavior, missing-auth recovery, cancellation, and restart followed by explicit saved-thread Continue. The user must not be asked to fill routine project forms to complete any normal Gemini request.
 
 No publication, ISO rebuild, broad agent-policy change or automatic recovery is included. The candidate is not installed. A concrete local rollout question was presented after archive verification, following the original plan's separate-rollout boundary. Installing the signed Codex update also needs that decision: its prior `0.152.0-2` package is absent from cache and the official repository returned 404 for the old archive. Preserve prior Voice packages and the user's unrelated discussion documents. Next action: receive the local rollout decision, then install through the supported privileged package flow and verify installed bytes before physical acceptance. The separate one-time execution-autonomy decision remains unanswered.
+
+## Recovery correction: current candidate is 0.1.5-10
+
+Further recovery review found that queued direct-agent work could restart automatically and interrupted tasks could retain stale approval prompts. Runtime `aeb7dbe6e2b9756b50211d04ffb4462f30daa336` corrects both: persisted queued/running/approval-waiting direct tasks become interrupted, live approval fields are cleared, and active child records become interrupted. Thread/turn identities, workspace, earlier completed children, activity and historical approval events remain intact. Unstarted proposals retain their explicit Start action. No automatic continuation is added.
+
+Regression coverage reopens the SQLite store and checks ten agent/state combinations without invoking the client factory. Focused routing/task tests passed 35 tests. The final pinned suite ran 320 tests successfully with two expected skips; controller/UI/orb checks and whitespace validation passed. Logs: `/tmp/maslow-voice-noforms/recovery-tests.log` and `recovery-final-tests.log`.
+
+An isolated production daemon process also loaded two synthetic persisted jobs through its actual startup lifecycle and Unix watch socket. Both returned interrupted with saved history and identities, no stale approval, and no automatic agent work. Its PATH excluded agent binaries; no account or inference was used. Frozen helper: `/tmp/maslow-voice-noforms/recovery-startup.py`, SHA-256 `57b8894bcdc9c3ae9a6d312a6dce6ac513e2bf7104c2822a770d58a0b196a68e`. Result: `/tmp/maslow-voice-noforms/recovery-startup/result.json`. This is startup recovery integration evidence with synthetic tasks, not a real Codex crash/Continue pass.
+
+Rendering that recovered data was attempted in a separate Quickshell preview, but the Lenovo session had become securely locked and screen capture waited. The owned preview and capture processes were stopped; the lock was not bypassed. No recovery screenshot was accepted. The earlier UI screenshots still apply to unchanged UI bytes, but a directly observed recovery-screen check remains pending.
+
+Replacement local candidate (supersedes uninstalled `0.1.5-9`):
+
+- Recipe: `68ac182152502fd33d9cc509498b14f28724e9df`, only Voice pkgrel `9 → 10`.
+- Archive: `/home/maslow/Maslow-ai-os/voice-mvp-build/voice-recovery/maslow-voice-0.1.5-10-x86_64.pkg.tar.zst`.
+- SHA-256: `1addfaf0eac6c2af9e97c66052a10ea583d517ae990eb04f4234aa3d18413170`.
+- Normal makepkg build/check/package and package invariants passed. Logs: `voice-mvp-build/voice-recovery-build.log` and `recovery-package-checks.log`.
+- All 41 extracted runtime/UI files match source; versioned entry points and compiled shader were verified. Earlier candidates and rollback package are preserved.
+
+The current candidate remains uninstalled. The pending rollout question now has this corrective candidate as its target; no response or execution-autonomy choice has arrived. No permission policy, credential, installed package, public channel or ISO changed. Next action: obtain the local rollout decision and an unlocked desktop, then install through the supported package flow and finish native acceptance. The overall goal remains active and unproven.
