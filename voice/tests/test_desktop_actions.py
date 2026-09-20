@@ -27,7 +27,7 @@ class DesktopTests(unittest.IsolatedAsyncioTestCase):
         launches = [call for call in calls if call[0] == "setsid"]
         self.assertEqual(len(launches), 1)
         self.assertEqual(launches[0][-2:], ("--", "codex"))
-        self.assertEqual(sum(c[:3] == ("hyprctl", "dispatch", "focuswindow") for c in calls), 2)
+        self.assertEqual(sum(c[:2] == ("hyprctl", "dispatch") and "hl.dsp.focus" in c[2] for c in calls), 2)
 
     async def test_unobserved_launch_is_not_success(self):
         desktop = DesktopActions(AsyncMock(return_value="[]"), timeout=0)
@@ -85,3 +85,9 @@ class DesktopTests(unittest.IsolatedAsyncioTestCase):
         with self.assertRaisesRegex(VoiceError, "isolated workspace"):
             await DesktopActions(runner).open_path({"mode": "offline", "project": "/project"})
         runner.assert_not_awaited()
+
+    async def test_focus_supports_legacy_dispatch_fallback(self):
+        runner = AsyncMock(side_effect=[VoiceError("DESKTOP_FAILED", "Legacy dispatcher"), "ok"])
+        await DesktopActions(runner).focus({"address": "0x123"})
+        self.assertIn('hl.dsp.focus', runner.call_args_list[0].args[2])
+        self.assertEqual(runner.call_args_list[1].args, ("hyprctl", "dispatch", "focuswindow", "address:0x123"))

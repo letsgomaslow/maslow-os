@@ -116,7 +116,10 @@ class DesktopActions:
         address = client.get("address", "")
         if not re.fullmatch(r"0x[0-9a-fA-F]+", address):
             raise VoiceError("DESKTOP_UNAVAILABLE", "The application window identity is invalid.")
-        await self.run("hyprctl", "dispatch", "focuswindow", "address:" + address)
+        try:
+            await self.run("hyprctl", "dispatch", 'hl.dsp.focus({ window = "address:' + address + '" })')
+        except VoiceError:
+            await self.run("hyprctl", "dispatch", "focuswindow", "address:" + address)
 
     async def open_path(self, task, relative=None):
         if task.get("mode") == "offline":
