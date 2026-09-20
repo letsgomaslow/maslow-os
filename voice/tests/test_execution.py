@@ -1,4 +1,6 @@
 import asyncio
+import json
+import shutil
 import sys
 import tempfile
 import unittest
@@ -271,6 +273,8 @@ class CodexAdapterTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(calls["thread/start"]["approvalPolicy"], "untrusted")
         self.assertEqual(calls["thread/start"]["approvalsReviewer"], "user")
         self.assertEqual(calls["thread/start"]["sandbox"], "workspace-write")
+        self.assertEqual(FakeRpc.instance.cwd, task["project"])
+        self.assertNotIn("cwd", calls["thread/start"])
         self.assertNotIn("danger-full-access", str(FakeRpc.instance.calls))
         self.assertEqual(calls["turn/start"]["input"][0]["text"], "Fix navigation")
         self.assertEqual((result["provider_session_id"], result["thread_id"], result["turn_id"]),
@@ -281,6 +285,53 @@ class CodexAdapterTests(unittest.IsolatedAsyncioTestCase):
             }, "approval-1")
         self.assertEqual(raised.exception.code, "CODEX_REQUEST_UNSUPPORTED")
         self.assertTrue(FakeRpc.instance.closed)
+
+    @unittest.skipUnless(shutil.which("codex"), "requires installed Codex app-server")
+    async def test_real_app_server_preserves_project_trust_without_model_inference(self):
+        from unittest.mock import AsyncMock
+
+        class NoInferenceRpc(JsonRpcProcess):
+            async def request(self, method, params=None):
+                if method == "turn/start":
+                    raise VoiceError("TEST_NO_INFERENCE", "Stop before any model inference.")
+                result = await super().request(method, params)
+                if method == "thread/start":
+                    self.started_thread = result
+                return result
+
+        for trust in (None, "trusted", "untrusted"):
+            with self.subTest(trust=trust), tempfile.TemporaryDirectory() as root:
+                home, project = Path(root, "home"), Path(root, "workspace")
+                codex_home = home / ".codex"
+                codex_home.mkdir(parents=True)
+                project.mkdir()
+                (project / ".codex").mkdir()
+                (project / ".codex" / "config.toml").write_text('model_reasoning_effort = "high"\n')
+                config = codex_home / "config.toml"
+                contents = 'model_reasoning_effort = "low"\n'
+                if trust:
+                    contents += f'[projects.{json.dumps(str(project))}]\ntrust_level = {json.dumps(trust)}\n'
+                config.write_text(contents)
+                before = config.read_bytes()
+                adapter = CodexAppServerAdapter(
+                    shutil.which("codex"), rpc_factory=NoInferenceRpc,
+                    environment={"HOME": str(home), "CODEX_HOME": str(codex_home),
+                                 "PATH": "/usr/bin:/bin", "LANG": "C.UTF-8"},
+                )
+                approve, progress = AsyncMock(), AsyncMock()
+                with self.assertRaises(VoiceError) as raised:
+                    await asyncio.wait_for(adapter.run({"project": str(project)}, {}, "Unused", approve, progress), 15)
+                self.assertEqual(raised.exception.code, "TEST_NO_INFERENCE")
+                result = adapter.rpc.started_thread
+                self.assertEqual(result["cwd"], str(project))
+                self.assertEqual(result["approvalPolicy"], "untrusted")
+                self.assertEqual(result["approvalsReviewer"], "user")
+                self.assertEqual(result["sandbox"]["type"], "workspaceWrite")
+                self.assertFalse(result["sandbox"]["networkAccess"])
+                self.assertEqual(result["reasoningEffort"], "high" if trust == "trusted" else "low")
+                self.assertEqual(config.read_bytes(), before)
+                approve.assert_not_awaited()
+                self.assertTrue(adapter.rpc.closed)
 
     async def test_command_approval_never_offers_a_truncated_detail(self):
         from unittest.mock import AsyncMock

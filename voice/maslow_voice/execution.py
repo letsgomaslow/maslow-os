@@ -457,8 +457,11 @@ class CodexAppServerAdapter:
                     **({"modelProvider": "maslow"} if self.base_url else {}),
                 })
             else:
+                # The dedicated app-server already runs in task["project"]. Codex
+                # treats an explicit start cwd plus workspace-write as consent
+                # to persist project trust, independently of approvalPolicy.
                 started = await self.rpc.request("thread/start", {
-                    "cwd": task["project"], "approvalPolicy": "untrusted",
+                    "approvalPolicy": "untrusted",
                     "approvalsReviewer": "user", "sandbox": "workspace-write", "ephemeral": False,
                     "threadSource": "appServer",
                     **({"model": self.model} if self.model else {}),
