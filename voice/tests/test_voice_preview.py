@@ -81,6 +81,22 @@ class PreviewTests(unittest.IsolatedAsyncioTestCase):
             await self.service.dispatch({"action": "silence"})
         self.assertIsNone(self.service.preview_task)
 
+    async def test_old_stop_does_not_clear_a_replacement_preview(self):
+        old = asyncio.create_task(asyncio.sleep(10))
+        replacement = asyncio.create_task(asyncio.sleep(10))
+        self.service.preview_task = old
+        original_gather = asyncio.gather
+        async def replaced(*args, **kwargs):
+            result = await original_gather(*args, **kwargs)
+            self.service.preview_task = replacement
+            self.service.voice_preview["state"] = "connecting"
+            return result
+        with patch("maslow_voice.daemon.asyncio.gather", side_effect=replaced):
+            await self.service.stop_preview()
+        self.assertIs(self.service.preview_task, replacement)
+        self.assertEqual(self.service.voice_preview["state"], "connecting")
+        await self.service.stop_preview()
+
     async def test_real_sdk_request_output_only_and_cleanup(self):
         from google.genai import types
         session = SimpleNamespace(send_client_content=AsyncMock())

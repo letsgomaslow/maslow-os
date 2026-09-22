@@ -798,9 +798,11 @@ class VoiceService:
             task.cancel()
             await asyncio.gather(task, return_exceptions=True)
             # A task cancelled before its first step never runs its finally.
-            self.preview_task = None
-            self.voice_preview["state"] = "idle"
-            await self.publish()
+            # Do not clear a newer preview that started while this stop awaited.
+            if self.preview_task is task:
+                self.preview_task = None
+                self.voice_preview["state"] = "idle"
+                await self.publish()
 
     async def dispatch(self, request):
         if self.preview_task is not None and request.get("action") not in {"status", "stop_gemini_voice_preview", "end_voice", "silence", "mute", "test", "models"}:
