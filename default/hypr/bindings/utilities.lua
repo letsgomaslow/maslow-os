@@ -11,10 +11,10 @@ o.bind("SUPER + K", "Keybindings", "omarchy-menu-keybindings")
 -- Personal bindings load after these defaults and remain authoritative. Set
 -- omarchy_voice_binding=false before the defaults to keep this chord unused.
 if _G.omarchy_voice_binding ~= false then
-  o.bind(_G.omarchy_voice_binding or "SUPER + SHIFT + V", "Toggle Maslow Voice", "omarchy-launch-voice start")
+  o.bind(_G.omarchy_voice_binding or "SUPER + H", "Toggle Maslow Voice", "omarchy-launch-voice start")
 end
 if _G.omarchy_voice_extended_binding ~= false then
-  o.bind(_G.omarchy_voice_extended_binding or "SUPER + CTRL + SHIFT + V", "Toggle extended Voice", "omarchy-launch-voice extended")
+  o.bind(_G.omarchy_voice_extended_binding or "SUPER + SHIFT + H", "Toggle extended Voice", "omarchy-launch-voice extended")
 end
 o.bind("SUPER + ALT + K", "Tmux keybindings", "omarchy-menu-tmux-keybindings")
 o.bind("SUPER + CTRL + K", "Herdr keybindings", "omarchy-menu-herdr-keybindings")
