@@ -31,6 +31,11 @@ from .tasks import TaskManager, text_field, validate_brief
 
 
 TASK_NOTICE_SECONDS = 30
+# Post-echo-cancellation RMS, not a claim of speech recognition. Require a
+# sustained signal so isolated clicks do not renew the inactivity deadline.
+INPUT_ACTIVITY_LEVEL = 0.005
+INPUT_ACTIVITY_SECONDS = 0.2
+INPUT_ACTIVITY_MAX_GAP = 0.3
 
 
 class VoiceService:
@@ -68,6 +73,8 @@ class VoiceService:
         self.live_transcript = LiveTranscript()
         self.live_delegations = {}
         self.provider_epoch = None
+        self.input_activity_since = None
+        self.input_activity_last = None
         self.last_activity = time.monotonic()
         self.session_started = self.last_activity
         self.lifecycle_lock = asyncio.Lock()
@@ -176,11 +183,22 @@ class VoiceService:
         elif kind == "level":
             level = max(0, min(float(event.get("level", 0)), 1))
             self.voice["level"] = level
+            now = time.monotonic()
+            if self.voice["microphone"] and not self.voice["speaking"] and level >= INPUT_ACTIVITY_LEVEL:
+                if self.input_activity_last is None or now - self.input_activity_last > INPUT_ACTIVITY_MAX_GAP:
+                    self.input_activity_since = now
+                self.input_activity_last = now
+                if now - self.input_activity_since >= INPUT_ACTIVITY_SECONDS:
+                    self.last_activity = now
+            else:
+                self.input_activity_since = self.input_activity_last = None
             self.queue_level_publish()
             return
         elif kind == "transcript":
             text = str(event.get("text", ""))[:24000]
             role = "user" if event.get("role") == "user" else "assistant"
+            if role == "user" and text.strip() and self.voice["microphone"]:
+                self.last_activity = time.monotonic()
             transcript = self.session["transcript"]
             if transcript and transcript[-1].get("partial") and transcript[-1]["role"] == role:
                 if event.get("final"):
@@ -622,6 +640,7 @@ class VoiceService:
             self.audit.record("session_ended", session_id=self.session["id"], provider=self.settings.value["mode"],
                               elapsed_ms=round((time.monotonic() - self.session_started) * 1000))
         self.voice.update(enabled=False, state="disabled", microphone=False, speaking=False, level=0)
+        self.input_activity_since = self.input_activity_last = None
         if provider:
             self.provider_cleanup = self.background(self._release_provider(provider))
         return self.provider_cleanup
