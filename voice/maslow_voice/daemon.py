@@ -13,6 +13,7 @@ import uuid
 from pathlib import Path
 
 from .audio import PortAudioTransport
+from .voice_preview import VOICES, play_sample
 from .audit import SessionAudit
 from .config import Settings, atomic_json, private_directory, runtime_directory, validate_settings
 from .coordinator import HermesRuntime, hermes_configuration
@@ -45,6 +46,8 @@ class VoiceService:
         self.provider_factory = provider_factory
         self.audio_transport_factory = audio_transport_factory
         self.live_planner = live_planner or LiveTaskPlanner()
+        self.preview_task = None
+        self.voice_preview = {"state": "idle", "voice": "", "error": ""}
         self.provider = None
         self.session = {"id": str(uuid.uuid4()), "transcript": []}
         self.voice = {"enabled": False, "state": "disabled", "microphone": False, "speaking": False, "level": 0, "error": ""}
@@ -105,7 +108,7 @@ class VoiceService:
         session = dict(self.session, transcript=[dict(turn, text=turn["text"][-4000:]) for turn in self.session["transcript"][-40:]])
         snapshot = {"schemaVersion": 1, "voice": dict(self.voice), "settings": dict(self.settings.value),
                     "tasks": tasks, "session": session, "readiness": self.readiness,
-                    "task_view_request": dict(self.task_view_request)}
+                    "task_view_request": dict(self.task_view_request), "voice_preview": dict(self.voice_preview)}
         # Keep a busy task history within the IPC frame. Full results remain in
         # the store; approval details are never shortened for an approval decision.
         while len(tasks) > 1 and len(json.dumps(snapshot).encode()) > 3 * 1024 * 1024:
@@ -648,6 +651,7 @@ class VoiceService:
             await asyncio.shield(cleanup)
 
     async def end_voice(self, preserve_error=False):
+        await self.stop_preview()
         # Do not wait for lifecycle_lock: its owner may be connecting indefinitely.
         cleanup = self._detach_provider()
         await self._cancel_level_publish()
@@ -756,7 +760,51 @@ class VoiceService:
         await self.publish()
         return {"readiness": self.readiness}
 
+    async def start_preview(self, voice):
+        if not isinstance(voice, str) or voice not in VOICES:
+            raise VoiceError("INVALID_VOICE", "Choose a supported Gemini voice.")
+        if self.settings.value["mode"] != "gemini_live":
+            raise VoiceError("PREVIEW_UNAVAILABLE", "Voice previews are available in Maslow Voice mode.")
+        if self.preview_task is not None or self.provider is not None or self.conversation_requests or self.store.active() or self.configuration_lock.locked():
+            raise VoiceError("VOICE_BUSY", "End the conversation and finish or stop active work before previewing.")
+        self.voice_preview = {"state": "connecting", "voice": voice, "error": ""}
+        self.preview_task = self.background(self._run_preview(voice))
+        await self.publish()
+
+    async def _run_preview(self, voice):
+        try:
+            key = await asyncio.wait_for(self.credentials.get("google"), 10)
+            if not key:
+                raise VoiceError("GEMINI_AUTH_REQUIRED", "Add your Google AI Studio key in Voice Settings.")
+            async def playing():
+                self.voice_preview["state"] = "playing"
+                await self.publish()
+            await play_sample(dict(self.settings.value), key, voice, playing,
+                              transport_factory=self.audio_transport_factory)
+            self.voice_preview["state"] = "idle"
+        except asyncio.CancelledError:
+            self.voice_preview["state"] = "idle"
+            raise
+        except Exception as error:
+            self.voice_preview.update(state="error", error=error.message if isinstance(error, VoiceError) else
+                                      "Could not play this voice. Check your connection and Google setup, then try again.")
+        finally:
+            self.preview_task = None
+            await self.publish()
+
+    async def stop_preview(self):
+        task = self.preview_task
+        if task is not None:
+            task.cancel()
+            await asyncio.gather(task, return_exceptions=True)
+            # A task cancelled before its first step never runs its finally.
+            self.preview_task = None
+            self.voice_preview["state"] = "idle"
+            await self.publish()
+
     async def dispatch(self, request):
+        if self.preview_task is not None and request.get("action") not in {"status", "stop_gemini_voice_preview", "end_voice", "silence", "mute", "test", "models"}:
+            raise VoiceError("PREVIEW_ACTIVE", "Stop the voice preview before starting a conversation or changing settings.")
         if request.get("action") in {"configure", "configure_livekit", "configure_gemini_live", "credential"}:
             async with self.configuration_lock:
                 return await self._dispatch(request)
@@ -780,6 +828,7 @@ class VoiceService:
     async def _dispatch(self, request):
         action = request.get("action")
         allowed = {
+            "preview_gemini_voice": {"voice"}, "stop_gemini_voice_preview": set(),
             "status": set(), "configure": {"settings"}, "credential": {"name", "value"}, "test": set(), "models": set(),
             "configure_livekit": {"url", "api_key", "api_secret"},
             "configure_gemini_live": {"url", "api_key", "api_secret", "google_api_key"},
@@ -789,6 +838,12 @@ class VoiceService:
         }
         if action not in allowed or set(request) - allowed[action] - {"action"}:
             raise VoiceError("INVALID_REQUEST", "That Voice action or field is not supported.")
+        if action == "preview_gemini_voice":
+            await self.start_preview(request.get("voice"))
+            return {}
+        if action == "stop_gemini_voice_preview":
+            await self.stop_preview()
+            return {}
         if action == "status":
             if not self.readiness.get("checks") and self.settings.value["mode"] in {"gemini_live", "gpt_live", "livekit", "openai"}:
                 await self.check_readiness()
@@ -829,6 +884,7 @@ class VoiceService:
         elif action == "end_voice":
             await self.end_voice()
         elif action in {"mute", "silence"}:
+            await self.stop_preview()
             if self.provider:
                 if action == "mute":
                     if type(request.get("muted")) is not bool:

@@ -4,14 +4,19 @@ import json
 from typing import Literal
 
 from .base import ProviderError, ToolPreference
+from ..config import DEFAULTS
 from ..errors import VoiceError
 
 
 def create_agent(provider, agents, base):
+    prompt = provider.config.get("gemini_live_prompt", DEFAULTS["gemini_live_prompt"])
+    if not isinstance(prompt, str) or not prompt.strip():
+        prompt = DEFAULTS["gemini_live_prompt"]
+
     class GeminiAgent(type(base)):
         def __init__(self):
             agents.Agent.__init__(self, instructions=(
-                "You are Maslow's concise voice assistant. Answer conversation directly. "
+                prompt + " "
                 "Use desktop_action to open Browser, Files, Hub, Terminal or Codex, without creating a task. "
                 "Opening Codex means a standalone terminal, NOT the delegated job. Use task_control show for that job. "
                 "Use submit_intent only for explicitly requested external work. Preserve the named agent; otherwise use auto. "

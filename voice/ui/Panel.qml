@@ -14,6 +14,7 @@ Item {
   property bool nativePreviewFixtureMode: false
   property string page: "talk"
   property bool settingsOpen: false
+  readonly property string defaultGeminiPrompt: "You are Maslow's concise voice assistant. Answer conversation directly."
   property string draft: ""
   property string selectedProject: ""
   property string explicitContext: ""
@@ -59,6 +60,8 @@ Item {
   readonly property bool sessionLocked: lockService ? lockService.locked === true : false
   onSessionLockedChanged: if (sessionLocked) { compactControlsOpen = false; close(); send("end_voice") }
 
+  readonly property var voicePreview: controller.voicePreview || ({})
+  readonly property bool previewBusy: ["connecting", "playing"].indexOf(String(voicePreview.state || "")) >= 0
   readonly property var voice: controller.voice || ({})
   readonly property var taskError: voice.task_error || ({})
   readonly property var settings: controller.settings || ({})
@@ -1116,6 +1119,50 @@ Item {
                   visible: root.settings.mode === "gemini_live"
                   Layout.fillWidth: true
                   spacing: 8
+                  Text { text: "Voice and conversation"; color: "#FFFFFF"; font.family: "Manrope"; font.pixelSize: 18; Accessible.role: Accessible.Heading }
+                  Text { text: "Voice"; color: "#FFFFFF"; font.family: "Manrope" }
+                  VoiceSelect {
+                    id: geminiVoice
+                    enabled: !root.conversation && !root.working && !root.previewBusy
+                    model: ["Puck", "Zephyr", "Charon", "Kore", "Fenrir", "Leda", "Orus", "Aoede", "Callirrhoe", "Autonoe", "Enceladus", "Iapetus", "Umbriel", "Algieba", "Despina", "Erinome", "Algenib", "Rasalgethi", "Laomedeia", "Achernar", "Alnilam", "Schedar", "Gacrux", "Pulcherrima", "Achird", "Zubenelgenubi", "Vindemiatrix", "Sadachbia", "Sadaltager", "Sulafat"]
+                    currentIndex: model.indexOf(String(root.settings.gemini_live_voice || "Puck"))
+                    displayText: currentIndex >= 0 ? currentText : String(root.settings.gemini_live_voice || "Puck")
+                    Accessible.name: "Gemini voice"
+
+                  }
+                  RowLayout {
+                    VoiceButton {
+                      text: root.previewBusy ? "Stop preview" : "Play preview"
+                      enabled: root.previewBusy || (!root.conversation && !root.working && geminiVoice.currentIndex >= 0)
+                      onClicked: root.previewBusy ? root.send("stop_gemini_voice_preview") : root.send("preview_gemini_voice", { voice: geminiVoice.currentText })
+                    }
+                    VoiceButton { text: "Use this voice"; enabled: !root.conversation && !root.working && !root.previewBusy && geminiVoice.currentIndex >= 0; onClicked: root.configure("gemini_live_voice", geminiVoice.currentText) }
+                  }
+                  Text {
+                    text: root.voicePreview.state === "error" ? String(root.voicePreview.error || "Preview failed.") : (root.previewBusy ? (root.voicePreview.state === "connecting" ? "Connecting preview…" : "Playing preview…") : "Saved voice: " + String(root.settings.gemini_live_voice || "Puck") + ". Preview uses your Google account. Microphone stays off.")
+                    color: root.voicePreview.state === "error" ? "#EE7BB3" : "#D1D5DB"
+                    font.family: "Manrope"; wrapMode: Text.WordWrap; Layout.fillWidth: true
+                    Accessible.role: Accessible.StatusBar; Accessible.name: text
+                  }
+                  Text { text: "Conversation prompt"; color: "#FFFFFF"; font.family: "Manrope" }
+                  Text { text: "Describe how Maslow should respond: tone, pace and level of detail. App and task controls remain available."; color: "#D1D5DB"; font.family: "Manrope"; wrapMode: Text.WordWrap; Layout.fillWidth: true }
+                  ScrollView {
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: 130
+                    clip: true
+                    VoiceArea {
+                      id: geminiPrompt
+                      wrapMode: TextEdit.Wrap
+                      text: String(root.settings.gemini_live_prompt || root.defaultGeminiPrompt)
+                      enabled: !root.conversation && !root.working && !root.previewBusy
+                      Accessible.name: "Gemini conversation prompt"
+                    }
+                  }
+                  RowLayout {
+                    VoiceButton { text: "Save prompt"; enabled: !root.conversation && !root.working && !root.previewBusy && geminiPrompt.text.length <= 4096; onClicked: root.configure("gemini_live_prompt", geminiPrompt.text.trim() || root.defaultGeminiPrompt) }
+                    VoiceButton { text: "Reset default"; enabled: !root.conversation && !root.working && !root.previewBusy; onClicked: { geminiPrompt.text = root.defaultGeminiPrompt; root.configure("gemini_live_prompt", root.defaultGeminiPrompt) } }
+                  }
+                  Text { text: geminiPrompt.text.length > 4096 ? "Keep the prompt within 4,096 characters." : (root.conversation || root.working ? "End the conversation and finish or stop active work before changing these settings." : "Choose Use this voice to save your choice. Save your prompt, then start a conversation to try it."); color: "#D1D5DB"; font.family: "Manrope"; wrapMode: Text.WordWrap; Layout.fillWidth: true }
                   Text { text: "Maslow Voice setup"; color: "#FFFFFF"; font.family: "Manrope"; font.pixelSize: 18; Accessible.role: Accessible.Heading }
                   Text { text: "Maslow Voice uses Gemini Live with Google AI Studio. LiveKit details save optional Expressive mode setup. Credentials stay in this computer's keyring."; color: "#D1D5DB"; font.family: "Manrope"; wrapMode: Text.WordWrap; Layout.fillWidth: true }
                   Text { text: "LiveKit project URL (optional Expressive mode)"; color: "#FFFFFF"; font.family: "Manrope" }

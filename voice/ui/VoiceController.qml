@@ -18,6 +18,7 @@ Item {
   // Keep long-lived snapshot branches stable while the 20 Hz voice meter
   // changes. QML repeaters treat a replacement JavaScript array as a new
   // model, even when every task inside it has the same content.
+  property var voicePreview: snapshot.voice_preview || ({ state: "idle", voice: "", error: "" })
   property var voice: snapshot.voice
   property var settings: snapshot.settings
   property var tasks: snapshot.tasks
@@ -91,6 +92,7 @@ Item {
   }
 
   function applySnapshot(value) {
+    voicePreview = reuseUnchanged(voicePreview, value.voice_preview || ({ state: "idle", voice: "", error: "" }))
     var nextVoice = reuseUnchanged(voice, value.voice)
     var nextSettings = reuseUnchanged(settings, value.settings)
     var nextTasks = reconcileTasks(tasks, Array.isArray(value.tasks) ? value.tasks : [])
@@ -113,6 +115,7 @@ Item {
       tasks: tasks,
       session: session,
       readiness: readiness,
+      voice_preview: voicePreview,
       task_view_request: taskViewRequest
     }
   }

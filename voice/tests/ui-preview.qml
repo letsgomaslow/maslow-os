@@ -129,6 +129,11 @@ ShellRoot {
       next.settings[key] = value === "true" ? true : (value === "false" ? false : value)
       panel.voiceController.setFixture(next)
     }
+    function voicePreview(state: string): void {
+      var next = JSON.parse(JSON.stringify(panel.voiceController.snapshot))
+      next.voice_preview = { state: state, voice: "Zephyr", error: state === "error" ? "Could not play this voice. Try again." : "" }
+      panel.voiceController.setFixture(next)
+    }
     function requests(): string { return JSON.stringify(panel.voiceController.fixtureRequests) }
     function typeStatus(): string { return JSON.stringify({ page: panel.page, messageFocused: panel.messageInputFocused, advancedOptionsOpen: panel.advancedRequestOptionsOpen }) }
     function taskFocusStatus(): string { return JSON.stringify({ page: panel.page, selectedTaskId: panel.selectedTaskId, focusedTaskInputId: panel.focusedTaskInputId, taskInputFocusTaskId: panel.taskInputFocusTaskId, taskInputFocusRequest: panel.taskInputFocusRequest, focusedTaskActionTaskId: panel.focusedTaskActionTaskId, focusedTaskActionName: panel.focusedTaskActionName, taskActionFocusRequest: panel.taskActionFocusRequest }) }

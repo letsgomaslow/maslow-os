@@ -424,3 +424,8 @@ for (const [state, microphone, expected] of [
   assert.equal(runInNewContext(`${microphoneFunction}; microphoneText();`, { voice: {state, microphone} }), expected);
 }
 console.log("Maslow Voice UI contract and approval/export behavior checks passed.");
+
+assert.match(panel, /Play preview/);
+assert.match(panel, /stop_gemini_voice_preview/);
+assert.match(panel, /preview_gemini_voice", \{ voice: geminiVoice.currentText \}/);
+assert.match(panel, /Use this voice/);

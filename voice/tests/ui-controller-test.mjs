@@ -27,6 +27,7 @@ runInNewContext([
   qmlFunction("applySnapshot"),
 ].join("\n"), context);
 
+context.voicePreview = { state: "idle", voice: "", error: "" };
 context.voice = { enabled: false, state: "disabled" };
 context.settings = {};
 context.tasks = [];
@@ -102,3 +103,7 @@ assert.strictEqual(visibleDismissedTasks[0], dismissedTasks[1]);
 const changedSession = { id: "session", transcript: [{ role: "user", text: "first", partial: true }] };
 assert.strictEqual(context.reuseUnchanged(changedSession, structuredClone(changedSession)), changedSession);
 assert.notStrictEqual(context.reuseUnchanged(changedSession, { id: "session", transcript: [{ role: "user", text: "second", partial: true }] }), changedSession, "partial transcript text changes propagate");
+
+context.applySnapshot({ ...context.snapshot, voice_preview: { state: "playing", voice: "Zephyr", error: "" } });
+assert.equal(context.voicePreview.state, "playing");
+assert.equal(context.snapshot.voice_preview.voice, "Zephyr");
