@@ -380,7 +380,7 @@ class GeminiServiceTests(unittest.IsolatedAsyncioTestCase):
                     "api_secret": "new-secret", "google_api_key": "new-google"})
         self.assertEqual(self.values, before)
 
-    async def test_muted_audio_and_user_transcripts_do_not_extend_idle(self):
+    async def test_audio_energy_and_user_transcripts_do_not_extend_idle(self):
         self.service.last_activity = 5
         await self.service.provider_event({"type": "level", "level": 1})
         await self.service.provider_event({"type": "transcript", "role": "user", "text": "nearby speech", "final": True})

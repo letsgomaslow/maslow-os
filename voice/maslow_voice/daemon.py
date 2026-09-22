@@ -31,11 +31,6 @@ from .tasks import TaskManager, text_field, validate_brief
 
 
 TASK_NOTICE_SECONDS = 30
-# Post-echo-cancellation RMS, not a claim of speech recognition. Require a
-# sustained signal so isolated clicks do not renew the inactivity deadline.
-INPUT_ACTIVITY_LEVEL = 0.005
-INPUT_ACTIVITY_SECONDS = 0.2
-INPUT_ACTIVITY_MAX_GAP = 0.3
 
 
 class VoiceService:
@@ -55,7 +50,7 @@ class VoiceService:
         self.voice_preview = {"state": "idle", "voice": "", "error": ""}
         self.provider = None
         self.session = {"id": str(uuid.uuid4()), "transcript": []}
-        self.voice = {"enabled": False, "state": "disabled", "microphone": False, "speaking": False, "level": 0, "error": ""}
+        self.voice = {"enabled": False, "state": "disabled", "microphone": False, "speaking": False, "level": 0, "error": "", "extended": False}
         self.readiness = {"ready": False, "checks": [], "models": [],
                           "conversation": {"ready": False, "checks": []}, "tasks": {"ready": False, "checks": []}}
         self.desktop = DesktopActions()
@@ -73,10 +68,9 @@ class VoiceService:
         self.live_transcript = LiveTranscript()
         self.live_delegations = {}
         self.provider_epoch = None
-        self.input_activity_since = None
-        self.input_activity_last = None
         self.last_activity = time.monotonic()
         self.session_started = self.last_activity
+        self.voice_toggle_lock = asyncio.Lock()
         self.lifecycle_lock = asyncio.Lock()
         self.configuration_lock = asyncio.Lock()
         self.turn_lock = asyncio.Lock()
@@ -183,22 +177,11 @@ class VoiceService:
         elif kind == "level":
             level = max(0, min(float(event.get("level", 0)), 1))
             self.voice["level"] = level
-            now = time.monotonic()
-            if self.voice["microphone"] and not self.voice["speaking"] and level >= INPUT_ACTIVITY_LEVEL:
-                if self.input_activity_last is None or now - self.input_activity_last > INPUT_ACTIVITY_MAX_GAP:
-                    self.input_activity_since = now
-                self.input_activity_last = now
-                if now - self.input_activity_since >= INPUT_ACTIVITY_SECONDS:
-                    self.last_activity = now
-            else:
-                self.input_activity_since = self.input_activity_last = None
             self.queue_level_publish()
             return
         elif kind == "transcript":
             text = str(event.get("text", ""))[:24000]
             role = "user" if event.get("role") == "user" else "assistant"
-            if role == "user" and text.strip() and self.voice["microphone"]:
-                self.last_activity = time.monotonic()
             transcript = self.session["transcript"]
             if transcript and transcript[-1].get("partial") and transcript[-1]["role"] == role:
                 if event.get("final"):
@@ -639,8 +622,7 @@ class VoiceService:
         if provider is not None:
             self.audit.record("session_ended", session_id=self.session["id"], provider=self.settings.value["mode"],
                               elapsed_ms=round((time.monotonic() - self.session_started) * 1000))
-        self.voice.update(enabled=False, state="disabled", microphone=False, speaking=False, level=0)
-        self.input_activity_since = self.input_activity_last = None
+        self.voice.update(enabled=False, state="disabled", microphone=False, speaking=False, level=0, extended=False)
         if provider:
             self.provider_cleanup = self.background(self._release_provider(provider))
         return self.provider_cleanup
@@ -681,7 +663,7 @@ class VoiceService:
         for task in pending:
             if task is not current and not task.done():
                 task.cancel()
-        self.voice.update(enabled=False, state="disabled", microphone=False, speaking=False, level=0)
+        self.voice.update(enabled=False, state="disabled", microphone=False, speaking=False, level=0, extended=False)
         self.voice.pop("task_error", None)
         if not preserve_error:
             self.voice["error"] = ""
@@ -823,13 +805,29 @@ class VoiceService:
                 self.voice_preview["state"] = "idle"
                 await self.publish()
 
+    async def toggle_voice(self, extended):
+        if type(extended) is not bool:
+            raise VoiceError("INVALID_REQUEST", "Choose normal or extended Voice.")
+        async with self.voice_toggle_lock:
+            if self.voice["enabled"] and self.provider:
+                if self.voice.get("extended", False) == extended:
+                    await self.end_voice()
+                else:
+                    self.voice["extended"] = extended
+                    self.last_activity = time.monotonic()
+                    await self.publish()
+            else:
+                await self.start_voice()
+                self.voice["extended"] = extended
+                await self.publish()
+
     async def dispatch(self, request):
         if self.preview_task is not None and request.get("action") not in {"status", "stop_gemini_voice_preview", "end_voice", "silence", "mute", "test", "models"}:
             raise VoiceError("PREVIEW_ACTIVE", "Stop the voice preview before starting a conversation or changing settings.")
         if request.get("action") in {"configure", "configure_livekit", "configure_gemini_live", "credential"}:
             async with self.configuration_lock:
                 return await self._dispatch(request)
-        if request.get("action") not in {"start_voice", "submit_text"}:
+        if request.get("action") not in {"start_voice", "submit_text", "toggle_voice"}:
             return await self._dispatch(request)
         current = asyncio.current_task()
         self.conversation_requests.add(current)
@@ -849,6 +847,7 @@ class VoiceService:
     async def _dispatch(self, request):
         action = request.get("action")
         allowed = {
+            "toggle_voice": {"extended"},
             "preview_gemini_voice": {"voice"}, "stop_gemini_voice_preview": set(),
             "status": set(), "configure": {"settings"}, "credential": {"name", "value"}, "test": set(), "models": set(),
             "configure_livekit": {"url", "api_key", "api_secret"},
@@ -900,6 +899,8 @@ class VoiceService:
             target = self.settings.value["speech_directory"] or str(self.directory / "speech")
             await asyncio.to_thread(download_speech, target)
             return await self.check_readiness()
+        elif action == "toggle_voice":
+            await self.toggle_voice(request.get("extended", False))
         elif action == "start_voice":
             await self.start_voice(project=request.get("project", ""), context=request.get("context", ""))
         elif action == "end_voice":
@@ -1113,7 +1114,7 @@ class VoiceService:
     def session_expired(self, now=None):
         now = time.monotonic() if now is None else now
         return (now - self.session_started >= 30 * 60
-                or (not self.voice["speaking"] and now - self.last_activity > self.settings.value["idle_seconds"]))
+                or (not self.voice.get("extended", False) and not self.voice["speaking"] and now - self.last_activity > self.settings.value["idle_seconds"]))
 
     async def maintenance(self):
         while True:

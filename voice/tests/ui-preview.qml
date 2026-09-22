@@ -129,6 +129,11 @@ ShellRoot {
       next.settings[key] = value === "true" ? true : (value === "false" ? false : value)
       panel.voiceController.setFixture(next)
     }
+    function extended(value: bool): void {
+      var next = JSON.parse(JSON.stringify(panel.voiceController.snapshot))
+      next.voice.extended = value
+      panel.voiceController.setFixture(next)
+    }
     function voicePreview(state: string): void {
       var next = JSON.parse(JSON.stringify(panel.voiceController.snapshot))
       next.voice_preview = { state: state, voice: "Zephyr", error: state === "error" ? "Could not play this voice. Try again." : "" }

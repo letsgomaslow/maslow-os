@@ -46,43 +46,31 @@ class ServiceTests(unittest.IsolatedAsyncioTestCase):
         self.service.store.close()
         self.temporary.cleanup()
 
-    async def test_long_microphone_turn_renews_idle_then_quiet_expires(self):
-        self.service.voice.update(enabled=True, microphone=True, speaking=False)
+    async def test_extended_toggle_preserves_session_and_normal_idle_policy(self):
+        await self.service.dispatch({"action": "toggle_voice", "extended": False})
+        provider = self.service.provider
         self.service.session_started = self.service.last_activity = 0
-        # Ninety seconds of post-APM input before any final transcript exists.
-        for tick in range(1, 1801):
-            now = tick / 20
-            with patch("maslow_voice.daemon.time.monotonic", return_value=now):
-                await self.service.provider_event({"type": "level", "level": 0.01})
-            if now > 1:
-                self.assertFalse(self.service.session_expired(now))
-        self.assertGreater(self.service.last_activity, 89)
-        with patch("maslow_voice.daemon.time.monotonic", return_value=100):
-            await self.service.provider_event({"type": "level", "level": 0.001})
-        self.assertTrue(self.service.session_expired(151))
+        self.assertTrue(self.service.session_expired(61))
+        await self.service.dispatch({"action": "toggle_voice", "extended": True})
+        self.assertIs(self.service.provider, provider)
+        self.assertTrue(self.service.voice["extended"])
+        self.assertFalse(self.service.session_expired(120))
         self.assertTrue(self.service.session_expired(1800))
+        await self.service.dispatch({"action": "toggle_voice", "extended": True})
+        self.assertIsNone(self.service.provider)
+        self.assertFalse(self.service.voice["extended"])
+        await self.service.dispatch({"action": "start_voice"})
+        self.assertFalse(self.service.voice["extended"])
 
-    async def test_idle_ignores_clicks_muted_input_and_output_echo(self):
-        self.service.session_started = self.service.last_activity = 0
-        self.service.voice.update(enabled=True, microphone=True, speaking=False)
-        for now in (10, 20, 30, 40, 50):
-            with patch("maslow_voice.daemon.time.monotonic", return_value=now):
-                await self.service.provider_event({"type": "level", "level": 0.8})
-        self.assertEqual(self.service.last_activity, 0)
-        for microphone, speaking in ((False, False), (True, True)):
-            self.service.voice.update(microphone=microphone, speaking=speaking)
-            for tick in range(20):
-                with patch("maslow_voice.daemon.time.monotonic", return_value=51 + tick / 20):
-                    await self.service.provider_event({"type": "level", "level": 0.8})
-        self.assertEqual(self.service.last_activity, 0)
-
-    async def test_recognized_microphone_turn_counts_before_assistant_reply(self):
-        self.service.voice.update(microphone=True)
-        self.service.last_activity = 0
-        with patch("maslow_voice.daemon.time.monotonic", return_value=59):
-            await self.service.provider_event({"type": "transcript", "role": "user",
-                                              "text": "I am still thinking this through.", "final": False})
-        self.assertEqual(self.service.last_activity, 59)
+    async def test_extended_is_session_only_and_toggle_rejects_non_boolean(self):
+        before = dict(self.service.settings.value)
+        await self.service.dispatch({"action": "toggle_voice", "extended": True})
+        self.assertTrue(self.service.voice["extended"])
+        await self.service.dispatch({"action": "toggle_voice", "extended": False})
+        self.assertFalse(self.service.voice["extended"])
+        self.assertEqual(before, self.service.settings.value)
+        with self.assertRaises(VoiceError):
+            await self.service.dispatch({"action": "toggle_voice", "extended": "yes"})
 
     def livekit_credentials(self, initial=None):
         values = dict(initial or {})

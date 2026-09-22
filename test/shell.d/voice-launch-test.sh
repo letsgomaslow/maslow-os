@@ -44,6 +44,9 @@ if name == "omarchy-hyprland-session-locked":
     checks = s.get("compositor", [1])
     code = checks.pop(0) if len(checks) > 1 else checks[0]
     done(code=code)
+if name == "omarchy-voice-control":
+    s["voice_request"] = json.load(sys.stdin)
+    done(json.dumps(s.get("voice_response", {"ok": True})))
 if name == "omarchy-shell":
     action = sys.argv[1:3]
     if action == ["lock", "status"]:
@@ -78,7 +81,7 @@ if name == "omarchy-shell":
 done()
 ''')
     mock.chmod(0o755)
-    for name in ("flock", "omarchy-cmd-missing", "omarchy-hyprland-session-locked", "omarchy-shell", "omarchy-launch-hub", "omarchy-pkg-add", "systemctl"):
+    for name in ("flock", "omarchy-cmd-missing", "omarchy-hyprland-session-locked", "omarchy-shell", "omarchy-launch-hub", "omarchy-voice-control", "omarchy-pkg-add", "systemctl"):
         (commands / name).symlink_to(mock)
     (commands / "omarchy-launch-voice").symlink_to(root / "bin/omarchy-launch-voice")
     env = dict(os.environ, PATH=f"{commands}:{os.environ['PATH']}",
@@ -124,6 +127,16 @@ done()
     assert not actions(state, "rescanPlugins")
     assert actions(state, "summon") == [["omarchy-shell", "shell", "summon", "maslow.voice", '{"page":"settings"}']]
     print("ok - registered Voice opens the requested page without refreshing plugins")
+
+    for page, extended in (("start", False), ("extended", True)):
+        state, _ = run({}, page=page)
+        assert state["voice_request"] == {"action": "toggle_voice", "extended": extended}
+        assert actions(state, "summon")[-1][-1] == '{"page":"talk"}'
+        state, _ = run({"compositor": [0]}, page=page)
+        assert "voice_request" not in state
+    state, _ = run({"voice_response": {"ok": False, "error": {"message": "Needs setup"}}}, page="extended")
+    assert actions(state, "summon")[-1][-1] == '{"page":"settings"}'
+    print("ok - normal/extended shortcuts toggle only when unlocked and show setup failures")
 
     state, _ = run({"present": False, "pending": 2})
     assert len(actions(state, "rescanPlugins")) == 1

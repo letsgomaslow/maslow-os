@@ -241,7 +241,7 @@ Item {
     if (voice.state === "connecting") return "Connecting"
     if (voice.state === "thinking") return "Thinking"
     if (voice.speaking === true || voice.state === "speaking" || voice.state === "talking") return "Speaking"
-    if (voice.state === "listening") return "Listening"
+    if (voice.state === "listening") return voice.extended === true ? "Listening · extended" : "Listening"
     return "Ready to listen"
   }
   function send(action, extra) {
@@ -460,7 +460,7 @@ Item {
   }
   function microphoneText() {
     if (voice.state === "connecting") return "Connecting — requesting microphone access"
-    if (voice.state === "listening") return voice.microphone === true ? "Listening — microphone on" : "Listening — microphone off"
+    if (voice.state === "listening") return voice.microphone === true ? (voice.extended === true ? "Extended conversation — microphone on; no inactivity timeout" : "Listening — microphone on") : "Listening — microphone off"
     return voice.microphone === true ? "Microphone on" : "Microphone off"
   }
   function handleControlResponse(response) {
@@ -905,6 +905,7 @@ Item {
                 Item { Layout.fillHeight: true }
                 Text { visible: root.voice.error || controller.transportError; Layout.alignment: Qt.AlignHCenter; text: root.voice.error || controller.transportError; color: "#EE7BB3"; font.family: "Manrope"; wrapMode: Text.WordWrap; Accessible.role: Accessible.AlertMessage; Accessible.name: text }
                 Text { Layout.alignment: Qt.AlignHCenter; text: root.conversation ? root.stateText() : "What would you like to work on?"; color: "#FFFFFF"; font.family: "Manrope"; font.pixelSize: 24 }
+                Text { visible: root.voice.extended === true; Layout.alignment: Qt.AlignHCenter; text: "Extended conversation · no inactivity timeout · 30-minute maximum"; color: "#6DC4AD"; font.family: "Manrope"; wrapMode: Text.WordWrap; Layout.maximumWidth: 520; Accessible.role: Accessible.StatusBar; Accessible.name: text }
                 VoiceButton { id: talkAction; Layout.alignment: Qt.AlignHCenter; text: root.conversation ? "End conversation" : "Start talking"; onClicked: root.conversation ? root.send("end_voice") : root.requestVoiceStart() }
                 Text { Layout.alignment: Qt.AlignHCenter; text: "Talk through an idea, ask a question, or ask Maslow to hand work to your agents."; color: "#D1D5DB"; font.family: "Manrope"; font.pixelSize: 15; wrapMode: Text.WordWrap; horizontalAlignment: Text.AlignHCenter; Layout.maximumWidth: 520 }
                 Text { Layout.alignment: Qt.AlignHCenter; text: root.microphoneText() + (root.transcript.length > 0 ? "  ·  Captions: " + String(root.transcript[root.transcript.length - 1].text || "") : ""); color: "#D1D5DB"; font.family: "Manrope"; font.pixelSize: 13; wrapMode: Text.WordWrap; horizontalAlignment: Text.AlignHCenter; Layout.maximumWidth: 520; Accessible.role: Accessible.StatusBar; Accessible.name: text }
