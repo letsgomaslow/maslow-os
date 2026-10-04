@@ -26,10 +26,11 @@ for (let stateMode = 0; stateMode <= 7; stateMode++) {
   assert.equal(property("moving", { stateMode, visible: false, moodTime: 0, failedHold: 4.5 }), false);
 }
 for (const [values, expected] of [
-  [{ stateMode: 0 }, "idle"], [{ stateMode: 1 }, "observing"], [{ stateMode: 2 }, "idle"],
+  [{ stateMode: 0 }, "idle"], [{ stateMode: 1 }, "observing"], [{ stateMode: 2 }, "listening"],
   [{ stateMode: 3, voiceState: "thinking" }, "thinking"], [{ stateMode: 3, voiceState: "working" }, "working"],
-  [{ stateMode: 4 }, "idle"], [{ stateMode: 5 }, "resting"], [{ stateMode: 6 }, "failed"], [{ stateMode: 7 }, "inactive"],
-  [{ stateMode: 5, reaction: "completed" }, "done"], [{ stateMode: 2, reaction: "interrupted" }, "idle"]
+  [{ stateMode: 4 }, "speaking"], [{ stateMode: 5 }, "resting"], [{ stateMode: 6 }, "failed"], [{ stateMode: 7 }, "inactive"],
+  [{ stateMode: 5, reaction: "completed" }, "done"], [{ stateMode: 2, reaction: "interrupted" }, "listening"],
+  [{ stateMode: 2, reaction: "wake" }, "waking"], [{ stateMode: 6, reaction: "wake" }, "failed"], [{ stateMode: 2, reaction: "completed" }, "done"]
 ]) assert.equal(property("mood", values), expected, JSON.stringify(values));
 for (const [level, expected] of [[-1, 0], [0.5, 0.5], [4, 1], [NaN, 0], [Infinity, 0]]) {
   assert.equal(property("normalizedLevel", { audioLevel: level }), expected);
@@ -64,6 +65,18 @@ assert.match(orb, /onInterruptionSequenceChanged/);
 assert.match(orb, /onCompletionSequenceChanged/);
 assert.match(orb, /root.reactionTime >=/);
 assert.match(orb, /import "OrbFrame.js" as OrbFrame/);
+// A conversation starting from ready or setup wakes once; reduced motion never does.
+// The state at creation is recorded, so the first conversation after loading wakes.
+assert.match(orb, /Component\.onCompleted: \{[^}]*previousStateMode = stateMode/);
+const wake = orb.match(/onStateModeChanged: \{([\s\S]*?)\n  \}/)?.[1];
+assert.ok(wake);
+for (const [previousStateMode, stateMode, reducedMotion, expected] of [[0, 2, false, true], [7, 1, false, true], [0, 1, true, false], [-1, 2, false, false], [4, 2, false, false], [5, 2, false, false]]) {
+  let woke = false;
+  const scope = { previousStateMode, stateMode, reducedMotion, react: kind => { woke = kind === "wake"; } };
+  vm.runInNewContext(wake, scope);
+  assert.equal(woke, expected, `wake from ${previousStateMode} to ${stateMode}`);
+  assert.equal(scope.previousStateMode, stateMode);
+}
 
 const paint = orb.match(/onPaint: \{([\s\S]*?)\n      \}\n    \}\n    Loader/)?.[1];
 assert.ok(paint);

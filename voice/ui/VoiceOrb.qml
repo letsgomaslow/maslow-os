@@ -34,10 +34,13 @@ Item {
   readonly property real energy: Math.min(1, responseLevel * 4)
   readonly property real stretch: reducedMotion ? 1 : stateMode === 3 ? 0.94 + Math.sin(phase * 0.8) * 0.025 : 1 + energy * 0.09
   readonly property real squash: reducedMotion ? 1 : stateMode === 3 ? 0.96 + Math.cos(phase * 0.8) * 0.012 : 1 - energy * 0.07
-  // Eye choreography comes from OrbFrame.js; completion plays "done" once.
-  readonly property string mood: reaction === "completed" ? "done" : stateMode === 6 ? "failed" : stateMode === 7 ? "inactive" : stateMode === 5 ? "resting" : stateMode === 3 ? (voiceState === "working" ? "working" : "thinking") : stateMode === 1 ? "observing" : "idle"
+  // Eye choreography comes from OrbFrame.js. Completion plays "done" once and
+  // a starting conversation plays "waking" once; listening and speaking
+  // follow the measured input and playback level.
+  readonly property string mood: reaction === "completed" ? "done" : stateMode === 6 ? "failed" : reaction === "wake" ? "waking" : stateMode === 7 ? "inactive" : stateMode === 5 ? "resting" : stateMode === 3 ? (voiceState === "working" ? "working" : "thinking") : stateMode === 1 ? "observing" : stateMode === 2 ? "listening" : stateMode === 4 ? "speaking" : "idle"
   readonly property real failedHold: OrbFrame.FAILED_HOLD * OrbFrame.MOODS.failed.cycle
   readonly property real doneLength: OrbFrame.DONE_END * OrbFrame.MOODS.done.cycle
+  readonly property real wakeLength: OrbFrame.MOODS.waking.cycle
   property real moodStart: 0
   readonly property real moodTime: Math.max(0, phase - moodStart)
   // Mood changes ease from the previous mood's frame on their own clock, so
@@ -48,12 +51,17 @@ Item {
   property real blendTime: 1
   readonly property var face: {
     if (reducedMotion) return OrbFrame.stillFrame(shownMood)
-    return OrbFrame.blend(blendFrom, OrbFrame.frameAt(shownMood, shownMood === "done" ? reactionTime : moodTime), blendTime / 0.3)
+    return OrbFrame.blend(blendFrom, OrbFrame.frameAt(shownMood, moodClock(shownMood), energy), blendTime / 0.3)
   }
-  Component.onCompleted: shownMood = mood
+  // Reaction moods run on the reaction clock so they play even while paused.
+  function moodClock(name) { return name === "done" || name === "waking" ? reactionTime : moodTime }
+  Component.onCompleted: {
+    shownMood = mood
+    previousStateMode = stateMode
+  }
   readonly property real openness: reducedMotion || reaction !== "interrupted" ? 1 : OrbFrame.interruptOpenness(reactionTime)
   onMoodChanged: {
-    blendFrom = OrbFrame.frameAt(shownMood, shownMood === "done" ? reactionTime : moodTime)
+    blendFrom = OrbFrame.frameAt(shownMood, moodClock(shownMood), energy)
     shownMood = mood
     moodStart = phase
     blendTime = 0
@@ -78,6 +86,13 @@ Item {
     reactionTimer.restart()
   }
   onInterruptionSequenceChanged: if (interruptionSequence > 0) react("interrupted")
+  // Wake once when a conversation starts from the ready or setup state.
+  // Recorded at creation, so an orb created mid-conversation never wakes.
+  property int previousStateMode: -1
+  onStateModeChanged: {
+    if ([0, 7].indexOf(previousStateMode) >= 0 && [1, 2].indexOf(stateMode) >= 0 && !reducedMotion) react("wake")
+    previousStateMode = stateMode
+  }
   onCompletionSequenceChanged: if (completionSequence > 0) react("completed")
   Timer {
     interval: 40
@@ -97,7 +112,7 @@ Item {
     repeat: true
     onTriggered: {
       root.reactionTime += 0.04
-      if (root.reactionTime >= (root.reaction === "completed" ? root.doneLength : 0.4)) { root.reaction = ""; stop() }
+      if (root.reactionTime >= (root.reaction === "completed" ? root.doneLength : root.reaction === "wake" ? root.wakeLength : 0.4)) { root.reaction = ""; stop() }
     }
   }
 
@@ -219,8 +234,9 @@ Item {
         // The mouth steps aside while the eyes travel through its space.
         opacity: ["thinking", "working", "failed"].indexOf(root.face.mood) >= 0 ? 0 : 1
         Behavior on opacity { enabled: !root.reducedMotion; NumberAnimation { duration: 150 } }
-        width: body.width * 0.10
-        height: root.stateMode === 4 ? body.height * (0.025 + root.energy * 0.06) : body.height * 0.025
+        // Speech opens the mouth into a rounder shape as playback gets louder.
+        width: body.width * (root.stateMode === 4 ? 0.10 - root.energy * 0.025 : 0.10)
+        height: root.stateMode === 4 ? body.height * (0.025 + root.energy * 0.075) : body.height * 0.025
         x: face.px(OrbFrame.CENTER) - width / 2
         y: face.px(OrbFrame.MOUTH_Y) - height / 2
         radius: height / 2

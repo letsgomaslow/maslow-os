@@ -43,7 +43,10 @@ var MOODS = {
   done: { cycle: 3.2, reps: 1 },
   failed: { cycle: 5.5, reps: 1 },
   inactive: { cycle: 3.4, reps: 1 },
-  resting: { cycle: 1, reps: 1 }
+  resting: { cycle: 1, reps: 1 },
+  listening: { cycle: 6, reps: 1 },
+  speaking: { cycle: 4.4, reps: 1 },
+  waking: { cycle: 1.3, reps: 1 }
 }
 
 function clamp(v, a, b) { return v < a ? a : v > b ? b : v }
@@ -240,8 +243,56 @@ function resting() {
   return s
 }
 
-function moodState(mood, p, cycle) {
+// Maslow's own conversation moods. They are not in Moodstone: the orb listens
+// and talks, so these follow the measured input or playback level (0..1).
+
+// Listening: attentive darting glances and a curious head tilt; the eyes
+// widen and lift as the person's voice gets louder.
+// The eyes stay a little larger than at rest so listening reads at a glance.
+var LISTEN_TRACK = [[0, 0, 0, 0, 0, 0], [0.18, 4, -1.5, 4, -1.5, 1], [0.4, 4, -1.5, 4, -1.5, 0], [0.5, -4, 0.5, -4, 0.5, 1], [0.75, -4, 0.5, -4, 0.5, 0], [0.85, 0, 0, 0, 0, 1], [1, 0, 0, 0, 0, 0]]
+function listening(p, cycle, level) {
+  var g = gazeAt(LISTEN_TRACK, p)
+  var widen = 1.1 + 0.25 * level
+  var poses = [restPose(0, g[0], g[1] - 1 - 2.5 * level), restPose(1, g[2], g[3] - 1 - 2.5 * level)]
+  for (var i = 0; i < 2; i++) { poses[i].w *= widen; poses[i].h *= widen }
+  var s = calm(poses)
+  s.tilt = Math.sin(TAU * p) * 7
+  s.openness = opennessAt(p, cycle, [0.45, 0.92], 1)
+  return s
+}
+
+// Speaking: a nod as the turn starts, a gentle sway, and eyes that lift and
+// smile-squint on emphasis while the body bobs with the voice.
+var SPEAK_TRACK = [[0, 0, 0, 0, 0, 0], [0.3, 4, 0, 4, 0, 0], [0.6, -3.5, 0, -3.5, 0, 0], [1, 0, 0, 0, 0, 0]]
+var NOD_SECONDS = 0.45
+function speaking(p, cycle, level, seconds) {
+  var g = gazeAt(SPEAK_TRACK, p)
+  var poses = [restPose(0, g[0], g[1] - 3.5 * level), restPose(1, g[2], g[3] - 3.5 * level)]
+  for (var i = 0; i < 2; i++) poses[i].h *= 1 - 0.45 * level
+  var s = calm(poses)
+  s.tilt = Math.sin(TAU * p) * 6
+  var nod = seconds < NOD_SECONDS ? Math.sin(Math.PI * seconds / NOD_SECONDS) * 3.5 : 0
+  s.offset = [0, nod - 2.5 * level]
+  s.openness = opennessAt(p, cycle, [0.2, 0.7], 0.8)
+  return s
+}
+
+// Waking: plays once as a conversation starts. The eyes open from half shut
+// with a little overshoot, look left and right, and settle at rest.
+var WAKE_TRACK = [[0, 0, 1, 0, 1, 0], [0.25, 0, -1, 0, -1, 1], [0.38, 0, -1, 0, -1, 0], [0.5, -4, -1, -4, -1, 1], [0.62, -4, -1, -4, -1, 0], [0.75, 4, -1, 4, -1, 1], [0.86, 4, -1, 4, -1, 0], [1, 0, 0, 0, 0, 1]]
+function waking(p) {
+  var g = gazeAt(WAKE_TRACK, p)
+  var s = calm([restPose(0, g[0], g[1]), restPose(1, g[2], g[3])])
+  s.openness = p < 0.25 ? lerp(0.15, 1, easeBack(p / 0.25)) : 1
+  s.tilt = (g[0] + g[2]) / 2 * -0.8
+  return s
+}
+
+function moodState(mood, p, cycle, level, seconds) {
   switch (mood) {
+  case "listening": return listening(p, cycle, level)
+  case "speaking": return speaking(p, cycle, level, seconds)
+  case "waking": return waking(p)
   case "observing": return observing(p, cycle)
   case "thinking": return thinking(p, cycle)
   case "working": return working(p, cycle)
@@ -277,14 +328,18 @@ function sleepMarks(p) {
   return marks
 }
 
+// One-shot moods play once and hold the pose at this share of their cycle.
+var ONE_SHOT = { done: DONE_END, failed: FAILED_HOLD, waking: 1 }
+
 // A frame for `mood` at `seconds` into it, with blink squash, swirls and
-// sleep marks applied. "done" and "failed" do not loop: they hold their end.
-function frameAt(mood, seconds) {
+// sleep marks applied. `level` (0..1) drives listening and speaking.
+function frameAt(mood, seconds, level) {
   var info = MOODS[mood] || MOODS.idle
   var length = info.cycle * info.reps
-  var t = mood === "done" ? clamp(seconds, 0, DONE_END * info.cycle) : mood === "failed" ? clamp(seconds, 0, FAILED_HOLD * info.cycle) : ((seconds % length) + length) % length
-  var p = mood === "done" || mood === "failed" ? t / info.cycle : wrap01(t / info.cycle)
-  var s = moodState(mood, p, info.cycle)
+  var shot = ONE_SHOT[mood]
+  var t = shot !== undefined ? clamp(seconds, 0, shot * info.cycle) : ((seconds % length) + length) % length
+  var p = shot !== undefined ? t / info.cycle : wrap01(t / info.cycle)
+  var s = moodState(mood, p, info.cycle, clamp(Number(level) || 0, 0, 1), Math.max(0, seconds))
   // Shut eyes get a touch wider and almost flat.
   var sx = 1 + 0.05 * (1 - s.openness)
   var sy = 0.08 + 0.92 * s.openness
@@ -313,7 +368,7 @@ function frameAt(mood, seconds) {
 }
 
 // The moment that shows each mood best, for reduced motion.
-var KEY_POSE = { idle: 0, observing: 0.25, thinking: 0.57, working: 0.137, done: 0.286, failed: 0.37, inactive: 0.12, resting: 0 }
+var KEY_POSE = { idle: 0, observing: 0.25, thinking: 0.57, working: 0.137, done: 0.286, failed: 0.37, inactive: 0.12, resting: 0, listening: 0, speaking: 0.3, waking: 1 }
 function stillFrame(mood) {
   var info = MOODS[mood] || MOODS.idle
   return frameAt(mood, (KEY_POSE[mood] || 0) * info.cycle)

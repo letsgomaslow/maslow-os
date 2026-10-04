@@ -6,7 +6,7 @@ import vm from "node:vm";
 // OrbFrame.js is a QML library; drop its pragma and evaluate it as a script.
 const source = readFileSync(fileURLToPath(new URL("../ui/OrbFrame.js", import.meta.url)), "utf8").replace(/^\.pragma library\n/, "");
 const frame = vm.runInNewContext(`${source}\n({ frameAt, stillFrame, blend, loopLength, swirlPoints, interruptOpenness, MOODS, CENTER, BODY_RADIUS, MOUTH_Y, FAILED_HOLD, DONE_END })`);
-const moods = ["idle", "observing", "thinking", "working", "done", "failed", "inactive", "resting"];
+const moods = ["idle", "observing", "thinking", "working", "done", "failed", "inactive", "resting", "listening", "speaking", "waking"];
 const close = (a, b, message) => assert.ok(Math.abs(a - b) < 1e-6, `${message}: ${a} != ${b}`);
 
 function assertContained(f, label) {
@@ -24,13 +24,13 @@ function assertContained(f, label) {
 
 for (const mood of moods) {
   const length = frame.loopLength(mood);
-  for (let t = 0; t <= length * 1.5; t += 0.01) assertContained(frame.frameAt(mood, t), `${mood} at ${t.toFixed(2)}`);
+  for (const level of [0, 0.5, 1]) for (let t = 0; t <= length * 1.5; t += 0.01) assertContained(frame.frameAt(mood, t, level), `${mood} at ${t.toFixed(2)} level ${level}`);
   assertContained(frame.stillFrame(mood), `${mood} still`);
   assert.equal(frame.frameAt(mood, 0).mood, mood);
 }
 
 // Looping moods are seamless; one-shot moods hold their end.
-for (const mood of ["idle", "observing", "thinking", "working", "inactive"]) {
+for (const mood of ["idle", "observing", "thinking", "working", "inactive", "listening"]) {
   const length = frame.loopLength(mood);
   for (const t of [0, 0.7, 2.3]) {
     const a = frame.frameAt(mood, t), b = frame.frameAt(mood, t + length);
@@ -71,6 +71,23 @@ const from = frame.frameAt("thinking", 3), to = frame.frameAt("idle", 0);
 assert.deepEqual(frame.blend(from, to, 0).eyes, from.eyes);
 assert.deepEqual(frame.blend(from, to, 1), to);
 assert.deepEqual(frame.blend(null, to, 0), to);
+
+// Listening widens and lifts the eyes with the person's voice.
+const quiet = frame.frameAt("listening", 1, 0), loud = frame.frameAt("listening", 1, 1);
+assert.ok(loud.eyes[0].h > quiet.eyes[0].h * 1.15 && loud.eyes[0].cy < quiet.eyes[0].cy, "listening reacts to input");
+assert.ok(Math.abs(frame.frameAt("listening", 1.5).tilt) > 2, "listening tilts the head");
+// Speaking nods as the turn starts, then bobs and squints with playback.
+assert.ok(frame.frameAt("speaking", 0.22).offset[1] > 2, "speaking starts with a nod");
+close(frame.frameAt("speaking", 0.5).offset[1], 0, "the nod ends");
+const calmSpeech = frame.frameAt("speaking", 1, 0), loudSpeech = frame.frameAt("speaking", 1, 1);
+assert.ok(loudSpeech.offset[1] < calmSpeech.offset[1] && loudSpeech.eyes[0].h < calmSpeech.eyes[0].h && loudSpeech.eyes[0].cy < calmSpeech.eyes[0].cy, "speaking reacts to playback");
+// Waking opens half-shut eyes, looks both ways and ends at rest.
+const wakeLength = frame.MOODS.waking.cycle;
+assert.ok(frame.frameAt("waking", 0).eyes[0].h < idleFirst.eyes[0].h * 0.3, "waking starts sleepy");
+assert.ok(frame.frameAt("waking", 0.58 * wakeLength).eyes[0].cx < idleFirst.eyes[0].cx - 3, "waking looks left");
+assert.ok(frame.frameAt("waking", 0.8 * wakeLength).eyes[0].cx > idleFirst.eyes[0].cx + 3, "waking looks right");
+const wokeUp = frame.frameAt("waking", wakeLength + 2);
+wokeUp.eyes.forEach((eye, index) => { close(eye.cx, idleFirst.eyes[index].cx, "waking ends at rest"); close(eye.cy, idleFirst.eyes[index].cy, "waking ends at rest"); });
 
 // Interruption is one quick blink.
 assert.equal(frame.interruptOpenness(0), 1);
