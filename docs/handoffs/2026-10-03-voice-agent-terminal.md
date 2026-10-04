@@ -268,6 +268,33 @@ Polish gaps noted:
 - No periodic progress cues.
 - The Work view omits web jobs.
 
+## Spoken announcements crashed the session (0.1.5-27)
+
+The person saw the notifications ("results are ready") but heard nothing. Asking for status was spoken normally.
+
+Journal evidence: each announcement was immediately followed by a Gemini Live `1011 Internal error` that ended the session.
+
+| Error | Notice logged | Notice |
+| --- | --- | --- |
+| 14:17:52.07 | 14:17:52.10 | `web-1` |
+| 14:18:17.58 | 14:18:17.65 | `web-2` |
+
+`notify_task` awaited the LiveKit speech handle, which completes when the session dies. The logged "spoken" therefore meant only that the handle completed.
+
+Isolation with the Gemini API directly (`gemini-3.8-live`):
+- Model-role, user-role and realtime-text injections all spoke correctly in fresh sessions.
+- They also spoke with tools, compression, streaming audio and the real screen content added.
+- The pinned plugin sends `generate_reply(instructions=...)` for 3.x models as a bare model-role turn with no placeholder. Mid-conversation, that exact shape produced unrelated text instead of the announcement.
+
+Fix in `cb4c0e48`:
+- The provider keeps its realtime session and sends announcements as `LiveClientRealtimeInput(text=...)`.
+- In a real Gemini Voice session started from source (text mode, temporary state), the update started a new LiveKit generation within 0.6 s. The transcript recorded "The cheapest flight is 337 dollars on Alaska." with no error.
+- Replies to these updates have no captured user turn, so they cannot run tools.
+- The journal now says "sent to the conversation".
+- Pinned suite: 414 tests passed (two expected skips).
+
+Package: recipe `6fd9364` advances to `0.1.5-27`. Archive SHA-256 `d3503433e3ae9964acfbb3375dc334aec580981e336a420e33e99f995c52c211`.
+
 ## Not verified
 
 - No live Gemini conversation called the new tools.
