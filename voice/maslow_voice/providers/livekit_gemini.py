@@ -28,7 +28,9 @@ class LiveKitGeminiProvider(LiveKitNativeExpressiveProvider):
         if not self._started or self._session is None or self._muted or self._paused:
             return False
         if self._audio_enabled:
-            if self._session.user_state != "listening" or self._session.agent_state != "listening":
+            # "away" is LiveKit's state after 15 seconds of user silence, which
+            # is exactly when a long job's result arrives.
+            if self._session.user_state not in {"listening", "away"} or self._session.agent_state != "listening":
                 return False
         else:
             # The pinned realtime SDK can retain 'speaking' after text-only

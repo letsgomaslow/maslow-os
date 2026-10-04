@@ -137,6 +137,9 @@ class GeminiSdkTests(unittest.IsolatedAsyncioTestCase):
             fake.generate_reply.assert_not_awaited()
             fake.user_state = "listening"
             self.assertTrue(await self.provider.notify_task("Completed"))
+            # "away" is LiveKit's state after 15 seconds of silence: still quiet.
+            fake.user_state = "away"
+            self.assertTrue(await self.provider.notify_task("Completed"))
             self.assertEqual(fake.generate_reply.call_args.kwargs["tools"], [])
         finally:
             self.provider._session = original

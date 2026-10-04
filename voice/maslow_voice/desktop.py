@@ -250,7 +250,10 @@ class DesktopActions:
             state = "working"
         else:
             state = "idle"
-        tail = "\n".join(line.rstrip() for line in text.splitlines()[-25:] if line.strip())[-1500:]
+        # The agent's own words sit above its input box; the box and footer
+        # below it are interface text, not the answer.
+        conversation = agent_terminal.split_input(text)[0]
+        tail = "\n".join(line.rstrip() for line in conversation.splitlines()[-30:] if line.strip())[-2000:]
         return {"agent": agent, "state": state, "prompt": prompt, "screen": tail}
 
     async def focus(self, client):

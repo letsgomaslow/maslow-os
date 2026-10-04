@@ -235,20 +235,28 @@ class MvpServiceTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(notices, [("codex", "waiting for a decision", "Allow the playwright MCP server"), ("codex", "finished", "Cheapest: $142")])
         self.assertNotIn("codex", self.service.agent_jobs)
 
-    async def test_a_spoken_result_leaves_time_to_answer(self):
+    async def test_a_spoken_result_is_also_notified_and_leaves_time_to_answer(self):
         self.service.provider.notify_task = AsyncMock(return_value=True)
+        self.service.jobs["web-1"] = {"id": "web-1", "title": "find cheap flights", "state": "finished", "started": 0, "updated": 0, "result": ""}
         self.service.last_activity = 0
-        await self.service.agent_notice("codex", "finished", "Cheapest: $142")
+        await self.service.agent_notice("web-1", "finished", "› find cheap flights\n• Cheapest is **$337** on Alaska, Oct 20–27.")
+        self.service.desktop.run.assert_awaited_once_with("omarchy-notification-send", "--app-name", "Maslow Voice",
+                                                          'The task "find cheap flights" has finished', "Cheapest is $337 on Alaska, Oct 20–27.")
+        self.service.provider.notify_task.assert_awaited_once()
         self.assertGreater(self.service.last_activity, 0)
         self.assertFalse(self.service.session_expired())
 
-    async def test_finished_notice_falls_back_to_a_desktop_notification(self):
+    def test_answer_line_skips_progress_and_interface_text(self):
+        screen = ("› Web task from Maslow Voice. Request: find flights\n• I’ll compare flights.\n• Explored\n  └ List files\n"
+                  "• The cheapest option is **$324** nonstop on United, Oct 11.\n  | Flight | Price |")
+        self.assertEqual(self.service.answer_line(screen), "The cheapest option is $324 nonstop on United, Oct 11.")
+        self.assertEqual(self.service.answer_line(""), "")
+
+    async def test_finished_notice_without_a_conversation_is_still_notified(self):
         self.service.provider = None
-        await self.service.agent_notice("codex", "finished", "Cheapest: $142")
-        self.service.desktop.run.assert_awaited_once_with("omarchy-notification-send", "Maslow Voice", "Codex has finished.")
-        self.service.jobs["web-1"] = {"id": "web-1", "title": "find cheap flights", "state": "finished", "started": 0, "updated": 0, "result": ""}
-        await self.service.agent_notice("web-1", "finished", "Cheapest: $142")
-        self.service.desktop.run.assert_awaited_with("omarchy-notification-send", "Maslow Voice", 'The task "find cheap flights" has finished.')
+        await self.service.agent_notice("codex", "finished", "• All tests pass.")
+        self.service.desktop.run.assert_awaited_once_with("omarchy-notification-send", "--app-name", "Maslow Voice",
+                                                          "Codex has finished", "All tests pass.")
 
     def test_running_agent_keeps_a_quiet_conversation_open(self):
         quiet = self.service.last_activity + self.service.settings.value["idle_seconds"] + 5

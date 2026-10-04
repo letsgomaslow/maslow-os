@@ -569,26 +569,43 @@ class VoiceService:
         finally:
             self.agent_jobs.discard(agent)
 
+    @staticmethod
+    def answer_line(screen):
+        """The first line of the agent's final answer, for a notification."""
+        blocks = [line.strip() for line in str(screen).splitlines() if line.strip()]
+        answers = [index for index, line in enumerate(blocks) if line.startswith("•")]
+        line = blocks[answers[-1]] if answers else (blocks[-1] if blocks else "")
+        line = line.lstrip("• ").replace("**", "")
+        return line if len(line) <= 180 else line[:179].rstrip() + "…"
+
     async def agent_notice(self, agent, state, screen):
-        """Tell the person in conversation when possible, otherwise with a desktop notification."""
+        """Always notify on the desktop; also speak when a conversation is open."""
         name = self.job_name(agent)
+        if state == "finished":
+            headline, body = f"{name} has finished", self.answer_line(screen)
+        else:
+            headline, body = f"{name} is waiting for your decision", "Answer it in the agent's window, or tell Maslow Voice."
+        try:
+            await self.desktop.run("omarchy-notification-send", "--app-name", "Maslow Voice", headline, body)
+            notified = "notified"
+        except VoiceError as error:
+            notified = "notify failed " + error.code
+        spoken = "no conversation"
         provider = self.provider
         if provider and self.settings.value["mode"] == "gemini_live" and hasattr(provider, "notify_task"):
-            content = json.dumps({"agent": name, "state": state,
-                                  "guidance": "Summarise the agent's answer for the person in a few spoken sentences.",
+            content = json.dumps({"task": name, "state": state,
+                                  "guidance": "Tell the person this in a few spoken sentences, leading with the answer.",
                                   "screen": screen})
+            spoken = "not spoken: no quiet moment"
             deadline = time.monotonic() + TASK_NOTICE_SECONDS
             while self.provider is provider and time.monotonic() < deadline:
                 if await provider.notify_task(content):
                     # Give the person time to answer before the idle timeout.
                     self.last_activity = time.monotonic()
-                    return
+                    spoken = "spoken"
+                    break
                 await asyncio.sleep(0.5)
-        message = f"{name} has finished." if state == "finished" else f"{name} is waiting for your decision."
-        try:
-            await self.desktop.run("omarchy-notification-send", "Maslow Voice", message)
-        except VoiceError:
-            pass
+        print(f"Voice notice {agent} {state}: {notified}, {spoken}", file=sys.stderr, flush=True)
 
     APPROVE_WORDS = re.compile(r"\b(approve|approved|yes|yeah|yep|allow|accept|okay|ok|sure|proceed|confirm|go ahead|do it|trust it)\b")
     DENY_WORDS = re.compile(r"\b(deny|denied|no|nope|don't|dont|do not|reject|decline|cancel|block|refuse|stop)\b")
