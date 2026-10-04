@@ -186,6 +186,16 @@ class AgentTerminalTests(unittest.IsolatedAsyncioTestCase):
         await DesktopActions(run, timeout=0.5, agent_cwd=Path(self.temp.name) / "Maslow Voice").open("codex")
         self.assertTrue(any(call[0] == "setsid" for call in fake.calls))
 
+    async def test_agent_state_reads_working_waiting_idle_and_closed(self):
+        for screen, expected in (("• Working (3s • esc to interrupt)", "working"), (APPROVAL, "waiting"), ("• Done.\n› Ask Codex", "idle")):
+            fake = FakeDesktop(screen=screen)
+            self.assertEqual((await self.desktop(fake).agent_state("codex"))["state"], expected)
+        async def gone(*args):
+            raise VoiceError("DESKTOP_FAILED", "no session")
+        self.assertEqual((await DesktopActions(gone).agent_state("codex"))["state"], "closed")
+        with self.assertRaises(VoiceError):
+            await DesktopActions(gone).agent_state("bash")
+
     async def test_answer_without_a_waiting_prompt_sends_nothing(self):
         fake = FakeDesktop()
         with self.assertRaisesRegex(VoiceError, "not waiting"):

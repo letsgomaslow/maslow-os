@@ -103,6 +103,11 @@ class GeminiSdkTests(unittest.IsolatedAsyncioTestCase):
         response = json.loads(await self.provider._agent.tell_agent(context, "run the tests", "codex", "none"))
         self.provider._submit_callback.assert_awaited_once_with(
             {"operation": "agent", "agent": "codex", "text": "run the tests", "reply": ""}, "final-turn")
+        self.provider._tool_turns["web-call"] = "final-turn"
+        context.function_call.call_id = "web-call"
+        await self.provider._agent.tell_agent(context, "find cheap flights to Austin next week", "codex", "none", "web_task")
+        self.provider._submit_callback.assert_awaited_with(
+            {"operation": "agent", "agent": "codex", "text": "find cheap flights to Austin next week", "reply": "", "kind": "web_task"}, "final-turn")
         self.assertEqual(response["status"], "needs_answer")
 
     async def test_interrupted_task_control_cannot_mutate_job(self):
@@ -239,8 +244,9 @@ class GeminiSdkTests(unittest.IsolatedAsyncioTestCase):
         self.assertIsNotNone(model._opts.output_audio_transcription)
         schema = self.agents.ToolContext(self.provider._agent.tools).parse_function_tools("openai", strict=True)
         tools = {item["function"]["name"]: item["function"]["parameters"]["properties"] for item in schema}
-        self.assertEqual(set(tools), {"submit_intent", "desktop_action", "task_control", "tell_agent"})
-        self.assertEqual(set(tools["tell_agent"]), {"text", "agent", "reply"})
+        self.assertEqual(set(tools), {"submit_intent", "desktop_action", "task_control", "tell_agent", "agent_status"})
+        self.assertEqual(set(tools["tell_agent"]), {"text", "agent", "reply", "kind"})
+        self.assertEqual(set(tools["agent_status"]), {"agent"})
         # Gemini Live refuses the whole session when any enum value is empty.
         def enums(value):
             if isinstance(value, dict):

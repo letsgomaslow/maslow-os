@@ -64,6 +64,7 @@ class VoiceService:
         self.action_lock = asyncio.Lock()
         self.action_receipts = {}
         self.caption_sequence = 0
+        self.agent_jobs = set()
         self.task_view_request = {"task_id": "", "sequence": time.time_ns() // 1_000_000}
         self.task_attention = {"task_id": "", "sequence": self.task_view_request["sequence"]}
         self.current_task_id = ""
@@ -404,6 +405,82 @@ class VoiceService:
                 return f"Opening {host.removeprefix('www.')}…"
         return f"Opening {label}…"
 
+    def profile_context(self):
+        """Personal context for agents, such as home city and currency.
+
+        Maslow's central memory (Hermes built-in, Honcho or Hindsight, chosen in
+        Hub setup) is the intended source. Voice keeps no separate copy, so this
+        stays empty until that memory can be read here.
+        """
+        return {}
+
+    def web_task_text(self, words):
+        """Frame a spoken web task with facts the agent cannot know and fixed limits."""
+        now = time.localtime()
+        context = f"Today is {time.strftime('%A %d %B %Y', now)}, local time {time.strftime('%H:%M %Z', now)}."
+        for label, value in self.profile_context().items():
+            context += f" {label}: {value}."
+        return (f"Web task from Maslow Voice. {context} "
+                "Use the playwright MCP browser tools (browser_navigate, browser_snapshot, browser_click, browser_type) in the visible browser; "
+                "do not use the computer tool, scripts or a text-only web search. Resolve relative dates from today's date. "
+                "Browse and compare only: never buy, book, sign in, create accounts or enter payment or personal details; stop and say what is needed. "
+                "Finish with a short answer: the best three options with prices, dates and links. "
+                f"Request: {words}")
+
+    def watch_agent(self, agent):
+        if agent in self.agent_jobs:
+            return
+        self.agent_jobs.add(agent)
+        self.background(self._watch_agent(agent))
+
+    async def _watch_agent(self, agent, *, interval=3, quiet_needed=2, grace=20, limit=30 * 60):
+        """Follow a web task until the agent finishes, announcing decisions and the result."""
+        started = time.monotonic()
+        busy_seen = False
+        quiet = 0
+        announced_prompt = ""
+        try:
+            while time.monotonic() - started < limit:
+                await asyncio.sleep(interval)
+                state = await self.desktop.agent_state(agent)
+                if state["state"] == "closed":
+                    return
+                if state["state"] == "working":
+                    busy_seen, quiet = True, 0
+                elif state["state"] == "waiting":
+                    quiet = 0
+                    if state["prompt"] != announced_prompt:
+                        announced_prompt = state["prompt"]
+                        await self.agent_notice(agent, "waiting for a decision", state["prompt"])
+                elif busy_seen or time.monotonic() - started > grace:
+                    quiet += 1
+                    if quiet >= quiet_needed:
+                        await self.agent_notice(agent, "finished", state["screen"])
+                        return
+        except Exception:
+            self.audit.record("error", session_id=self.session["id"], code="AGENT_WATCH_FAILED")
+        finally:
+            self.agent_jobs.discard(agent)
+
+    async def agent_notice(self, agent, state, screen):
+        """Tell the person in conversation when possible, otherwise with a desktop notification."""
+        name = AGENT_NAMES.get(agent, "The agent")
+        provider = self.provider
+        if provider and self.settings.value["mode"] == "gemini_live" and hasattr(provider, "notify_task"):
+            content = json.dumps({"agent": name, "state": state,
+                                  "guidance": "Summarise the agent's answer for the person in a few spoken sentences.",
+                                  "screen": screen})
+            deadline = time.monotonic() + TASK_NOTICE_SECONDS
+            while self.provider is provider and time.monotonic() < deadline:
+                if await provider.notify_task(content):
+                    return
+                await asyncio.sleep(0.5)
+        message = f"{name} finished your web task." if state == "finished" else f"{name} is waiting for your decision."
+        try:
+            await self.desktop.run("omarchy-notification-send", "Maslow Voice", message)
+        except VoiceError:
+            pass
+
     APPROVE_WORDS = re.compile(r"\b(approve|approved|yes|yeah|yep|allow|accept|okay|ok|sure|proceed|confirm|go ahead|do it|trust it)\b")
     DENY_WORDS = re.compile(r"\b(deny|denied|no|nope|don't|dont|do not|reject|decline|cancel|block|refuse|stop)\b")
 
@@ -423,9 +500,9 @@ class VoiceService:
         if not isinstance(intent, dict):
             return "invalid"
         allowed = {"browser", "files", "hub", "terminal", "codex", "claude", "open", "close", "status", "show", "steer", "cancel",
-                   "continue", "show_result", "approve", "deny"}
+                   "continue", "show_result", "approve", "deny", "instruction", "web_task"}
         parts = [str(intent.get("operation", "submit"))]
-        for key in ("application", "action", "agent", "reply"):
+        for key in ("application", "action", "agent", "reply", "kind"):
             value = intent.get(key)
             if value:
                 parts.append(value if value in allowed else "other")
@@ -458,14 +535,15 @@ class VoiceService:
             if turn["mode"] != "gemini_live":
                 raise VoiceError("ACTION_UNAVAILABLE", "These conversation controls are available in Gemini Voice.")
             operation = intent.get("operation")
-            fields = {"desktop": {"operation", "application", "url", "action"}, "agent": {"operation", "agent", "text", "reply"},
+            fields = {"desktop": {"operation", "application", "url", "action"}, "agent": {"operation", "agent", "text", "reply", "kind"},
+                      "agent_status": {"operation", "agent"},
                       "task": {"operation", "action", "text"},
                       "submit": {"operation", "brief", "project_name", "new_project"}}
             if operation not in fields or set(intent) - fields[operation]:
                 raise VoiceError("INVALID_REQUEST", "The Voice action contains unsupported fields.")
             key = turn_id + ":" + hashlib.sha256(json.dumps(intent, sort_keys=True).encode()).hexdigest()
             # Status is a fresh read; all mutating tool retries reuse their receipt.
-            cacheable = not (operation == "task" and intent.get("action") == "status")
+            cacheable = not (operation == "task" and intent.get("action") == "status") and operation != "agent_status"
             if cacheable and key in self.action_receipts:
                 return self.action_receipts[key]
             if operation == "desktop" and intent.get("action", "open") == "close":
@@ -476,13 +554,23 @@ class VoiceService:
                     raise VoiceError("INVALID_REQUEST", "Desktop actions can open or close an application.")
                 await self.show_caption(self.action_caption(intent))
                 result = await self.desktop.open(intent.get("application"), intent.get("url") or None)
+            elif operation == "agent_status":
+                result = await self.desktop.agent_state(intent.get("agent"))
             elif operation == "agent":
+                kind = intent.get("kind", "instruction")
+                if kind not in {"instruction", "web_task"}:
+                    raise VoiceError("INVALID_REQUEST", "Agent requests are instructions or web tasks.")
                 if intent.get("reply"):
                     self.require_spoken_answer(intent["reply"], turn["source"])
                 await self.show_caption(self.action_caption(intent))
-                result = await self.desktop.tell(intent.get("agent"), intent.get("text", ""), intent.get("reply", ""))
+                text = intent.get("text", "")
+                if kind == "web_task" and not intent.get("reply"):
+                    text = self.web_task_text(text)
+                result = await self.desktop.tell(intent.get("agent"), text, intent.get("reply", ""))
                 if result.get("status") == "needs_answer":
                     await self.show_caption(f"{AGENT_NAMES.get(intent.get('agent'), 'The agent')} is waiting for your answer")
+                elif kind == "web_task" and result.get("status") == "sent":
+                    self.watch_agent(intent["agent"])
             elif operation == "submit":
                 if type(intent.get("new_project", False)) is not bool:
                     raise VoiceError("INVALID_REQUEST", "New project must be true or false.")
@@ -1288,7 +1376,8 @@ class VoiceService:
     def session_expired(self, now=None):
         now = time.monotonic() if now is None else now
         return (now - self.session_started >= 30 * 60
-                or (not self.voice.get("paused", False) and not self.voice.get("extended", False) and not self.voice["speaking"] and now - self.last_activity > self.settings.value["idle_seconds"]))
+                or (not self.voice.get("paused", False) and not self.voice.get("extended", False) and not self.voice["speaking"]
+                    and not self.agent_jobs and now - self.last_activity > self.settings.value["idle_seconds"]))
 
     async def maintenance(self):
         while True:

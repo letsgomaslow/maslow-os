@@ -207,6 +207,23 @@ class DesktopActions:
         await agent_terminal.type_line(self.run, agent, words)
         return {"agent": agent, "status": "sent", "verification": "keys_delivered"}
 
+    async def agent_state(self, agent):
+        """What the visible agent is doing now, read from its screen."""
+        if agent not in agent_terminal.AGENTS:
+            raise VoiceError("APPLICATION_NOT_ALLOWED", "Voice can check Codex or Claude Code.")
+        if not await agent_terminal.exists(self.run, agent):
+            return {"agent": agent, "state": "closed"}
+        text = await agent_terminal.screen(self.run, agent)
+        prompt = agent_terminal.pending_prompt(agent, text)
+        if prompt:
+            state = "waiting"
+        elif agent_terminal.BUSY in text:
+            state = "working"
+        else:
+            state = "idle"
+        tail = "\n".join(line.rstrip() for line in text.splitlines()[-25:] if line.strip())[-1500:]
+        return {"agent": agent, "state": state, "prompt": prompt, "screen": tail}
+
     async def focus(self, client):
         address = client.get("address", "")
         if not re.fullmatch(r"0x[0-9a-fA-F]+", address):

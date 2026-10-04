@@ -111,6 +111,58 @@ class MvpServiceTests(unittest.IsolatedAsyncioTestCase):
         await self.service.conversation_action(approve | {"reply": "deny"}, "no")
         self.assertEqual(self.service.desktop.tell.await_count, 2)
 
+    async def test_web_task_is_framed_by_the_daemon_and_followed(self):
+        self.service.desktop.tell.return_value = {"agent": "codex", "status": "sent"}
+        watched = []
+        self.service.watch_agent = watched.append
+        await self.service.conversation_action({"operation": "agent", "agent": "codex", "kind": "web_task", "reply": "",
+                                                "text": "find cheap flights from Newark to Austin next week or the week after"}, "first")
+        agent, text, reply = self.service.desktop.tell.await_args.args
+        self.assertEqual((agent, reply), ("codex", ""))
+        self.assertIn("Today is ", text)
+        self.assertIn("playwright", text)
+        self.assertIn("never buy, book, sign in", text)
+        self.assertTrue(text.endswith("Request: find cheap flights from Newark to Austin next week or the week after"))
+        self.assertEqual(watched, ["codex"])
+        words = "find cheap flights from Newark to Austin next week or the week after"
+        self.assertEqual(self.service.voice["action_caption"], "Telling Codex: " + words[:60] + "…")
+        with self.assertRaises(VoiceError):
+            await self.service.conversation_action({"operation": "agent", "agent": "codex", "kind": "shell", "text": "x", "reply": ""}, "first")
+
+    async def test_agent_status_is_always_a_fresh_read(self):
+        self.service.desktop.agent_state.return_value = {"agent": "codex", "state": "working", "screen": "• Working"}
+        for _ in range(2):
+            result = await self.service.conversation_action({"operation": "agent_status", "agent": "codex"}, "first")
+        self.assertEqual(result["state"], "working")
+        self.assertEqual(self.service.desktop.agent_state.await_count, 2)
+
+    async def test_watcher_announces_decisions_once_and_the_finished_answer(self):
+        states = [{"state": "working"}, {"state": "waiting", "prompt": "Allow the playwright MCP server"},
+                  {"state": "waiting", "prompt": "Allow the playwright MCP server"}, {"state": "working"},
+                  {"state": "idle", "screen": "Cheapest: $142"}, {"state": "idle", "screen": "Cheapest: $142"}]
+        self.service.desktop.agent_state.side_effect = states
+        notices = []
+        async def notice(agent, state, screen):
+            notices.append((agent, state, screen))
+        self.service.agent_notice = notice
+        self.service.agent_jobs.add("codex")
+        await self.service._watch_agent("codex", interval=0)
+        self.assertEqual(notices, [("codex", "waiting for a decision", "Allow the playwright MCP server"), ("codex", "finished", "Cheapest: $142")])
+        self.assertNotIn("codex", self.service.agent_jobs)
+
+    async def test_finished_notice_falls_back_to_a_desktop_notification(self):
+        self.service.provider = None
+        await self.service.agent_notice("codex", "finished", "Cheapest: $142")
+        self.service.desktop.run.assert_awaited_once_with("omarchy-notification-send", "Maslow Voice", "Codex finished your web task.")
+
+    def test_running_agent_keeps_a_quiet_conversation_open(self):
+        quiet = self.service.last_activity + self.service.settings.value["idle_seconds"] + 5
+        self.service.session_started = quiet - 60
+        self.assertTrue(self.service.session_expired(now=quiet))
+        self.service.agent_jobs.add("codex")
+        self.assertFalse(self.service.session_expired(now=quiet))
+        self.assertTrue(self.service.session_expired(now=self.service.session_started + 30 * 60))
+
     async def test_action_caption_fades_even_after_failure(self):
         self.service.desktop.open.side_effect = VoiceError("APPLICATION_NOT_OBSERVED", "no window")
         with patch("maslow_voice.daemon.asyncio.sleep", AsyncMock()):
