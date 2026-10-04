@@ -43,7 +43,9 @@ class GeminiPromptTests(unittest.TestCase):
                 provider = SimpleNamespace(config={"gemini_live_prompt": saved})
                 agent = create_agent(provider, self.Agents, self.BaseAgent())
                 self.assertTrue(agent.instructions.startswith(expected + " "))
-                self.assertIn("Use desktop_action to open Browser, Files, Hub, Terminal or Codex", agent.instructions)
+                self.assertIn("Use desktop_action to open Browser, Files, Hub, Terminal, Obsidian or Codex", agent.instructions)
+                self.assertIn("call write_note", agent.instructions)
+                self.assertIn("never summarise the content yourself", agent.instructions)
                 self.assertIn("Use submit_intent only for explicitly requested external work.", agent.instructions)
                 self.assertIn("Use task_control for progress, corrections, cancellation, continuation or results of the current job.", agent.instructions)
 
@@ -275,7 +277,8 @@ class GeminiSdkTests(unittest.IsolatedAsyncioTestCase):
         self.assertIsNotNone(model._opts.output_audio_transcription)
         schema = self.agents.ToolContext(self.provider._agent.tools).parse_function_tools("openai", strict=True)
         tools = {item["function"]["name"]: item["function"]["parameters"]["properties"] for item in schema}
-        self.assertEqual(set(tools), {"submit_intent", "desktop_action", "task_control", "tell_agent", "agent_status"})
+        self.assertEqual(set(tools), {"submit_intent", "desktop_action", "task_control", "tell_agent", "write_note", "agent_status"})
+        self.assertEqual(set(tools["write_note"]), {"request", "research"})
         self.assertEqual(set(tools["tell_agent"]), {"text", "agent", "reply", "kind", "job"})
         self.assertEqual(set(tools["agent_status"]), {"job", "show"})
         # Gemini Live refuses the whole session when any enum value is empty.

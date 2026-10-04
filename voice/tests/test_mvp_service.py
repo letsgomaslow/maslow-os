@@ -132,6 +132,101 @@ class MvpServiceTests(unittest.IsolatedAsyncioTestCase):
         with self.assertRaises(VoiceError):
             await self.service.conversation_action({"operation": "agent", "agent": "codex", "kind": "shell", "text": "x", "reply": ""}, "first")
 
+    async def test_note_job_writes_a_brief_from_the_whole_conversation_and_starts_in_the_vault(self):
+        vault = self.root / "Vault"
+        vault.mkdir()
+        self.service.notes_vault = lambda: vault
+        self.service.desktop.tell.side_effect = lambda seat, *args, **kwargs: {"agent": seat, "status": "sent"}
+        watched = []
+        self.service.watch_agent = lambda seat, **options: watched.append((seat, options))
+        note = {"operation": "note", "request": "write up this app idea and research how to launch it", "research": "yes"}
+        await self.turn("short", "Save this")
+        with self.assertRaises(VoiceError) as raised:
+            await self.service.conversation_action(note, "short")
+        self.assertEqual(raised.exception.code, "NOTE_NOTHING_TO_WRITE")
+        await self.turn("rant", "I keep thinking about an app for dog walkers with lots of dogs that plans the best routes and parks for them")
+        await self.service.provider_event({"type": "transcript", "role": "assistant", "text": "Who pays for it?", "final": True})
+        await self.turn("ask", "Put all of that in Obsidian and research the market")
+        result = await self.service.conversation_action(note, "ask")
+        (seat, line), options = self.service.desktop.tell.await_args
+        self.assertEqual((seat, result["job"], options["cwd"]), ("note-1", "note-1", vault))
+        self.assertEqual(options["title"], "Note: " + self.service.job_title(note["request"]))
+        brief = Path(line.split("brief at ", 1)[1].split(" and follow", 1)[0])
+        self.assertEqual(brief.parent, self.root / "state" / "notes")
+        text = brief.read_text()
+        self.assertIn("Person: I keep thinking about an app for dog walkers", text)
+        self.assertIn("Maslow: Who pays for it?", text)
+        self.assertIn(note["request"], text)
+        self.assertIn("The person asked for research", text)
+        self.assertEqual(watched, [("note-1", {"limit": 45 * 60})])
+        self.assertEqual(self.service.jobs["note-1"]["kind"], "note")
+        self.assertEqual(self.service.job_name("note-1"), "The note \"" + self.service.job_title(note["request"]) + "\"")
+        self.assertIn("Obsidian note note-1", self.service.briefing())
+        self.assertTrue(self.service.voice["action_caption"].startswith("Writing an Obsidian note: "))
+        # A second note takes the second seat; a third waits for one to finish.
+        await self.service.conversation_action(note | {"request": "make my plan for today"}, "ask")
+        with self.assertRaises(VoiceError) as raised:
+            await self.service.conversation_action(note | {"request": "and another"}, "ask")
+        self.assertEqual(raised.exception.code, "JOBS_FULL")
+        for bad in ({"research": "maybe"}, {"request": " "}, {"extra": 1}):
+            with self.assertRaises(VoiceError):
+                await self.service.conversation_action(note | bad, "ask")
+
+    async def test_first_note_in_a_vault_holds_its_instruction_until_trust_is_answered(self):
+        vault = self.root / "Vault"
+        vault.mkdir()
+        self.service.notes_vault = lambda: vault
+        trust = "Trust this folder? Codex can read, edit, and run files here"
+        self.service.desktop.tell.side_effect = [{"agent": "note-1", "status": "needs_answer", "prompt": trust},
+                                                 {"agent": "note-1", "status": "answered", "reply": "approve"},
+                                                 {"agent": "note-1", "status": "sent"}]
+        self.service.desktop.agent_state.return_value = {"state": "idle"}
+        watched = []
+        self.service.watch_agent = lambda seat, **options: watched.append(seat)
+        await self.turn("rant", "Plan my week around the launch, the hiring calls and finally fixing my sleep schedule please")
+        result = await self.service.conversation_action({"operation": "note", "request": "plan my week", "research": "no"}, "rant")
+        self.assertEqual((result["status"], self.service.jobs["note-1"]["state"]), ("needs_answer", "waiting"))
+        self.assertIn("reply approve and job note-1", result["note"])
+        instruction = self.service.jobs["note-1"]["pending"]
+        self.assertEqual(watched, [])
+        await self.turn("yes", "Yes, trust it")
+        result = await self.service.conversation_action({"operation": "agent", "agent": "codex", "text": "", "reply": "approve", "job": "note-1"}, "yes")
+        self.assertIn("job has started", result["note"])
+        self.assertEqual(self.service.desktop.tell.await_args.args[:2], ("note-1", instruction))
+        self.assertNotIn("pending", self.service.jobs["note-1"])
+        self.assertEqual((watched, self.service.jobs["note-1"]["state"]), (["note-1"], "working"))
+
+    async def test_declined_trust_ends_the_note_job(self):
+        vault = self.root / "Vault"
+        vault.mkdir()
+        self.service.notes_vault = lambda: vault
+        self.service.desktop.tell.side_effect = [{"agent": "note-1", "status": "needs_answer", "prompt": "Trust this folder?"},
+                                                 {"agent": "note-1", "status": "answered", "reply": "deny"}]
+        await self.turn("rant", "Plan my week around the launch, the hiring calls and finally fixing my sleep schedule please")
+        await self.service.conversation_action({"operation": "note", "request": "plan my week", "research": "no"}, "rant")
+        await self.turn("no", "No, don't")
+        result = await self.service.conversation_action({"operation": "agent", "agent": "codex", "text": "", "reply": "deny", "job": "note-1"}, "no")
+        self.assertEqual(result["note"], "The job was not started.")
+        self.service.desktop.end_seat.assert_awaited_once_with("note-1")
+        self.assertNotIn("note-1", self.service.jobs)
+
+    async def test_note_covers_a_conversation_that_just_ended(self):
+        vault = self.root / "Vault"
+        vault.mkdir()
+        self.service.notes_vault = lambda: vault
+        await self.turn("rant", "Today I need to finish the investor deck, call the accountant and stop doom scrolling at night")
+        await self.service.end_voice()
+        await self.service.start_voice(audio=False)
+        await self.turn("ask", "Turn what I said earlier into my plan for today")
+        self.service.desktop = AsyncMock()
+        self.service.desktop.tell.return_value = {"agent": "note-1", "status": "sent"}
+        self.service.watch_agent = lambda seat, **options: None
+        await self.service.conversation_action({"operation": "note", "request": "my plan for today", "research": "no"}, "ask")
+        line = self.service.desktop.tell.await_args.args[1]
+        text = Path(line.split("brief at ", 1)[1].split(" and follow", 1)[0]).read_text()
+        self.assertIn("finish the investor deck", text)
+        self.assertIn("Turn what I said earlier into my plan for today", text)
+
     async def test_separate_web_tasks_get_separate_seats_and_corrections_stay_with_their_job(self):
         self.service.desktop.tell.side_effect = lambda seat, *args, **kwargs: {"agent": seat, "status": "sent"}
         self.service.watch_agent = lambda seat: None

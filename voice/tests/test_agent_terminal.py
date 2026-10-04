@@ -282,6 +282,46 @@ class AgentTerminalTests(unittest.IsolatedAsyncioTestCase):
         with self.assertRaises(VoiceError):
             await DesktopActions(fake.run).close("web-9")
 
+    async def test_a_question_shown_after_startup_holds_the_words(self):
+        trust = "  Trust this folder? Codex can read, edit, and run files here\n› 1. Trust and continue\n  enter continue · esc back"
+        fake = FakeDesktop(screens=["", "", "  Loading", trust], screen=trust)
+        with patch.object(agent_terminal, "INPUT_WAIT", 3):
+            receipt = await self.desktop(fake).tell("codex", "write the note")
+        self.assertEqual(receipt["status"], "needs_answer")
+        self.assertIn("Trust this folder?", receipt["prompt"])
+        self.assertEqual(fake.pasted(), [])
+        self.assertEqual(fake.keys(), [])
+
+    def test_trust_dialog_is_accepted_with_enter_and_other_answers_keep_their_keys(self):
+        trust = "Trust this folder? Codex can read, edit, and run files here"
+        self.assertEqual(agent_terminal.answer_key("note-1", "approve", trust), "Enter")
+        self.assertEqual(agent_terminal.answer_key("codex", "approve", trust), "Enter")
+        self.assertEqual(agent_terminal.answer_key("note-1", "deny", trust), "Escape")
+        self.assertEqual(agent_terminal.answer_key("codex", "approve", "Would you like to run the following command?"), "y")
+        self.assertEqual(agent_terminal.answer_key("claude", "approve", "Yes, I trust this folder"), "1")
+
+    async def test_note_seats_start_codex_in_the_given_vault(self):
+        fake = FakeDesktop(window="maslow.voice.note-1")
+        started = set()
+        original = fake.run
+        async def run(*args):
+            if "has-session" in args and "=maslow-note-1" not in started:
+                raise VoiceError("DESKTOP_FAILED", "no session")
+            if "new-session" in args and "-d" in args:
+                started.add("=maslow-note-1")
+                fake.calls.append(args)
+                return ""
+            return await original(*args)
+        vault = Path(self.temp.name) / "Vault"
+        desktop = DesktopActions(run, timeout=0.5, agent_cwd=Path(self.temp.name) / "Maslow Voice")
+        receipt = await desktop.tell("note-1", "Read the brief", title="Note: plan", cwd=vault)
+        self.assertEqual(receipt["status"], "sent")
+        start = next(call for call in fake.calls if "new-session" in call)
+        self.assertEqual(start[start.index("-c"):], ("-c", str(vault), "--", "codex"))
+        self.assertEqual(agent_terminal.NAMES["note-1"], "Codex note writer 1")
+        await desktop.end_seat("note-1")
+        self.assertTrue(any("kill-session" in call and "=maslow-note-1" in call for call in fake.calls))
+
     async def test_answer_without_a_waiting_prompt_sends_nothing(self):
         fake = FakeDesktop()
         with self.assertRaisesRegex(VoiceError, "not waiting"):

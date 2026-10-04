@@ -22,13 +22,17 @@ AGENTS = {"codex": ("codex",), "claude": ("claude",)}
 # interactive seat; every web task gets its own Codex seat and browser so
 # separate requests never interrupt each other.
 WEB_SEATS = ("web-1", "web-2", "web-3")
-SEATS = (*AGENTS, *WEB_SEATS)
-NAMES = {"codex": "Codex", "claude": "Claude Code"} | {seat: "Codex web task " + seat[-1] for seat in WEB_SEATS}
+# Note seats run Codex inside the Obsidian vault, writing notes from a brief.
+NOTE_SEATS = ("note-1", "note-2")
+BACKGROUND_SEATS = (*WEB_SEATS, *NOTE_SEATS)
+SEATS = (*AGENTS, *BACKGROUND_SEATS)
+NAMES = ({"codex": "Codex", "claude": "Claude Code"} | {seat: "Codex web task " + seat[-1] for seat in WEB_SEATS}
+         | {seat: "Codex note writer " + seat[-1] for seat in NOTE_SEATS})
 
 
 def program(seat):
     """The agent program running in a seat."""
-    return "codex" if seat in WEB_SEATS else seat
+    return "codex" if seat in BACKGROUND_SEATS else seat
 # Text the agent shows while it waits for a decision, taken from the installed
 # binaries. Typing into one of these screens would pick an option, so words are
 # held until the person answers.
@@ -56,12 +60,15 @@ INPUT_READY = {"codex": ("for shortcuts",), "claude": ("❯",)}
 # One fixed key per answer: the first, one-time option or cancel. "Always" and
 # "for this session" options are never sent.
 KEYS = {"codex": {"approve": "y", "deny": "Escape"}, "claude": {"approve": "1", "deny": "Escape"}}
+# Codex's folder trust dialog ignores "y" and "1"; Enter accepts its first
+# option, "Trust and continue". Escape still goes back.
+TRUST = "Trust this folder?"
 MAX_TEXT = 2000
 ENTER_DELAY = 0.25
 DELIVERY_WAIT = 8  # Long requests take Codex a few seconds to echo.
 INPUT_WAIT = 20  # Codex can take several seconds to start its tools.
 STABLE_READS = 6  # About 1.5 seconds of an unchanged screen.
-WIDTH, HEIGHT = 160, 48  # Background web task seats.
+WIDTH, HEIGHT = 160, 48  # Background web task and note seats.
 
 
 def session(agent):
@@ -162,6 +169,23 @@ async def input_ready(run, agent, wait=0):
         await asyncio.sleep(0.25)
 
 
+async def settled_screen(run, agent, wait=0):
+    """The screen once the agent shows its input box or a decision.
+
+    A freshly started agent can show a question, such as Codex's folder trust
+    dialog, a few seconds after its pane exists. Checking earlier would miss
+    it and then wait for an input box that never appears.
+    """
+    deadline = asyncio.get_running_loop().time() + wait
+    while True:
+        text = await screen(run, agent)
+        if pending_prompt(agent, text) or any(marker in text for marker in INPUT_READY[program(agent)]) or BUSY in text:
+            return text
+        if asyncio.get_running_loop().time() >= deadline:
+            return text
+        await asyncio.sleep(0.25)
+
+
 def flat(text):
     return " ".join(text.split())
 
@@ -229,5 +253,11 @@ async def type_line(run, agent, text):
     raise VoiceError("NOT_DELIVERED", "The words may not have reached the agent. Check its window before trying again.")
 
 
-async def press(run, agent, reply):
-    await run(*tmux("send-keys", "-t", target(agent), KEYS[program(agent)][reply]))
+def answer_key(agent, reply, prompt=""):
+    if reply == "approve" and program(agent) == "codex" and TRUST in prompt:
+        return "Enter"
+    return KEYS[program(agent)][reply]
+
+
+async def press(run, agent, reply, prompt=""):
+    await run(*tmux("send-keys", "-t", target(agent), answer_key(agent, reply, prompt)))

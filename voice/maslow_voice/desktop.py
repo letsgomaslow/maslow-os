@@ -34,7 +34,7 @@ async def command(*argv):
 
 
 class DesktopActions:
-    APPLICATIONS = {"browser", "files", "hub", "terminal", "codex", "claude"}
+    APPLICATIONS = {"browser", "files", "hub", "terminal", "codex", "claude", "obsidian"}
 
     def __init__(self, run=command, *, timeout=8, agent_cwd=None):
         self.run = run
@@ -70,12 +70,13 @@ class DesktopActions:
                 break
         return names
 
-    async def open(self, application, url=None, *, title=None, view=False):
-        # Web task seats are opened only by Voice itself. They run in the
-        # background at a fixed size: the browser is what the person watches,
-        # and Voice always has a full screen to read. view attaches a window.
-        if not isinstance(application, str) or application.casefold() not in self.APPLICATIONS | set(agent_terminal.WEB_SEATS):
-            raise VoiceError("APPLICATION_NOT_ALLOWED", "Voice can open Browser, Files, Hub, Terminal, Codex, or Claude Code.")
+    async def open(self, application, url=None, *, title=None, view=False, cwd=None):
+        # Web task and note seats are opened only by Voice itself. They run in
+        # the background at a fixed size: the browser or vault is what the
+        # person watches, and Voice always has a full screen to read. view
+        # attaches a window. cwd starts a new background seat in that folder.
+        if not isinstance(application, str) or application.casefold() not in self.APPLICATIONS | set(agent_terminal.BACKGROUND_SEATS):
+            raise VoiceError("APPLICATION_NOT_ALLOWED", "Voice can open Browser, Files, Hub, Terminal, Obsidian, Codex, or Claude Code.")
         application = application.casefold()
         if url is not None:
             if application != "browser":
@@ -87,13 +88,16 @@ class DesktopActions:
             raise VoiceError("CLAUDE_MISSING", "Claude Code is not installed. Open Hub setup to install or repair it.")
         if application in agent_terminal.SEATS and not shutil.which("tmux"):
             raise VoiceError("APPLICATION_UNAVAILABLE", "Voice needs tmux to keep coding agents visible. Install tmux and try again.")
-        if application in agent_terminal.WEB_SEATS and not view:
+        if application == "obsidian" and not shutil.which("obsidian"):
+            raise VoiceError("APPLICATION_UNAVAILABLE", "Obsidian is not installed.")
+        if application in agent_terminal.BACKGROUND_SEATS and not view:
             async with self.lock:
                 if not await agent_terminal.exists(self.run, application):
                     # Start through uwsm-app so the tmux server gets its own desktop
                     # scope. Started directly, it would belong to the Voice
                     # service and be stopped with it on every update.
-                    await self.run("setsid", "-f", "uwsm-app", "--", *agent_terminal.detached_argv(application, self.agent_folder()))
+                    folder = Path(cwd) if cwd else self.agent_folder()
+                    await self.run("setsid", "-f", "uwsm-app", "--", *agent_terminal.detached_argv(application, folder))
                     deadline = time.monotonic() + self.timeout
                     while not await agent_terminal.exists(self.run, application):
                         if time.monotonic() >= deadline:
@@ -135,6 +139,8 @@ class DesktopActions:
                 # validate_url guarantees an http(s) scheme, so the address can
                 # never be read as a browser option.
                 await self.run("setsid", "-f", "omarchy-launch-browser", *([url] if url else []))
+            elif application == "obsidian":
+                await self.run("setsid", "-f", "uwsm-app", "--", "obsidian")
             else:
                 await self.run("setsid", "-f", "omarchy-launch-nautilus")
             deadline = time.monotonic() + self.timeout
@@ -152,7 +158,7 @@ class DesktopActions:
     async def matcher(self, application):
         classes = await self.browser_classes() if application == "browser" else {
             "files": {"org.gnome.nautilus"}, "terminal": {"maslow.voice.terminal"},
-            "codex": {"maslow.voice.codex"}, "claude": {"maslow.voice.claude"},
+            "codex": {"maslow.voice.codex"}, "claude": {"maslow.voice.claude"}, "obsidian": {"obsidian", "md.obsidian.obsidian"},
         }.get(application) or {"maslow.voice." + application}
         def matching(client):
             return bool(client.get("mapped", True)) and any(str(client.get(key, "")).casefold() in classes for key in ("class", "initialClass"))
@@ -161,7 +167,7 @@ class DesktopActions:
     async def close(self, application):
         """Close one window of an allowlisted application: the one Voice opened, else the most recently used."""
         if not isinstance(application, str) or application.casefold() not in self.APPLICATIONS:
-            raise VoiceError("APPLICATION_NOT_ALLOWED", "Voice can close Browser, Files, Terminal, Codex, or Claude Code.")
+            raise VoiceError("APPLICATION_NOT_ALLOWED", "Voice can close Browser, Files, Terminal, Obsidian, Codex, or Claude Code.")
         application = application.casefold()
         if application == "hub":
             raise VoiceError("APPLICATION_NOT_ALLOWED", "Close Hub from its own window.")
@@ -196,7 +202,7 @@ class DesktopActions:
         self.agent_cwd.mkdir(parents=True, exist_ok=True)
         return self.agent_cwd
 
-    async def tell(self, agent, text="", reply="", *, title=None, busy_ok=True):
+    async def tell(self, agent, text="", reply="", *, title=None, busy_ok=True, cwd=None):
         """Type the person's words into the visible agent, or answer its waiting prompt."""
         if agent not in agent_terminal.SEATS:
             raise VoiceError("APPLICATION_NOT_ALLOWED", "Voice can talk to Codex or Claude Code.")
@@ -205,17 +211,17 @@ class DesktopActions:
         words = "" if reply else agent_terminal.clean(text)
         # Opening first keeps the agent on screen, reattaching a session whose
         # window was closed, so nothing is typed out of sight.
-        await self.open(agent, title=title)
+        await self.open(agent, title=title, cwd=cwd)
         name = agent_terminal.NAMES[agent]
         if not await agent_terminal.ready(self.run, agent, self.timeout):
             raise VoiceError("AGENT_NOT_READY", f"{name} is not ready in its terminal yet. Check its window and try again.")
-        prompt = agent_terminal.pending_prompt(agent, await agent_terminal.screen(self.run, agent))
+        prompt = agent_terminal.pending_prompt(agent, await agent_terminal.settled_screen(self.run, agent, agent_terminal.INPUT_WAIT))
         if reply:
             if not prompt:
                 raise VoiceError("NO_PENDING_PROMPT", f"{name} is not waiting for an answer.")
             if any(marker in prompt for marker in agent_terminal.WINDOW_ONLY[agent_terminal.program(agent)]):
                 raise VoiceError("ANSWER_IN_WINDOW", f"{name} would remember this answer permanently. Answer it in the {name} window.")
-            await agent_terminal.press(self.run, agent, reply)
+            await agent_terminal.press(self.run, agent, reply, prompt)
             return {"agent": agent, "status": "answered", "reply": reply, "verification": "keys_delivered"}
         if prompt:
             # Never type words into a decision screen; they could pick an option.
@@ -229,8 +235,8 @@ class DesktopActions:
         return {"agent": agent, "status": "sent", "verification": "keys_delivered"}
 
     async def end_seat(self, seat):
-        """End a finished web task's session so its seat can take a new job."""
-        if seat not in agent_terminal.WEB_SEATS:
+        """End a finished background job's session so its seat can take a new job."""
+        if seat not in agent_terminal.BACKGROUND_SEATS:
             raise VoiceError("APPLICATION_NOT_ALLOWED", "Only web task seats are reused.")
         if await agent_terminal.exists(self.run, seat):
             await self.run(*agent_terminal.tmux("kill-session", "-t", "=" + agent_terminal.session(seat)))
