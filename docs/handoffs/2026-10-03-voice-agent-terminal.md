@@ -56,11 +56,38 @@ Date: 2026-10-03. Goal: make Maslow Voice useful beyond conversation while keepi
   - The GPU shader path and the 56 px orb size were not rendered.
 - The full `./test/all` aggregate was not rerun. The runtime-smoke lockscreen failure from the merge handoff remains unresolved and is unrelated to these files.
 
+## Live Lenovo test (source checkout through the installed service)
+
+The installed `maslow-voice 0.1.5-18` service ran the source checkout through a temporary runtime drop-in, `/run/user/1000/systemd/user/maslow-voice.service.d/source-test.conf`, which sets `PYTHONPATH` to `voice/`. No installed files changed; the installed orb UI was used, so captions were not visible.
+
+- **First attempt failed.** Every Gemini session was refused at setup: `function_declarations[3].parameters.properties[reply].enum[0]: cannot be empty`.
+  - The OpenAI-format schema test missed it.
+  - Fixed in `24a27547`: "no answer" is now `none`, and a Google-format schema test rejects empty enum values.
+- **Person-reported results:**
+  - "go to github.com" and "search for tmux" worked.
+  - "Open Codex" with the trust prompt answered worked.
+  - "Tell Codex to list the files in this folder" was typed and submitted once.
+  - Close and reopen reattached the same session.
+- **Missing feature found:** closing windows. Added in `c0e9838f`, along with a per-action journal line.
+- **Journal evidence (21:59–22:07 local):**
+  - `desktop codex: opened`
+  - `desktop codex close: closed`
+  - `agent codex: sent`
+  - `agent codex approve: answered`
+  - `desktop codex close: closed`
+- **Codex screen evidence:**
+  - The sandbox blocked `curl -I example.com` ("Could not resolve host").
+  - The spoken approval produced "You approved codex to run curl -I example.com this time", confirming `y` maps to the one-time option.
+  - The rerun returned HTTP 200.
+- **Open observations:**
+  - "Close the browser" produced no action line.
+  - Gemini rewrote the spoken request into a literal command instead of passing the words through.
+
 ## Not verified
 
 - No live Gemini conversation called the new tools.
 - No real Codex session received typed text or approval keys.
-- The paste-burst delay and the approve key `y` need confirming in a live Codex session.
+- The approve key `y` is now confirmed live. The 0.25-second Enter delay worked for short requests; long dictation is untested.
 - Prompt detection reads the screen, so a Codex TUI change can break the markers. A missed marker means words could land on a decision screen.
 - Claude Code is deliberately not reachable through `tell_agent` until its prompt text ("Do you want to proceed?", "Yes, I trust this folder") and keys are confirmed.
 - Playwright MCP was not run, and the headed browser from the tmux-started agent is unverified.
