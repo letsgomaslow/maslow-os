@@ -1,6 +1,6 @@
 # Voice websites, visible Codex terminal and action captions
 
-Date: 2026-10-03. Goal: make Maslow Voice useful beyond conversation while keeping the design simple. Voice now opens websites, talks to a Codex session the person can watch, names each action on the orb before it runs, and can hand web tasks to an agent-driven visible browser. Source is committed on local branch `voice-agent-terminal` in `maslow-os` and in `maslow-os-pkgs`. Nothing is pushed, merged, packaged, installed or published.
+Date: 2026-10-03. Goal: make Maslow Voice useful beyond conversation while keeping the design simple. Voice now opens websites, talks to a Codex session the person can watch, names each action on the orb before it runs, and can hand web tasks to an agent-driven visible browser. Source is committed on local branch `voice-agent-terminal` in `maslow-os` and in `maslow-os-pkgs`. Nothing is pushed, merged or published; `0.1.5-20` is installed locally on the Lenovo only.
 
 ## Commits
 
@@ -83,13 +83,31 @@ The installed `maslow-voice 0.1.5-18` service ran the source checkout through a 
   - "Close the browser" produced no action line.
   - Gemini rewrote the spoken request into a literal command instead of passing the words through.
 
+## Claude Code, guidance fixes and local install
+
+- **`18780937`:**
+  - Adds Claude Code: session `maslow-claude`, class `maslow.voice.claude`, approve `1`, deny `Escape`.
+  - Tells the model to pass the person's own words as plain-language instructions and to use `action close` for windows.
+  - Holds typing only for dialog-specific text. Claude's generic "Do you want to…" counts only with a following `1. Yes` option, so ordinary questions in replies no longer block typing.
+  - Pinned suite: 388 tests passed (two expected skips).
+- **Build:** `maslow-voice 0.1.5-20` was built in the existing builder (`makepkg -d`, because only the runtime `tmux` dependency was absent there).
+  - Frozen inputs: runtime `git archive` of `18780937` and recipe `3b690c9`.
+  - `check()` passed. Archive SHA-256 `d178212b6b968c4eaf143fd4c66bda83e572edaf804b74d273fb8047a6fdb161`.
+  - `.PKGINFO` lists `tmux`. Packaged `agent_terminal.py`, `desktop.py`, `daemon.py`, `gemini_tools.py` and `Panel.qml` match the frozen source.
+- **Install:** installed locally with `pkexec pacman -U`.
+  - The temporary source drop-in was then removed. The service runs `PYTHONPATH=/usr/lib/maslow-voice`.
+  - `pacman -Qkk` reports zero altered files among 9123.
+  - The queued plugin refresh was consumed by the packaged launcher, and the 0.1.5-20 Panel was inspected on screen.
+  - Rollback archive: `voice-mvp-build/voice-theme/maslow-voice-0.1.5-18-x86_64.pkg.tar.zst`.
+  - Build and install logs: `voice-mvp-build/voice-agent-terminal/`.
+
 ## Not verified
 
 - No live Gemini conversation called the new tools.
 - No real Codex session received typed text or approval keys.
 - The approve key `y` is now confirmed live. The 0.25-second Enter delay worked for short requests; long dictation is untested.
 - Prompt detection reads the screen, so a Codex TUI change can break the markers. A missed marker means words could land on a decision screen.
-- Claude Code is deliberately not reachable through `tell_agent` until its prompt text ("Do you want to proceed?", "Yes, I trust this folder") and keys are confirmed.
+- Claude Code's dialog text and keys (`1`, `Escape`) are taken from its binary and still need a live test.
 - Playwright MCP was not run, and the headed browser from the tmux-started agent is unverified.
 - Package build, install and rollback were not done.
 
