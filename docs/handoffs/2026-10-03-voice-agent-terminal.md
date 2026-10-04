@@ -119,6 +119,39 @@ The installed `maslow-voice 0.1.5-18` service ran the source checkout through a 
   - Installed with `pkexec`. Integrity reports 0 altered files among 9123. The plugin refreshed to `0.1.5-21/Panel.qml`.
   - Logs: `voice-mvp-build/voice-agent-terminal-21/`.
 
+## Web tasks through Codex and Playwright (0.1.5-22)
+
+Design decisions:
+- Gemini stays the decision model; no separate router.
+- Web tasks go to Codex with Playwright in a visible, isolated browser.
+- Browsing steps are pre-approved, as the person chose.
+- Personal context is to come from Maslow's central memory (Hermes built-in, Honcho or Hindsight); Voice keeps no copy, so `profile_context()` is an empty hook for now.
+
+Live Codex 0.157.1 findings, observed directly through Voice's tmux session:
+
+- **Built-in browser:** Codex's built-in computer and browser tool fails in the CLI with `CUA_REPL_ENABLED_SURFACES is required`. Playwright is therefore the path.
+- **Headless until the display was forwarded:** Playwright ran without a window until `env_vars = ["WAYLAND_DISPLAY", "DISPLAY", "XDG_RUNTIME_DIR"]` was added. A visible "Example Domain – Google Chrome" window was then observed.
+- **Approvals saved as permanent:** selecting "1. Allow" (Enter on the highlighted once-option) on an MCP tool dialog wrote `approval_mode = "approve"` to `~/.codex/config.toml`. The saved approvals were removed (backup in the session scratchpad). Voice now holds words on these dialogs and refuses spoken answers (`ANSWER_IN_WINDOW`).
+- **Inconsistent tool choice:** without explicit tool names, Codex tried the computer tool, Node scripts and text web search. The web-task frame now names the playwright MCP tools.
+- **Words left unsent in three cases:**
+  - the transcript was scrolled, so Enter only returned to the latest messages;
+  - Codex was starting, showing "tab to queue message";
+  - long dictation, where Enter became a newline.
+- **Window switched to Claude:** a session ending moved its window onto Claude's session, because of the person's `detach-on-destroy off`.
+- **Fixed in `ccdea17b`:**
+  - a private `tmux.conf`;
+  - one bracketed paste with confirmed submission;
+  - no key presses after a decision appears;
+  - replacement of stale windows.
+  - A long multi-clause message then submitted first time live.
+- `5256bbac` adds web-task framing, the watcher, keeping the session open, spoken or notified results, `agent_status`, the isolated pre-approved setup and `voice/dev/route_eval.py`. Pinned suite: 400 tests passed (two expected skips).
+- **Routing check** (`route_eval.py`, `gemini-flash-latest` standing in for Live): all 15 answered requests routed as expected, including the flight request as `tell_agent:web_task`, plus opens, closes and talk. The remaining 15 hit the key's quota (`429 RESOURCE_EXHAUSTED`) and are untested, not failed.
+- **Package:** recipe `0ea9677` advances to `0.1.5-22`, built from a `git archive` of `5256bbac`.
+  - Archive SHA-256 `b25770dc0fdce7b1531d1722963773112924aa065fa602137be1b4ed466e36a5`; includes `tmux.conf`.
+  - Installed with `pkexec`: 0 altered files among 9124. The plugin refreshed to `0.1.5-22/Panel.qml`.
+  - Voice's tmux server was restarted to load its configuration.
+- **Setup command not yet installed:** the updated `omarchy-setup-voice-browser` belongs to the runtime package and is not installed. Run it from the source checkout. The current Codex entry is the earlier non-isolated server with display forwarding and no saved approvals.
+
 ## Not verified
 
 - No live Gemini conversation called the new tools.

@@ -27,7 +27,7 @@ Hub's Voice page is the installation and readiness entry point. It reads a reduc
 - "Open Codex" shows Codex in a terminal window that Voice can talk to. Closing the window keeps Codex running, and the next "open Codex" brings the same session back.
 - "Tell Codex to add a dark mode toggle" types those words into Codex and submits them, so you can watch Codex work. "Open Claude" and "tell Claude to …" work the same way with Claude Code.
 - When Codex asks for a decision, Voice reads it out and waits. Say "approve" or "deny"; Voice sends a one-time answer only, never "always allow".
-- Web tasks such as "tell Codex to find the cheapest flight on that site" work after running `omarchy setup voice browser`, which adds a visible browser tool to Codex and Claude Code once you confirm.
+- Web tasks such as "find cheap flights from Newark to Austin next week or the week after" work after running `omarchy setup voice browser`. Codex browses in a visible window with a fresh profile, Voice tells you it is working, and reports the best options when it finishes, or sends a notification if the conversation has ended. Ask "how is Codex doing?" any time. Codex never buys, books or signs in; it stops and tells you what is needed.
 - The orb's status line names each action as it starts, for example "Opening github.com…" or "Telling Codex: …".
 
 ## Conversation modes
