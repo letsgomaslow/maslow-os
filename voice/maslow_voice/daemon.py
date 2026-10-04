@@ -56,8 +56,8 @@ class VoiceService:
                       "input_level": 0, "playback_level": 0, "interruption_sequence": 0}
         self.readiness = {"ready": False, "checks": [], "models": [],
                           "conversation": {"ready": False, "checks": []}, "tasks": {"ready": False, "checks": []}}
-        self.desktop = DesktopActions()
         self.workspaces = WorkspaceResolver(self.directory, self.store)
+        self.desktop = DesktopActions(agent_cwd=self.workspaces.root)
         self.action_lock = asyncio.Lock()
         self.action_receipts = {}
         self.caption_sequence = 0
@@ -380,6 +380,12 @@ class VoiceService:
     @staticmethod
     def action_caption(intent):
         # Captions are composed here from validated fields, never by the model.
+        if intent.get("operation") == "agent":
+            reply = intent.get("reply")
+            if reply:
+                return "Approving in Codex…" if reply == "approve" else "Declining in Codex…"
+            words = " ".join(str(intent.get("text", "")).split())
+            return "Telling Codex: " + (words[:60] + "…" if len(words) > 60 else words)
         application = str(intent.get("application", ""))
         url = intent.get("url")
         if url:
@@ -416,7 +422,8 @@ class VoiceService:
             if turn["mode"] != "gemini_live":
                 raise VoiceError("ACTION_UNAVAILABLE", "These conversation controls are available in Gemini Voice.")
             operation = intent.get("operation")
-            fields = {"desktop": {"operation", "application", "url"}, "task": {"operation", "action", "text"},
+            fields = {"desktop": {"operation", "application", "url"}, "agent": {"operation", "agent", "text", "reply"},
+                      "task": {"operation", "action", "text"},
                       "submit": {"operation", "brief", "project_name", "new_project"}}
             if operation not in fields or set(intent) - fields[operation]:
                 raise VoiceError("INVALID_REQUEST", "The Voice action contains unsupported fields.")
@@ -428,6 +435,11 @@ class VoiceService:
             if operation == "desktop":
                 await self.show_caption(self.action_caption(intent))
                 result = await self.desktop.open(intent.get("application"), intent.get("url") or None)
+            elif operation == "agent":
+                await self.show_caption(self.action_caption(intent))
+                result = await self.desktop.tell(intent.get("agent"), intent.get("text", ""), intent.get("reply", ""))
+                if result.get("status") == "needs_answer":
+                    await self.show_caption("Codex is waiting for your answer")
             elif operation == "submit":
                 if type(intent.get("new_project", False)) is not bool:
                     raise VoiceError("INVALID_REQUEST", "New project must be true or false.")

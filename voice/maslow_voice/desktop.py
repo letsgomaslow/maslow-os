@@ -9,6 +9,7 @@ import shutil
 import time
 from pathlib import Path
 
+from . import agent_terminal
 from .errors import VoiceError
 from .execution import validate_url
 
@@ -35,9 +36,10 @@ async def command(*argv):
 class DesktopActions:
     APPLICATIONS = {"browser", "files", "hub", "terminal", "codex"}
 
-    def __init__(self, run=command, *, timeout=8):
+    def __init__(self, run=command, *, timeout=8, agent_cwd=None):
         self.run = run
         self.timeout = timeout
+        self.agent_cwd = Path(agent_cwd) if agent_cwd else Path.home() / "Projects" / "Maslow Voice"
         self.windows = {}
         self.lock = asyncio.Lock()
 
@@ -78,6 +80,8 @@ class DesktopActions:
             url = validate_url(url)
         if application == "codex" and not shutil.which("codex"):
             raise VoiceError("CODEX_MISSING", "Codex is not installed. Open Hub setup to install or repair it.")
+        if application in agent_terminal.AGENTS and not shutil.which("tmux"):
+            raise VoiceError("APPLICATION_UNAVAILABLE", "Voice needs tmux to keep Codex visible. Install tmux and try again.")
         async with self.lock:
             # Hub is a Quickshell surface, not a Hyprland client. Successful IPC
             # means its summon was accepted; do not invent window-ready evidence.
@@ -101,8 +105,10 @@ class DesktopActions:
                 return {"application": application, "status": "focused", "verification": "window_observed"}
             if application in {"terminal", "codex"}:
                 argv = ["uwsm-app", "--", "xdg-terminal-exec", f"--app-id=maslow.voice.{application}", "--title=Maslow " + application.title()]
-                if application == "codex":
-                    argv += ["--", "codex"]
+                if application in agent_terminal.AGENTS:
+                    # Attach to the running agent, or start it here so it
+                    # inherits this desktop session's environment.
+                    argv += ["--", *agent_terminal.attach_argv(application, self.agent_folder())]
                 # Terminal processes remain attached. Detach through setsid -f;
                 # the observable window, not this helper's exit, is the receipt.
                 await self.run("setsid", "-f", *argv)
@@ -123,6 +129,39 @@ class DesktopActions:
                 if time.monotonic() >= deadline:
                     raise VoiceError("APPLICATION_NOT_OBSERVED", "The launch was requested, but its window did not appear. Check the desktop before trying again.")
                 await asyncio.sleep(0.1)
+
+    def agent_folder(self):
+        # The same managed root as Voice projects, with the same refusal of
+        # redirected folders.
+        if any(parent.is_symlink() for parent in (self.agent_cwd, *self.agent_cwd.parents)):
+            raise VoiceError("UNSAFE_PROJECT", "The managed Voice project folder cannot use symbolic links.")
+        self.agent_cwd.mkdir(parents=True, exist_ok=True)
+        return self.agent_cwd
+
+    async def tell(self, agent, text="", reply=""):
+        """Type the person's words into the visible agent, or answer its waiting prompt."""
+        if agent not in agent_terminal.AGENTS:
+            raise VoiceError("APPLICATION_NOT_ALLOWED", "Voice can talk to Codex.")
+        if reply not in {"", *agent_terminal.KEYS[agent]}:
+            raise VoiceError("INVALID_REQUEST", "Answer with approve or deny.")
+        words = "" if reply else agent_terminal.clean(text)
+        # Opening first keeps the agent on screen, reattaching a session whose
+        # window was closed, so nothing is typed out of sight.
+        await self.open(agent)
+        if not await agent_terminal.ready(self.run, agent, self.timeout):
+            raise VoiceError("AGENT_NOT_READY", "Codex is not ready in its terminal yet. Check its window and try again.")
+        prompt = agent_terminal.pending_prompt(agent, await agent_terminal.screen(self.run, agent))
+        if reply:
+            if not prompt:
+                raise VoiceError("NO_PENDING_PROMPT", "Codex is not waiting for an answer.")
+            await agent_terminal.press(self.run, agent, reply)
+            return {"agent": agent, "status": "answered", "reply": reply, "verification": "keys_delivered"}
+        if prompt:
+            # Never type words into a decision screen; they could pick an option.
+            return {"agent": agent, "status": "needs_answer", "prompt": prompt,
+                    "message": "Codex is waiting for a decision. Nothing was typed."}
+        await agent_terminal.type_line(self.run, agent, words)
+        return {"agent": agent, "status": "sent", "verification": "keys_delivered"}
 
     async def focus(self, client):
         address = client.get("address", "")

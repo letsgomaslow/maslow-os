@@ -56,6 +56,27 @@ class MvpServiceTests(unittest.IsolatedAsyncioTestCase):
         with self.assertRaisesRegex(VoiceError, "unsupported fields"):
             await self.service.conversation_action({"operation": "desktop", "application": "browser", "text": "hi"}, "first")
 
+    async def test_agent_words_are_captioned_once_and_retries_reuse_the_receipt(self):
+        seen = []
+        async def tell(agent, text, reply):
+            seen.append((agent, text, reply, self.service.voice.get("action_caption")))
+            return {"agent": agent, "status": "sent"}
+        self.service.desktop.tell.side_effect = tell
+        action = {"operation": "agent", "agent": "codex", "text": "add a dark mode toggle", "reply": ""}
+        await self.service.conversation_action(action, "first")
+        await self.service.conversation_action(action, "first")
+        self.assertEqual(seen, [("codex", "add a dark mode toggle", "", "Telling Codex: add a dark mode toggle")])
+        with self.assertRaisesRegex(VoiceError, "unsupported fields"):
+            await self.service.conversation_action(action | {"application": "terminal"}, "first")
+
+    async def test_waiting_agent_prompt_is_shown_not_answered(self):
+        self.service.desktop.tell.return_value = {"agent": "codex", "status": "needs_answer", "prompt": "Would you like to run the following command?"}
+        result = await self.service.conversation_action({"operation": "agent", "agent": "codex", "text": "hi", "reply": ""}, "first")
+        self.assertEqual(result["status"], "needs_answer")
+        self.assertEqual(self.service.voice["action_caption"], "Codex is waiting for your answer")
+        self.assertEqual(self.service.action_caption({"operation": "agent", "reply": "approve"}), "Approving in Codex…")
+        self.assertEqual(self.service.action_caption({"operation": "agent", "text": "x" * 80}), "Telling Codex: " + "x" * 60 + "…")
+
     async def test_action_caption_fades_even_after_failure(self):
         self.service.desktop.open.side_effect = VoiceError("APPLICATION_NOT_OBSERVED", "no window")
         with patch("maslow_voice.daemon.asyncio.sleep", AsyncMock()):

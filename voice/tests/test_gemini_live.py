@@ -89,6 +89,17 @@ class GeminiSdkTests(unittest.IsolatedAsyncioTestCase):
         self.provider._submit_callback.assert_awaited_once_with(
             {"operation": "desktop", "application": "browser", "url": "https://github.com"}, "final-turn")
 
+    async def test_tell_agent_forwards_words_and_relays_waiting_prompt(self):
+        self.provider._started = True
+        self.provider._tool_turns["tell-call"] = "final-turn"
+        self.provider._submit_callback.return_value = {"status": "needs_answer", "prompt": "Would you like to run the following command?"}
+        context = SimpleNamespace(function_call=SimpleNamespace(call_id="tell-call"),
+                                  speech_handle=SimpleNamespace(interrupted=False))
+        response = json.loads(await self.provider._agent.tell_agent(context, "run the tests"))
+        self.provider._submit_callback.assert_awaited_once_with(
+            {"operation": "agent", "agent": "codex", "text": "run the tests", "reply": ""}, "final-turn")
+        self.assertEqual(response["status"], "needs_answer")
+
     async def test_interrupted_task_control_cannot_mutate_job(self):
         self.provider._started = True
         self.provider._tool_turns["control-call"] = "final-turn"
@@ -223,7 +234,8 @@ class GeminiSdkTests(unittest.IsolatedAsyncioTestCase):
         self.assertIsNotNone(model._opts.output_audio_transcription)
         schema = self.agents.ToolContext(self.provider._agent.tools).parse_function_tools("openai", strict=True)
         tools = {item["function"]["name"]: item["function"]["parameters"]["properties"] for item in schema}
-        self.assertEqual(set(tools), {"submit_intent", "desktop_action", "task_control"})
+        self.assertEqual(set(tools), {"submit_intent", "desktop_action", "task_control", "tell_agent"})
+        self.assertEqual(set(tools["tell_agent"]), {"text", "agent", "reply"})
         self.assertEqual(set(tools["submit_intent"]), set(BRIEF) | {"project_name", "new_project"})
         self.assertEqual(set(tools["desktop_action"]), {"application", "url"})
         for parameters in tools.values():

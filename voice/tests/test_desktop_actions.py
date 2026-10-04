@@ -20,13 +20,17 @@ class DesktopTests(unittest.IsolatedAsyncioTestCase):
             if args[0] == "setsid":
                 clients.append({"address": "0x123", "class": "maslow.voice.codex", "mapped": True})
             return "ok"
-        desktop = DesktopActions(run)
+        temp = tempfile.TemporaryDirectory()
+        self.addCleanup(temp.cleanup)
+        desktop = DesktopActions(run, agent_cwd=Path(temp.name) / "Maslow Voice")
         with patch("maslow_voice.desktop.shutil.which", return_value="/bin/codex"):
             self.assertEqual((await desktop.open("codex"))["status"], "opened")
             self.assertEqual((await desktop.open("codex"))["status"], "focused")
         launches = [call for call in calls if call[0] == "setsid"]
         self.assertEqual(len(launches), 1)
-        self.assertEqual(launches[0][-2:], ("--", "codex"))
+        # Codex runs inside a reattachable tmux session on Voice's own server.
+        self.assertEqual(launches[0][-12:], ("--", "tmux", "-L", "maslow-voice", "new-session", "-A", "-s", "maslow-codex",
+                                             "-c", str(Path(temp.name) / "Maslow Voice"), "--", "codex"))
         self.assertEqual(sum(c[:2] == ("hyprctl", "dispatch") and "hl.dsp.focus" in c[2] for c in calls), 2)
 
     async def test_website_always_uses_launcher_even_when_browser_is_open(self):
