@@ -55,6 +55,19 @@ Evidence:
 
 Not verified: spoken (audio) note requests, the first trust answer by voice in the person's real vault, the spoken result announcement for a note, and Claude Code or Hermes as note writers (Codex only).
 
+## First real test and 0.1.5-30
+
+The person ran a spoken session (16:37–16:47): two website opens, a web task (finished 16:42, spoken), then a note. They reported it went fine except a jitter of the text and orb in thinking mode.
+
+Log findings:
+- The first note at 16:43:10 failed with `AGENT_NOT_READY`: the background Codex took longer than the 8 s start limit while a web task was busy. Background seats now get the 20 s input wait.
+- After that error Gemini produced about 30 short generations in 18 s (16:43:11–16:43:29). Follow-up generations have no spoken turn, so their tool calls were refused with "please repeat the request", which the model obeyed in a loop; each refusal also emitted a task error event. The refusal is now `NO_SPOKEN_REQUEST`, tells the model to stop and explain, and emits no event.
+- The second attempt worked: trust prompt 16:44:00, spoken approval 16:44:15, note saved 16:47:13 (`Voice Notes/2026-10-04 Blind Dog Enrichment App.md` with a 151-line linked research note, 20 links). Codex said the conversation held no earlier search results: the web task's answer had only been spoken. Briefs now include final answers of web tasks finished in the last hour (job results keep 2000 characters).
+
+Jitter: LiveKit agent states flick between listening, thinking and speaking within a turn; each flick changed the orb mood (eyes starting to merge), shrank the body 6% in one frame and swapped the status text. The Panel now shows those three states only after 250 ms (`settledState`), the orb animates on `FrameAnimation` by real frame time instead of a 25 fps timer, and body scale eases. The retry loop above was a second source of flicker.
+
+Commits `3deda09e` (smoothness, loop, startup wait) and `c6b24c7d` (web results in notes); recipe `4d2d50c` (`0.1.5-30`), archive SHA-256 `fa2d12761ffe90d66df7a9eb9d6269baff0df90b0c528c910a3eff35c4724230`. 428 Python tests OK (two expected skips), orb/UI/controller/launcher checks pass, GPU preview rendered with the frame clock and no QML warnings. Installed with 0 altered of 9126 files; Voice was confirmed idle immediately before the restart; plugin rescanned behind the unlocked guard; the ready orb was observed and the shell log has no Voice errors. Smoothness on the physical display during a real conversation is for the person to confirm.
+
 ## Next action
 
-The person tests a spoken brainstorm ending in "put this in Obsidian" (first use asks to trust the vault) and the new orb moods in a real conversation.
+The person confirms the thinking-state jitter is gone in a real conversation and that a note after a web task builds on its results.
