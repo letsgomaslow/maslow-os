@@ -488,6 +488,10 @@ class VoiceService:
             now = time.time()
             self.jobs[seat] = {"id": seat, "title": title.removeprefix("Web: "), "state": "working", "started": now, "updated": now, "result": ""}
             self.watch_agent(seat)
+        elif result.get("status") == "sent" and seat in self.jobs:
+            # A follow-up restarts the job; report its new result too.
+            self.jobs[seat].update(state="working", updated=time.time())
+            self.watch_agent(seat)
         return result
 
     def job_name(self, seat):
@@ -576,6 +580,8 @@ class VoiceService:
             deadline = time.monotonic() + TASK_NOTICE_SECONDS
             while self.provider is provider and time.monotonic() < deadline:
                 if await provider.notify_task(content):
+                    # Give the person time to answer before the idle timeout.
+                    self.last_activity = time.monotonic()
                     return
                 await asyncio.sleep(0.5)
         message = f"{name} has finished." if state == "finished" else f"{name} is waiting for your decision."
@@ -1497,6 +1503,23 @@ class VoiceService:
                         process.kill()
                         await process.wait()
 
+    async def warm_conversation(self):
+        """Load the Gemini conversation libraries before the first click.
+
+        The package ships no bytecode, so the first import after every service
+        start (update, login) takes several seconds. Done during the click, it
+        left the orb at "Connecting" long enough that a second click cancelled.
+        """
+        if self.settings.value["mode"] != "gemini_live":
+            return
+        def load():
+            import google.genai.types  # noqa: F401
+            import livekit.plugins.google  # noqa: F401
+        try:
+            await asyncio.to_thread(load)
+        except Exception:
+            pass  # The session start reports any real import problem.
+
     async def run(self):
         from .execution import ExecutionManager
         from .routing import AgentRouter
@@ -1517,6 +1540,7 @@ class VoiceService:
         self.tool_socket.chmod(0o600)
         await self.tasks.recover()
         self.background(self.maintenance())
+        self.background(self.warm_conversation())
         stop = asyncio.Event()
         loop = asyncio.get_running_loop()
         for sig in (signal.SIGTERM, signal.SIGINT):

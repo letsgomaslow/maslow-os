@@ -422,6 +422,7 @@ assert.equal(captionState({state: "listening", action_caption: "Opening github.c
 assert.equal(captionState({state: "listening", paused: true, action_caption: "Opening github.com…"}), "Paused · click to resume", "Pause outranks action captions");
 assert.equal(captionState({error: "lost", action_caption: "Opening github.com…"}), "Connection lost · click to retry", "Errors outrank action captions");
 assert.equal(captionState({state: "listening"}), "Listening");
+assert.equal(captionState({state: "connecting"}), "Connecting · click to cancel", "A second click while connecting cancels, so say so");
 assert.match(panel, /elide: Text\.ElideRight; leftPadding: 10/, "Long captions are elided inside the status pill");
 const needsApprovalFunction = panel.match(/function needsApproval\(task\) \{[\s\S]*?\n  \}/)[0];
 const badgeFunction = panel.match(/function badgeForTasks\(items\) \{[\s\S]*?\n  \}/)[0];

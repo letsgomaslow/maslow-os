@@ -90,7 +90,15 @@ class DesktopActions:
         if application in agent_terminal.WEB_SEATS and not view:
             async with self.lock:
                 if not await agent_terminal.exists(self.run, application):
-                    await self.run(*agent_terminal.detached_argv(application, self.agent_folder()))
+                    # Start through uwsm-app so the tmux server gets its own desktop
+                    # scope. Started directly, it would belong to the Voice
+                    # service and be stopped with it on every update.
+                    await self.run("setsid", "-f", "uwsm-app", "--", *agent_terminal.detached_argv(application, self.agent_folder()))
+                    deadline = time.monotonic() + self.timeout
+                    while not await agent_terminal.exists(self.run, application):
+                        if time.monotonic() >= deadline:
+                            raise VoiceError("AGENT_NOT_READY", "The web task could not start. Try again in a moment.")
+                        await asyncio.sleep(0.1)
                     await self.run(*agent_terminal.tmux("set-option", "-w", "-t", agent_terminal.target(application), "window-size", "manual"))
             return {"application": application, "status": "started", "verification": "session_started"}
         async with self.lock:

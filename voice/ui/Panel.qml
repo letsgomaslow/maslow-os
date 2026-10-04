@@ -315,7 +315,7 @@ Item {
     if (voice.paused === true) return "Paused · click to resume"
     if (voice.action_caption) return voice.action_caption
     if (disabled) return "Connect Voice"
-    if (voice.state === "connecting") return "Connecting"
+    if (voice.state === "connecting") return "Connecting · click to cancel"
     if (voice.state === "thinking") return "Thinking"
     if (voice.speaking === true || voice.state === "speaking" || voice.state === "talking") return "Speaking"
     if (voice.state === "listening") return voice.extended === true ? "Listening · extended" : "Listening"

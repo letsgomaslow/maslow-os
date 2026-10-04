@@ -146,6 +146,14 @@ class MvpServiceTests(unittest.IsolatedAsyncioTestCase):
         (seat, text, _), options = self.service.desktop.tell.await_args
         # A correction goes to its own job, unframed, and may redirect that work.
         self.assertEqual((seat, text, options["busy_ok"]), ("web-1", "make it Dallas instead", True))
+        watched = []
+        self.service.watch_agent = watched.append
+        self.service.jobs["web-1"]["state"] = "finished"
+        await self.turn("return", "Add a return trip to the flight search")
+        await self.service.conversation_action(web | {"text": "add a return trip", "job": "web-1"}, "return")
+        # The follow-up's result is reported too.
+        self.assertEqual((watched, self.service.jobs["web-1"]["state"]), (["web-1"], "working"))
+        self.service.watch_agent = lambda seat: None
         await self.turn("third", "Find hotels in Austin")
         await self.service.conversation_action(web | {"text": "find hotels in Austin"}, "third")
         await self.turn("fourth", "Find restaurants in Austin")
@@ -177,6 +185,17 @@ class MvpServiceTests(unittest.IsolatedAsyncioTestCase):
         await self.service.conversation_action({"operation": "agent_status", "job": "web-1", "show": True}, "first")
         self.service.desktop.open.assert_awaited_with("web-1", title="Web: find cheap flights", view=True)
         self.assertEqual(self.service.voice["action_caption"], "Showing find cheap flights…")
+
+    async def test_conversation_libraries_are_loaded_before_the_first_click(self):
+        loaded = []
+        async def to_thread(function):
+            loaded.append(function)
+        with patch("maslow_voice.daemon.asyncio.to_thread", to_thread):
+            await self.service.warm_conversation()
+            self.service.settings.value["mode"] = "openai"
+            await self.service.warm_conversation()
+        self.assertEqual(len(loaded), 1)
+        loaded[0]()  # The real imports succeed in the pinned environment.
 
     async def test_new_conversation_is_briefed_on_tasks_and_the_last_exchange(self):
         self.service.jobs["web-1"] = {"id": "web-1", "title": "find cheap flights", "state": "working", "started": 0, "updated": 0, "result": ""}
@@ -215,6 +234,13 @@ class MvpServiceTests(unittest.IsolatedAsyncioTestCase):
         await self.service._watch_agent("codex", interval=0)
         self.assertEqual(notices, [("codex", "waiting for a decision", "Allow the playwright MCP server"), ("codex", "finished", "Cheapest: $142")])
         self.assertNotIn("codex", self.service.agent_jobs)
+
+    async def test_a_spoken_result_leaves_time_to_answer(self):
+        self.service.provider.notify_task = AsyncMock(return_value=True)
+        self.service.last_activity = 0
+        await self.service.agent_notice("codex", "finished", "Cheapest: $142")
+        self.assertGreater(self.service.last_activity, 0)
+        self.assertFalse(self.service.session_expired())
 
     async def test_finished_notice_falls_back_to_a_desktop_notification(self):
         self.service.provider = None

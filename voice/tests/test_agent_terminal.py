@@ -258,17 +258,21 @@ class AgentTerminalTests(unittest.IsolatedAsyncioTestCase):
                 raise VoiceError("DESKTOP_FAILED", "no session")
             if "new-session" in args and "-d" in args:
                 started.add("=maslow-web-2")
+                fake.calls.append(args)
+                return ""  # A background start creates no window.
             return await original(*args)
         desktop = DesktopActions(run, timeout=0.5, agent_cwd=Path(self.temp.name) / "Maslow Voice")
         receipt = await desktop.tell("web-2", "find hotels", title="Web: find hotels")
         self.assertEqual(receipt["status"], "sent")
         start = next(call for call in fake.calls if "new-session" in call)
+        # Its own desktop scope, so restarting Voice never stops the job.
+        self.assertEqual(start[:4], ("setsid", "-f", "uwsm-app", "--"))
         self.assertEqual(start[start.index("new-session"):], ("new-session", "-d", "-s", "maslow-web-2", "-x", "160", "-y", "48",
                                                               "-c", str(Path(self.temp.name) / "Maslow Voice"), "--", "codex"))
         self.assertTrue(any("window-size" in call and "manual" in call for call in fake.calls))
-        self.assertFalse(any(call[0] == "setsid" for call in fake.calls))
+        self.assertFalse(any("xdg-terminal-exec" in call for call in fake.calls))
         await desktop.open("web-2", title="Web: find hotels", view=True)
-        viewer = next(call for call in fake.calls if call[0] == "setsid")
+        viewer = next(call for call in fake.calls if "xdg-terminal-exec" in call)
         self.assertIn("--app-id=maslow.voice.web-2", viewer)
         self.assertIn("--title=Maslow Web: find hotels", viewer)
         await desktop.end_seat("web-2")
