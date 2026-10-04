@@ -84,6 +84,18 @@ The initial source calculator run and the final installed tracker run are differ
 
 Do not weaken checks, widen agent permissions, trust arbitrary directories, bypass OS authentication, change provider billing, copy code into installed paths, or add dependencies just to make a demo appear successful. Keep build outputs, credentials, raw private histories and recordings outside Git. A user-approved source merge does not authorize package publication or an ISO rebuild.
 
+## October agent-terminal iteration: what we learned
+
+Closed as good enough, not complete; see the [handoff](handoffs/2026-10-03-voice-agent-terminal.md).
+
+- **Voice should direct; agents act; the screen shows it.** Opening pages and windows is Voice's own job. Real web work goes to an agent with a visible browser. No browser automation lives in Voice.
+- **No second "brain" was needed.** Gemini routes; the daemon owns state such as the job list, the briefing and the delivery checks. Separate requests became separate jobs, and corrections name their job.
+- **Keystrokes are not delivery.** Fresh agents drop early input, scrolled or busy views swallow Enter, and long text echoes slowly. Wait for a settled input box, paste once, and confirm in the conversation.
+- **Consent stays human.** A model once tried to approve on its own. Approvals now need the person's words in that turn, never "always", and some dialogs are left to the window.
+- **Results must arrive without being asked for.** A notification always, speech when a conversation is open. "away" after 15 s of silence is the normal state when results arrive.
+- **Verify plugin paths end to end.** Gemini 3.8 broke on the plugin's instruction injection. A raw API trial passed while the real session failed.
+- **Continuity is the daemon's job:** short sessions with a briefing, not an always-open paid connection. A local wake word is the candidate next step.
+
 ## Remaining acceptance and iteration order
 
 1. Physical Lenovo journey: real microphone/speaker, one spoken new-app request, unrelated conversation during work, one spoken and one typed correction, understandable pause-time updates and a short reviewed recording. Check original transcript, task identity and resulting requirement; do not substitute typed/synthetic input.

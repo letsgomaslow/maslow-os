@@ -1,6 +1,24 @@
 # Voice websites, visible Codex terminal and action captions
 
-Date: 2026-10-03. Goal: make Maslow Voice useful beyond conversation while keeping the design simple. Voice now opens websites, talks to a Codex session the person can watch, names each action on the orb before it runs, and can hand web tasks to an agent-driven visible browser. Source is committed on local branch `voice-agent-terminal` in `maslow-os` and in `maslow-os-pkgs`. Nothing is pushed, merged or published; `0.1.5-20` is installed locally on the Lenovo only.
+Date: 2026-10-03 to 2026-10-04. Goal: make Maslow Voice useful beyond conversation while keeping the design simple. **Iteration status: closed as good enough for now, not complete.** Remaining gates are listed at the end and are the starting point for the next iteration. Source was developed on `voice-agent-terminal` in `maslow-os` and `maslow-os-pkgs` and the runtime branch was merged into local `main` at the person's request. Nothing was pushed or published; `maslow-voice 0.1.5-27` is installed locally on the Lenovo only.
+
+
+## Iteration summary
+
+What exists at the end of this iteration:
+
+- **Pages and windows by voice:** open a website or a Google search; open and close Browser, Files, Terminal, Codex and Claude Code.
+- **Talking to agents:** Codex and Claude Code run in visible, reattachable tmux terminals on Voice's private server (`tmux -L maslow-voice`, own `tmux.conf`). `tell_agent` pastes the person's words once, confirms delivery and holds words while a decision dialog is shown. Spoken approve/deny sends only the one-time answer, and only when the person's own words say so. Codex MCP tool dialogs are left to the window.
+- **Web tasks:** each runs as its own job, a background Codex seat with an isolated, visible Playwright browser (up to three at once). The daemon adds today's date and fixed browse-only limits, keeps a job list, routes follow-ups to the named job, and lists or shows jobs on request.
+- **Results:** every finished job always raises a desktop notification. While a conversation is open, the result is also sent to Gemini as realtime text to be spoken.
+- **Continuity:** each new conversation is briefed on running jobs and the previous exchange, stale delegated tasks are not "current", and sliding-window compression keeps long sessions going.
+- **Orb:** shows a caption for each action. The first click after an update connects, because the Gemini libraries are warmed at service start.
+
+Main lessons, also recorded in the [Voice product reference](../maslow-voice-product.md):
+- Read the agent's screen rather than trusting keystrokes.
+- Confirm delivery from the conversation, not the input box.
+- Keep daemon-started processes out of the service cgroup.
+- Do not trust a plugin path (`generate_reply(instructions=...)` on Gemini 3.8) without an end-to-end check.
 
 ## Commits
 
@@ -295,24 +313,24 @@ Fix in `cb4c0e48`:
 
 Package: recipe `6fd9364` advances to `0.1.5-27`. Archive SHA-256 `d3503433e3ae9964acfbb3375dc334aec580981e336a420e33e99f995c52c211`.
 
-## Not verified
+## Remaining gates for the next iteration
 
-- No live Gemini conversation called the new tools.
-- No real Codex session received typed text or approval keys.
-- The approve key `y` is now confirmed live. The 0.25-second Enter delay worked for short requests; long dictation is untested.
-- Prompt detection reads the screen, so a Codex TUI change can break the markers. A missed marker means words could land on a decision screen.
-- Claude Code's dialog text and keys (`1`, `Escape`) are taken from its binary and still need a live test.
-- Playwright MCP was not run, and the headed browser from the tmux-started agent is unverified.
-- Package build, install and rollback were not done.
+This iteration is good enough to use and demonstrate. It is not accepted as complete.
+
+1. **Spoken result, heard live:** confirm on the Lenovo that a finished job's result is heard after the realtime-text change (`cb4c0e48`). The end-to-end check was a real Gemini session in text mode, not audio.
+2. **Polish:**
+   - the orb badge and Work view should show web jobs (the badge still shows a stale delegated "Result ready");
+   - close or tidy finished jobs' browsers;
+   - give periodic progress cues during long jobs;
+   - captions on the installed orb have not yet been confirmed by the person.
+3. **Claude Code live:** confirm its dialog markers and answer keys (`1`, `Escape`) with a real prompt. The person's Claude settings use auto mode, so no prompt has appeared yet.
+4. **Fragile screen reading:** Codex and Claude TUI text changes can break the markers (`esc to interrupt`, `for shortcuts`, dialog phrases). Consider structured status (Codex app-server or `codex queue`) instead of screen reading.
+5. **Codex MCP approvals:** Codex 0.157 saves "Allow" as permanent. Re-check on newer Codex before allowing spoken answers to those dialogs.
+6. **Memory:** connect `profile_context()` to Maslow's central memory (Hermes built-in, Honcho or Hindsight) once it can be read safely.
+7. **Wake word:** decide on local wake-word listening ("Hey Maslow") to avoid paying for silent live sessions.
+8. **Routing evidence:** rerun `voice/dev/route_eval.py` when the key's quota allows. 15 of 30 cases were measured, all correct.
+9. **Release work:** pushing, a coordinated package merge to `maslow`, signing, channel promotion and ISO inclusion remain separate authorized steps. The full `./test/all` aggregate and the earlier runtime-smoke lockscreen failure were not revisited.
 
 ## Next action
 
-With authorization, build and locally install `maslow-voice 0.1.5-20` from these branches. Then on the Lenovo:
-
-1. Say "go to github.com" and "search for tmux".
-2. Say "open Codex", close the window, and say "open Codex" again.
-3. Say "tell Codex to list the files here", and confirm it submits once.
-4. Make Codex ask for approval, then say "approve"; repeat and say "deny".
-5. Run `omarchy setup voice browser`, then ask Codex for a web task.
-
-Record the exact prompt text and keys observed.
+Confirm a spoken job result on the Lenovo, then start the polish pass with the orb showing web jobs.
