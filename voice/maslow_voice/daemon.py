@@ -19,6 +19,7 @@ from .voice_preview import VOICES, play_sample
 from .audit import SessionAudit
 from .config import Settings, atomic_json, private_directory, runtime_directory, validate_settings
 from .coordinator import HermesRuntime, hermes_configuration
+from .agent_terminal import NAMES as AGENT_NAMES
 from .desktop import DesktopActions
 from .workspaces import WorkspaceResolver
 from .hermes import HermesClient
@@ -382,14 +383,16 @@ class VoiceService:
     def action_caption(intent):
         # Captions are composed here from validated fields, never by the model.
         if intent.get("operation") == "agent":
+            name = AGENT_NAMES.get(intent.get("agent"), "the agent")
             reply = intent.get("reply")
             if reply:
-                return "Approving in Codex…" if reply == "approve" else "Declining in Codex…"
+                return f"Approving in {name}…" if reply == "approve" else f"Declining in {name}…"
             words = " ".join(str(intent.get("text", "")).split())
-            return "Telling Codex: " + (words[:60] + "…" if len(words) > 60 else words)
+            return f"Telling {name}: " + (words[:60] + "…" if len(words) > 60 else words)
         application = str(intent.get("application", ""))
+        label = AGENT_NAMES.get(application, application.title()[:20])
         if intent.get("action") == "close":
-            return f"Closing {application.title()[:20]}…"
+            return f"Closing {label}…"
         url = intent.get("url")
         if url:
             try:
@@ -398,13 +401,13 @@ class VoiceService:
                 host = None
             if host:
                 return f"Opening {host.removeprefix('www.')}…"
-        return f"Opening {application.title()[:20]}…"
+        return f"Opening {label}…"
 
     @staticmethod
     def action_label(intent):
         if not isinstance(intent, dict):
             return "invalid"
-        allowed = {"browser", "files", "hub", "terminal", "codex", "open", "close", "status", "show", "steer", "cancel",
+        allowed = {"browser", "files", "hub", "terminal", "codex", "claude", "open", "close", "status", "show", "steer", "cancel",
                    "continue", "show_result", "approve", "deny"}
         parts = [str(intent.get("operation", "submit"))]
         for key in ("application", "action", "agent", "reply"):
@@ -462,7 +465,7 @@ class VoiceService:
                 await self.show_caption(self.action_caption(intent))
                 result = await self.desktop.tell(intent.get("agent"), intent.get("text", ""), intent.get("reply", ""))
                 if result.get("status") == "needs_answer":
-                    await self.show_caption("Codex is waiting for your answer")
+                    await self.show_caption(f"{AGENT_NAMES.get(intent.get('agent'), 'The agent')} is waiting for your answer")
             elif operation == "submit":
                 if type(intent.get("new_project", False)) is not bool:
                     raise VoiceError("INVALID_REQUEST", "New project must be true or false.")

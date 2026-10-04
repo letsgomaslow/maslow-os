@@ -34,7 +34,7 @@ async def command(*argv):
 
 
 class DesktopActions:
-    APPLICATIONS = {"browser", "files", "hub", "terminal", "codex"}
+    APPLICATIONS = {"browser", "files", "hub", "terminal", "codex", "claude"}
 
     def __init__(self, run=command, *, timeout=8, agent_cwd=None):
         self.run = run
@@ -72,7 +72,7 @@ class DesktopActions:
 
     async def open(self, application, url=None):
         if not isinstance(application, str) or application.casefold() not in self.APPLICATIONS:
-            raise VoiceError("APPLICATION_NOT_ALLOWED", "Voice can open Browser, Files, Hub, Terminal, or Codex.")
+            raise VoiceError("APPLICATION_NOT_ALLOWED", "Voice can open Browser, Files, Hub, Terminal, Codex, or Claude Code.")
         application = application.casefold()
         if url is not None:
             if application != "browser":
@@ -80,8 +80,10 @@ class DesktopActions:
             url = validate_url(url)
         if application == "codex" and not shutil.which("codex"):
             raise VoiceError("CODEX_MISSING", "Codex is not installed. Open Hub setup to install or repair it.")
+        if application == "claude" and not shutil.which("claude"):
+            raise VoiceError("CLAUDE_MISSING", "Claude Code is not installed. Open Hub setup to install or repair it.")
         if application in agent_terminal.AGENTS and not shutil.which("tmux"):
-            raise VoiceError("APPLICATION_UNAVAILABLE", "Voice needs tmux to keep Codex visible. Install tmux and try again.")
+            raise VoiceError("APPLICATION_UNAVAILABLE", "Voice needs tmux to keep coding agents visible. Install tmux and try again.")
         async with self.lock:
             # Hub is a Quickshell surface, not a Hyprland client. Successful IPC
             # means its summon was accepted; do not invent window-ready evidence.
@@ -99,8 +101,9 @@ class DesktopActions:
                 await self.focus(found)
                 self.windows[application] = found["address"]
                 return {"application": application, "status": "focused", "verification": "window_observed"}
-            if application in {"terminal", "codex"}:
-                argv = ["uwsm-app", "--", "xdg-terminal-exec", f"--app-id=maslow.voice.{application}", "--title=Maslow " + application.title()]
+            if application == "terminal" or application in agent_terminal.AGENTS:
+                title = "Maslow " + agent_terminal.NAMES.get(application, application.title())
+                argv = ["uwsm-app", "--", "xdg-terminal-exec", f"--app-id=maslow.voice.{application}", "--title=" + title]
                 if application in agent_terminal.AGENTS:
                     # Attach to the running agent, or start it here so it
                     # inherits this desktop session's environment.
@@ -128,7 +131,8 @@ class DesktopActions:
 
     async def matcher(self, application):
         classes = await self.browser_classes() if application == "browser" else {
-            "files": {"org.gnome.nautilus"}, "terminal": {"maslow.voice.terminal"}, "codex": {"maslow.voice.codex"},
+            "files": {"org.gnome.nautilus"}, "terminal": {"maslow.voice.terminal"},
+            "codex": {"maslow.voice.codex"}, "claude": {"maslow.voice.claude"},
         }[application]
         def matching(client):
             return bool(client.get("mapped", True)) and any(str(client.get(key, "")).casefold() in classes for key in ("class", "initialClass"))
@@ -137,7 +141,7 @@ class DesktopActions:
     async def close(self, application):
         """Close one window of an allowlisted application: the one Voice opened, else the most recently used."""
         if not isinstance(application, str) or application.casefold() not in self.APPLICATIONS:
-            raise VoiceError("APPLICATION_NOT_ALLOWED", "Voice can close Browser, Files, Terminal, or Codex.")
+            raise VoiceError("APPLICATION_NOT_ALLOWED", "Voice can close Browser, Files, Terminal, Codex, or Claude Code.")
         application = application.casefold()
         if application == "hub":
             raise VoiceError("APPLICATION_NOT_ALLOWED", "Close Hub from its own window.")
@@ -160,7 +164,8 @@ class DesktopActions:
             receipt = {"application": application, "status": "closed", "verification": "close_requested"}
             if application in agent_terminal.AGENTS:
                 # Only the viewer detaches; the tmux session keeps the agent running.
-                receipt["note"] = "Codex keeps running. Opening Codex again brings the same session back."
+                name = agent_terminal.NAMES[application]
+                receipt["note"] = f"{name} keeps running. Opening {name} again brings the same session back."
             return receipt
 
     def agent_folder(self):
@@ -174,25 +179,26 @@ class DesktopActions:
     async def tell(self, agent, text="", reply=""):
         """Type the person's words into the visible agent, or answer its waiting prompt."""
         if agent not in agent_terminal.AGENTS:
-            raise VoiceError("APPLICATION_NOT_ALLOWED", "Voice can talk to Codex.")
+            raise VoiceError("APPLICATION_NOT_ALLOWED", "Voice can talk to Codex or Claude Code.")
         if reply not in {"", *agent_terminal.KEYS[agent]}:
             raise VoiceError("INVALID_REQUEST", "Answer with approve or deny.")
         words = "" if reply else agent_terminal.clean(text)
         # Opening first keeps the agent on screen, reattaching a session whose
         # window was closed, so nothing is typed out of sight.
         await self.open(agent)
+        name = agent_terminal.NAMES[agent]
         if not await agent_terminal.ready(self.run, agent, self.timeout):
-            raise VoiceError("AGENT_NOT_READY", "Codex is not ready in its terminal yet. Check its window and try again.")
+            raise VoiceError("AGENT_NOT_READY", f"{name} is not ready in its terminal yet. Check its window and try again.")
         prompt = agent_terminal.pending_prompt(agent, await agent_terminal.screen(self.run, agent))
         if reply:
             if not prompt:
-                raise VoiceError("NO_PENDING_PROMPT", "Codex is not waiting for an answer.")
+                raise VoiceError("NO_PENDING_PROMPT", f"{name} is not waiting for an answer.")
             await agent_terminal.press(self.run, agent, reply)
             return {"agent": agent, "status": "answered", "reply": reply, "verification": "keys_delivered"}
         if prompt:
             # Never type words into a decision screen; they could pick an option.
             return {"agent": agent, "status": "needs_answer", "prompt": prompt,
-                    "message": "Codex is waiting for a decision. Nothing was typed."}
+                    "message": f"{name} is waiting for a decision. Nothing was typed."}
         await agent_terminal.type_line(self.run, agent, words)
         return {"agent": agent, "status": "sent", "verification": "keys_delivered"}
 

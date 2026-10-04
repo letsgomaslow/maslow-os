@@ -74,8 +74,10 @@ class MvpServiceTests(unittest.IsolatedAsyncioTestCase):
         result = await self.service.conversation_action({"operation": "agent", "agent": "codex", "text": "hi", "reply": ""}, "first")
         self.assertEqual(result["status"], "needs_answer")
         self.assertEqual(self.service.voice["action_caption"], "Codex is waiting for your answer")
-        self.assertEqual(self.service.action_caption({"operation": "agent", "reply": "approve"}), "Approving in Codex…")
-        self.assertEqual(self.service.action_caption({"operation": "agent", "text": "x" * 80}), "Telling Codex: " + "x" * 60 + "…")
+        self.assertEqual(self.service.action_caption({"operation": "agent", "agent": "codex", "reply": "approve"}), "Approving in Codex…")
+        self.assertEqual(self.service.action_caption({"operation": "agent", "agent": "codex", "text": "x" * 80}), "Telling Codex: " + "x" * 60 + "…")
+        self.assertEqual(self.service.action_caption({"operation": "agent", "agent": "claude", "text": "hi"}), "Telling Claude Code: hi")
+        self.assertEqual(self.service.action_caption({"operation": "desktop", "application": "claude", "action": "close"}), "Closing Claude Code…")
 
     async def test_close_is_routed_and_captioned(self):
         seen = []

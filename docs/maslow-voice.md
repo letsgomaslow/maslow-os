@@ -25,7 +25,7 @@ Hub's Voice page is the installation and readiness entry point. It reads a reduc
 - "Go to github.com" or "search for tmux" opens the default browser at that page. Voice only opens pages; it does not click or type in them.
 - "Close Codex" (or Files, Terminal, the browser) closes that window.
 - "Open Codex" shows Codex in a terminal window that Voice can talk to. Closing the window keeps Codex running, and the next "open Codex" brings the same session back.
-- "Tell Codex to add a dark mode toggle" types those words into Codex and submits them, so you can watch Codex work.
+- "Tell Codex to add a dark mode toggle" types those words into Codex and submits them, so you can watch Codex work. "Open Claude" and "tell Claude to …" work the same way with Claude Code.
 - When Codex asks for a decision, Voice reads it out and waits. Say "approve" or "deny"; Voice sends a one-time answer only, never "always allow".
 - Web tasks such as "tell Codex to find the cheapest flight on that site" work after running `omarchy setup voice browser`, which adds a visible browser tool to Codex and Claude Code once you confirm.
 - The orb's status line names each action as it starts, for example "Opening github.com…" or "Telling Codex: …".

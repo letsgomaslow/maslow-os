@@ -17,16 +17,20 @@ def create_agent(provider, agents, base):
         def __init__(self):
             agents.Agent.__init__(self, instructions=(
                 prompt + " "
-                "Use desktop_action to open Browser, Files, Hub, Terminal or Codex, without creating a task. "
+                "Use desktop_action to open Browser, Files, Hub, Terminal or Codex, without creating a task. Claude Code is also available as claude. "
                 "To visit a website, call desktop_action with browser and a complete https URL, for example https://github.com. "
                 "To search the web with no site named, use https://duckduckgo.com/?q= followed by the URL-encoded query. "
                 "desktop_action only opens pages; it cannot click, type or fill forms. "
-                "To close an application window, call desktop_action with action close. Closing Codex only hides its window; Codex keeps running. "
-                "Opening Codex shows a live Codex terminal the user can watch. It is NOT the delegated job; use task_control show for that job. "
-                "Use tell_agent to pass the user's words to that terminal Codex; it opens Codex when needed. "
-                "When the user addresses Codex directly or has opened Codex in this conversation, use tell_agent rather than submit_intent. "
-                "When the user asks Codex to do something, send their request faithfully in text, lightly cleaned up, without adding your own plans. "
-                "For multi-step web tasks such as searching a site, filling forms or comparing pages, tell_agent Codex what to do in the browser. "
+                "You can close windows: when the user asks to close the browser, Files, the terminal, Codex or Claude Code, call desktop_action "
+                "with that application and action close. Do not say you cannot close windows. "
+                "Closing Codex or Claude Code only hides its window; the agent keeps running. "
+                "Opening Codex or Claude Code shows a live terminal the user can watch. It is NOT the delegated job; use task_control show for that job. "
+                "Use tell_agent to pass the user's words to that terminal agent; it opens the agent when needed. Use agent claude when the user names Claude, otherwise codex. "
+                "When the user addresses Codex or Claude directly or has opened one in this conversation, use tell_agent rather than submit_intent. "
+                "Send the user's request in their own words as a plain-language instruction, only removing filler words and the agent's name. "
+                "Never translate it into a shell command, code or your own plan; the agent decides how to do it. "
+                "For example, 'tell Codex to check whether example.com is reachable using curl' becomes text 'Check whether example.com is reachable using curl'. "
+                "For multi-step web tasks such as searching a site, filling forms or comparing pages, tell_agent the agent what to do in the browser. "
                 "If tell_agent returns needs_answer, read the prompt to the user briefly and wait. Call tell_agent with reply approve or deny "
                 "only after the user clearly answers that prompt. Never approve on your own or on an ambiguous answer. "
                 "Use submit_intent only for explicitly requested external work. Preserve the named agent; otherwise use auto. "
@@ -79,7 +83,7 @@ def create_agent(provider, agents, base):
                 return "SUBMITTED: Task saved for review. No work has started."
             return "SUBMITTED: " + json.dumps(result)
 
-        async def desktop_action(self, context, application: Literal["browser", "files", "hub", "terminal", "codex"], url: str = "",
+        async def desktop_action(self, context, application: Literal["browser", "files", "hub", "terminal", "codex", "claude"], url: str = "",
                                  action: Literal["open", "close"] = "open") -> str:
             """Open, focus or close a desktop application window. With browser, url opens that complete https address."""
             payload = {"operation": "desktop", "application": application}
@@ -93,9 +97,9 @@ def create_agent(provider, agents, base):
             """Inspect or control the daemon's current job. Use text for corrections or continuation."""
             return json.dumps(await self._call(context, {"operation": "task", "action": operation, "text": text}))
 
-        async def tell_agent(self, context, text: str = "", agent: Literal["codex"] = "codex",
+        async def tell_agent(self, context, text: str = "", agent: Literal["codex", "claude"] = "codex",
                              reply: Literal["none", "approve", "deny"] = "none") -> str:
-            """Type the user's words into the visible Codex terminal. Use reply approve or deny only to answer its waiting prompt; otherwise none."""
+            """Type the user's own words into the visible Codex or Claude Code terminal. Use reply approve or deny only to answer its waiting prompt; otherwise none."""
             # Gemini rejects empty enum values, so "none" stands for no answer.
             answer = "" if reply == "none" else reply
             return json.dumps(await self._call(context, {"operation": "agent", "agent": agent, "text": text, "reply": answer}))
