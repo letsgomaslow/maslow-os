@@ -68,6 +68,18 @@ Jitter: LiveKit agent states flick between listening, thinking and speaking with
 
 Commits `3deda09e` (smoothness, loop, startup wait) and `c6b24c7d` (web results in notes); recipe `4d2d50c` (`0.1.5-30`), archive SHA-256 `fa2d12761ffe90d66df7a9eb9d6269baff0df90b0c528c910a3eff35c4724230`. 428 Python tests OK (two expected skips), orb/UI/controller/launcher checks pass, GPU preview rendered with the frame clock and no QML warnings. Installed with 0 altered of 9126 files; Voice was confirmed idle immediately before the restart; plugin rescanned behind the unlocked guard; the ready orb was observed and the shell log has no Voice errors. Smoothness on the physical display during a real conversation is for the person to confirm.
 
+## Conversation flow and dropped sessions (0.1.5-31)
+
+The person reported that opening the browser or Codex stopped the conversation mid-sentence and resumed when the page loaded, and that "Connection lost · click to retry" appeared, reproducibly when asking for an Obsidian note.
+
+Findings:
+- Gemini 3.8 Live waits silently for each tool result. Opening an app waits for its window; agent, web and note actions wait for Codex to start. Gemini's `NON_BLOCKING` tool behaviour, supported by the pinned plugin, did not help in a real text session (the reply came later: 23.1 s against 13.4 s).
+- 11 Gemini 1011 "internal error" drops in three days, between 7 s and 9 minutes into sessions. The four that followed an action within 5 s all followed Codex screen text or a note job reaching the conversation (note start, `agent_status` on a note or Codex seat, a note's finished update); web task updates (0 of 4) and website opens (0 of 9) never did. A real text session with the same note screen did not reproduce it. Cause unconfirmed.
+
+Changes in `60a0004f`: desktop, agent and note actions answer within 0.8 s and finish in the background (only a failure or a waiting question is said later; retries reuse the receipt); updates carry the agent's closing message instead of the screen; a running Gemini conversation that drops with `GEMINI_CONNECTION_FAILED` reconnects at most twice per 180 s, keeping session, transcript, mode and extended setting, with a briefing to continue without greeting.
+
+Evidence: 432 Python tests OK (two expected skips); real Gemini text session with a six-second action replied at 6.5 s, before the action finished at 7.1 s; a real reconnect took 0.3 s and the model still recalled details from before the drop. Recipe `7bd65c4` (`0.1.5-31`), archive SHA-256 `2037441c991f87f1c3b24ebbc0a93203fcd91e4c057d526ddbb0464fc8ecc90b`; installed with 0 altered of 9126 files; Voice idle immediately before restart; plugin rescanned; ready orb observed. Not verified: real server drops with audio and the person's perception of the flow.
+
 ## Next action
 
-The person confirms the thinking-state jitter is gone in a real conversation and that a note after a web task builds on its results.
+The person tries a spoken session with app opens and an Obsidian note and reports whether speech still stalls and whether any drop now reconnects on its own.
