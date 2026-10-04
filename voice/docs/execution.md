@@ -1,6 +1,6 @@
 # Voice execution bridge
 
-The conversational provider emits a bounded task brief. Gemini additionally receives bounded desktop and task-control tools; the daemon owns task identities and validates final-transcript and provider-session binding before dispatch. No conversational tool accepts shell commands or grants agent approvals. `TaskManager` persists the original request, normalized brief, project, mode, `selected_agent`, and plain-language `routing_reason` before work starts. `AgentRouter` then supplies one TaskManager-compatible client for Codex, Hermes, or Claude.
+The conversational provider emits a bounded task brief. Gemini additionally receives bounded desktop and task-control tools; the daemon owns task identities and validates final-transcript and provider-session binding before dispatch. No conversational tool accepts shell commands. The only spoken approval path is the visible Codex terminal's fixed approve-or-deny answer, sent only while that terminal shows a waiting decision and only after the person answers it; delegated-job approvals stay in the task view. `TaskManager` persists the original request, normalized brief, project, mode, `selected_agent`, and plain-language `routing_reason` before work starts. `AgentRouter` then supplies one TaskManager-compatible client for Codex, Hermes, or Claude.
 
 An explicit `tool_preference` selects only that agent. If its readiness check fails, Voice returns `AGENT_UNAVAILABLE` and does not fall back. Automatic routing checks the configured ready default first, then Codex, Hermes, and Claude in that fixed order without checking the same candidate twice. A repeated request identity returns the saved task and route without repeating readiness or submission.
 
@@ -97,10 +97,30 @@ These source checks do not establish Google account authentication, physical mic
 
 ## Gemini MVP control surface
 
-Gemini exposes `desktop_action` for Browser, Files, Hub, Terminal and a standalone Codex terminal, and `task_control` for status, show, steer, cancel, continue and show-result. Launching Codex does not attach that terminal to a delegated job. Desktop windows are observed and refocused by registered identity; Hub uses the existing shell acknowledgement because its panel is a layer surface. Process creation alone does not mean an application is ready.
+Gemini exposes `desktop_action` for Browser, Files, Hub, Terminal and the visible Codex terminal (with an optional website address for Browser), `tell_agent` for that terminal, and `task_control` for status, show, steer, cancel, continue and show-result. Launching Codex does not attach that terminal to a delegated job. Desktop windows are observed and refocused by registered identity; Hub uses the existing shell acknowledgement because its panel is a layer surface. Process creation alone does not mean an application is ready.
 
 Explicit work uses a selected directory, the current conversation project, or a collision-safe new directory under `~/Projects/Maslow Voice`. Named projects resolve against saved Voice project associations; ambiguous names require clarification. Duplicate submissions retain task/workspace identity. Conversation, status and desktop actions never allocate workspaces. Only one active Codex job is supported.
 
 Tasks retain bounded private activity, instruction outcomes, artifact references and verification fields alongside attempt/child/thread/turn identity. The Tasks view exposes live text, command/file summaries, exact-request approvals, typed instructions, Stop, Continue and folder/artifact actions. Stopping or muting conversation leaves execution running. Completion and attention notices wait for a conversational pause and expire rather than interrupting speech indefinitely.
 
 Artifact links are constrained to the task workspace and checked again before opening. File existence is not behavioral verification. Agent-reported tests and results are labeled separately from Maslow checks. The orb's background-work indicator excludes completed tasks and is independent of microphone state.
+
+## Websites and action captions
+
+`desktop_action` accepts an optional `url` only with `browser`. The daemon checks it with `validate_url` (complete HTTP or HTTPS, no embedded credentials or control characters) and always passes it to `omarchy-launch-browser`, which reuses and focuses a running browser itself. The model writes search requests as ordinary search-page URLs. Opening a page never clicks, types or submits anything.
+
+Before a desktop or agent action runs, the daemon publishes `voice.action_caption`, a short line such as "Opening github.com…" or "Telling Codex: …" composed from the validated fields, never written by the model. The orb's status pill shows it after connection errors and pause, and it fades four seconds after the most recent caption whether or not the action succeeded.
+
+## Visible agent terminal
+
+"Open Codex" starts Codex inside tmux on Voice's private server (`tmux -L maslow-voice`, session `maslow-codex`, window class `maslow.voice.codex`) in `~/Projects/Maslow Voice`. The visible terminal runs `tmux new-session -A`, so it creates the session itself, giving Codex the desktop session's environment, and reattaches when the window is reopened. Codex starts with the person's own configuration; Voice never adds approval or sandbox bypass flags. Codex is the session's only program: when it exits the session ends, so typed words can never reach a shell. The separate server keeps `omarchy-launch-terminal-tmux` from attaching to it.
+
+`tell_agent` first opens or focuses that window, then requires `#{pane_current_command}` to be the agent itself. It reads the screen with `capture-pane`:
+
+- With no waiting decision, the person's words are cleaned of control characters, typed literally with `send-keys -l`, and submitted with Enter after a 0.25-second pause, because Codex treats an Enter that follows fast input as a pasted newline.
+- While Codex shows a decision ("Would you like to…", "Trust this folder?"), words are not typed, because they could select an option. The tool returns `needs_answer` with the prompt so the model can read it aloud.
+- `reply` `approve` sends `y` and `deny` sends `Escape`, only while a decision is on screen. No "always" or "this session" option is ever sent.
+
+Every agent action uses the same per-turn receipt cache as other Gemini actions, so a model retry cannot type twice. The `gemini_live` gate keeps this unavailable in offline mode. Claude Code is not yet reachable this way; its prompt text and answer keys must be verified on the Lenovo first.
+
+`omarchy-setup-voice-browser` is the opt-in step for web tasks. After confirmation it registers a pinned Playwright MCP server with Codex, and with Claude Code when installed, so a request such as "tell Codex to compare these two pages" is carried out in a visible browser by the agent under its own approval settings. Voice itself contains no browser automation.

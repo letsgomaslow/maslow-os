@@ -55,6 +55,11 @@ ShellRoot {
       next.voice.level = value === "speaking" ? 0.7 : 0.2
       panel.voiceController.setFixture(next)
     }
+    function caption(value: string): void {
+      var next = JSON.parse(JSON.stringify(panel.voiceController.snapshot))
+      next.voice.action_caption = value
+      panel.voiceController.setFixture(next)
+    }
     function mode(value: string): void {
       var next = JSON.parse(JSON.stringify(panel.voiceController.snapshot))
       next.settings.mode = value
