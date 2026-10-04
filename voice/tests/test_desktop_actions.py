@@ -5,6 +5,7 @@ import unittest
 from pathlib import Path
 from unittest.mock import AsyncMock, patch
 
+from maslow_voice import agent_terminal
 from maslow_voice.desktop import DesktopActions, command
 from maslow_voice.errors import VoiceError
 
@@ -29,8 +30,8 @@ class DesktopTests(unittest.IsolatedAsyncioTestCase):
         launches = [call for call in calls if call[0] == "setsid"]
         self.assertEqual(len(launches), 1)
         # Codex runs inside a reattachable tmux session on Voice's own server.
-        self.assertEqual(launches[0][-12:], ("--", "tmux", "-L", "maslow-voice", "new-session", "-A", "-s", "maslow-codex",
-                                             "-c", str(Path(temp.name) / "Maslow Voice"), "--", "codex"))
+        self.assertEqual(launches[0][-14:], ("--", "tmux", "-L", "maslow-voice", "-f", str(agent_terminal.CONFIG), "new-session", "-A", "-s",
+                                             "maslow-codex", "-c", str(Path(temp.name) / "Maslow Voice"), "--", "codex"))
         self.assertEqual(sum(c[:2] == ("hyprctl", "dispatch") and "hl.dsp.focus" in c[2] for c in calls), 2)
 
     async def test_website_always_uses_launcher_even_when_browser_is_open(self):

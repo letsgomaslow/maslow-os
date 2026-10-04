@@ -96,7 +96,10 @@ class DesktopActions:
             found = next((c for c in clients if c.get("address") == cached and matching(c)), None)
             found = found or next((c for c in clients if matching(c)), None)
             # A website always goes through the launcher, which reuses and
-            # focuses a running browser itself.
+            # focuses a running browser itself. An agent window whose session
+            # has ended is only closing; start a fresh one instead.
+            if found and application in agent_terminal.AGENTS and not await agent_terminal.exists(self.run, application):
+                found = None
             if found and url is None:
                 await self.focus(found)
                 self.windows[application] = found["address"]
@@ -193,6 +196,8 @@ class DesktopActions:
         if reply:
             if not prompt:
                 raise VoiceError("NO_PENDING_PROMPT", f"{name} is not waiting for an answer.")
+            if any(marker in prompt for marker in agent_terminal.WINDOW_ONLY[agent]):
+                raise VoiceError("ANSWER_IN_WINDOW", f"{name} would remember this answer permanently. Answer it in the {name} window.")
             await agent_terminal.press(self.run, agent, reply)
             return {"agent": agent, "status": "answered", "reply": reply, "verification": "keys_delivered"}
         if prompt:

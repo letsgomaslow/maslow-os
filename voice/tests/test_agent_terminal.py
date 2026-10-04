@@ -19,8 +19,9 @@ APPROVAL = """• Running tests
 class FakeDesktop:
     """A tmux server and window list that record every command."""
 
-    def __init__(self, states=("0|codex",), screen="› Ask Codex to do anything", window="maslow.voice.codex"):
+    def __init__(self, states=("0|codex",), screen="› Ask Codex to do anything", window="maslow.voice.codex", screens=()):
         self.window = window
+        self.screens = list(screens)
         self.calls = []
         self.states = list(states)
         self.screen = screen
@@ -38,11 +39,14 @@ class FakeDesktop:
                 raise VoiceError("DESKTOP_FAILED", "no session")
             return state + "\n"
         if "capture-pane" in args:
-            return self.screen
+            return self.screens.pop(0) if self.screens else self.screen
         return ""
 
     def keys(self):
         return [call[call.index("send-keys") + 1:] for call in self.calls if "send-keys" in call]
+
+    def pasted(self):
+        return [call[-1] for call in self.calls if "set-buffer" in call]
 
 
 class AgentTerminalTests(unittest.IsolatedAsyncioTestCase):
@@ -67,7 +71,7 @@ class AgentTerminalTests(unittest.IsolatedAsyncioTestCase):
 
     def test_launch_never_adds_approval_or_bypass_flags(self):
         argv = agent_terminal.attach_argv("codex", "/home/me/Projects/Maslow Voice")
-        self.assertEqual(argv, ["tmux", "-L", "maslow-voice", "new-session", "-A", "-s", "maslow-codex",
+        self.assertEqual(argv, ["tmux", "-L", "maslow-voice", "-f", str(agent_terminal.CONFIG), "new-session", "-A", "-s", "maslow-codex",
                                 "-c", "/home/me/Projects/Maslow Voice", "--", "codex"])
         self.assertFalse(any(word in " ".join(argv) for word in ("approve", "bypass", "auto", "yolo", "danger")))
 
@@ -76,12 +80,20 @@ class AgentTerminalTests(unittest.IsolatedAsyncioTestCase):
             fake = FakeDesktop(states)
             self.assertEqual(await agent_terminal.ready(fake.run, "codex", wait=0.5), expected, states)
 
-    async def test_words_are_typed_literally_then_submitted(self):
+    def test_private_server_closes_viewers_with_their_agent(self):
+        config = agent_terminal.CONFIG.read_text()
+        self.assertIn("set -g detach-on-destroy on", config)
+        self.assertIn("set -g remain-on-exit off", config)
+        # The person's own tmux settings load first, so the fixed lines win.
+        self.assertLess(config.index("source-file -q ~/.config/tmux/tmux.conf"), config.index("detach-on-destroy on"))
+
+    async def test_words_are_pasted_as_one_block_then_submitted(self):
         fake = FakeDesktop()
         receipt = await self.desktop(fake).tell("codex", "add a dark mode toggle; C-c Enter")
         self.assertEqual(receipt["status"], "sent")
-        self.assertEqual(fake.keys(), [("-t", "=maslow-codex:", "-l", "--", "add a dark mode toggle; C-c Enter"),
-                                       ("-t", "=maslow-codex:", "Enter")])
+        self.assertEqual(fake.pasted(), ["add a dark mode toggle; C-c Enter"])
+        self.assertTrue(any("paste-buffer" in call and "-p" in call for call in fake.calls))
+        self.assertEqual(fake.keys(), [("-t", "=maslow-codex:", "Enter")])
         self.assertTrue(all(call[:3] == ("tmux", "-L", "maslow-voice") for call in fake.calls if call[0] == "tmux"))
 
     async def test_opening_the_window_comes_before_any_typing(self):
@@ -130,7 +142,49 @@ class AgentTerminalTests(unittest.IsolatedAsyncioTestCase):
         self.assertIn("--title=Maslow Claude Code", launch)
         fake = FakeDesktop(states=["0|claude"], screen="> ", window="maslow.voice.claude")
         await self.desktop(fake).tell("claude", "add a dark mode toggle")
-        self.assertEqual(fake.keys()[0], ("-t", "=maslow-claude:", "-l", "--", "add a dark mode toggle"))
+        self.assertEqual(fake.pasted(), ["add a dark mode toggle"])
+
+    async def test_unsubmitted_words_scrolled_view_and_startup_are_recovered(self):
+        idle = "› Ask Codex to do anything"
+        # Scrolled away: return to latest before pasting, so Enter then submits.
+        fake = FakeDesktop(screens=["• old reply\n  ↓ Back to bottom · esc", "• old reply\n  ↓ Back to bottom · esc", idle, idle])
+        await self.desktop(fake).tell("codex", "check the build")
+        self.assertEqual(fake.keys(), [("-t", "=maslow-codex:", "Enter"), ("-t", "=maslow-codex:", "Enter")])
+        # Enter became a newline: the words are still in the input box, so submit again.
+        stuck = "› check whether example.com is reachable\n  GPT · ~/Projects"
+        fake = FakeDesktop(screens=[idle, idle, stuck, "• Working (1s • esc to interrupt)"])
+        await self.desktop(fake).tell("codex", "check whether example.com is reachable")
+        self.assertEqual(fake.keys(), [("-t", "=maslow-codex:", "Enter"), ("-t", "=maslow-codex:", "Enter")])
+        # Codex still starting: Tab queues the message.
+        fake = FakeDesktop(screens=[idle, idle, "› check\n  tab to queue message", "• Working (1s • esc to interrupt)"])
+        await self.desktop(fake).tell("codex", "check")
+        self.assertEqual(fake.keys(), [("-t", "=maslow-codex:", "Enter"), ("-t", "=maslow-codex:", "Tab")])
+
+    async def test_no_key_is_pressed_once_a_decision_appears_after_submitting(self):
+        dialog = '› check\n  Allow the playwright MCP server to run tool "browser_navigate"?\n  › 1. Allow'
+        fake = FakeDesktop(screens=["› Ask Codex", "› Ask Codex", dialog, dialog])
+        await self.desktop(fake).tell("codex", "check")
+        self.assertEqual(fake.keys(), [("-t", "=maslow-codex:", "Enter")])
+
+    async def test_tool_dialogs_codex_would_remember_are_answered_in_the_window(self):
+        dialog = 'Allow the playwright MCP server to run tool "browser_navigate"?\n  url: https://example.com\n  › 1. Allow\n    3. Always allow'
+        fake = FakeDesktop(screen=dialog)
+        self.assertIn("browser_navigate", (await self.desktop(fake).tell("codex", "next"))["prompt"])
+        with self.assertRaises(VoiceError) as raised:
+            await self.desktop(fake).tell("codex", "", "approve")
+        self.assertEqual(raised.exception.code, "ANSWER_IN_WINDOW")
+        self.assertEqual(fake.keys(), [])
+
+    async def test_window_of_an_ended_session_is_replaced_not_focused(self):
+        fake = FakeDesktop()
+        fake.windows.append({"address": "0x5", "class": "maslow.voice.codex", "mapped": True})
+        original = fake.run
+        async def run(*args):
+            if "has-session" in args:
+                raise VoiceError("DESKTOP_FAILED", "no session")
+            return await original(*args)
+        await DesktopActions(run, timeout=0.5, agent_cwd=Path(self.temp.name) / "Maslow Voice").open("codex")
+        self.assertTrue(any(call[0] == "setsid" for call in fake.calls))
 
     async def test_answer_without_a_waiting_prompt_sends_nothing(self):
         fake = FakeDesktop()
