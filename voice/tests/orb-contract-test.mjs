@@ -19,10 +19,18 @@ for (const [voiceState, expected] of Object.entries({ idle: 0, connecting: 1, li
 assert.equal(property("stateMode", { voiceState: "listening", disabled: true }), 7);
 assert.equal(property("stateMode", { voiceState: "error", disabled: true }), 6);
 for (let stateMode = 0; stateMode <= 7; stateMode++) {
-  assert.equal(property("moving", { stateMode }), stateMode < 5);
-  assert.equal(property("moving", { stateMode, reducedMotion: true }), false);
-  assert.equal(property("moving", { stateMode, visible: false }), false);
+  // An error animates only until its fall finishes, then holds still.
+  assert.equal(property("moving", { stateMode, moodTime: 0, failedHold: 4.5 }), stateMode < 5 || stateMode === 6);
+  assert.equal(property("moving", { stateMode, moodTime: 4.5, failedHold: 4.5 }), stateMode < 5);
+  assert.equal(property("moving", { stateMode, reducedMotion: true, moodTime: 0, failedHold: 4.5 }), false);
+  assert.equal(property("moving", { stateMode, visible: false, moodTime: 0, failedHold: 4.5 }), false);
 }
+for (const [values, expected] of [
+  [{ stateMode: 0 }, "idle"], [{ stateMode: 1 }, "observing"], [{ stateMode: 2 }, "idle"],
+  [{ stateMode: 3, voiceState: "thinking" }, "thinking"], [{ stateMode: 3, voiceState: "working" }, "working"],
+  [{ stateMode: 4 }, "idle"], [{ stateMode: 5 }, "resting"], [{ stateMode: 6 }, "failed"], [{ stateMode: 7 }, "inactive"],
+  [{ stateMode: 5, reaction: "completed" }, "done"], [{ stateMode: 2, reaction: "interrupted" }, "idle"]
+]) assert.equal(property("mood", values), expected, JSON.stringify(values));
 for (const [level, expected] of [[-1, 0], [0.5, 0.5], [4, 1], [NaN, 0], [Infinity, 0]]) {
   assert.equal(property("normalizedLevel", { audioLevel: level }), expected);
   assert.equal(property("normalizedPlayback", { playbackLevel: level }), expected);
@@ -55,6 +63,7 @@ assert.match(orb, /clip: true/);
 assert.match(orb, /onInterruptionSequenceChanged/);
 assert.match(orb, /onCompletionSequenceChanged/);
 assert.match(orb, /root.reactionTime >=/);
+assert.match(orb, /import "OrbFrame.js" as OrbFrame/);
 
 const paint = orb.match(/onPaint: \{([\s\S]*?)\n      \}\n    \}\n    Loader/)?.[1];
 assert.ok(paint);

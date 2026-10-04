@@ -1,5 +1,6 @@
 pragma ComponentBehavior: Bound
 import QtQuick
+import "OrbFrame.js" as OrbFrame
 
 Item {
   id: root
@@ -21,11 +22,11 @@ Item {
   readonly property color pupilColor: contrastInk(eyeColor)
   readonly property color focusColor: contrastInk(backgroundColor)
   property real phase: 0
-  property bool blinking: false
   property string reaction: ""
   property real reactionTime: 0
   readonly property int stateMode: voiceState === "error" ? 6 : disabled ? 7 : ["paused", "muted"].indexOf(voiceState) >= 0 ? 5 : voiceState === "connecting" ? 1 : ["thinking", "working"].indexOf(voiceState) >= 0 ? 3 : ["speaking", "talking"].indexOf(voiceState) >= 0 ? 4 : ["listening", "conversation"].indexOf(voiceState) >= 0 ? 2 : 0
-  readonly property bool moving: visible && !reducedMotion && stateMode < 5
+  // A persistent error plays its fall once, then holds the fallen pose.
+  readonly property bool moving: visible && !reducedMotion && (stateMode < 5 || (stateMode === 6 && moodTime < failedHold))
   readonly property real normalizedLevel: isFinite(Number(audioLevel)) ? Math.max(0, Math.min(1, Number(audioLevel))) : 0
   readonly property real normalizedPlayback: isFinite(Number(playbackLevel)) ? Math.max(0, Math.min(1, Number(playbackLevel))) : 0
   // Playback is measured at the speaker, never inferred from the network or microphone.
@@ -33,8 +34,30 @@ Item {
   readonly property real energy: Math.min(1, responseLevel * 4)
   readonly property real stretch: reducedMotion ? 1 : stateMode === 3 ? 0.94 + Math.sin(phase * 0.8) * 0.025 : 1 + energy * 0.09
   readonly property real squash: reducedMotion ? 1 : stateMode === 3 ? 0.96 + Math.cos(phase * 0.8) * 0.012 : 1 - energy * 0.07
-  readonly property real bounce: reducedMotion || reaction !== "completed" ? 0 : -Math.sin(reactionTime / 0.65 * Math.PI) * height * 0.05
-  readonly property real eyeHeight: blinking && !reducedMotion ? 0.025 : stateMode === 5 ? 0.045 : stateMode === 3 ? 0.11 : reaction === "interrupted" ? 0.13 : 0.19
+  // Eye choreography comes from OrbFrame.js; completion plays "done" once.
+  readonly property string mood: reaction === "completed" ? "done" : stateMode === 6 ? "failed" : stateMode === 7 ? "inactive" : stateMode === 5 ? "resting" : stateMode === 3 ? (voiceState === "working" ? "working" : "thinking") : stateMode === 1 ? "observing" : "idle"
+  readonly property real failedHold: OrbFrame.FAILED_HOLD * OrbFrame.MOODS.failed.cycle
+  readonly property real doneLength: OrbFrame.DONE_END * OrbFrame.MOODS.done.cycle
+  property real moodStart: 0
+  readonly property real moodTime: Math.max(0, phase - moodStart)
+  // Mood changes ease from the previous mood's frame on their own clock, so
+  // static states such as paused still complete the transition. The face
+  // reads shownMood, which only the change handler sets, to avoid a loop.
+  property string shownMood: "idle"
+  property var blendFrom: null
+  property real blendTime: 1
+  readonly property var face: {
+    if (reducedMotion) return OrbFrame.stillFrame(shownMood)
+    return OrbFrame.blend(blendFrom, OrbFrame.frameAt(shownMood, shownMood === "done" ? reactionTime : moodTime), blendTime / 0.3)
+  }
+  Component.onCompleted: shownMood = mood
+  readonly property real openness: reducedMotion || reaction !== "interrupted" ? 1 : OrbFrame.interruptOpenness(reactionTime)
+  onMoodChanged: {
+    blendFrom = OrbFrame.frameAt(shownMood, shownMood === "done" ? reactionTime : moodTime)
+    shownMood = mood
+    moodStart = phase
+    blendTime = 0
+  }
   property bool shaderFailed: false
   readonly property bool shaderReady: gpuOrb.active && !shaderFailed
   onShaderReadyChanged: fluidFallback.requestPaint()
@@ -49,8 +72,9 @@ Item {
   }
 
   function react(kind) {
-    reaction = kind
+    // Reset the clock first so a new "done" never starts from an old time.
     reactionTime = 0
+    reaction = kind
     reactionTimer.restart()
   }
   onInterruptionSequenceChanged: if (interruptionSequence > 0) react("interrupted")
@@ -62,27 +86,25 @@ Item {
     onTriggered: root.phase += 0.04
   }
   Timer {
+    interval: 40
+    running: root.visible && !root.reducedMotion && root.blendTime < 0.3
+    repeat: true
+    onTriggered: root.blendTime += 0.04
+  }
+  Timer {
     id: reactionTimer
     interval: 40
     repeat: true
     onTriggered: {
       root.reactionTime += 0.04
-      if (root.reactionTime >= (root.reaction === "completed" ? 0.65 : 0.4)) { root.reaction = ""; stop() }
+      if (root.reactionTime >= (root.reaction === "completed" ? root.doneLength : 0.4)) { root.reaction = ""; stop() }
     }
   }
-  Timer {
-    interval: 4200
-    running: root.visible && !root.reducedMotion && root.stateMode < 5
-    repeat: true
-    onTriggered: { root.blinking = true; blinkEnd.restart() }
-  }
-  Timer { id: blinkEnd; interval: 130; onTriggered: root.blinking = false }
 
   Item {
     id: body
     width: parent.width
     height: parent.height
-    y: root.bounce
     opacity: root.stateMode === 7 ? 0.55 : 1
     transform: Scale { origin.x: body.width / 2; origin.y: body.height / 2; xScale: root.stretch; yScale: root.squash }
     Canvas {
@@ -157,36 +179,97 @@ Item {
       }
     }
     // Shared native geometry gives the character the same face on both renderers.
-    Repeater {
-      model: 2
-      Rectangle {
-        required property int index
-        x: body.width * (index === 0 ? 0.34 : 0.57)
-        y: body.height * (root.stateMode === 3 ? 0.40 : 0.37)
-        width: body.width * 0.10
-        height: body.height * root.eyeHeight
-        radius: width / 2
-        color: root.eyeColor
-        rotation: root.stateMode === 3 ? (index === 0 ? -12 : 12) : root.stateMode === 6 ? (index === 0 ? 12 : -12) : 0
-        Behavior on height { enabled: !root.reducedMotion; NumberAnimation { duration: 90 } }
+    Item {
+      id: face
+      readonly property real unit: width * 0.395 / OrbFrame.BODY_RADIUS
+      function px(value) { return width / 2 + (value - OrbFrame.CENTER) * unit }
+      width: body.width
+      height: body.height
+      x: root.face.offset[0] * unit
+      y: root.face.offset[1] * unit
+      rotation: root.face.tilt
+      Repeater {
+        model: 2
         Rectangle {
-          visible: root.eyeHeight > 0.05
-          width: parent.width * 0.48
-          height: width
-          radius: width / 2
-          x: (parent.width - width) / 2
-          y: parent.height * 0.48
-          color: root.pupilColor
+          id: eye
+          required property int index
+          readonly property var pose: root.face.eyes[index]
+          readonly property real eyeHeight: pose.h * root.openness * face.unit
+          x: face.px(pose.cx) - width / 2
+          y: face.px(pose.cy) - height / 2
+          width: pose.w * face.unit
+          height: eyeHeight
+          radius: Math.min(pose.r * face.unit, width / 2, height / 2)
+          rotation: pose.rot * 180 / Math.PI
+          opacity: pose.alpha
+          color: root.eyeColor
+          Rectangle {
+            // Pupils show only on open, upright eyes, not on dots or slits.
+            visible: eye.height > eye.width * 1.25 && eye.opacity > 0.5
+            width: eye.width * 0.48
+            height: width
+            radius: width / 2
+            x: (eye.width - width) / 2
+            y: eye.height * 0.48
+            color: root.pupilColor
+          }
         }
       }
-    }
-    Rectangle {
-      x: body.width * 0.45
-      y: body.height * 0.66
-      width: body.width * 0.10
-      height: root.stateMode === 4 ? body.height * (0.025 + root.energy * 0.06) : body.height * 0.025
-      radius: height / 2
-      color: root.eyeColor
+      Rectangle {
+        // The mouth steps aside while the eyes travel through its space.
+        opacity: ["thinking", "working", "failed"].indexOf(root.face.mood) >= 0 ? 0 : 1
+        Behavior on opacity { enabled: !root.reducedMotion; NumberAnimation { duration: 150 } }
+        width: body.width * 0.10
+        height: root.stateMode === 4 ? body.height * (0.025 + root.energy * 0.06) : body.height * 0.025
+        x: face.px(OrbFrame.CENTER) - width / 2
+        y: face.px(OrbFrame.MOUTH_Y) - height / 2
+        radius: height / 2
+        color: root.eyeColor
+      }
+      Canvas {
+        id: marks
+        // Dizzy swirls and sleep marks; repaints only while either is shown.
+        readonly property bool shown: root.face.swirls.length > 0 || root.face.sleep.length > 0
+        property bool painted: false
+        anchors.fill: parent
+        onWidthChanged: requestPaint()
+        Connections {
+          target: root
+          function onFaceChanged() { if (marks.shown || marks.painted) marks.requestPaint() }
+          function onEyeColorChanged() { marks.requestPaint() }
+        }
+        onPaint: {
+          const ctx = getContext("2d")
+          ctx.reset()
+          ctx.clearRect(0, 0, width, height)
+          painted = shown
+          ctx.strokeStyle = String(root.eyeColor)
+          ctx.lineCap = "round"
+          ctx.lineJoin = "round"
+          for (const swirl of root.face.swirls) {
+            const points = OrbFrame.swirlPoints(swirl)
+            ctx.globalAlpha = swirl.alpha
+            ctx.lineWidth = Math.max(1, face.unit * 1.1)
+            ctx.beginPath()
+            for (let index = 0; index < points.length; index++) {
+              if (index === 0) ctx.moveTo(face.px(points[index][0]), face.px(points[index][1]))
+              else ctx.lineTo(face.px(points[index][0]), face.px(points[index][1]))
+            }
+            ctx.stroke()
+          }
+          for (const mark of root.face.sleep) {
+            const half = mark.size / 2
+            ctx.globalAlpha = mark.alpha
+            ctx.lineWidth = Math.max(1, mark.size * 0.22 * face.unit)
+            ctx.beginPath()
+            ctx.moveTo(face.px(mark.x - half), face.px(mark.y - half))
+            ctx.lineTo(face.px(mark.x + half), face.px(mark.y - half))
+            ctx.lineTo(face.px(mark.x - half), face.px(mark.y + half))
+            ctx.lineTo(face.px(mark.x + half), face.px(mark.y + half))
+            ctx.stroke()
+          }
+        }
+      }
     }
   }
   // Status symbols remain static and independent of deformation.

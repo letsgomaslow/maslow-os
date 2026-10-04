@@ -18,4 +18,5 @@ fi
 PYTHONDONTWRITEBYTECODE=1 PYTHONPATH="$ROOT/voice" "$voice_python" -m unittest discover -s "$ROOT/voice/tests" -p 'test_*.py'
 node "$ROOT/voice/tests/ui-contract-test.mjs"
 node "$ROOT/voice/tests/orb-contract-test.mjs"
+node "$ROOT/voice/tests/orb-frame-test.mjs"
 pass "Voice lifecycle, task boundary, offline workspace and UI contracts"
