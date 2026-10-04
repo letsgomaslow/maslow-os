@@ -4,7 +4,7 @@ import base64
 import json
 import unittest
 from types import SimpleNamespace
-from unittest.mock import AsyncMock
+from unittest.mock import AsyncMock, patch
 
 from maslow_voice.providers.base import ProviderError
 from maslow_voice.providers.openai_realtime import OpenAIRealtimeProvider
@@ -18,6 +18,7 @@ class Socket:
         self.updated = True
         self.closed = False
         self.configured = asyncio.Event()
+        self.ack_clear = True
 
     async def send(self, value):
         event = json.loads(value)
@@ -26,6 +27,8 @@ class Socket:
             self.configured.set()
             if self.updated:
                 self.inbox.put_nowait(json.dumps({'type': 'session.updated'}))
+        elif event['type'] == 'input_audio_buffer.clear' and self.ack_clear:
+            self.inbox.put_nowait(json.dumps({'type': 'input_audio_buffer.cleared'}))
 
     async def recv(self):
         value = await self.inbox.get()
@@ -92,6 +95,154 @@ class OpenAILifecycleTests(unittest.IsolatedAsyncioTestCase):
                                           'item': {'id': item, 'role': 'assistant'}})
         await self.provider._handle_event({'type': 'response.output_audio.delta', 'response_id': response, 'item_id': item,
                                           'delta': base64.b64encode(b'\x01\x00' * samples).decode()})
+
+    async def test_pause_preserves_connection_flushes_output_and_rejects_late_events(self):
+        await self.provider.start()
+        self.audio.blocked = True
+        await self.output()
+        await self.audio.entered.wait()
+        await self.provider.pause(True)
+        pause_start = len(self.events)
+        await self.provider.pause(True)
+        await self.provider._handle_event({'type': 'response.output_audio.delta', 'response_id': 'r1',
+                                          'delta': base64.b64encode(b'\x02\x00' * 240).decode()})
+        await self.provider._handle_event({'type': 'response.done', 'response': {'id': 'r1', 'status': 'cancelled'}})
+        await asyncio.gather(*self.provider._drain_tasks)
+        await self.provider.wait_playback()
+        self.assertEqual(self.audio.frames, [])
+        self.assertTrue(self.provider._started)
+        self.assertFalse(self.socket.closed)
+        self.assertTrue(self.provider._paused)
+        self.assertTrue(all(event['state'] == 'paused' and not event['microphone'] and not event['speaking']
+                            for event in self.events[pause_start:] if event['type'] == 'voice_state'))
+        self.assertTrue(any(event['type'] == 'input_audio_buffer.clear' for event in self.socket.sent))
+        await self.provider.pause(False)
+        await self.provider._handle_event({'type': 'response.output_audio.delta', 'response_id': 'late-unknown',
+                                          'delta': base64.b64encode(b'\x03\x00' * 240).decode()})
+        await self.provider.wait_playback()
+        self.assertEqual(self.audio.frames, [])
+        await self.provider._create_response('fresh-turn')
+        await self.provider._handle_event({'type': 'response.created', 'response': {'id': 'fresh', 'metadata': {'maslow_turn_id': 'fresh-turn'}}})
+        await self.provider._handle_event({'type': 'response.output_audio.delta', 'response_id': 'fresh', 'item_id': 'fresh-item',
+                                          'delta': base64.b64encode(b'\x01\x00' * 240).decode()})
+        await self.provider.wait_playback()
+        self.assertEqual(len(self.audio.frames), 1)
+        self.assertFalse(self.provider._paused)
+
+    async def test_delayed_created_response_cannot_cross_resume_barrier_or_replace_fresh_response(self):
+        await self.provider.start()
+        await self.provider._create_response('old-turn')
+        await self.provider.pause(True)
+        await self.provider.pause(False)
+        for identity, metadata in [('late-unknown', {}), ('late-old', {'maslow_turn_id': 'old-turn'})]:
+            await self.provider._handle_event({'type': 'response.created', 'response': {'id': identity, 'metadata': metadata}})
+            await self.provider._handle_event({'type': 'response.output_audio.delta', 'response_id': identity,
+                                              'delta': base64.b64encode(b'\x02\x00' * 240).decode()})
+        await self.provider.wait_playback()
+        self.assertEqual(self.audio.frames, [])
+        self.assertIsNone(self.provider._active_response_id)
+        await self.provider._create_response('new-turn')
+        await self.provider._handle_event({'type': 'response.created', 'response': {'id': 'new-response', 'metadata': {'maslow_turn_id': 'new-turn'}}})
+        await self.provider._handle_event({'type': 'response.created', 'response': {'id': 'another-old', 'metadata': {'maslow_turn_id': 'old-turn'}}})
+        self.assertEqual(self.provider._active_response_id, 'new-response')
+
+    async def test_typed_reply_while_paused_has_transcript_without_speaker_or_microphone(self):
+        await self.provider.start()
+        await self.provider.pause(True)
+        typed = asyncio.create_task(self.provider.text('Keep working'))
+        while not self.provider._typed_waiters:
+            await asyncio.sleep(0)
+        turn = next(iter(self.provider._typed_waiters))
+        await self.provider._handle_event({'type': 'response.created', 'response': {'id': 'typed-paused', 'metadata': {'maslow_turn_id': turn}}})
+        await self.provider._handle_event({'type': 'response.output_audio.delta', 'response_id': 'typed-paused',
+                                          'delta': base64.b64encode(b'\x03\x00' * 240).decode()})
+        await self.provider._handle_event({'type': 'response.output_audio_transcript.done', 'response_id': 'typed-paused', 'transcript': 'Still working'})
+        await self.provider._handle_event({'type': 'response.done', 'response': {'id': 'typed-paused', 'status': 'completed'}})
+        await typed
+        await self.provider.wait_playback()
+        self.assertEqual(self.audio.frames, [])
+        self.assertTrue(self.provider._paused)
+        self.assertTrue(any(event.get('text') == 'Still working' for event in self.events))
+        await self.provider.pause(False)
+        await self.provider._handle_event({'type': 'response.output_audio.delta', 'response_id': 'typed-paused',
+                                          'delta': base64.b64encode(b'\x03\x00' * 240).decode()})
+        await self.provider.wait_playback()
+        self.assertEqual(self.audio.frames, [])
+
+    async def test_pause_before_typed_response_created_settles_caller_and_cancels_exact_response(self):
+        await self.provider.start()
+        typed = asyncio.create_task(self.provider.text('Explain this'))
+        while not self.provider._typed_waiters:
+            await asyncio.sleep(0)
+        turn = next(iter(self.provider._typed_waiters))
+        await self.provider.pause(True)
+        await self.provider.pause(False)
+        await self.provider._create_response('fresh-turn')
+        await self.provider._handle_event({'type': 'response.created', 'response': {
+            'id': 'fresh', 'metadata': {'maslow_turn_id': 'fresh-turn'}}})
+        await self.provider._handle_event({'type': 'response.created', 'response': {
+            'id': 'retired', 'metadata': {'maslow_turn_id': turn}}})
+        await asyncio.wait_for(typed, 1)
+        cancellation = self.socket.sent[-1]
+        self.assertEqual(cancellation['type'], 'response.cancel')
+        self.assertEqual(cancellation['response_id'], 'retired')
+        await self.provider._handle_event({'type': 'response.output_audio.delta', 'response_id': 'retired',
+                                          'delta': base64.b64encode(b'\x03\x00' * 240).decode()})
+        await self.provider._handle_event({'type': 'response.done', 'response': {'id': 'retired', 'status': 'cancelled'}})
+        await self.provider._handle_event({'type': 'error', 'error': {
+            'code': 'response_cancel_not_active', 'event_id': cancellation['event_id']}})
+        await self.provider.wait_playback()
+        self.assertEqual(self.audio.frames, [])
+        self.assertEqual(self.provider._active_response_id, 'fresh')
+        self.assertTrue(self.provider._response_active)
+        self.assertTrue(self.provider._started)
+        self.assertFalse(self.socket.closed)
+
+    async def test_unrelated_cancel_error_remains_a_failure(self):
+        await self.provider.start()
+        self.provider._retired_cancellations['retired-cancel'] = 'old-response'
+        await self.provider._handle_event({'type': 'error', 'error': {
+            'code': 'response_cancel_not_active', 'event_id': 'other-request'}})
+        self.assertIsNotNone(self.provider._start_failure)
+        self.assertFalse(self.provider._started)
+
+    async def test_capture_waiting_on_writer_cannot_send_after_pause(self):
+        from maslow_voice.audio import PcmFrame
+        await self.provider.start()
+        await self.provider._write_lock.acquire()
+        capture = asyncio.create_task(self.provider._on_audio(PcmFrame(b'\x01\x00' * 480)))
+        await asyncio.sleep(0)
+        self.provider._paused = True
+        self.provider._write_lock.release()
+        await capture
+        self.assertFalse(any(event['type'] == 'input_audio_buffer.append' for event in self.socket.sent))
+
+    async def test_pause_waits_for_clear_ack_and_discards_preceding_late_vad_commits(self):
+        await self.provider.start()
+        self.socket.ack_clear = False
+        pause = asyncio.create_task(self.provider.pause(True))
+        while not any(event['type'] == 'input_audio_buffer.clear' for event in self.socket.sent):
+            await asyncio.sleep(0)
+        self.assertFalse(pause.done())
+        self.assertTrue(self.provider._paused)
+        self.socket.inbox.put_nowait(json.dumps({'type': 'input_audio_buffer.committed', 'item_id': 'old-mic-item'}))
+        self.socket.inbox.put_nowait(json.dumps({'type': 'input_audio_buffer.cleared'}))
+        await asyncio.wait_for(pause, 1)
+        self.assertFalse(any(event['type'] == 'response.create' for event in self.socket.sent))
+        await self.provider.pause(False)
+        self.assertFalse(self.provider._paused)
+
+    async def test_missing_clear_ack_times_out_with_audio_still_paused(self):
+        await self.provider.start()
+        self.socket.ack_clear = False
+        with patch('maslow_voice.providers.openai_realtime.PAUSE_CANCEL_TIMEOUT_SECONDS', 0.01):
+            with self.assertRaises(TimeoutError):
+                await self.provider.pause(True)
+            self.assertTrue(self.provider._paused)
+            with self.assertRaises(TimeoutError):
+                await self.provider.pause(False)
+        self.assertTrue(self.provider._paused)
+        self.assertTrue(self.provider._input_clear_required)
 
     async def test_all_allowed_voices_and_default_reach_pcm24k_session_configuration(self):
         self.assertEqual(self.provider._session_config('gpt-realtime-2.1', True)['audio']['output']['voice'], 'cedar')

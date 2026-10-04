@@ -83,19 +83,58 @@ class PortAudioTransport:
         self.blocksize = blocksize
         self.microphone_device = microphone_device or None
         self.speaker_device = speaker_device or None
-        self._queue: asyncio.Queue[PcmFrame] = asyncio.Queue(maxsize=queue_frames)
-        self._output: deque[bytes] = deque(maxlen=queue_frames)
+        self._queue: asyncio.Queue[tuple[PcmFrame, bytes]] = asyncio.Queue(maxsize=queue_frames)
+        self._output: deque[tuple[int, bytes]] = deque(maxlen=queue_frames)
         self._loop: asyncio.AbstractEventLoop | None = None
         self._handler: AudioHandler | None = None
         self._stream: Any = None
         self._pump: asyncio.Task[None] | None = None
         self._muted = False
+        self._paused = False
+        self._input_generation = 0
         self._running = False
         self._played_samples = 0
         self._generation = 0
         self._apm = None
         self._on_error = on_error
         self._capture = capture
+        self._playback_handler: Callable[[float], Awaitable[None]] | None = None
+        self._meter_latest: tuple[int, bytes] | None = None
+        self._meter_pending = False
+        self._meter_task: asyncio.Task[None] | None = None
+
+    def set_playback_handler(self, handler: Callable[[float], Awaitable[None]]) -> None:
+        self._playback_handler = handler
+
+    def _schedule_meter(self, pcm: bytes) -> None:
+        # The callback only replaces one bounded sample and schedules one
+        # consumer. RMS calculation and publication run on the event loop.
+        if self._playback_handler is None or self._loop is None:
+            return
+        self._meter_latest = (self._generation, pcm)
+        if not self._meter_pending:
+            self._meter_pending = True
+            self._loop.call_soon_threadsafe(self._start_meter)
+
+    def _start_meter(self) -> None:
+        self._meter_task = asyncio.create_task(self._publish_meter())
+
+    async def _publish_meter(self) -> None:
+        try:
+            while self._meter_latest is not None:
+                generation, pcm = self._meter_latest
+                self._meter_latest = None
+                if generation != self._generation:
+                    continue
+                samples = memoryview(pcm).cast("h")
+                level = min(1.0, math.sqrt(sum(value * value for value in samples) / len(samples)) / 32768.0) if samples else 0.0
+                if self._playback_handler is not None:
+                    await self._playback_handler(level)
+        finally:
+            self._meter_pending = False
+            self._meter_task = None
+            if self._meter_latest is not None:
+                self._schedule_meter(self._meter_latest[1])
 
     @property
     def played_ms(self):
@@ -136,33 +175,43 @@ class PortAudioTransport:
             self._apm.set_stream_delay_ms(30)
             self._loop = asyncio.get_running_loop()
             self._handler = handler
+        elif self._playback_handler is not None:
+            self._loop = asyncio.get_running_loop()
         self._running = True
 
         def input_callback(indata: Any, rendered: bytes, frames: int) -> None:
             # The callback may never await, perform I/O, or call a provider.
-            if self._muted or not self._running or self._loop is None:
+            generation = self._input_generation
+            if self._muted or self._paused or not self._running or self._loop is None:
                 return
             pcm = bytes(indata)
-            self._loop.call_soon_threadsafe(self._put_input, (PcmFrame(pcm, self.sample_rate), rendered))
+            self._loop.call_soon_threadsafe(self._put_input, (PcmFrame(pcm, self.sample_rate), rendered), generation)
 
         def output_callback(outdata: Any, frames: int, _time: Any, _status: Any) -> None:
+            generation = self._generation
             required = frames * 2
             data = bytearray(required)
             written = 0
             # RTC packets may be shorter than the device callback (10 ms vs
             # 20 ms). Join available PCM before padding a genuine underrun.
-            while written < required:
+            while written < required and self._running and not self._paused and generation == self._generation:
                 try:
-                    chunk = self._output.popleft()
+                    chunk_generation, chunk = self._output.popleft()
                 except IndexError:
                     break
+                if chunk_generation != generation:
+                    continue
                 count = min(len(chunk), required - written)
                 data[written:written + count] = chunk[:count]
                 written += count
                 if count < len(chunk):
-                    self._output.appendleft(chunk[count:])
+                    self._output.appendleft((generation, chunk[count:]))
+            if self._paused or not self._running or generation != self._generation:
+                data = bytearray(required)
+                written = 0
             self._played_samples += written // 2
             outdata[:] = data
+            self._schedule_meter(bytes(data))
             return bytes(data)
 
         def callback(indata, outdata, frames, time, status):
@@ -189,8 +238,10 @@ class PortAudioTransport:
         if self._capture:
             self._pump = asyncio.create_task(self._run_input())
 
-    def _put_input(self, frame: PcmFrame) -> None:
-        if self._capture and self._running and not self._muted and not self._queue.full():
+    def _put_input(self, frame: tuple[PcmFrame, bytes], generation: int | None = None) -> None:
+        if generation is not None and generation != self._input_generation:
+            return
+        if self._capture and self._running and not self._muted and not self._paused and not self._queue.full():
             self._queue.put_nowait(frame)
 
     async def _run_input(self) -> None:
@@ -212,7 +263,7 @@ class PortAudioTransport:
     async def _drain_input(self) -> None:
         while self._running:
             frame, rendered = await self._queue.get()
-            if self._handler is not None and not self._muted:
+            if self._handler is not None and not self._muted and not self._paused:
                 from livekit import rtc
                 # WebRTC APM consumes exactly 10 ms frames. Feed the samples
                 # actually sent to the speaker, not a synthesized text estimate.
@@ -230,16 +281,16 @@ class PortAudioTransport:
                 await self._handler(PcmFrame(bytes(cleaned), self.sample_rate))
 
     async def play(self, frame: PcmFrame) -> None:
-        if self._running:
+        if self._running and not self._paused:
             pcm = resample_pcm16(frame, self.sample_rate).pcm
             generation = self._generation
             size = self.blocksize * 2
             for offset in range(0, len(pcm), size):
                 while self._running and generation == self._generation and len(self._output) >= self._output.maxlen:
                     await asyncio.sleep(0.01)
-                if not self._running or generation != self._generation:
+                if not self._running or self._paused or generation != self._generation:
                     return
-                self._output.append(pcm[offset:offset + size])
+                self._output.append((generation, pcm[offset:offset + size]))
 
     async def wait_playback(self):
         while self._running and self._output:
@@ -249,17 +300,33 @@ class PortAudioTransport:
         self._generation += 1
         self._output.clear()
         self._played_samples = 0
+        self._schedule_meter(b"")
+
+    def set_paused(self, paused: bool) -> None:
+        """Gate both callback directions immediately, before provider awaits."""
+        if self._paused == paused:
+            return
+        self._paused = paused
+        self._input_generation += 1
+        self._generation += 1
+        self._output.clear()
+        while not self._queue.empty():
+            self._queue.get_nowait()
+        self._schedule_meter(b"")
 
     async def set_muted(self, muted: bool) -> None:
         self._muted = muted
+        self._input_generation += 1
         if muted:
             while not self._queue.empty():
                 self._queue.get_nowait()
 
     async def stop(self) -> None:
         self._running = False
+        self._input_generation += 1
         self._generation += 1
         self._output.clear()
+        self._schedule_meter(b"")
         while not self._queue.empty():
             self._queue.get_nowait()
         if self._pump is not None:

@@ -24,6 +24,9 @@ class FakeProvider:
         await self.emit({"type": "voice_state", "state": "listening", "microphone": audio})
     async def stop(self):
         self.started = False
+    async def pause(self, paused):
+        self.paused = paused
+        await self.emit({"type": "voice_state", "state": "paused" if paused else "listening", "microphone": not paused})
     async def text(self, text, context):
         await self.emit({"type": "transcript", "role": "user", "text": text, "final": True, "turn_id": "turn-" + text})
     async def append_context(self, kind, content, delegation_id=None):
@@ -57,8 +60,11 @@ class ServiceTests(unittest.IsolatedAsyncioTestCase):
         self.assertFalse(self.service.session_expired(120))
         self.assertTrue(self.service.session_expired(1800))
         await self.service.dispatch({"action": "toggle_voice", "extended": True})
-        self.assertIsNone(self.service.provider)
-        self.assertFalse(self.service.voice["extended"])
+        self.assertIs(self.service.provider, provider)
+        self.assertTrue(self.service.voice["paused"])
+        self.assertTrue(self.service.voice["extended"])
+        self.assertEqual(self.service.session_started, 0)
+        await self.service.end_voice()
         await self.service.dispatch({"action": "start_voice"})
         self.assertFalse(self.service.voice["extended"])
 

@@ -146,14 +146,14 @@ class ControlServer:
                             # Off must also discard older queued conversation
                             # requests, so none can restart capture after Off.
                             for task, metadata in tuple(pending.items()):
-                                if metadata["action"] in {"start_voice", "submit_text"}:
+                                if metadata["action"] in {"start_voice", "submit_text", "toggle_voice", "pause_voice"}:
                                     metadata["cancelled"] = True
                                     # The daemon first revokes the provider epoch,
                                     # then cancels active work. Cancelling here
                                     # could run a stale callback before revocation.
                         if len(pending) >= 32 and action != "end_voice":
                             raise VoiceError("CONTROL_BUSY", "Voice has too many pending requests. Wait for the current action or turn Voice off.")
-                        safety = action in {"end_voice", "mute", "silence", "status"}
+                        safety = action in {"end_voice", "mute", "silence", "pause_voice", "toggle_voice", "status"}
                         metadata = {"action": action, "cancelled": False}
                         task = asyncio.create_task(answer(request, metadata, None if safety else barrier, safety))
                         pending[task] = metadata

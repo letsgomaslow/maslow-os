@@ -25,7 +25,7 @@ class LiveKitGeminiProvider(LiveKitNativeExpressiveProvider):
 
     async def notify_task(self, content):
         """Speak a daemon update only in a quiet gap, never by interrupting a turn."""
-        if not self._started or self._session is None or self._muted:
+        if not self._started or self._session is None or self._muted or self._paused:
             return False
         if self._audio_enabled:
             if self._session.user_state != "listening" or self._session.agent_state != "listening":

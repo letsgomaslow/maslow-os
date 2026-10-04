@@ -41,13 +41,17 @@ ShellRoot {
     target: "voice-fixture"
     function page(value: string): void { panel.open(JSON.stringify({ page: value })) }
     function close(): void { panel.close() }
-    function compact(): void { panel.compactControlsOpen = true }
+    function activate(): void { panel.startFromOrb() }
+    function details(): void { panel.openDetails() }
+    function badge(): void { panel.openBadgeTask() }
     function state(value: string): void {
       var next = JSON.parse(JSON.stringify(panel.voiceController.snapshot))
       next.voice.state = value
       next.voice.enabled = value !== "disabled"
       next.voice.microphone = value === "listening"
       next.voice.speaking = value === "speaking"
+      next.voice.paused = value === "paused"
+      next.voice.playback_level = value === "speaking" ? 0.15 : 0
       next.voice.level = value === "speaking" ? 0.7 : 0.2
       panel.voiceController.setFixture(next)
     }
@@ -129,6 +133,14 @@ ShellRoot {
       next.settings[key] = value === "true" ? true : (value === "false" ? false : value)
       panel.voiceController.setFixture(next)
     }
+    function interrupt(): void {
+      var next = JSON.parse(JSON.stringify(panel.voiceController.snapshot))
+      next.voice.state = "listening"
+      next.voice.microphone = true
+      next.voice.playback_level = 0
+      next.voice.interruption_sequence = (next.voice.interruption_sequence || 0) + 1
+      panel.voiceController.setFixture(next)
+    }
     function extended(value: bool): void {
       var next = JSON.parse(JSON.stringify(panel.voiceController.snapshot))
       next.voice.extended = value
@@ -146,7 +158,9 @@ ShellRoot {
     function repairStatus(): string { return JSON.stringify({ page: panel.page, settingsOpen: panel.settingsOpen, projectRepairOpen: panel.projectRepairOpen, advancedRequestOptionsOpen: panel.advancedRequestOptionsOpen }) }
     function setupSaved(): void { panel.voiceController.applyLine('{"ok":true,"livekit_saved":true}') }
     function setupError(): void { panel.voiceController.applyLine('{"ok":false,"error":{"message":"LiveKit setup could not be saved. Check the project URL and try again."}}') }
-    function status(): string { return JSON.stringify({ placement: panel.heldPlacement, diameter: panel.heldDiameter, desired: panel.desiredPlacement, controllerOpen: panel.controllerOpen, compactControlsOpen: panel.compactControlsOpen, state: panel.voice.state, selectedTaskId: panel.selectedTaskId, working: panel.working }) }
+    function position(x: real, y: real): void { panel.localOrbPositionActive = true; panel.localOrbPositionX = x; panel.localOrbPositionY = y }
+    function geometry(): string { return JSON.stringify(panel.fixtureGeometry()) }
+    function status(): string { return JSON.stringify({ diameter: panel.heldDiameter, controllerOpen: panel.controllerOpen, status: panel.stateText(), badge: panel.taskBadge, state: panel.voice.state, selectedTaskId: panel.selectedTaskId, working: panel.working }) }
     function stressStatus(): string { return JSON.stringify({ taskDelegateCreations: panel.taskDelegateCreations, transcriptDelegateCreations: panel.transcriptDelegateCreations, meterFramesRemaining: meterFramesRemaining, meterLevel: panel.voice.level, taskApproval: panel.tasks[0] ? panel.tasks[0].approval.detail : "", captions: panel.transcript.length }) }
   }
 }

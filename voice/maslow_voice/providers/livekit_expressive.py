@@ -324,9 +324,11 @@ class LiveKitExpressiveProvider(VoiceProvider):
             self._queue_event({"type": "transcript", "role": "assistant", "text": event.item.text_content, "final": True})
 
     async def _on_audio(self, frame: PcmFrame) -> None:
-        if not self._started or self._muted or self._source is None:
+        if not self._started or self._muted or self._paused or self._source is None:
             return
         await self._level(frame)
+        if not self._started or self._muted or self._paused:
+            return
         rtc, _api, _agents = self._imports()
         frame = resample_pcm16(frame, 48_000)
         rtc_frame = rtc.AudioFrame(

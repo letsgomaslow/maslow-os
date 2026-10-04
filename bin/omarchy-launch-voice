@@ -92,13 +92,16 @@ else
     else
       request='{"action":"toggle_voice","extended":false}'
     fi
+    # Discovery is complete. Do not hold its lock across a network startup:
+    # another shortcut must reach the daemon to cancel Connecting.
+    rm -f -- "$refresh_pending"
+    exec 9>&-
     response=$(omarchy-voice-control <<<"$request") || exit 1
     if ! jq -e '.ok == true' <<<"$response" >/dev/null; then
       jq -r '.error.message // "Voice could not start."' <<<"$response" >&2
-      page=settings
-    else
-      page=talk
+      exit 1
     fi
+    exit 0
   fi
   result=$(omarchy-shell shell summon maslow.voice "{\"page\":\"$page\"}") || defer_open
   # The IPC command exits successfully even when summon returns "unknown".

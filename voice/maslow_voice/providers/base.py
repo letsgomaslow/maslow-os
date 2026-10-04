@@ -12,7 +12,7 @@ from typing import Any, Final, Literal, TypedDict
 from maslow_voice.audio import PcmFrame
 from maslow_voice.errors import VoiceError
 
-VoiceState = Literal["connecting", "listening", "thinking", "speaking", "disabled", "error"]
+VoiceState = Literal["connecting", "listening", "thinking", "speaking", "paused", "disabled", "error"]
 ToolPreference = Literal["auto", "codex", "claude", "hermes"]
 Emit = Callable[[dict[str, Any]], Awaitable[None]]
 Submit = Callable[[dict[str, Any], str], Awaitable[dict[str, Any]]]
@@ -29,6 +29,7 @@ class Intent(TypedDict):
 
 INTENT_KEYS: Final = frozenset(Intent.__annotations__)
 TOOL_PREFERENCES: Final = frozenset({"auto", "codex", "claude", "hermes"})
+PAUSE_CANCEL_TIMEOUT_SECONDS: Final = 5.0
 
 
 class ProviderError(VoiceError):
@@ -101,10 +102,14 @@ class VoiceProvider(ABC):
         self._started = False
         self._audio_enabled = False
         self._muted = False
+        self._paused = False
         self._state: VoiceState = "disabled"
         # Provider objects may be constructed while configuration is loaded,
         # before the daemon has entered its event loop (notably on Python 3.9).
         self._emit_lock: asyncio.Lock | None = None
+        attach_meter = getattr(audio_transport, "set_playback_handler", None)
+        if attach_meter is not None:
+            attach_meter(self._playback_level)
 
     @abstractmethod
     async def start(self, audio: bool = True) -> None:
@@ -121,15 +126,42 @@ class VoiceProvider(ABC):
     async def mute(self, muted: bool) -> None:
         self._muted = muted
         if self.audio_transport is not None:
-            await self.audio_transport.set_muted(muted)
+            await self.audio_transport.set_muted(muted or self._paused)
         if self._started:
             await self._state_event("listening", microphone=self._audio_enabled and not muted)
+
+    async def pause(self, paused: bool) -> None:
+        """Keep the connection/context while discarding all interrupted audio."""
+        if self._paused == paused:
+            return
+        self._paused = paused
+        gate = getattr(self.audio_transport, "set_paused", None)
+        if gate is not None:
+            gate(paused)
+        if paused:
+            # Physical callback gates above run before cancellation or any
+            # network wait. The legacy mute control remains independent.
+            if self.audio_transport is not None:
+                await self.audio_transport.set_muted(True)
+            await asyncio.wait_for(self.silence(), PAUSE_CANCEL_TIMEOUT_SECONDS)
+        else:
+            if self.audio_transport is not None:
+                await self.audio_transport.clear_playback()
+                await self.audio_transport.set_muted(self._muted)
+        if self._started:
+            await self._state_event("paused" if paused else "listening", microphone=not paused and self._audio_enabled and not self._muted)
+
+    async def _playback_level(self, level: float) -> None:
+        if self._paused or not self._started:
+            level = 0.0
+        await self._emit_callback({"type": "playback_level", "playback_level": round(level, 4)})
 
     async def silence(self) -> None:
         """Interrupt local playback. Cloud providers extend this to cancel output."""
 
         if self.audio_transport is not None:
             await self.audio_transport.clear_playback()
+        await self._event({"type": "interrupted"})
         if self._started:
             await self._state_event("listening", microphone=self._audio_enabled and not self._muted)
 
@@ -138,12 +170,17 @@ class VoiceProvider(ABC):
         if self._emit_lock is None:
             self._emit_lock = asyncio.Lock()
         async with self._emit_lock:
+            if event.get("type") == "voice_state" and self._paused and event.get("state") not in {"disabled", "error", "connecting"}:
+                event = {**event, "state": "paused", "microphone": False, "speaking": False}
             await self._emit_callback(event)
 
     async def _state_event(self, state: VoiceState, *, microphone: bool, speaking: bool = False) -> None:
         self._state = state
+        if self._paused and state not in {"connecting", "disabled", "error"}:
+            state = self._state = "paused"
+            speaking = False
         if state not in {"connecting", "disabled", "error"}:
-            microphone = self._audio_enabled and not self._muted
+            microphone = self._audio_enabled and not self._muted and not self._paused
         await self._event({"type": "voice_state", "state": state, "microphone": microphone, "speaking": speaking})
 
     async def _error(self, error: BaseException | str, default: str = "Voice connection failed") -> None:
@@ -185,4 +222,6 @@ class VoiceProvider(ABC):
         level = min(1.0, math.sqrt(mean_square) / 32768.0)
         # Meter readings are independent of ordered transcript/state delivery.
         # A slow UI consumer of those events must not hold microphone ingestion.
-        await self._emit_callback({"type": "level", "level": round(level, 4)})
+        if self._paused or self._muted:
+            level = 0.0
+        await self._emit_callback({"type": "level", "level": round(level, 4), "input_level": round(level, 4)})

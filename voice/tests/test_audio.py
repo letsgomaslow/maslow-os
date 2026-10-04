@@ -62,6 +62,92 @@ class PcmResamplingTests(unittest.TestCase):
 
 
 class PlaybackTransportTests(unittest.IsolatedAsyncioTestCase):
+    async def test_pause_resume_during_callback_never_replays_old_packet_remainder(self):
+        stream = SimpleNamespace(start=Mock(), stop=Mock(), close=Mock())
+        factory = Mock(return_value=stream)
+        transport = PortAudioTransport(capture=False)
+        class InterruptedBytes(bytes):
+            def __getitem__(self, key):
+                # Model a callback thread preempted by a rapid pause/resume on
+                # the event-loop thread while copying the current packet.
+                transport.set_paused(True)
+                transport.set_paused(False)
+                return super().__getitem__(key)
+        with patch.dict("sys.modules", {"sounddevice": SimpleNamespace(RawOutputStream=factory)}):
+            await transport.start(AsyncMock())
+            try:
+                transport._output.append((transport._generation, InterruptedBytes(b'\x01\x00' * 960)))
+                callback = factory.call_args.kwargs['callback']
+                rendered = bytearray(480)
+                callback(rendered, 240, None, None)
+                self.assertEqual(rendered, b'\0' * 480)
+                callback(rendered, 240, None, None)
+                self.assertEqual(rendered, b'\0' * 480)
+                self.assertEqual(transport.played_samples, 0)
+            finally:
+                await transport.stop()
+
+    async def test_pause_flushes_both_directions_and_stale_capture_after_resume(self):
+        transport = PortAudioTransport(blocksize=480, queue_frames=2)
+        transport._running = True
+        frame = (PcmFrame(b"\x01\x00" * 480), b"\0\0" * 480)
+        old_input_generation = transport._input_generation
+        transport._put_input(frame, old_input_generation)
+        producer = asyncio.create_task(transport.play(PcmFrame(b"\x01\x00" * 2400)))
+        await asyncio.sleep(0)
+        transport.set_paused(True)
+        await asyncio.wait_for(producer, 1)
+        self.assertTrue(transport._queue.empty())
+        self.assertFalse(transport._output)
+        await transport.play(PcmFrame(b"\x02\x00" * 480))
+        self.assertFalse(transport._output)
+        transport.set_paused(False)
+        transport._put_input(frame, old_input_generation)
+        self.assertTrue(transport._queue.empty())
+        transport._put_input(frame, transport._input_generation)
+        self.assertEqual(transport._queue.qsize(), 1)
+        await transport.play(PcmFrame(b"\x03\x00" * 480))
+        self.assertEqual([pcm for _generation, pcm in transport._output], [b"\x03\x00" * 480])
+        await transport.stop()
+
+    async def test_playback_meter_uses_callback_consumption_and_coalesces_slow_publication(self):
+        stream = SimpleNamespace(start=Mock(), stop=Mock(), close=Mock())
+        factory = Mock(return_value=stream)
+        transport = PortAudioTransport(capture=False)
+        levels = []
+        entered, release = asyncio.Event(), asyncio.Event()
+        async def meter(level):
+            levels.append(level)
+            entered.set()
+            await release.wait()
+        transport.set_playback_handler(meter)
+        with patch.dict("sys.modules", {"sounddevice": SimpleNamespace(RawOutputStream=factory)}):
+            await transport.start(AsyncMock())
+            callback = factory.call_args.kwargs["callback"]
+            try:
+                await transport.play(PcmFrame(b"\0\x40" * 960))
+                self.assertEqual(levels, [])
+                rendered = bytearray(1920)
+                callback(rendered, 960, None, None)
+                await entered.wait()
+                self.assertEqual(levels, [0.5])
+                task = transport._meter_task
+                for _ in range(40):
+                    callback(rendered, 960, None, None)
+                self.assertIs(transport._meter_task, task)
+                self.assertEqual(len(levels), 1)
+                transport.set_paused(True)
+                await transport.play(PcmFrame(b"\0\x40" * 960))
+                callback(rendered, 960, None, None)
+                self.assertEqual(rendered, b"\0" * 1920)
+                release.set()
+                await task
+                self.assertEqual(levels, [0.5, 0.0])
+                self.assertEqual(transport.played_samples, 960)
+            finally:
+                release.set()
+                await transport.stop()
+
     async def test_exact_playback_cursor_and_bounded_output_latency(self):
         transport = PortAudioTransport()
         transport._played_samples = 985
@@ -182,7 +268,7 @@ class PlaybackTransportTests(unittest.IsolatedAsyncioTestCase):
             self.assertEqual(list(transport._output), [])
             # A new reply remains playable; only the interrupted producer ends.
             await transport.play(PcmFrame(b"\x02\x00" * 480, PCM48K))
-            self.assertEqual(list(transport._output), [b"\x02\x00" * 480])
+            self.assertEqual([pcm for _generation, pcm in transport._output], [b"\x02\x00" * 480])
         finally:
             await transport.stop()
             producer.cancel()
@@ -259,7 +345,7 @@ class PlaybackTransportTests(unittest.IsolatedAsyncioTestCase):
                 rendered = bytearray(1920)
                 transport._stream.callback(b"\0" * 1920, rendered, 960, None, None)
                 self.assertEqual(bytes(rendered), first + second[:1440])
-                self.assertEqual(list(transport._output), [second[1440:], third])
+                self.assertEqual([pcm for _generation, pcm in transport._output], [second[1440:], third])
                 self.assertEqual(transport.played_ms, 20)
 
                 transport._stream.callback(b"\0" * 1920, rendered, 960, None, None)
@@ -276,7 +362,7 @@ class PlaybackTransportTests(unittest.IsolatedAsyncioTestCase):
                 short_output = bytearray(480)
                 transport._stream.callback(b"\0" * 480, short_output, 240, None, None)
                 self.assertEqual(bytes(short_output), second[:480])
-                self.assertEqual(list(transport._output), [second[480:]])
+                self.assertEqual([pcm for _generation, pcm in transport._output], [second[480:]])
                 await transport.clear_playback()
                 transport._stream.callback(b"\0" * 1920, rendered, 960, None, None)
                 self.assertEqual(bytes(rendered), b"\0" * 1920)

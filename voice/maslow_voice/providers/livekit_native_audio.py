@@ -32,6 +32,7 @@ class NativeAgentAudioInput(voice_io.AudioInput):
         self._space = asyncio.Event()
         self._space.set()
         self._closed = False
+        self._paused = False
         self._generation = 0
 
     async def push_frame(self, frame: rtc.AudioFrame) -> bool:
@@ -41,7 +42,7 @@ class NativeAgentAudioInput(voice_io.AudioInput):
         while True:
             if self._closed:
                 raise asyncio.CancelledError
-            if generation != self._generation:
+            if self._paused or generation != self._generation:
                 return False
             if not self._frames.full():
                 # The lifecycle validation and put are deliberately adjacent:
@@ -59,6 +60,10 @@ class NativeAgentAudioInput(voice_io.AudioInput):
         while not self._frames.empty():
             self._frames.get_nowait()
         self._space.set()
+
+    def set_paused(self, paused: bool) -> None:
+        self._paused = paused
+        self.discard()
 
     def close(self) -> None:
         if self._closed:
@@ -120,6 +125,8 @@ class NativeAgentAudioOutput(voice_io.AudioOutput):
         self._clear_task: asyncio.Task[None] | None = None
         self._interrupted = asyncio.Event()
         self._closed = False
+        self._paused = False
+        self._generation = 0
 
     def _played_samples(self) -> int:
         value = getattr(self._transport, "played_samples", None)
@@ -134,7 +141,8 @@ class NativeAgentAudioOutput(voice_io.AudioOutput):
         return MIN_OUTPUT_TAIL_SECONDS
 
     async def capture_frame(self, frame: rtc.AudioFrame) -> None:
-        if self._closed:
+        generation = self._generation
+        if self._closed or self._paused:
             return
         if frame.sample_rate != PCM48K or frame.num_channels != 1:
             raise ProviderError("Native LiveKit audio requires 48 kHz mono PCM")
@@ -149,7 +157,7 @@ class NativeAgentAudioOutput(voice_io.AudioOutput):
             await asyncio.shield(self._clear_task)
         # aclose() may have completed while this call waited for a prior
         # segment. Do not let that stale producer start a new output segment.
-        if self._closed:
+        if self._closed or self._paused or generation != self._generation:
             return
         await super().capture_frame(frame)
         if self._playback is None:
@@ -173,6 +181,7 @@ class NativeAgentAudioOutput(voice_io.AudioOutput):
 
         if self._closed:
             return
+        self._generation += 1
         consumed_before_clear = self._played_samples()
         self._interrupted.set()
         for playback in (self._flushing, self._playback):
@@ -184,6 +193,15 @@ class NativeAgentAudioOutput(voice_io.AudioOutput):
             self._flushing, self._playback = self._playback, None
             self._flush_task = asyncio.create_task(self._finish_playback(self._flushing))
         super().flush()
+
+    def set_paused(self, paused: bool) -> None:
+        if self._paused == paused:
+            return
+        self._paused = paused
+        if paused:
+            self.clear_buffer()
+        else:
+            self._generation += 1
 
     async def _clear_transport(self) -> None:
         await self._transport.clear_playback()
