@@ -171,6 +171,47 @@ Live Codex 0.157.1 findings, observed directly through Voice's tmux session:
   - The Codex config still holds exactly the 15 pre-approvals.
   - This run bypassed Gemini, so spoken routing, the watcher's spoken result and the notification fallback remain the person's live voice test.
 
+## Parallel web jobs and conversation continuity (0.1.5-24)
+
+The person reported two problems:
+- A second spoken web task ("find activities in Austin") was typed into the busy Codex session and redirected the flight search.
+- After a lost connection, "check on the task" answered about an old delegated test app.
+
+Decision: no second model. The daemon holds the state and Gemini keeps deciding.
+
+What changed in `51e87880`:
+
+- **Separate web jobs:**
+  - Each new web task gets a background Codex seat (`web-1`…`web-3`, tmux `-x 160 -y 48`, window size manual) and its own isolated Playwright browser.
+  - A daemon job list tracks id, title, state and result.
+  - `tell_agent` takes `job` for an explicit correction. Plain instructions never type into a working agent (`busy`).
+  - A fourth concurrent task is refused (`JOBS_FULL`). Finished seats are ended and reused.
+  - `agent_status` lists jobs by name and `show` opens a titled viewer.
+  - Notices name the job ("The task \"find cheap flights…\" has finished").
+- **Why background seats:** visible web-task terminals were squeezed to 37×5 by tiling, which hid the conversation from both the person and Voice. The browsers remain the visible surface.
+- **Continuity:**
+  - Every Gemini session starts with a briefing: running jobs, active delegated jobs, and the last six transcript lines if the previous conversation ended under 30 minutes ago.
+  - `current_task()` ignores delegated tasks that are neither active nor updated within an hour.
+  - Sliding-window context compression was enabled after a live check that `gemini-3.8-live` accepts it.
+- **Delivery under real timing:**
+  - Fresh Codex draws its input box before loading configuration (status changes from "default" to "high") and drops earlier input. Voice now waits for a settled screen (about 1.5 seconds).
+  - Long requests take more than 1.5 seconds to echo. Voice pastes exactly once, waits up to 8 seconds for evidence in the conversation (not the input box), and otherwise reports `NOT_DELIVERED`.
+
+Checks:
+- Pinned suite: 410 tests passed (two expected skips).
+- Live parallel run from installed-equivalent source:
+  - `web-1` (example.com) and `web-2` (maslow.ai) were both delivered and both working at the same time, with exactly one request each.
+  - Both answered correctly. maslow.ai's heading was read as "Your agents. One shared foundation."
+- Package:
+  - Recipe `947c3fd` advances to `0.1.5-24`. Archive SHA-256 `ea38f93e0816c0c5123d0ec15b3cebf5229cb45ad6eaf0bfabbc026a5424a5a5`.
+  - Installed with `pkexec`: 0 altered files among 9124. Plugin refreshed.
+
+Not live-tested yet:
+- The spoken flow with two tasks.
+- The briefing after a reconnect.
+- The viewer.
+- Compression across a long session.
+
 ## Not verified
 
 - No live Gemini conversation called the new tools.
