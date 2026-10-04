@@ -101,6 +101,24 @@ The installed `maslow-voice 0.1.5-18` service ran the source checkout through a 
   - Rollback archive: `voice-mvp-build/voice-theme/maslow-voice-0.1.5-18-x86_64.pkg.tar.zst`.
   - Build and install logs: `voice-mvp-build/voice-agent-terminal/`.
 
+## Second live round and 0.1.5-21
+
+- **Journal (22:23–22:27):**
+  - Browser URL open and **browser close** worked.
+  - Codex was sent the request and the spoken approve was answered.
+  - Claude opened and the request was sent. Claude listed the files under its own "auto mode", which comes from the person's Claude settings, not from Voice flags.
+  - **Gemini then issued `agent claude approve` one second later with no prompt on screen and no spoken answer.** The screen check refused it (`NO_PENDING_PROMPT`).
+  - A 22:15 Gemini `1011 Internal error` came from the provider before the reinstall.
+- **`b108ff29`:**
+  - Switches spoken searches to Google.
+  - Adds a daemon guard: approve or deny is accepted only when the person's own words in that turn say so, and negated approvals are refused.
+  - Pinned suite: 389 tests passed (two expected skips).
+- **Build and install:**
+  - Recipe `3eeb83c` advances to `0.1.5-21`, built from a `git archive` of `b108ff29`.
+  - Archive SHA-256 `deaff2a9041dd1c13dfb1c61507d1150dd02709dafe3862b483d81374f11df87`.
+  - Installed with `pkexec`. Integrity reports 0 altered files among 9123. The plugin refreshed to `0.1.5-21/Panel.qml`.
+  - Logs: `voice-mvp-build/voice-agent-terminal-21/`.
+
 ## Not verified
 
 - No live Gemini conversation called the new tools.
