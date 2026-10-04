@@ -552,7 +552,11 @@ class VoiceService:
         await self.show_caption(self.action_caption(intent))
         folder = self.directory / "notes"
         notes.prune(folder, self.settings.value["retention_days"])
-        path = notes.write_brief(folder, vault, request, research, lines)
+        # Answers from web tasks finished in the last hour, so the note builds
+        # on research the person already had done instead of missing it.
+        results = [job for job in self.jobs.values()
+                   if job.get("kind", "web") == "web" and job["state"] == "finished" and time.time() - job["updated"] < 3600]
+        path = notes.write_brief(folder, vault, request, research, lines, results=results)
         title = self.job_title(request)
         result = await self.desktop.tell(seat, notes.instruction(path), title="Note: " + title, cwd=vault)
         result["job"] = seat
@@ -643,7 +647,7 @@ class VoiceService:
                     quiet += 1
                     if quiet >= quiet_needed:
                         if job:
-                            job.update(state="finished", result=state["screen"][-600:], updated=time.time())
+                            job.update(state="finished", result=state["screen"][-2000:], updated=time.time())
                         await self.agent_notice(agent, "finished", state["screen"])
                         return
         except Exception:

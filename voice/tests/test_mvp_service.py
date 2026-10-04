@@ -1,5 +1,6 @@
 import asyncio
 import tempfile
+import time
 import unittest
 from pathlib import Path
 from unittest.mock import AsyncMock, patch
@@ -158,6 +159,7 @@ class MvpServiceTests(unittest.IsolatedAsyncioTestCase):
         self.assertIn("Maslow: Who pays for it?", text)
         self.assertIn(note["request"], text)
         self.assertIn("The person asked for research", text)
+        self.assertNotIn("Results from Maslow's background tasks", text)
         self.assertEqual(watched, [("note-1", {"limit": 45 * 60})])
         self.assertEqual(self.service.jobs["note-1"]["kind"], "note")
         self.assertEqual(self.service.job_name("note-1"), "The note \"" + self.service.job_title(note["request"]) + "\"")
@@ -209,6 +211,29 @@ class MvpServiceTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(result["note"], "The job was not started.")
         self.service.desktop.end_seat.assert_awaited_once_with("note-1")
         self.assertNotIn("note-1", self.service.jobs)
+
+    async def test_note_brief_includes_recent_web_task_results(self):
+        vault = self.root / "Vault"
+        vault.mkdir()
+        self.service.notes_vault = lambda: vault
+        self.service.desktop.tell.return_value = {"agent": "note-1", "status": "sent"}
+        self.service.watch_agent = lambda seat, **options: None
+        now = time.time()
+        self.service.jobs["web-1"] = {"id": "web-1", "kind": "web", "title": "research dog apps", "state": "finished",
+                                      "started": now - 300, "updated": now - 60, "result": "• Top apps: Pupford, Dogo. https://dogo.app"}
+        self.service.jobs["web-2"] = {"id": "web-2", "kind": "web", "title": "old search", "state": "finished",
+                                      "started": now - 9000, "updated": now - 7200, "result": "stale answer"}
+        self.service.jobs["web-3"] = {"id": "web-3", "kind": "web", "title": "still going", "state": "working",
+                                      "started": now - 30, "updated": now - 5, "result": ""}
+        await self.turn("ask", "Write up the dog app idea with everything the web search found")
+        await self.service.conversation_action({"operation": "note", "request": "write up the dog app idea", "research": "auto"}, "ask")
+        line = self.service.desktop.tell.await_args.args[1]
+        text = Path(line.split("brief at ", 1)[1].split(" and follow", 1)[0]).read_text()
+        self.assertIn("Results from Maslow's background tasks", text)
+        self.assertIn("### research dog apps", text)
+        self.assertIn("Top apps: Pupford, Dogo. https://dogo.app", text)
+        self.assertNotIn("stale answer", text)
+        self.assertNotIn("still going", text)
 
     async def test_note_covers_a_conversation_that_just_ended(self):
         vault = self.root / "Vault"
