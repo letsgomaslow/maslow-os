@@ -24,6 +24,9 @@ class FakeProvider:
         await self.emit({"type": "voice_state", "state": "listening", "microphone": audio})
     async def stop(self):
         self.started = False
+    async def pause(self, paused):
+        self.paused = paused
+        await self.emit({"type": "voice_state", "state": "paused" if paused else "listening", "microphone": not paused})
     async def text(self, text, context):
         await self.emit({"type": "transcript", "role": "user", "text": text, "final": True, "turn_id": "turn-" + text})
     async def append_context(self, kind, content, delegation_id=None):
@@ -45,6 +48,35 @@ class ServiceTests(unittest.IsolatedAsyncioTestCase):
         await self.service.end_voice()
         self.service.store.close()
         self.temporary.cleanup()
+
+    async def test_extended_toggle_preserves_session_and_normal_idle_policy(self):
+        await self.service.dispatch({"action": "toggle_voice", "extended": False})
+        provider = self.service.provider
+        self.service.session_started = self.service.last_activity = 0
+        self.assertTrue(self.service.session_expired(61))
+        await self.service.dispatch({"action": "toggle_voice", "extended": True})
+        self.assertIs(self.service.provider, provider)
+        self.assertTrue(self.service.voice["extended"])
+        self.assertFalse(self.service.session_expired(120))
+        self.assertTrue(self.service.session_expired(1800))
+        await self.service.dispatch({"action": "toggle_voice", "extended": True})
+        self.assertIs(self.service.provider, provider)
+        self.assertTrue(self.service.voice["paused"])
+        self.assertTrue(self.service.voice["extended"])
+        self.assertEqual(self.service.session_started, 0)
+        await self.service.end_voice()
+        await self.service.dispatch({"action": "start_voice"})
+        self.assertFalse(self.service.voice["extended"])
+
+    async def test_extended_is_session_only_and_toggle_rejects_non_boolean(self):
+        before = dict(self.service.settings.value)
+        await self.service.dispatch({"action": "toggle_voice", "extended": True})
+        self.assertTrue(self.service.voice["extended"])
+        await self.service.dispatch({"action": "toggle_voice", "extended": False})
+        self.assertFalse(self.service.voice["extended"])
+        self.assertEqual(before, self.service.settings.value)
+        with self.assertRaises(VoiceError):
+            await self.service.dispatch({"action": "toggle_voice", "extended": "yes"})
 
     def livekit_credentials(self, initial=None):
         values = dict(initial or {})

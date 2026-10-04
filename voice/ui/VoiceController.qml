@@ -18,6 +18,7 @@ Item {
   // Keep long-lived snapshot branches stable while the 20 Hz voice meter
   // changes. QML repeaters treat a replacement JavaScript array as a new
   // model, even when every task inside it has the same content.
+  property var voicePreview: snapshot.voice_preview || ({ state: "idle", voice: "", error: "" })
   property var voice: snapshot.voice
   property var settings: snapshot.settings
   property var tasks: snapshot.tasks
@@ -28,9 +29,12 @@ Item {
   // into view without reopening the panel for every status snapshot.
   property var taskViewRequest: snapshot.task_view_request || null
   property string transportError: ""
+  property bool connectionLost: false
   property var lastResponse: ({})
   property bool watching: watchProcess.running
   property bool watchingRequested: false
+  property bool transportReady: false
+  property var pendingRequests: []
   signal responseReceived(var response)
 
   function setFixture(next) {
@@ -38,6 +42,7 @@ Item {
     fixtureMode = true
     applySnapshot(next)
     transportError = ""
+    connectionLost = false
   }
 
   function semanticEqual(left, right) {
@@ -91,6 +96,7 @@ Item {
   }
 
   function applySnapshot(value) {
+    voicePreview = reuseUnchanged(voicePreview, value.voice_preview || ({ state: "idle", voice: "", error: "" }))
     var nextVoice = reuseUnchanged(voice, value.voice)
     var nextSettings = reuseUnchanged(settings, value.settings)
     var nextTasks = reconcileTasks(tasks, Array.isArray(value.tasks) ? value.tasks : [])
@@ -113,6 +119,7 @@ Item {
       tasks: tasks,
       session: session,
       readiness: readiness,
+      voice_preview: voicePreview,
       task_view_request: taskViewRequest
     }
   }
@@ -125,14 +132,29 @@ Item {
 
   function stop() {
     watchingRequested = false
+    transportReady = false
+    pendingRequests = []
     reconnectTimer.stop()
     if (watchProcess.running) watchProcess.signal(15)
   }
 
   function request(value) {
     if (fixtureMode) { fixtureRequests = fixtureRequests.concat([value]); return }
-    start()
-    if (watchProcess.running) watchProcess.write(JSON.stringify(value) + "\n")
+    if (transportReady) {
+      watchProcess.write(JSON.stringify(value) + "\n")
+    } else {
+      if (pendingRequests.length >= 32) { transportError = "Wait for Voice to reconnect before trying again."; return }
+      pendingRequests = pendingRequests.concat([value])
+      start()
+    }
+  }
+
+  function flushRequests() {
+    transportReady = true
+    watchProcess.write(JSON.stringify({ action: "status" }) + "\n")
+    var requests = pendingRequests
+    pendingRequests = []
+    for (var index = 0; index < requests.length; index++) watchProcess.write(JSON.stringify(requests[index]) + "\n")
   }
 
   function applyLine(line) {
@@ -141,6 +163,7 @@ Item {
       if (value && value.schemaVersion === 1 && value.voice && value.settings) {
         applySnapshot(value)
         transportError = ""
+        connectionLost = false
       } else if (value && typeof value.ok === "boolean") {
         lastResponse = value
         if (value.ok === false && value.error)
@@ -149,6 +172,7 @@ Item {
       }
     } catch (error) {
       transportError = "Voice control returned an unreadable response."
+      connectionLost = true
     }
   }
 
@@ -163,10 +187,13 @@ Item {
     command: ["omarchy-voice-control", "--watch"]
     running: false
     stdinEnabled: true
-    onStarted: { reconnectTimer.stop(); root.request({ action: "status" }) }
+    onStarted: { reconnectTimer.stop(); root.flushRequests() }
     onExited: function(exitCode) {
+      root.transportReady = false
+      root.pendingRequests = [] // Never replay audio activation after a failed controller start.
       if (!root.fixtureMode && root.watchingRequested) {
         root.transportError = "Voice is reconnecting."
+        root.connectionLost = true
         reconnectTimer.restart()
       }
     }

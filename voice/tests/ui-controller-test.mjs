@@ -27,6 +27,7 @@ runInNewContext([
   qmlFunction("applySnapshot"),
 ].join("\n"), context);
 
+context.voicePreview = { state: "idle", voice: "", error: "" };
 context.voice = { enabled: false, state: "disabled" };
 context.settings = {};
 context.tasks = [];
@@ -102,3 +103,28 @@ assert.strictEqual(visibleDismissedTasks[0], dismissedTasks[1]);
 const changedSession = { id: "session", transcript: [{ role: "user", text: "first", partial: true }] };
 assert.strictEqual(context.reuseUnchanged(changedSession, structuredClone(changedSession)), changedSession);
 assert.notStrictEqual(context.reuseUnchanged(changedSession, { id: "session", transcript: [{ role: "user", text: "second", partial: true }] }), changedSession, "partial transcript text changes propagate");
+
+context.applySnapshot({ ...context.snapshot, voice_preview: { state: "playing", voice: "Zephyr", error: "" } });
+assert.equal(context.voicePreview.state, "playing");
+assert.equal(context.snapshot.voice_preview.voice, "Zephyr");
+
+runInNewContext(qmlFunction("applyLine"), context);
+context.transportError = "";
+context.connectionLost = false;
+context.responseReceived = () => {};
+context.applyLine(JSON.stringify({ok: false, error: {message: "This approval is stale."}}));
+assert.equal(context.connectionLost, false, "A task error must not report a lost voice connection");
+context.applyLine("not JSON");
+assert.equal(context.connectionLost, true);
+context.applyLine(JSON.stringify(context.snapshot));
+assert.equal(context.connectionLost, false, "A new daemon snapshot clears the connection-lost state");
+
+const writes = [];
+const disconnected = {fixtureMode: false, transportReady: false, pendingRequests: [], start: () => {}, watchProcess: {write: value => writes.push(JSON.parse(value))}};
+runInNewContext([qmlFunction("request"), qmlFunction("flushRequests")].join("\n"), disconnected);
+disconnected.request({action: "toggle_voice", extended: false});
+assert.equal(writes.length, 0, "An explicit retry waits until the process input pipe is ready");
+disconnected.flushRequests();
+assert.deepEqual(writes, [{action: "status"}, {action: "toggle_voice", extended: false}]);
+assert.equal(disconnected.pendingRequests.length, 0);
+assert.match(source, /root.pendingRequests = \[\] \/\/ Never replay audio activation/);

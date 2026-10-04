@@ -45,6 +45,33 @@ class OptionalNativeSdkTest(unittest.IsolatedAsyncioTestCase):
 
 
 class NativeInputOutputTests(OptionalNativeSdkTest):
+    async def test_pause_rejects_native_frames_and_invalidates_waiting_output_until_resume(self):
+        source = self.NativeAgentAudioInput()
+        await source.push_frame(self.frame())
+        source.set_paused(True)
+        self.assertFalse(await source.push_frame(self.frame()))
+        self.assertTrue(source._frames.empty())
+        source.set_paused(False)
+        self.assertTrue(await source.push_frame(self.frame()))
+        source.close()
+        transport = _Transport()
+        output = self.NativeAgentAudioOutput(transport)
+        await output.capture_frame(self.frame())
+        output.flush()
+        stale = asyncio.create_task(output.capture_frame(self.frame()))
+        await asyncio.sleep(0)
+        output.set_paused(True)
+        await stale
+        await output.capture_frame(self.frame())
+        self.assertEqual(len(transport.played), 1)
+        await output._clear_task
+        await output._flush_task
+        self.assertEqual(output._pending_playback_count, 0)
+        output.set_paused(False)
+        await output.capture_frame(self.frame())
+        self.assertEqual(len(transport.played), 2)
+        await output.aclose()
+
     async def test_input_backpressure_mute_and_close_invalidate_stale_frames(self):
         source = self.NativeAgentAudioInput()
         self.assertTrue(await source.push_frame(self.frame()))
@@ -223,6 +250,52 @@ class NativeProviderTests(unittest.IsolatedAsyncioTestCase):
             submit=submit,
             audio_transport=audio,
         )
+
+    async def test_native_and_google_pause_gate_locally_before_bounded_sdk_cancellation(self):
+        from maslow_voice.audio import PcmFrame, PortAudioTransport
+        from maslow_voice.providers import create_provider
+        from maslow_voice.providers.livekit_native_audio import NativeAgentAudioInput, NativeAgentAudioOutput
+        for mode in ('livekit', 'gemini_live'):
+            with self.subTest(mode=mode):
+                events = []
+                async def emit(event):
+                    events.append(event)
+                audio = PortAudioTransport()
+                audio._running = True
+                provider = create_provider({'mode': mode}, {}, emit, AsyncMock(), audio)
+                provider._started = provider._audio_enabled = provider._native_ready = True
+                provider._native_input = NativeAgentAudioInput()
+                provider._native_output = NativeAgentAudioOutput(audio)
+                provider._session = _Session()
+                entered, release = asyncio.Event(), asyncio.Event()
+                async def interrupt(**kwargs):
+                    self.assertEqual(kwargs, {'force': True})
+                    entered.set()
+                    await release.wait()
+                provider._session.interrupt = AsyncMock(side_effect=interrupt)
+                await audio.play(PcmFrame(b'\x01\x00' * 960))
+                operation = asyncio.create_task(provider.pause(True))
+                await entered.wait()
+                self.assertTrue(audio._paused and provider._paused)
+                self.assertTrue(provider._native_input._paused and provider._native_output._paused)
+                self.assertFalse(audio._output)
+                provider._agent_state(SimpleNamespace(new_state='speaking'))
+                await asyncio.gather(*provider._event_tasks)
+                self.assertEqual(events[-1]['state'], 'paused')
+                self.assertFalse(events[-1]['microphone'] or events[-1]['speaking'])
+                release.set()
+                await operation
+                self.assertTrue(provider._started)
+                session = provider._session
+                await provider.pause(False)
+                self.assertIs(provider._session, session)
+                self.assertFalse(audio._paused or provider._paused)
+                self.assertFalse(provider._native_input._paused or provider._native_output._paused)
+                session.input.set_audio_enabled.assert_called_with(True)
+                if mode == 'gemini_live':
+                    await provider.pause(True)
+                    self.assertFalse(await provider.notify_task('Finished'))
+                await provider.stop()
 
     async def test_audio_false_starts_agent_session_without_device_or_native_io(self):
         audio = SimpleNamespace(start=AsyncMock(), stop=AsyncMock(), set_muted=AsyncMock())

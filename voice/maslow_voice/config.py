@@ -16,6 +16,7 @@ DEFAULTS = {
     "realtime_model": "gpt-realtime-2.1", "realtime_voice": "cedar", "live_voice": "marin",
     "livekit_url": "", "livekit_voice": "Ashley",
     "gemini_live_model": "gemini-3.8-live", "gemini_live_voice": "Puck", "task_policy": "lab_auto",
+    "gemini_live_prompt": "You are Maslow's concise voice assistant. Answer conversation directly.",
     "reduced_motion": False, "fixed_position": False, "orb_position": None, "display": "",
     "idle_seconds": 60, "retention_days": 30, "microphone_device": "",
     "speaker_device": "", "ollama_models": "", "speech_directory": "",

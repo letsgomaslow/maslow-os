@@ -44,6 +44,19 @@ if name == "omarchy-hyprland-session-locked":
     checks = s.get("compositor", [1])
     code = checks.pop(0) if len(checks) > 1 else checks[0]
     done(code=code)
+if name == "omarchy-voice-control":
+    s["voice_request"] = json.load(sys.stdin)
+    s.setdefault("voice_requests", []).append(s["voice_request"])
+    save()
+    if s.get("block_voice") and len(s["voice_requests"]) == 1:
+        Path(os.environ["VOICE_TEST_CONTROL_STARTED"]).touch()
+        deadline = time.monotonic() + 5
+        while not Path(os.environ["VOICE_TEST_CONTROL_RELEASE"]).exists():
+            if time.monotonic() > deadline: sys.exit(1)
+            time.sleep(.01)
+    # Do not overwrite requests recorded by another launcher during the wait.
+    print(json.dumps(s.get("voice_response", {"ok": True})))
+    sys.exit(0)
 if name == "omarchy-shell":
     action = sys.argv[1:3]
     if action == ["lock", "status"]:
@@ -78,16 +91,18 @@ if name == "omarchy-shell":
 done()
 ''')
     mock.chmod(0o755)
-    for name in ("flock", "omarchy-cmd-missing", "omarchy-hyprland-session-locked", "omarchy-shell", "omarchy-launch-hub", "omarchy-pkg-add", "systemctl"):
+    for name in ("flock", "omarchy-cmd-missing", "omarchy-hyprland-session-locked", "omarchy-shell", "omarchy-launch-hub", "omarchy-voice-control", "omarchy-pkg-add", "systemctl"):
         (commands / name).symlink_to(mock)
     (commands / "omarchy-launch-voice").symlink_to(root / "bin/omarchy-launch-voice")
     env = dict(os.environ, PATH=f"{commands}:{os.environ['PATH']}",
                XDG_RUNTIME_DIR=str(runtime), VOICE_TEST_STATE=str(state_file),
-               VOICE_TEST_STARTED=str(fixture / "started"), VOICE_TEST_RELEASE=str(fixture / "release"))
+               VOICE_TEST_STARTED=str(fixture / "started"), VOICE_TEST_RELEASE=str(fixture / "release"),
+               VOICE_TEST_CONTROL_STARTED=str(fixture / "control-started"),
+               VOICE_TEST_CONTROL_RELEASE=str(fixture / "control-release"))
 
     marker = runtime / "maslow-voice-refresh-pending"
 
-    def run(state, command="launch", page="settings", pending=False, graphical=True, extra_env=None):
+    def run(state, command="launch", page="settings", pending=False, graphical=True, extra_env=None, expected_exit=0):
         if pending:
             marker.touch(mode=0o600)
         else:
@@ -97,7 +112,7 @@ done()
         if extra_env:
             call_env = dict(call_env, **extra_env)
         result = subprocess.run(["bash", str(root / f"bin/omarchy-{command}-voice"), page], env=call_env, text=True, capture_output=True, timeout=8)
-        assert result.returncode == 0, result.stderr
+        assert result.returncode == expected_exit, result.stderr
         return json.loads(state_file.read_text()), result.stdout
 
     def actions(state, action):
@@ -124,6 +139,50 @@ done()
     assert not actions(state, "rescanPlugins")
     assert actions(state, "summon") == [["omarchy-shell", "shell", "summon", "maslow.voice", '{"page":"settings"}']]
     print("ok - registered Voice opens the requested page without refreshing plugins")
+
+    for page, extended in (("start", False), ("extended", True)):
+        state, _ = run({}, page=page)
+        assert state["voice_request"] == {"action": "toggle_voice", "extended": extended}
+        assert not actions(state, "summon"), "Shortcuts never open details"
+        state, _ = run({"compositor": [0]}, page=page)
+        assert "voice_request" not in state
+    state, _ = run({"voice_response": {"ok": False, "error": {"message": "Needs setup"}}}, page="extended", expected_exit=1)
+    assert not actions(state, "summon"), "Connection failure never opens settings"
+    print("ok - normal/extended shortcuts toggle only when unlocked without opening panels")
+
+    for page, extended in (("start", False), ("extended", True)):
+        control_started = fixture / "control-started"
+        control_release = fixture / "control-release"
+        control_started.unlink(missing_ok=True)
+        control_release.unlink(missing_ok=True)
+        marker.touch(mode=0o600)
+        state_file.write_text(json.dumps(dict(block_voice=True)))
+        first = subprocess.Popen(["bash", str(root / "bin/omarchy-launch-voice"), page],
+                                 env=env, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        try:
+            deadline = time.monotonic() + 5
+            while not control_started.exists():
+                assert time.monotonic() < deadline, "first shortcut did not reach blocked startup"
+                time.sleep(.01)
+            assert not marker.exists(), "completed discovery must clear its marker before releasing the lock"
+            second = subprocess.run(["bash", str(root / "bin/omarchy-launch-voice"), page],
+                                    env=env, text=True, capture_output=True, timeout=3)
+            assert second.returncode == 0, second.stderr
+            assert "already opening" not in second.stdout, "startup blocked the cancellation shortcut"
+            state = json.loads(state_file.read_text())
+            assert state["voice_requests"] == [{"action": "toggle_voice", "extended": extended}] * 2
+            assert len(actions(state, "rescanPlugins")) == 1, "cancellation must not reload active plugins"
+            assert not actions(state, "summon"), "activation/cancellation must leave panels closed"
+            # An installer can write a new refresh request after discovery was
+            # unlocked. A delayed startup receipt must not erase that request.
+            marker.touch(mode=0o600)
+        finally:
+            control_release.touch()
+            output, error = first.communicate(timeout=5)
+        assert first.returncode == 0, error
+        assert marker.exists(), "delayed startup erased a newer install refresh request"
+        marker.unlink()
+    print("ok - a second shortcut reaches connecting cancellation without rescanning or opening panels")
 
     state, _ = run({"present": False, "pending": 2})
     assert len(actions(state, "rescanPlugins")) == 1

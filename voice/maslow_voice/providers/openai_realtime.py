@@ -17,7 +17,7 @@ from typing import Any, Protocol
 from maslow_voice.audio import PCM24K, PcmFrame, resample_pcm16
 from maslow_voice.voices import OPENAI_VOICES
 
-from .base import ProviderError, VoiceProvider, validate_intent
+from .base import PAUSE_CANCEL_TIMEOUT_SECONDS, ProviderError, VoiceProvider, validate_intent
 
 
 class RealtimeSocket(Protocol):
@@ -70,6 +70,8 @@ class OpenAIRealtimeProvider(VoiceProvider):
         self._assistant_item_id: str | None = None
         self._played_ms = 0
         self._ready = asyncio.Event()
+        self._input_cleared = asyncio.Event()
+        self._input_clear_required = False
         self._response_active = False
         self._start_failure = False
         self._response_turns = {}
@@ -89,6 +91,9 @@ class OpenAIRealtimeProvider(VoiceProvider):
         self._playback_item_id = None
         self._item_played_start = 0
         self._audio_generation = 0
+        self._response_requests = {}
+        self._retired_cancellations = {}
+        self._waiting_fresh_response = False
 
     async def start(self, audio: bool = True) -> None:
         if self._started:
@@ -96,6 +101,10 @@ class OpenAIRealtimeProvider(VoiceProvider):
         self._ready.clear()
         self._start_failure = None
         self._muted = False
+        self._paused = False
+        self._waiting_fresh_response = False
+        self._input_clear_required = False
+        self._input_cleared.clear()
         key = self.secrets.get("openai", "")
         if not key:
             await self._raise_start_error(ProviderError("OpenAI credentials are unavailable"), "OpenAI Voice is not ready")
@@ -114,6 +123,9 @@ class OpenAIRealtimeProvider(VoiceProvider):
             if not self._started:
                 raise asyncio.CancelledError()
             if audio and self.audio_transport is not None:
+                gate = getattr(self.audio_transport, "set_paused", None)
+                if gate is not None:
+                    gate(False)
                 await self.audio_transport.set_muted(False)
                 await self.audio_transport.start(self._on_audio)
                 self._playback_task = asyncio.create_task(self._play_audio())
@@ -242,6 +254,8 @@ class OpenAIRealtimeProvider(VoiceProvider):
                     waiter.set_result(None)
             self._typed_waiters.clear()
             self._response_turns.clear()
+            self._response_requests.clear()
+            self._retired_cancellations.clear()
             self._transcribed.clear()
             self._cancelled_responses.clear()
             self._response_active = False
@@ -285,12 +299,17 @@ class OpenAIRealtimeProvider(VoiceProvider):
             self._typed_waiters.pop(turn_id, None)
 
     async def _create_response(self, turn_id):
+        self._response_requests[turn_id] = self._audio_generation
+        if len(self._response_requests) > 100:
+            self._response_requests.pop(next(iter(self._response_requests)))
         await self._send({"type": "response.create", "response": {"metadata": {"maslow_turn_id": turn_id}}})
 
     async def _on_audio(self, frame: PcmFrame) -> None:
-        if not self._started or self._muted:
+        if not self._started or self._muted or self._paused:
             return
         await self._level(frame)
+        if not self._started or self._muted or self._paused:
+            return
         pcm = resample_pcm16(frame, PCM24K).pcm
         if pcm:
             await self._send({"type": "input_audio_buffer.append", "audio": base64.b64encode(pcm).decode("ascii")})
@@ -319,6 +338,25 @@ class OpenAIRealtimeProvider(VoiceProvider):
         self._assistant_item_id = self._playback_item_id = None
         self._played_ms = 0
 
+    async def pause(self, paused: bool) -> None:
+        if self._paused == paused:
+            return
+        if not paused:
+            if self._input_clear_required:
+                await asyncio.wait_for(self._input_cleared.wait(), PAUSE_CANCEL_TIMEOUT_SECONDS)
+            # Discard any typed speech generated during the pause, before
+            # reopening either callback direction.
+            await asyncio.wait_for(self.silence(), PAUSE_CANCEL_TIMEOUT_SECONDS)
+        self._waiting_fresh_response = True
+        await super().pause(paused)
+        if paused and self._started:
+            self._input_clear_required = True
+            self._input_cleared.clear()
+            await asyncio.wait_for(self._send({"type": "input_audio_buffer.clear"}), PAUSE_CANCEL_TIMEOUT_SECONDS)
+            # Keep input gated until the socket reader has processed the
+            # server's clear acknowledgement and preceding VAD commits.
+            await asyncio.wait_for(self._input_cleared.wait(), PAUSE_CANCEL_TIMEOUT_SECONDS)
+
     def _clear_pending_audio(self):
         self._audio_generation += 1
         while not self._playback_queue.empty():
@@ -332,7 +370,7 @@ class OpenAIRealtimeProvider(VoiceProvider):
                 generation, item_id, pcm = await self._playback_queue.get()
                 self._queued_audio_bytes -= len(pcm)
                 try:
-                    if generation != self._audio_generation:
+                    if self._paused or generation != self._audio_generation:
                         continue
                     if item_id != self._playback_item_id:
                         # A prior item may still be queued in PortAudio. Its
@@ -340,7 +378,7 @@ class OpenAIRealtimeProvider(VoiceProvider):
                         wait = getattr(self.audio_transport, "wait_playback", None)
                         if wait is not None:
                             await wait()
-                        if generation != self._audio_generation:
+                        if self._paused or generation != self._audio_generation:
                             continue
                         self._playback_item_id = item_id
                         self._item_played_start = getattr(self.audio_transport, "played_ms", 0)
@@ -377,6 +415,8 @@ class OpenAIRealtimeProvider(VoiceProvider):
         if self._socket is None:
             raise ProviderError("OpenAI Realtime is not connected")
         async with self._write_lock:
+            if event.get("type") == "input_audio_buffer.append" and (self._paused or self._muted or not self._started):
+                return
             await self._socket.send(json.dumps(event, separators=(",", ":")))
 
     async def _read_events(self) -> None:
@@ -396,28 +436,57 @@ class OpenAIRealtimeProvider(VoiceProvider):
         if not self._started:
             return
         event_type = event.get("type")
-        response_id = event.get("response_id")
+        response_id = event.get("response_id") or (event.get("response") or {}).get("id")
         if response_id in self._cancelled_responses and event_type not in {"response.done", "response.cancelled"}:
             return
         if event_type == "session.updated":
             self._ready.set()
+        elif event_type == "input_audio_buffer.cleared":
+            self._input_clear_required = False
+            self._input_cleared.set()
         elif event_type == "error":
-            await self._fail(event.get("error") or {})
+            error = event.get("error") or {}
+            cancellation = self._retired_cancellations.pop(error.get("event_id"), None)
+            if cancellation is not None and error.get("code") == "response_cancel_not_active":
+                return  # The retired response finished before its cancellation arrived.
+            await self._fail(error)
         elif event_type == "input_audio_buffer.speech_started":
             # VAD is factual: a user began speaking while output might be active.
-            await self.silence()
+            if not self._paused:
+                await self.silence()
         elif event_type == "input_audio_buffer.committed":
             # VAD still commits/transcribes audio; explicit response creation
             # echoes its exact input identity instead of guessing event order.
             item_id = event.get("item_id")
-            if isinstance(item_id, str) and item_id:
+            if not self._paused and isinstance(item_id, str) and item_id:
                 await self._create_response(item_id)
         elif event_type in {"response.created", "response.output_item.added"}:
             if event_type == "response.created":
                 response = event.get("response") or {}
                 response_id = response.get("id")
-                self._active_response_id = response_id
                 explicit_turn = (response.get("metadata") or {}).get("maslow_turn_id")
+                generation = self._response_requests.get(explicit_turn)
+                if ((generation is not None and generation != self._audio_generation)
+                        or (self._waiting_fresh_response and generation is None)):
+                    self._cancelled_responses.add(response_id)
+                    # Pause can retire a request before response.created arrives.
+                    # Its typed caller still needs normal completion; otherwise
+                    # its timeout would later tear down the retained session.
+                    waiter = self._typed_waiters.get(explicit_turn)
+                    if waiter is not None and not waiter.done():
+                        waiter.set_result(None)
+                    if response_id:
+                        # A newer response may already be active. Never let a
+                        # delayed retired response cancel that fresh generation.
+                        cancellation_id = uuid.uuid4().hex
+                        self._retired_cancellations[cancellation_id] = response_id
+                        if len(self._retired_cancellations) > 100:
+                            self._retired_cancellations.pop(next(iter(self._retired_cancellations)))
+                        await self._send({"type": "response.cancel", "response_id": response_id, "event_id": cancellation_id})
+                    return
+                self._active_response_id = response_id
+                if not self._paused:
+                    self._waiting_fresh_response = False
                 if response_id and explicit_turn:
                     self._response_turns[response_id] = explicit_turn
                     if len(self._response_turns) > 100:
@@ -428,6 +497,8 @@ class OpenAIRealtimeProvider(VoiceProvider):
             if item.get("role") == "assistant":
                 self._assistant_item_id = item.get("id")
         elif event_type in {"response.audio.delta", "response.output_audio.delta"}:
+            if self._paused or self._waiting_fresh_response:
+                return
             encoded = event.get("delta", "")
             if isinstance(encoded, str) and self.audio_transport is not None and self._audio_enabled:
                 pcm = base64.b64decode(encoded, validate=True)

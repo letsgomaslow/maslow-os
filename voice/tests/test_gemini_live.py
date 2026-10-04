@@ -11,12 +11,41 @@ from maslow_voice.config import DEFAULTS, Settings
 from maslow_voice.daemon import VoiceService
 from maslow_voice.errors import VoiceError
 from maslow_voice.providers import create_provider
+from maslow_voice.providers.gemini_tools import create_agent
 from maslow_voice.providers.livekit_gemini import LiveKitGeminiProvider
 from maslow_voice.store import TaskStore
 from maslow_voice.tasks import TaskManager
 
 BRIEF = {"objective": "Create a page", "summary": "Create the requested page.", "constraints": [],
          "requested_output": "page.html", "tool_preference": "hermes", "unresolved_questions": []}
+
+
+class GeminiPromptTests(unittest.TestCase):
+    class Agents:
+        class Agent:
+            def __init__(self, instructions=""):
+                self.instructions = instructions
+
+        class RunContext:
+            pass
+
+        @staticmethod
+        def function_tool(method):
+            return method
+
+    class BaseAgent(Agents.Agent):
+        pass
+
+    def test_agent_uses_saved_prompt_or_default_and_retains_tool_contract(self):
+        for saved, expected in (("Answer with warmth.", "Answer with warmth."), ("", DEFAULTS["gemini_live_prompt"]),
+                               (" \t", DEFAULTS["gemini_live_prompt"])):
+            with self.subTest(saved=saved):
+                provider = SimpleNamespace(config={"gemini_live_prompt": saved})
+                agent = create_agent(provider, self.Agents, self.BaseAgent())
+                self.assertTrue(agent.instructions.startswith(expected + " "))
+                self.assertIn("Use desktop_action to open Browser, Files, Hub, Terminal or Codex", agent.instructions)
+                self.assertIn("Use submit_intent only for explicitly requested external work.", agent.instructions)
+                self.assertIn("Use task_control for progress, corrections, cancellation, continuation or results of the current job.", agent.instructions)
 
 
 class GeminiSdkTests(unittest.IsolatedAsyncioTestCase):
@@ -32,6 +61,12 @@ class GeminiSdkTests(unittest.IsolatedAsyncioTestCase):
             emit=AsyncMock(side_effect=self.events.append), submit=AsyncMock(return_value={"state": "queued"}))
         self.provider._session = self.provider._create_agent_session(agents, "", "")
         self.addAsyncCleanup(self.provider.stop)
+
+    async def test_saved_voice_reaches_real_sdk_model(self):
+        self.provider.config["gemini_live_voice"] = "Zephyr"
+        session = self.provider._create_agent_session(self.agents, "", "")
+        self.addAsyncCleanup(session.aclose)
+        self.assertEqual(session.llm._opts.voice, "Zephyr")
 
     async def test_desktop_tool_binds_final_transcript_and_rejects_stale_retry(self):
         self.provider._started = True

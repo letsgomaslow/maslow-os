@@ -45,12 +45,18 @@ class MvpServiceTests(unittest.IsolatedAsyncioTestCase):
             await self.service.conversation_action({"operation": "task", "action": "status"}, "first")
         self.assertEqual(self.service.store.list(), [])
 
-    async def test_workspace_auto_dedup_and_view_request(self):
+    async def test_workspace_auto_dedup_and_passive_attention(self):
+        initial_view = dict(self.service.task_view_request)
         result = await self.service.conversation_action(BRIEF, "first")
         duplicate = await self.service.conversation_action(dict(BRIEF, summary="Paraphrased"), "first")
         self.assertEqual(result["id"], duplicate["id"])
         self.assertTrue(Path(result["project"]).is_dir())
-        self.assertEqual(self.service.snapshot()["task_view_request"]["task_id"], result["id"])
+        self.assertEqual(self.service.snapshot()["task_view_request"], initial_view)
+        self.assertEqual(self.service.snapshot()["task_attention"]["task_id"], result["id"])
+        await self.turn("show", "Show my task")
+        await self.service.conversation_action({"operation": "task", "action": "show"}, "show")
+        self.assertEqual(self.service.task_view_request["task_id"], result["id"])
+        self.assertEqual(self.service.task_view_request["sequence"], initial_view["sequence"] + 1)
         self.assertEqual(len(self.service.store.list()), 1)
         self.assertEqual(self.service.project, result["project"])
 

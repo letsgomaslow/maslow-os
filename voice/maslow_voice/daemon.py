@@ -13,6 +13,7 @@ import uuid
 from pathlib import Path
 
 from .audio import PortAudioTransport
+from .voice_preview import VOICES, play_sample
 from .audit import SessionAudit
 from .config import Settings, atomic_json, private_directory, runtime_directory, validate_settings
 from .coordinator import HermesRuntime, hermes_configuration
@@ -30,6 +31,7 @@ from .tasks import TaskManager, text_field, validate_brief
 
 
 TASK_NOTICE_SECONDS = 30
+PAUSABLE_MODES = frozenset({"gemini_live", "livekit", "openai"})
 
 
 class VoiceService:
@@ -45,9 +47,12 @@ class VoiceService:
         self.provider_factory = provider_factory
         self.audio_transport_factory = audio_transport_factory
         self.live_planner = live_planner or LiveTaskPlanner()
+        self.preview_task = None
+        self.voice_preview = {"state": "idle", "voice": "", "error": ""}
         self.provider = None
         self.session = {"id": str(uuid.uuid4()), "transcript": []}
-        self.voice = {"enabled": False, "state": "disabled", "microphone": False, "speaking": False, "level": 0, "error": ""}
+        self.voice = {"enabled": False, "state": "disabled", "microphone": False, "speaking": False, "level": 0, "error": "", "extended": False, "paused": False,
+                      "input_level": 0, "playback_level": 0, "interruption_sequence": 0}
         self.readiness = {"ready": False, "checks": [], "models": [],
                           "conversation": {"ready": False, "checks": []}, "tasks": {"ready": False, "checks": []}}
         self.desktop = DesktopActions()
@@ -55,6 +60,7 @@ class VoiceService:
         self.action_lock = asyncio.Lock()
         self.action_receipts = {}
         self.task_view_request = {"task_id": "", "sequence": time.time_ns() // 1_000_000}
+        self.task_attention = {"task_id": "", "sequence": self.task_view_request["sequence"]}
         self.current_task_id = ""
         self.task_relays = set()
         self.project = ""
@@ -67,6 +73,8 @@ class VoiceService:
         self.provider_epoch = None
         self.last_activity = time.monotonic()
         self.session_started = self.last_activity
+        self.paused_microphone = False
+        self.voice_toggle_lock = asyncio.Lock()
         self.lifecycle_lock = asyncio.Lock()
         self.configuration_lock = asyncio.Lock()
         self.turn_lock = asyncio.Lock()
@@ -105,7 +113,8 @@ class VoiceService:
         session = dict(self.session, transcript=[dict(turn, text=turn["text"][-4000:]) for turn in self.session["transcript"][-40:]])
         snapshot = {"schemaVersion": 1, "voice": dict(self.voice), "settings": dict(self.settings.value),
                     "tasks": tasks, "session": session, "readiness": self.readiness,
-                    "task_view_request": dict(self.task_view_request)}
+                    "task_view_request": dict(self.task_view_request), "task_attention": dict(self.task_attention),
+                    "voice_preview": dict(self.voice_preview)}
         # Keep a busy task history within the IPC frame. Full results remain in
         # the store; approval details are never shortened for an approval decision.
         while len(tasks) > 1 and len(json.dumps(snapshot).encode()) > 3 * 1024 * 1024:
@@ -151,6 +160,8 @@ class VoiceService:
     async def provider_event(self, event):
         kind = event.get("type")
         if kind == "voice_state":
+            if self.voice.get("paused"):
+                return  # Late provider transitions cannot reopen either audio direction.
             if self.voice["speaking"] and event.get("state") == "listening":
                 self.last_activity = time.monotonic()
             self.voice.update(state=event["state"], microphone=bool(event.get("microphone")), speaking=bool(event.get("speaking")))
@@ -170,11 +181,28 @@ class VoiceService:
             if self.provider:
                 self.background(self.end_voice())
             return  # end_voice publishes the final disabled snapshot.
-        elif kind == "level":
-            level = max(0, min(float(event.get("level", 0)), 1))
-            self.voice["level"] = level
+        elif kind in {"level", "playback_level"}:
+            field = "input_level" if kind == "level" else "playback_level"
+            level = max(0, min(float(event.get(field, event.get("level", 0))), 1))
+            if self.voice.get("paused"):
+                level = 0
+            self.voice[field] = level
+            if kind == "level":
+                self.voice["level"] = level
             self.queue_level_publish()
             return
+        elif kind == "interrupted":
+            was_speaking = self.voice["speaking"]
+            self.voice["playback_level"] = 0
+            self.voice["speaking"] = False
+            self.voice["interruption_sequence"] += 1
+            if (not self.voice.get("paused") and not self.voice.get("error")
+                    and self.voice["state"] not in {"paused", "connecting", "disabled", "error"}):
+                # Native VAD can acknowledge interruption before its next SDK
+                # state event. Keep the existing microphone/mute state truthful.
+                self.voice["state"] = "listening"
+                if was_speaking:
+                    self.last_activity = time.monotonic()
         elif kind == "transcript":
             text = str(event.get("text", ""))[:24000]
             role = "user" if event.get("role") == "user" else "assistant"
@@ -318,9 +346,11 @@ class VoiceService:
             raise VoiceError("TRANSCRIPT_PENDING", "Wait for the request transcript before performing an action.")
         return turn
 
-    async def request_task_view(self, task_id):
+    async def request_task_view(self, task_id, *, explicit=True):
         self.current_task_id = task_id
-        self.task_view_request = {"task_id": task_id, "sequence": self.task_view_request["sequence"] + 1}
+        field = "task_view_request" if explicit else "task_attention"
+        previous = getattr(self, field)
+        setattr(self, field, {"task_id": task_id, "sequence": previous["sequence"] + 1})
         await self.publish()
 
     def current_task(self):
@@ -471,14 +501,14 @@ class VoiceService:
                 failed = next((t for t in self.store.list(10000) if t["request_id"] == request_id), None)
                 if failed:
                     turn.update(task_id=failed["id"], task_error=None)
-                    await self.request_task_view(failed["id"])
+                    await self.request_task_view(failed["id"], explicit=False)
             raise
         if turn["mode"] == "gemini_live":
             # Only the daemon's submission receipt can associate a newly created
             # job with this turn; provider payloads cannot choose task identities.
             turn.update(task_id=task["id"], task_error=None)
             self.project = project
-            await self.request_task_view(task["id"])
+            await self.request_task_view(task["id"], explicit=False)
             self.watch_gemini_task(task["id"])
         self.voice.pop("task_error", None)
         self.audit.record("task", session_id=self.session["id"], task_id=task["id"], selected_agent=task.get("selected_agent"), state=task["state"])
@@ -550,7 +580,7 @@ class VoiceService:
                     if audio != self.voice["enabled"]:
                         await self._stop_provider()
                     else:
-                        if audio:
+                        if audio and not self.voice.get("paused"):
                             await self.provider.mute(False)
                         return
                 if project:
@@ -562,7 +592,8 @@ class VoiceService:
                 epoch = self.provider_epoch = object()
                 connecting_started = time.monotonic()
                 self.voice.pop("task_error", None)
-                self.voice.update(error="", state="connecting", enabled=audio, microphone=False, speaking=False)
+                self.voice.update(error="", state="connecting", enabled=audio, microphone=False, speaking=False, paused=False,
+                                  level=0, input_level=0, playback_level=0)
                 await self.publish()
                 config = dict(self.settings.value)
                 config["piper_executable"] = "/usr/lib/maslow-voice-local/piper"
@@ -618,7 +649,8 @@ class VoiceService:
         if provider is not None:
             self.audit.record("session_ended", session_id=self.session["id"], provider=self.settings.value["mode"],
                               elapsed_ms=round((time.monotonic() - self.session_started) * 1000))
-        self.voice.update(enabled=False, state="disabled", microphone=False, speaking=False, level=0)
+        self.voice.update(enabled=False, state="disabled", microphone=False, speaking=False, level=0, extended=False, paused=False,
+                          input_level=0, playback_level=0)
         if provider:
             self.provider_cleanup = self.background(self._release_provider(provider))
         return self.provider_cleanup
@@ -648,6 +680,7 @@ class VoiceService:
             await asyncio.shield(cleanup)
 
     async def end_voice(self, preserve_error=False):
+        await self.stop_preview()
         # Do not wait for lifecycle_lock: its owner may be connecting indefinitely.
         cleanup = self._detach_provider()
         await self._cancel_level_publish()
@@ -658,7 +691,8 @@ class VoiceService:
         for task in pending:
             if task is not current and not task.done():
                 task.cancel()
-        self.voice.update(enabled=False, state="disabled", microphone=False, speaking=False, level=0)
+        self.voice.update(enabled=False, state="disabled", microphone=False, speaking=False, level=0, extended=False, paused=False,
+                          input_level=0, playback_level=0)
         self.voice.pop("task_error", None)
         if not preserve_error:
             self.voice["error"] = ""
@@ -756,11 +790,117 @@ class VoiceService:
         await self.publish()
         return {"readiness": self.readiness}
 
+    async def start_preview(self, voice):
+        if not isinstance(voice, str) or voice not in VOICES:
+            raise VoiceError("INVALID_VOICE", "Choose a supported Gemini voice.")
+        if self.settings.value["mode"] != "gemini_live":
+            raise VoiceError("PREVIEW_UNAVAILABLE", "Voice previews are available in Maslow Voice mode.")
+        if self.preview_task is not None or self.provider is not None or self.conversation_requests or self.store.active() or self.configuration_lock.locked():
+            raise VoiceError("VOICE_BUSY", "End the conversation and finish or stop active work before previewing.")
+        self.voice_preview = {"state": "connecting", "voice": voice, "error": ""}
+        self.preview_task = self.background(self._run_preview(voice))
+        await self.publish()
+
+    async def _run_preview(self, voice):
+        try:
+            key = await asyncio.wait_for(self.credentials.get("google"), 10)
+            if not key:
+                raise VoiceError("GEMINI_AUTH_REQUIRED", "Add your Google AI Studio key in Voice Settings.")
+            async def playing():
+                self.voice_preview["state"] = "playing"
+                await self.publish()
+            await play_sample(dict(self.settings.value), key, voice, playing,
+                              transport_factory=self.audio_transport_factory)
+            self.voice_preview["state"] = "idle"
+        except asyncio.CancelledError:
+            self.voice_preview["state"] = "idle"
+            raise
+        except Exception as error:
+            self.voice_preview.update(state="error", error=error.message if isinstance(error, VoiceError) else
+                                      "Could not play this voice. Check your connection and Google setup, then try again.")
+        finally:
+            self.preview_task = None
+            await self.publish()
+
+    async def stop_preview(self):
+        task = self.preview_task
+        if task is not None:
+            task.cancel()
+            await asyncio.gather(task, return_exceptions=True)
+            # A task cancelled before its first step never runs its finally.
+            # Do not clear a newer preview that started while this stop awaited.
+            if self.preview_task is task:
+                self.preview_task = None
+                self.voice_preview["state"] = "idle"
+                await self.publish()
+
+    async def _pause_voice(self, paused):
+        if self.settings.value["mode"] not in PAUSABLE_MODES:
+            raise VoiceError("PAUSE_UNAVAILABLE", "Pause is available in Google Live, LiveKit and OpenAI Realtime.")
+        if not self.provider or not self.voice["enabled"]:
+            return
+        if self.voice.get("paused", False) == paused:
+            return
+        provider, epoch = self.provider, self.provider_epoch
+        if paused:
+            # Record daemon-owned intent before awaiting provider cancellation.
+            # The provider gates local capture/output before its first await.
+            self.paused_microphone = self.voice["microphone"]
+            self.voice.update(paused=True, state="paused", microphone=False, speaking=False,
+                              level=0, input_level=0, playback_level=0)
+            # The provider gates locally before yielding. Publish that pause
+            # while remote cancellation is still pending, without delaying it.
+            self.background(self.publish())
+        await provider.pause(paused)
+        if self.provider is not provider or self.provider_epoch is not epoch:
+            return
+        if not paused:
+            self.voice.update(paused=False, state="listening", microphone=self.paused_microphone, speaking=False,
+                              level=0, input_level=0, playback_level=0)
+            self.last_activity = time.monotonic()
+        await self.publish()
+
+    async def pause_voice(self, paused):
+        if type(paused) is not bool:
+            raise VoiceError("INVALID_REQUEST", "Pause requires an on or off value.")
+        epoch = self.provider_epoch
+        async with self.voice_toggle_lock:
+            if epoch is self.provider_epoch:
+                await self._pause_voice(paused)
+
+    async def toggle_voice(self, extended, *, project="", context=""):
+        if type(extended) is not bool:
+            raise VoiceError("INVALID_REQUEST", "Choose normal or extended Voice.")
+        # Startup owns lifecycle_lock and may wait on a network indefinitely.
+        # A second activation must revoke it without waiting for that owner.
+        if self.voice["state"] == "connecting":
+            await self.end_voice()
+            return
+        async with self.voice_toggle_lock:
+            if self.voice["state"] == "connecting":
+                await self.end_voice()
+            elif self.voice["enabled"] and self.provider:
+                if self.voice.get("extended", False) == extended:
+                    if self.settings.value["mode"] in PAUSABLE_MODES:
+                        await self._pause_voice(not self.voice.get("paused", False))
+                    else:
+                        await self.end_voice()
+                else:
+                    self.voice["extended"] = extended
+                    self.last_activity = time.monotonic()
+                    await self.publish()
+            else:
+                await self.start_voice(project=project, context=context)
+                self.voice["extended"] = extended
+                await self.publish()
+
     async def dispatch(self, request):
+        if self.preview_task is not None and request.get("action") not in {"status", "stop_gemini_voice_preview", "end_voice", "silence", "mute", "pause_voice", "test", "models"}:
+            raise VoiceError("PREVIEW_ACTIVE", "Stop the voice preview before starting a conversation or changing settings.")
         if request.get("action") in {"configure", "configure_livekit", "configure_gemini_live", "credential"}:
             async with self.configuration_lock:
                 return await self._dispatch(request)
-        if request.get("action") not in {"start_voice", "submit_text"}:
+        if request.get("action") not in {"start_voice", "submit_text", "toggle_voice", "pause_voice"}:
             return await self._dispatch(request)
         current = asyncio.current_task()
         self.conversation_requests.add(current)
@@ -769,7 +909,7 @@ class VoiceService:
         except asyncio.CancelledError:
             raise
         except Exception as error:
-            if isinstance(error, VoiceError) and error.code in {"INVALID_REQUEST", "INVALID_BRIEF", "PROJECT_REQUIRED", "SESSION_PROJECT_FIXED", "SESSION_CONTEXT_FIXED"}:
+            if isinstance(error, VoiceError) and error.code in {"INVALID_REQUEST", "INVALID_BRIEF", "PROJECT_REQUIRED", "SESSION_PROJECT_FIXED", "SESSION_CONTEXT_FIXED", "PAUSE_UNAVAILABLE"}:
                 raise
             self.voice["error"] = error.message if isinstance(error, VoiceError) else "Voice could not connect. Check its setup and try again."
             await self.end_voice(preserve_error=True)
@@ -780,6 +920,8 @@ class VoiceService:
     async def _dispatch(self, request):
         action = request.get("action")
         allowed = {
+            "toggle_voice": {"extended", "project", "context"}, "pause_voice": {"paused"},
+            "preview_gemini_voice": {"voice"}, "stop_gemini_voice_preview": set(),
             "status": set(), "configure": {"settings"}, "credential": {"name", "value"}, "test": set(), "models": set(),
             "configure_livekit": {"url", "api_key", "api_secret"},
             "configure_gemini_live": {"url", "api_key", "api_secret", "google_api_key"},
@@ -789,6 +931,12 @@ class VoiceService:
         }
         if action not in allowed or set(request) - allowed[action] - {"action"}:
             raise VoiceError("INVALID_REQUEST", "That Voice action or field is not supported.")
+        if action == "preview_gemini_voice":
+            await self.start_preview(request.get("voice"))
+            return {}
+        if action == "stop_gemini_voice_preview":
+            await self.stop_preview()
+            return {}
         if action == "status":
             if not self.readiness.get("checks") and self.settings.value["mode"] in {"gemini_live", "gpt_live", "livekit", "openai"}:
                 await self.check_readiness()
@@ -824,18 +972,27 @@ class VoiceService:
             target = self.settings.value["speech_directory"] or str(self.directory / "speech")
             await asyncio.to_thread(download_speech, target)
             return await self.check_readiness()
+        elif action == "toggle_voice":
+            await self.toggle_voice(request.get("extended", False), project=request.get("project", ""), context=request.get("context", ""))
+        elif action == "pause_voice":
+            await self.pause_voice(request.get("paused"))
         elif action == "start_voice":
-            await self.start_voice(project=request.get("project", ""), context=request.get("context", ""))
+            async with self.voice_toggle_lock:
+                await self.start_voice(project=request.get("project", ""), context=request.get("context", ""))
         elif action == "end_voice":
             await self.end_voice()
         elif action in {"mute", "silence"}:
-            if self.provider:
-                if action == "mute":
-                    if type(request.get("muted")) is not bool:
-                        raise VoiceError("INVALID_REQUEST", "Mute requires an on or off value.")
-                    await self.provider.mute(request["muted"])
-                else:
-                    await self.provider.silence()
+            await self.stop_preview()
+            epoch = self.provider_epoch
+            async with self.voice_toggle_lock:
+                if self.provider and epoch is self.provider_epoch:
+                    if action == "mute":
+                        if type(request.get("muted")) is not bool:
+                            raise VoiceError("INVALID_REQUEST", "Mute requires an on or off value.")
+                        if not self.voice.get("paused"):
+                            await self.provider.mute(request["muted"])
+                    else:
+                        await self.provider.silence()
         elif action == "desktop_action":
             if self.settings.value["mode"] == "offline":
                 raise VoiceError("OFFLINE_ACTION_UNAVAILABLE", "Host desktop actions are unavailable in offline mode.")
@@ -1036,7 +1193,7 @@ class VoiceService:
     def session_expired(self, now=None):
         now = time.monotonic() if now is None else now
         return (now - self.session_started >= 30 * 60
-                or (not self.voice["speaking"] and now - self.last_activity > self.settings.value["idle_seconds"]))
+                or (not self.voice.get("paused", False) and not self.voice.get("extended", False) and not self.voice["speaking"] and now - self.last_activity > self.settings.value["idle_seconds"]))
 
     async def maintenance(self):
         while True:

@@ -1,14 +1,14 @@
 #!/bin/bash
 # omarchy:summary=Open Maslow Voice
-# omarchy:args=[talk|type|tasks|settings]
+# omarchy:args=[talk|type|tasks|settings|start|extended]
 # omarchy:examples=omarchy launch voice | omarchy launch voice settings
 
 set -euo pipefail
 (( $# <= 1 )) || { echo "Choose one Voice page." >&2; exit 1; }
 page=${1:-talk}
 case "$page" in
-  talk|type|tasks|settings) ;;
-  *) echo "Choose talk, type, tasks, or settings." >&2; exit 1 ;;
+  talk|type|tasks|settings|start|extended) ;;
+  *) echo "Choose talk, type, tasks, settings, start, or extended." >&2; exit 1 ;;
 esac
 if omarchy-cmd-missing omarchy-voice-control; then
   omarchy-launch-hub voice
@@ -86,6 +86,23 @@ else
   fi
   [[ $state == "enabled" ]] || defer_open
   desktop_unlocked || defer_open
+  if [[ $page == "start" || $page == "extended" ]]; then
+    if [[ $page == "extended" ]]; then
+      request='{"action":"toggle_voice","extended":true}'
+    else
+      request='{"action":"toggle_voice","extended":false}'
+    fi
+    # Discovery is complete. Do not hold its lock across a network startup:
+    # another shortcut must reach the daemon to cancel Connecting.
+    rm -f -- "$refresh_pending"
+    exec 9>&-
+    response=$(omarchy-voice-control <<<"$request") || exit 1
+    if ! jq -e '.ok == true' <<<"$response" >/dev/null; then
+      jq -r '.error.message // "Voice could not start."' <<<"$response" >&2
+      exit 1
+    fi
+    exit 0
+  fi
   result=$(omarchy-shell shell summon maslow.voice "{\"page\":\"$page\"}") || defer_open
   # The IPC command exits successfully even when summon returns "unknown".
   [[ $result == "ok" ]] || defer_open

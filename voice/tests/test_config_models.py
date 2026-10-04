@@ -7,7 +7,7 @@ from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import patch
 
-from maslow_voice.config import Settings, validate_settings, validate_endpoint
+from maslow_voice.config import DEFAULTS, Settings, validate_settings, validate_endpoint
 from maslow_voice.coordinator import clean_environment, hermes_configuration, read_existing_model
 from maslow_voice.errors import VoiceError
 from maslow_voice.models import verify_speech
@@ -32,6 +32,23 @@ class ConfigurationTests(unittest.TestCase):
             settings.update({"realtime_voice": "marin", "livekit_voice": "Olivia"})
             self.assertEqual(Settings(root).value["realtime_voice"], "marin")
             self.assertEqual(Settings(root).value["livekit_voice"], "Olivia")
+
+    def test_gemini_live_prompt_persists_and_old_settings_use_its_default(self):
+        custom = "Speak with friendly brevity."
+        with tempfile.TemporaryDirectory() as root:
+            settings = Settings(root)
+            settings.update({"gemini_live_prompt": custom, "gemini_live_voice": "Zephyr"})
+            self.assertEqual(Settings(root).value["gemini_live_voice"], "Zephyr")
+            self.assertEqual(Settings(root).value["gemini_live_prompt"], custom)
+
+            old_path = Path(root) / "settings.json"
+            old_path.write_text(json.dumps({"mode": "gemini_live"}))
+            self.assertEqual(Settings(root).value["gemini_live_prompt"], DEFAULTS["gemini_live_prompt"])
+
+    def test_gemini_live_prompt_rejects_invalid_values(self):
+        for value in (None, "x" * 4097, "valid\x00prompt"):
+            with self.subTest(value=value), self.assertRaises(VoiceError):
+                validate_settings({"gemini_live_prompt": value})
 
     def test_orb_position_is_normalized_and_persistent(self):
         with tempfile.TemporaryDirectory() as root:
