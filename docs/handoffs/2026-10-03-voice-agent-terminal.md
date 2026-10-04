@@ -240,6 +240,34 @@ Checks:
 - Installed with `pkexec`: 0 altered files among 9124. Plugin refreshed.
 - The service had used 27 s of CPU before its first sample and none in the following 8 s, so the warm-up had completed before any click.
 
+## Result delivery fix (0.1.5-26)
+
+The person reported that both finished jobs produced neither speech nor a notification.
+
+Findings:
+- **Watcher works.** A live trace with the daemon's `_watch_agent` against a real Codex job detected "finished" three seconds after Codex went idle.
+- **Speech was blocked.** LiveKit's `user_away_timeout` (15 s) sets `user_state` to `away`, and `notify_task` spoke only while `listening`. Minutes-long jobs could therefore never be spoken.
+- **The notification was only a fallback**, sent after a further 30 s, with no recorded outcome. It worked when run with the service environment.
+
+Fix in `4105b759`:
+- Every finished or waiting job always runs `omarchy-notification-send --app-name "Maslow Voice"` with the job title and the first line of its answer.
+- Speech is attempted while the person is `listening` or `away`.
+- The answer is taken from the conversation above the agent's input box.
+- Each outcome is written to the journal as `Voice notice …: notified|…, spoken|…`.
+- Checked on a real Codex screen and an on-screen notification.
+- Pinned suite: 413 tests passed (two expected skips).
+
+Package:
+- Recipe `3d4a8d7` advances to `0.1.5-26`. Archive SHA-256 `b64697addc332384fae977ab876fbc74b8897257edd08d2b3ee21d93d55b603f`.
+- Installed: 0 altered files among 9124. Plugin refreshed.
+- Spoken delivery still needs the person's live confirmation.
+
+Polish gaps noted:
+- The orb badge shows a stale delegated "Result ready" instead of web jobs.
+- Finished jobs' browsers stay open.
+- No periodic progress cues.
+- The Work view omits web jobs.
+
 ## Not verified
 
 - No live Gemini conversation called the new tools.
