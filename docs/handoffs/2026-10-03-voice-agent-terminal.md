@@ -212,6 +212,34 @@ Not live-tested yet:
 - The viewer.
 - Compression across a long session.
 
+## Spoken two-job test review and 0.1.5-25
+
+Evidence: the Voice journal action lines, `voice-audit.jsonl`, and Codex session records (`~/.codex/sessions/2026/10/04/rollout-2026-10-04T09-37-0*`).
+
+| Step | Expected | Observed |
+| --- | --- | --- |
+| First orb click after the update | Connects | Stayed at Connecting; a second click cancelled it (`session_ended` with no start at 09:35:31); connected at 09:36:17 |
+| Flights Newark–Seattle | New job | 09:37:07 `web-1`; Alaska nonstop $337 round trip, Oct 20–27 |
+| Seattle activities next week | Separate job, flights continue | 09:37:13 `web-2`; both ran 09:37–09:41; Turkfest (free, Oct 10–11) and others |
+| Spoken or notified results | One per job | Both finished about 09:41:20; the conversation ended 09:41:53; delivery not provable from logs |
+| New conversation asking about tasks | Jobs listed | 09:42:16 new session, 09:42:21 job list |
+| Follow-ups to the flight job | Only that job changes | 09:42:46 next week: $324 United one-way, Oct 11. 09:46:01 return trip: $680 Alaska, Oct 6–11. No announcement |
+
+No purchase, booking or sign-in occurred. The `web-1` session disappeared after 09:49 for an unestablished reason.
+
+Root causes fixed in `a30c8fd7`:
+
+- **First click after an update:** the Gemini and LiveKit imports took 4.6–6.4 seconds because there is no bytecode (deliberate packaging rule). The service now warms them at startup, and the orb shows "Connecting · click to cancel".
+- **Web jobs stopped on restart:** daemon-started tmux servers were in `maslow-voice.service`'s cgroup (`KillMode=control-group`) and were stopped on restart. Seats now start through `setsid -f uwsm-app`; a live check showed `app-Hyprland-tmux-*.scope`.
+- **Follow-ups not announced:** follow-ups to a job were not watched. They are now.
+- **Session could end straight after a result:** a delivered notice now refreshes `last_activity`, so the conversation stays open for a reply.
+
+Checks:
+- Pinned suite: 412 tests passed (two expected skips).
+- Recipe `420c229` advances to `0.1.5-25`. Archive SHA-256 `d28dc309bf6346423c921f5125256bdeb74f70084f38d1951601c0dced2c7ef5`.
+- Installed with `pkexec`: 0 altered files among 9124. Plugin refreshed.
+- The service had used 27 s of CPU before its first sample and none in the following 8 s, so the warm-up had completed before any click.
+
 ## Not verified
 
 - No live Gemini conversation called the new tools.
