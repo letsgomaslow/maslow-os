@@ -10,6 +10,7 @@ import time
 from pathlib import Path
 
 from .errors import VoiceError
+from .execution import validate_url
 
 
 async def command(*argv):
@@ -67,10 +68,14 @@ class DesktopActions:
                 break
         return names
 
-    async def open(self, application):
+    async def open(self, application, url=None):
         if not isinstance(application, str) or application.casefold() not in self.APPLICATIONS:
             raise VoiceError("APPLICATION_NOT_ALLOWED", "Voice can open Browser, Files, Hub, Terminal, or Codex.")
         application = application.casefold()
+        if url is not None:
+            if application != "browser":
+                raise VoiceError("INVALID_REQUEST", "Only the browser can open a website address.")
+            url = validate_url(url)
         if application == "codex" and not shutil.which("codex"):
             raise VoiceError("CODEX_MISSING", "Codex is not installed. Open Hub setup to install or repair it.")
         async with self.lock:
@@ -88,7 +93,9 @@ class DesktopActions:
             cached = self.windows.get(application)
             found = next((c for c in clients if c.get("address") == cached and matching(c)), None)
             found = found or next((c for c in clients if matching(c)), None)
-            if found:
+            # A website always goes through the launcher, which reuses and
+            # focuses a running browser itself.
+            if found and url is None:
                 await self.focus(found)
                 self.windows[application] = found["address"]
                 return {"application": application, "status": "focused", "verification": "window_observed"}
@@ -99,15 +106,20 @@ class DesktopActions:
                 # Terminal processes remain attached. Detach through setsid -f;
                 # the observable window, not this helper's exit, is the receipt.
                 await self.run("setsid", "-f", *argv)
+            elif application == "browser":
+                # validate_url guarantees an http(s) scheme, so the address can
+                # never be read as a browser option.
+                await self.run("setsid", "-f", "omarchy-launch-browser", *([url] if url else []))
             else:
-                await self.run("setsid", "-f", "omarchy-launch-browser" if application == "browser" else "omarchy-launch-nautilus")
+                await self.run("setsid", "-f", "omarchy-launch-nautilus")
             deadline = time.monotonic() + self.timeout
             while True:
                 found = next((c for c in await self.clients() if matching(c)), None)
                 if found:
                     self.windows[application] = found["address"]
                     await self.focus(found)
-                    return {"application": application, "status": "opened", "verification": "window_observed"}
+                    receipt = {"application": application, "status": "opened", "verification": "window_observed"}
+                    return receipt | ({"url": url} if url else {})
                 if time.monotonic() >= deadline:
                     raise VoiceError("APPLICATION_NOT_OBSERVED", "The launch was requested, but its window did not appear. Check the desktop before trying again.")
                 await asyncio.sleep(0.1)

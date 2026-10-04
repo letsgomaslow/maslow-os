@@ -416,6 +416,13 @@ for (const voice of [{state: "connecting", enabled: true}, {state: "listening", 
 const setupContext = { conversation: false, conversationReady: false, supportsPause: true, voice: {}, controller: {connectionLost: false}, send: () => assert.fail("unready orb must not start voice"), openSettings: () => assert.fail("only setup status opens settings") };
 runInNewContext(`${startFromOrbFunction}; startFromOrb();`, setupContext);
 assert.equal(setupContext.feedback, "Connect Voice to start a conversation.");
+const stateTextFunction = panel.match(/function stateText\(\) \{[\s\S]*?\n  \}/)[0];
+const captionState = voice => runInNewContext(`${stateTextFunction}; stateText();`, {voice, disabled: false, controller: {connectionLost: false}});
+assert.equal(captionState({state: "listening", action_caption: "Opening github.com…"}), "Opening github.com…", "Action captions name what Voice is doing");
+assert.equal(captionState({state: "listening", paused: true, action_caption: "Opening github.com…"}), "Paused · click to resume", "Pause outranks action captions");
+assert.equal(captionState({error: "lost", action_caption: "Opening github.com…"}), "Connection lost · click to retry", "Errors outrank action captions");
+assert.equal(captionState({state: "listening"}), "Listening");
+assert.match(panel, /elide: Text\.ElideRight; leftPadding: 10/, "Long captions are elided inside the status pill");
 const needsApprovalFunction = panel.match(/function needsApproval\(task\) \{[\s\S]*?\n  \}/)[0];
 const badgeFunction = panel.match(/function badgeForTasks\(items\) \{[\s\S]*?\n  \}/)[0];
 const states = ["running", "completed", "failed", "waiting_input", "awaiting_approval"];

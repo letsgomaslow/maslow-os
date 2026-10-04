@@ -80,6 +80,15 @@ class GeminiSdkTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(json.loads(response)["status"], "not_performed")
         self.assertEqual(self.provider._submit_callback.await_count, 1)
 
+    async def test_desktop_tool_forwards_website_only_when_given(self):
+        self.provider._started = True
+        self.provider._tool_turns["web-call"] = "final-turn"
+        context = SimpleNamespace(function_call=SimpleNamespace(call_id="web-call"),
+                                  speech_handle=SimpleNamespace(interrupted=False))
+        await self.provider._agent.desktop_action(context, "browser", "https://github.com")
+        self.provider._submit_callback.assert_awaited_once_with(
+            {"operation": "desktop", "application": "browser", "url": "https://github.com"}, "final-turn")
+
     async def test_interrupted_task_control_cannot_mutate_job(self):
         self.provider._started = True
         self.provider._tool_turns["control-call"] = "final-turn"
@@ -216,6 +225,7 @@ class GeminiSdkTests(unittest.IsolatedAsyncioTestCase):
         tools = {item["function"]["name"]: item["function"]["parameters"]["properties"] for item in schema}
         self.assertEqual(set(tools), {"submit_intent", "desktop_action", "task_control"})
         self.assertEqual(set(tools["submit_intent"]), set(BRIEF) | {"project_name", "new_project"})
+        self.assertEqual(set(tools["desktop_action"]), {"application", "url"})
         for parameters in tools.values():
             self.assertNotIn("context", parameters)
         with patch.object(self.RealtimeSession, "_main_task", new=AsyncMock()):

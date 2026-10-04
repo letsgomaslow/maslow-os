@@ -11,6 +11,7 @@ import signal
 import time
 import uuid
 from pathlib import Path
+from urllib.parse import urlsplit
 
 from .audio import PortAudioTransport
 from .voice_preview import VOICES, play_sample
@@ -59,6 +60,7 @@ class VoiceService:
         self.workspaces = WorkspaceResolver(self.directory, self.store)
         self.action_lock = asyncio.Lock()
         self.action_receipts = {}
+        self.caption_sequence = 0
         self.task_view_request = {"task_id": "", "sequence": time.time_ns() // 1_000_000}
         self.task_attention = {"task_id": "", "sequence": self.task_view_request["sequence"]}
         self.current_task_id = ""
@@ -375,6 +377,33 @@ class VoiceService:
             "verification": "File existence checks do not verify the requested behavior. Agent-reported tests require review.",
         }
 
+    @staticmethod
+    def action_caption(intent):
+        # Captions are composed here from validated fields, never by the model.
+        application = str(intent.get("application", ""))
+        url = intent.get("url")
+        if url:
+            try:
+                host = urlsplit(str(url)).hostname
+            except ValueError:
+                host = None
+            if host:
+                return f"Opening {host.removeprefix('www.')}…"
+        return f"Opening {application.title()[:20]}…"
+
+    async def show_caption(self, caption):
+        """Publish a short line naming the action before it runs, then let it fade."""
+        self.caption_sequence = sequence = time.monotonic_ns()
+        self.voice["action_caption"] = caption
+        await self.publish()
+
+        async def clear():
+            await asyncio.sleep(4)
+            if self.caption_sequence == sequence:
+                self.voice.pop("action_caption", None)
+                await self.publish()
+        self.background(clear())
+
     async def conversation_action(self, intent, turn_id, *, epoch=None):
         async with self.action_lock:
             if epoch is not None and self.provider_epoch is not epoch:
@@ -387,7 +416,7 @@ class VoiceService:
             if turn["mode"] != "gemini_live":
                 raise VoiceError("ACTION_UNAVAILABLE", "These conversation controls are available in Gemini Voice.")
             operation = intent.get("operation")
-            fields = {"desktop": {"operation", "application"}, "task": {"operation", "action", "text"},
+            fields = {"desktop": {"operation", "application", "url"}, "task": {"operation", "action", "text"},
                       "submit": {"operation", "brief", "project_name", "new_project"}}
             if operation not in fields or set(intent) - fields[operation]:
                 raise VoiceError("INVALID_REQUEST", "The Voice action contains unsupported fields.")
@@ -397,7 +426,8 @@ class VoiceService:
             if cacheable and key in self.action_receipts:
                 return self.action_receipts[key]
             if operation == "desktop":
-                result = await self.desktop.open(intent.get("application"))
+                await self.show_caption(self.action_caption(intent))
+                result = await self.desktop.open(intent.get("application"), intent.get("url") or None)
             elif operation == "submit":
                 if type(intent.get("new_project", False)) is not bool:
                     raise VoiceError("INVALID_REQUEST", "New project must be true or false.")

@@ -39,11 +39,31 @@ class MvpServiceTests(unittest.IsolatedAsyncioTestCase):
         action = {"operation": "desktop", "application": "codex"}
         await self.service.conversation_action(action, "first")
         await self.service.conversation_action(action, "first")
-        self.service.desktop.open.assert_awaited_once_with("codex")
+        self.service.desktop.open.assert_awaited_once_with("codex", None)
         self.assertFalse((self.root / "projects").exists())
         with self.assertRaises(VoiceError):
             await self.service.conversation_action({"operation": "task", "action": "status"}, "first")
         self.assertEqual(self.service.store.list(), [])
+
+    async def test_website_is_forwarded_with_caption_published_first(self):
+        seen = []
+        async def open_app(application, url=None):
+            seen.append((application, url, self.service.voice.get("action_caption")))
+            return {"application": application, "status": "opened"}
+        self.service.desktop.open.side_effect = open_app
+        await self.service.conversation_action({"operation": "desktop", "application": "browser", "url": "https://www.github.com/x"}, "first")
+        self.assertEqual(seen, [("browser", "https://www.github.com/x", "Opening github.com…")])
+        with self.assertRaisesRegex(VoiceError, "unsupported fields"):
+            await self.service.conversation_action({"operation": "desktop", "application": "browser", "text": "hi"}, "first")
+
+    async def test_action_caption_fades_even_after_failure(self):
+        self.service.desktop.open.side_effect = VoiceError("APPLICATION_NOT_OBSERVED", "no window")
+        with patch("maslow_voice.daemon.asyncio.sleep", AsyncMock()):
+            with self.assertRaises(VoiceError):
+                await self.service.conversation_action({"operation": "desktop", "application": "files"}, "first")
+            self.assertEqual(self.service.voice["action_caption"], "Opening Files…")
+            await asyncio.gather(*self.service.work)
+        self.assertNotIn("action_caption", self.service.voice)
 
     async def test_workspace_auto_dedup_and_passive_attention(self):
         initial_view = dict(self.service.task_view_request)

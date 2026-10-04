@@ -29,6 +29,30 @@ class DesktopTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(launches[0][-2:], ("--", "codex"))
         self.assertEqual(sum(c[:2] == ("hyprctl", "dispatch") and "hl.dsp.focus" in c[2] for c in calls), 2)
 
+    async def test_website_always_uses_launcher_even_when_browser_is_open(self):
+        calls = []
+        async def run(*args):
+            calls.append(args)
+            if args[:3] == ("hyprctl", "-j", "clients"):
+                return json.dumps([{"address": "0x9", "class": "chromium", "mapped": True}])
+            if args[:2] == ("xdg-settings", "get"):
+                return "chromium.desktop\n"
+            return "ok"
+        receipt = await DesktopActions(run).open("browser", "https://github.com")
+        self.assertEqual(receipt["status"], "opened")
+        self.assertEqual(receipt["url"], "https://github.com")
+        self.assertIn(("setsid", "-f", "omarchy-launch-browser", "https://github.com"), calls)
+
+    async def test_unsafe_or_misplaced_website_launches_nothing(self):
+        runner = AsyncMock()
+        desktop = DesktopActions(runner)
+        for url in ("javascript:alert(1)", "file:///etc/passwd", "https://user@host.example", "--incognito", "github.com"):
+            with self.assertRaises(VoiceError):
+                await desktop.open("browser", url)
+        with self.assertRaisesRegex(VoiceError, "Only the browser"):
+            await desktop.open("files", "https://github.com")
+        runner.assert_not_awaited()
+
     async def test_unobserved_launch_is_not_success(self):
         desktop = DesktopActions(AsyncMock(return_value="[]"), timeout=0)
         with self.assertRaisesRegex(VoiceError, "window did not appear"):

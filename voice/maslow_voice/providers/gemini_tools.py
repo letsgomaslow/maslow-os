@@ -18,6 +18,9 @@ def create_agent(provider, agents, base):
             agents.Agent.__init__(self, instructions=(
                 prompt + " "
                 "Use desktop_action to open Browser, Files, Hub, Terminal or Codex, without creating a task. "
+                "To visit a website, call desktop_action with browser and a complete https URL, for example https://github.com. "
+                "To search the web with no site named, use https://duckduckgo.com/?q= followed by the URL-encoded query. "
+                "desktop_action only opens pages; it cannot click, type or fill forms. "
                 "Opening Codex means a standalone terminal, NOT the delegated job. Use task_control show for that job. "
                 "Use submit_intent only for explicitly requested external work. Preserve the named agent; otherwise use auto. "
                 "You handle project bookkeeping: write a short descriptive objective, summary, output and constraints yourself from the conversation. "
@@ -69,9 +72,12 @@ def create_agent(provider, agents, base):
                 return "SUBMITTED: Task saved for review. No work has started."
             return "SUBMITTED: " + json.dumps(result)
 
-        async def desktop_action(self, context, application: Literal["browser", "files", "hub", "terminal", "codex"]) -> str:
-            """Open or focus a desktop application. Codex opens an independent CLI terminal."""
-            return json.dumps(await self._call(context, {"operation": "desktop", "application": application}))
+        async def desktop_action(self, context, application: Literal["browser", "files", "hub", "terminal", "codex"], url: str = "") -> str:
+            """Open or focus a desktop application. With browser, url opens that complete https address. Codex opens an independent CLI terminal."""
+            payload = {"operation": "desktop", "application": application}
+            if url:
+                payload["url"] = url
+            return json.dumps(await self._call(context, payload))
 
         async def task_control(self, context, operation: Literal["status", "show", "steer", "cancel", "continue", "show_result"], text: str = "") -> str:
             """Inspect or control the daemon's current job. Use text for corrections or continuation."""
