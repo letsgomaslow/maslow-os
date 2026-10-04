@@ -1,6 +1,15 @@
 # Maslow AI-OS development: start here
 
-Updated 2026-10-03. This is the current workstream index, not a stable-release announcement. Update this file at each meaningful checkpoint; keep detailed evidence in dated handoffs rather than expanding AGENTS.md into a second backlog.
+Updated 2026-10-04. This is the current workstream index, not a stable-release announcement. Update this file at each meaningful checkpoint; keep detailed evidence in dated handoffs rather than expanding AGENTS.md into a second backlog.
+
+Voice agent-terminal checkpoint (iteration closed as good enough, not complete): [October 3–4 websites, agent terminals and web jobs](handoffs/2026-10-03-voice-agent-terminal.md). Voice can now:
+- open websites and close windows;
+- talk to visible Codex and Claude Code terminals, with screen-checked one-time approvals that require the person's own words;
+- run up to three parallel web tasks, each a background Codex with an isolated Playwright browser;
+- report results by notification and speech;
+- brief each new conversation on running jobs.
+
+Merged into local runtime `main`; the recipe branch `voice-agent-terminal` in `maslow-os-pkgs` (`0.1.5-27`, adds `tmux`) is not merged. Local `maslow-voice 0.1.5-27` (archive `d3503433…`) is installed on the Lenovo. Nothing is pushed or published. Remaining gates are in the handoff: a heard spoken result, orb/Work view for web jobs, Claude live keys, less fragile screen reading, memory and the wake-word decision. Next: confirm a spoken result live, then the orb polish pass.
 
 Voice merge checkpoint: [October 3 reviewed source integration](handoffs/2026-10-03-voice-merge.md). [Runtime PR #15](https://github.com/letsgomaslow/maslow-os/pull/15) is merged into `main` at `e46f88fe`; [package PR #5](https://github.com/letsgomaslow/maslow-os-pkgs/pull/5) is merged into `maslow` at `4488564`, with recipe `0.1.5-19`. Implementation `eba87bc5` includes orb-first controls, retained-session pause, actual playback signals and live theme colors; independent review corrected a delayed OpenAI typed-response pause race. Final pinned checks passed 362 tests with two expected skips, plus focused launcher/controller/CLI/brand/package checks and a verified local candidate build. The full aggregate passed 244/246 shell files; screenshot retry passed, but runtime smoke still crashes in the candidate's temporary lockscreen fixture despite identical tested source. Hosted runtime CI could not start due to a billing lock. Installed `0.1.5-18` remains unchanged. Exact evidence and remaining physical gates are recorded in the handoff; LiveKit Expressive remains acceptance-pending. Next iteration: investigate the native smoke crash, then resume separately authorized rollout and provider acceptance.
 
@@ -104,6 +113,8 @@ Lift estimates are relative engineering effort, not dates: XS = focused copy/che
 | P2 / F3 | Curate more data-only Featured entries with evidence-based Tested/Experimental/Coming soon labels | S | Signed catalog | A3; no executable catalog content |
 | P2 / S1 | Threat-model agent/secret separation; prototype restricted agents and user-approved credential operations, then adversarially test filesystem, clipboard, screen, sockets, and privilege boundaries | L overall; S design slice can start early | Runtime + Hub/Connect | Security review before handling real personal credentials; do not rely on prompt instructions |
 | P3 / F4 | One tested Paperclip/Hermes harness adapter, including compatibility, permissions, update and removal | M–L | Hub | Keep Coming soon until end-to-end proof; separate from full marketplace |
+| P1 / V1 | Voice agent terminal follow-up: confirm a heard job result; the orb badge and Work view show web jobs; finished browsers are tidied; periodic progress cues; Claude live keys | S–M | Runtime `voice/` + package | Handoff 2026-10-03-voice-agent-terminal |
+| P2 / V2 | Replace screen reading of agent TUIs with structured status where available (Codex app-server or `codex queue`); connect `profile_context()` to central memory; decide local wake word | M | Runtime `voice/` | V1; memory access boundary; privacy decision for always-on listening |
 | P3 / F5 | Full marketplace installer, universal memory, model routing, broad harness support | L | Separate scoped workstreams | Deferred; avoid expanding foundation work |
 
 Current published delivery checkpoint: [GPT-Live Lenovo test release](handoffs/2026-09-14-gpt-live-lenovo-test-release.md) is published and anonymously verified as Hub 0.3.2 / staging sequence 5, superseding the frozen 0.3.1 candidate for that test. The exact 0.3.0 package remains available for Hub rollback. The September 16 failure report belongs to the older Voice package. The September 19 Gemini/glass-Orb package is local and unpublished; its physical conversation, pointer interaction and selected-agent artifact gates remain open. LiveKit Expressive remains acceptance-pending. A3 physical Lenovo recovery and F1 Observability backend/trace acceptance remain open. R1/R2 remain recommendations, and security design S1 still blocks any promise of agent-hidden secrets.

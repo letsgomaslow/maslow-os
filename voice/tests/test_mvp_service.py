@@ -39,11 +39,241 @@ class MvpServiceTests(unittest.IsolatedAsyncioTestCase):
         action = {"operation": "desktop", "application": "codex"}
         await self.service.conversation_action(action, "first")
         await self.service.conversation_action(action, "first")
-        self.service.desktop.open.assert_awaited_once_with("codex")
+        self.service.desktop.open.assert_awaited_once_with("codex", None)
         self.assertFalse((self.root / "projects").exists())
         with self.assertRaises(VoiceError):
             await self.service.conversation_action({"operation": "task", "action": "status"}, "first")
         self.assertEqual(self.service.store.list(), [])
+
+    async def test_website_is_forwarded_with_caption_published_first(self):
+        seen = []
+        async def open_app(application, url=None):
+            seen.append((application, url, self.service.voice.get("action_caption")))
+            return {"application": application, "status": "opened"}
+        self.service.desktop.open.side_effect = open_app
+        await self.service.conversation_action({"operation": "desktop", "application": "browser", "url": "https://www.github.com/x"}, "first")
+        self.assertEqual(seen, [("browser", "https://www.github.com/x", "Opening github.com…")])
+        with self.assertRaisesRegex(VoiceError, "unsupported fields"):
+            await self.service.conversation_action({"operation": "desktop", "application": "browser", "text": "hi"}, "first")
+
+    async def test_agent_words_are_captioned_once_and_retries_reuse_the_receipt(self):
+        seen = []
+        async def tell(agent, text, reply, *, title=None, busy_ok=True):
+            seen.append((agent, text, reply, self.service.voice.get("action_caption"), busy_ok))
+            return {"agent": agent, "status": "sent"}
+        self.service.desktop.tell.side_effect = tell
+        action = {"operation": "agent", "agent": "codex", "text": "add a dark mode toggle", "reply": ""}
+        await self.service.conversation_action(action, "first")
+        await self.service.conversation_action(action, "first")
+        # A plain instruction never redirects work Codex is already doing.
+        self.assertEqual(seen, [("codex", "add a dark mode toggle", "", "Telling Codex: add a dark mode toggle", False)])
+        with self.assertRaisesRegex(VoiceError, "unsupported fields"):
+            await self.service.conversation_action(action | {"application": "terminal"}, "first")
+
+    async def test_waiting_agent_prompt_is_shown_not_answered(self):
+        self.service.desktop.tell.return_value = {"agent": "codex", "status": "needs_answer", "prompt": "Would you like to run the following command?"}
+        result = await self.service.conversation_action({"operation": "agent", "agent": "codex", "text": "hi", "reply": ""}, "first")
+        self.assertEqual(result["status"], "needs_answer")
+        self.assertEqual(self.service.voice["action_caption"], "Codex is waiting for your answer")
+        self.assertEqual(self.service.action_caption({"operation": "agent", "agent": "codex", "reply": "approve"}), "Approving in Codex…")
+        self.assertEqual(self.service.action_caption({"operation": "agent", "agent": "codex", "text": "x" * 80}), "Telling Codex: " + "x" * 60 + "…")
+        self.assertEqual(self.service.action_caption({"operation": "agent", "agent": "claude", "text": "hi"}), "Telling Claude Code: hi")
+        self.assertEqual(self.service.action_caption({"operation": "desktop", "application": "claude", "action": "close"}), "Closing Claude Code…")
+
+    async def test_close_is_routed_and_captioned(self):
+        seen = []
+        async def close(application):
+            seen.append((application, self.service.voice.get("action_caption")))
+            return {"application": application, "status": "closed"}
+        self.service.desktop.close.side_effect = close
+        await self.service.conversation_action({"operation": "desktop", "application": "codex", "action": "close"}, "first")
+        self.assertEqual(seen, [("codex", "Closing Codex…")])
+        self.service.desktop.open.assert_not_awaited()
+        with self.assertRaises(VoiceError):
+            await self.service.conversation_action({"operation": "desktop", "application": "codex", "action": "kill"}, "first")
+        self.assertEqual(self.service.action_label({"operation": "desktop", "application": "browser", "url": "https://x.example"}), "desktop browser url")
+        self.assertEqual(self.service.action_label({"operation": "agent", "agent": "codex", "text": "secret words", "reply": ""}), "agent codex")
+
+    async def test_agent_decisions_need_the_persons_own_answer(self):
+        self.service.desktop.tell.return_value = {"agent": "claude", "status": "answered"}
+        approve = {"operation": "agent", "agent": "claude", "text": "", "reply": "approve"}
+        # The turn that asked Claude for work did not answer anything.
+        with self.assertRaises(VoiceError) as raised:
+            await self.service.conversation_action(approve, "first")
+        self.assertEqual(raised.exception.code, "ANSWER_NOT_HEARD")
+        self.service.desktop.tell.assert_not_awaited()
+        await self.turn("ambiguous", "Don't approve that yet")
+        with self.assertRaises(VoiceError):
+            await self.service.conversation_action(approve, "ambiguous")
+        await self.turn("yes", "Yes, go ahead")
+        await self.service.conversation_action(approve, "yes")
+        self.service.desktop.tell.assert_awaited_once_with("claude", "", "approve", title=None, busy_ok=True)
+        await self.turn("no", "No, deny it")
+        await self.service.conversation_action(approve | {"reply": "deny"}, "no")
+        self.assertEqual(self.service.desktop.tell.await_count, 2)
+
+    async def test_web_task_is_framed_by_the_daemon_and_followed(self):
+        self.service.desktop.tell.return_value = {"agent": "web-1", "status": "sent"}
+        watched = []
+        self.service.watch_agent = watched.append
+        words = "find cheap flights from Newark to Austin next week or the week after"
+        result = await self.service.conversation_action({"operation": "agent", "agent": "codex", "kind": "web_task", "reply": "", "text": words}, "first")
+        (seat, text, reply), options = self.service.desktop.tell.await_args
+        self.assertEqual((seat, reply, result["job"]), ("web-1", "", "web-1"))
+        self.assertEqual(options["title"], "Web: " + self.service.job_title(words))
+        self.assertTrue(options["title"].endswith("…") and len(options["title"]) <= 53)
+        self.assertIn("Today is ", text)
+        self.assertIn("playwright", text)
+        self.assertIn("never buy, book, sign in", text)
+        self.assertTrue(text.endswith("Request: " + words))
+        self.assertEqual(watched, ["web-1"])
+        self.assertEqual(self.service.jobs["web-1"]["state"], "working")
+        self.assertEqual(self.service.voice["action_caption"], "Starting web task: " + words[:60] + "…")
+        with self.assertRaises(VoiceError):
+            await self.service.conversation_action({"operation": "agent", "agent": "codex", "kind": "shell", "text": "x", "reply": ""}, "first")
+
+    async def test_separate_web_tasks_get_separate_seats_and_corrections_stay_with_their_job(self):
+        self.service.desktop.tell.side_effect = lambda seat, *args, **kwargs: {"agent": seat, "status": "sent"}
+        self.service.watch_agent = lambda seat: None
+        web = {"operation": "agent", "agent": "codex", "kind": "web_task", "reply": ""}
+        await self.turn("flights", "Find cheap flights to Austin")
+        await self.service.conversation_action(web | {"text": "find cheap flights to Austin"}, "flights")
+        await self.turn("activities", "Find activities to do in Austin")
+        await self.service.conversation_action(web | {"text": "find activities to do in Austin"}, "activities")
+        self.assertEqual(sorted(self.service.jobs), ["web-1", "web-2"])
+        await self.turn("dallas", "Make the flights Dallas instead")
+        await self.service.conversation_action(web | {"text": "make it Dallas instead", "job": "web-1"}, "dallas")
+        (seat, text, _), options = self.service.desktop.tell.await_args
+        # A correction goes to its own job, unframed, and may redirect that work.
+        self.assertEqual((seat, text, options["busy_ok"]), ("web-1", "make it Dallas instead", True))
+        watched = []
+        self.service.watch_agent = watched.append
+        self.service.jobs["web-1"]["state"] = "finished"
+        await self.turn("return", "Add a return trip to the flight search")
+        await self.service.conversation_action(web | {"text": "add a return trip", "job": "web-1"}, "return")
+        # The follow-up's result is reported too.
+        self.assertEqual((watched, self.service.jobs["web-1"]["state"]), (["web-1"], "working"))
+        self.service.watch_agent = lambda seat: None
+        await self.turn("third", "Find hotels in Austin")
+        await self.service.conversation_action(web | {"text": "find hotels in Austin"}, "third")
+        await self.turn("fourth", "Find restaurants in Austin")
+        with self.assertRaises(VoiceError) as raised:
+            await self.service.conversation_action(web | {"text": "find restaurants in Austin"}, "fourth")
+        self.assertEqual(raised.exception.code, "JOBS_FULL")
+        # A finished job's seat is ended and reused for the next task.
+        self.service.jobs["web-2"]["state"] = "finished"
+        await self.service.conversation_action(web | {"text": "find restaurants in Austin"}, "fourth")
+        self.service.desktop.end_seat.assert_awaited_once_with("web-2")
+        self.assertEqual(self.service.jobs["web-2"]["title"], "find restaurants in Austin")
+        with self.assertRaises(VoiceError) as raised:
+            await self.service.conversation_action(web | {"text": "x", "job": "web-9"}, "fourth")
+        self.assertEqual(raised.exception.code, "JOB_NOT_FOUND")
+
+    async def test_status_lists_every_job_by_name_and_is_always_fresh(self):
+        self.service.jobs["web-1"] = {"id": "web-1", "title": "find cheap flights", "state": "working", "started": 0, "updated": 0, "result": ""}
+        states = {"web-1": {"state": "working", "screen": "• Working"}, "codex": {"state": "idle", "screen": "› Ask"}, "claude": {"state": "closed"}}
+        self.service.desktop.agent_state.side_effect = lambda seat: states[seat]
+        for _ in range(2):
+            result = await self.service.conversation_action({"operation": "agent_status"}, "first")
+        self.assertEqual([(job["job"], job["title"], job["state"]) for job in result["jobs"]],
+                         [("web-1", "find cheap flights", "working"), ("codex", "Codex", "idle")])
+        self.assertEqual(self.service.desktop.agent_state.await_count, 6)
+
+    async def test_show_opens_a_viewer_on_the_named_job(self):
+        self.service.jobs["web-1"] = {"id": "web-1", "title": "find cheap flights", "state": "working", "started": 0, "updated": 0, "result": ""}
+        self.service.desktop.agent_state.return_value = {"state": "working", "screen": "• Working"}
+        await self.service.conversation_action({"operation": "agent_status", "job": "web-1", "show": True}, "first")
+        self.service.desktop.open.assert_awaited_with("web-1", title="Web: find cheap flights", view=True)
+        self.assertEqual(self.service.voice["action_caption"], "Showing find cheap flights…")
+
+    async def test_conversation_libraries_are_loaded_before_the_first_click(self):
+        loaded = []
+        async def to_thread(function):
+            loaded.append(function)
+        with patch("maslow_voice.daemon.asyncio.to_thread", to_thread):
+            await self.service.warm_conversation()
+            self.service.settings.value["mode"] = "openai"
+            await self.service.warm_conversation()
+        self.assertEqual(len(loaded), 1)
+        loaded[0]()  # The real imports succeed in the pinned environment.
+
+    async def test_new_conversation_is_briefed_on_tasks_and_the_last_exchange(self):
+        self.service.jobs["web-1"] = {"id": "web-1", "title": "find cheap flights", "state": "working", "started": 0, "updated": 0, "result": ""}
+        self.service.session["transcript"] = [{"role": "user", "text": "Find cheap flights to Austin"}, {"role": "assistant", "text": "Searching now."}]
+        await self.service.end_voice()
+        briefing = self.service.briefing()
+        self.assertIn('Web task web-1 "find cheap flights": working', briefing)
+        self.assertIn("user: Find cheap flights to Austin", briefing)
+        self.assertIn("agent_status", briefing)
+        self.service.last_conversation["ended"] -= 3600
+        self.assertNotIn("Find cheap flights to Austin", self.service.briefing())
+
+    async def test_an_old_finished_task_is_not_the_current_task(self):
+        task, _ = self.service.store.create("old-request", dict(BRIEF), str(self.root), "gemini_live", "Build a tracker")
+        task = self.service.store.update(task["id"], state="completed") or self.service.store.get(task["id"])
+        self.assertEqual(self.service.current_task()["id"], task["id"])
+        later = task["updated_at"] + 7200
+        with patch("maslow_voice.daemon.time.time", return_value=later):
+            with self.assertRaises(VoiceError) as raised:
+                self.service.current_task()
+            self.service.current_task_id = task["id"]
+            with self.assertRaises(VoiceError):
+                self.service.current_task()
+        self.assertEqual(raised.exception.code, "TASK_NOT_FOUND")
+
+    async def test_watcher_announces_decisions_once_and_the_finished_answer(self):
+        states = [{"state": "working"}, {"state": "waiting", "prompt": "Allow the playwright MCP server"},
+                  {"state": "waiting", "prompt": "Allow the playwright MCP server"}, {"state": "working"},
+                  {"state": "idle", "screen": "Cheapest: $142"}, {"state": "idle", "screen": "Cheapest: $142"}]
+        self.service.desktop.agent_state.side_effect = states
+        notices = []
+        async def notice(agent, state, screen):
+            notices.append((agent, state, screen))
+        self.service.agent_notice = notice
+        self.service.agent_jobs.add("codex")
+        await self.service._watch_agent("codex", interval=0)
+        self.assertEqual(notices, [("codex", "waiting for a decision", "Allow the playwright MCP server"), ("codex", "finished", "Cheapest: $142")])
+        self.assertNotIn("codex", self.service.agent_jobs)
+
+    async def test_a_spoken_result_is_also_notified_and_leaves_time_to_answer(self):
+        self.service.provider.notify_task = AsyncMock(return_value=True)
+        self.service.jobs["web-1"] = {"id": "web-1", "title": "find cheap flights", "state": "finished", "started": 0, "updated": 0, "result": ""}
+        self.service.last_activity = 0
+        await self.service.agent_notice("web-1", "finished", "› find cheap flights\n• Cheapest is **$337** on Alaska, Oct 20–27.")
+        self.service.desktop.run.assert_awaited_once_with("omarchy-notification-send", "--app-name", "Maslow Voice",
+                                                          'The task "find cheap flights" has finished', "Cheapest is $337 on Alaska, Oct 20–27.")
+        self.service.provider.notify_task.assert_awaited_once()
+        self.assertGreater(self.service.last_activity, 0)
+        self.assertFalse(self.service.session_expired())
+
+    def test_answer_line_skips_progress_and_interface_text(self):
+        screen = ("› Web task from Maslow Voice. Request: find flights\n• I’ll compare flights.\n• Explored\n  └ List files\n"
+                  "• The cheapest option is **$324** nonstop on United, Oct 11.\n  | Flight | Price |")
+        self.assertEqual(self.service.answer_line(screen), "The cheapest option is $324 nonstop on United, Oct 11.")
+        self.assertEqual(self.service.answer_line(""), "")
+
+    async def test_finished_notice_without_a_conversation_is_still_notified(self):
+        self.service.provider = None
+        await self.service.agent_notice("codex", "finished", "• All tests pass.")
+        self.service.desktop.run.assert_awaited_once_with("omarchy-notification-send", "--app-name", "Maslow Voice",
+                                                          "Codex has finished", "All tests pass.")
+
+    def test_running_agent_keeps_a_quiet_conversation_open(self):
+        quiet = self.service.last_activity + self.service.settings.value["idle_seconds"] + 5
+        self.service.session_started = quiet - 60
+        self.assertTrue(self.service.session_expired(now=quiet))
+        self.service.agent_jobs.add("codex")
+        self.assertFalse(self.service.session_expired(now=quiet))
+        self.assertTrue(self.service.session_expired(now=self.service.session_started + 30 * 60))
+
+    async def test_action_caption_fades_even_after_failure(self):
+        self.service.desktop.open.side_effect = VoiceError("APPLICATION_NOT_OBSERVED", "no window")
+        with patch("maslow_voice.daemon.asyncio.sleep", AsyncMock()):
+            with self.assertRaises(VoiceError):
+                await self.service.conversation_action({"operation": "desktop", "application": "files"}, "first")
+            self.assertEqual(self.service.voice["action_caption"], "Opening Files…")
+            await asyncio.gather(*self.service.work)
+        self.assertNotIn("action_caption", self.service.voice)
 
     async def test_workspace_auto_dedup_and_passive_attention(self):
         initial_view = dict(self.service.task_view_request)

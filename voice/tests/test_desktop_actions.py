@@ -5,6 +5,7 @@ import unittest
 from pathlib import Path
 from unittest.mock import AsyncMock, patch
 
+from maslow_voice import agent_terminal
 from maslow_voice.desktop import DesktopActions, command
 from maslow_voice.errors import VoiceError
 
@@ -20,14 +21,62 @@ class DesktopTests(unittest.IsolatedAsyncioTestCase):
             if args[0] == "setsid":
                 clients.append({"address": "0x123", "class": "maslow.voice.codex", "mapped": True})
             return "ok"
-        desktop = DesktopActions(run)
+        temp = tempfile.TemporaryDirectory()
+        self.addCleanup(temp.cleanup)
+        desktop = DesktopActions(run, agent_cwd=Path(temp.name) / "Maslow Voice")
         with patch("maslow_voice.desktop.shutil.which", return_value="/bin/codex"):
             self.assertEqual((await desktop.open("codex"))["status"], "opened")
             self.assertEqual((await desktop.open("codex"))["status"], "focused")
         launches = [call for call in calls if call[0] == "setsid"]
         self.assertEqual(len(launches), 1)
-        self.assertEqual(launches[0][-2:], ("--", "codex"))
+        # Codex runs inside a reattachable tmux session on Voice's own server.
+        self.assertEqual(launches[0][-14:], ("--", "tmux", "-L", "maslow-voice", "-f", str(agent_terminal.CONFIG), "new-session", "-A", "-s",
+                                             "maslow-codex", "-c", str(Path(temp.name) / "Maslow Voice"), "--", "codex"))
         self.assertEqual(sum(c[:2] == ("hyprctl", "dispatch") and "hl.dsp.focus" in c[2] for c in calls), 2)
+
+    async def test_website_always_uses_launcher_even_when_browser_is_open(self):
+        calls = []
+        async def run(*args):
+            calls.append(args)
+            if args[:3] == ("hyprctl", "-j", "clients"):
+                return json.dumps([{"address": "0x9", "class": "chromium", "mapped": True}])
+            if args[:2] == ("xdg-settings", "get"):
+                return "chromium.desktop\n"
+            return "ok"
+        receipt = await DesktopActions(run).open("browser", "https://github.com")
+        self.assertEqual(receipt["status"], "opened")
+        self.assertEqual(receipt["url"], "https://github.com")
+        self.assertIn(("setsid", "-f", "omarchy-launch-browser", "https://github.com"), calls)
+
+    async def test_unsafe_or_misplaced_website_launches_nothing(self):
+        runner = AsyncMock()
+        desktop = DesktopActions(runner)
+        for url in ("javascript:alert(1)", "file:///etc/passwd", "https://user@host.example", "--incognito", "github.com"):
+            with self.assertRaises(VoiceError):
+                await desktop.open("browser", url)
+        with self.assertRaisesRegex(VoiceError, "Only the browser"):
+            await desktop.open("files", "https://github.com")
+        runner.assert_not_awaited()
+
+    async def test_close_targets_one_window_and_reports_when_none_is_open(self):
+        windows = [{"address": "0xa", "class": "maslow.voice.codex", "mapped": True, "focusHistoryID": 3},
+                   {"address": "0xb", "class": "maslow.voice.codex", "mapped": True, "focusHistoryID": 1},
+                   {"address": "0xc", "class": "org.gnome.nautilus", "mapped": True, "focusHistoryID": 0}]
+        calls = []
+        async def run(*args):
+            calls.append(args)
+            return json.dumps(windows) if args[:3] == ("hyprctl", "-j", "clients") else "ok"
+        desktop = DesktopActions(run)
+        receipt = await desktop.close("codex")
+        self.assertEqual(receipt["status"], "closed")
+        self.assertIn("keeps running", receipt["note"])
+        closes = [c for c in calls if c[:2] == ("hyprctl", "dispatch")]
+        self.assertEqual(closes, [("hyprctl", "dispatch", 'hl.dsp.window.close({ window = "address:0xb" })')])
+        windows.clear()
+        self.assertEqual((await desktop.close("files"))["status"], "not_open")
+        for target in ("hub", "unknown", "codex; rm"):
+            with self.assertRaises(VoiceError):
+                await desktop.close(target)
 
     async def test_unobserved_launch_is_not_success(self):
         desktop = DesktopActions(AsyncMock(return_value="[]"), timeout=0)

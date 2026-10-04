@@ -1,0 +1,63 @@
+#!/bin/bash
+
+# omarchy:summary=Let Codex and Claude Code drive a visible browser for Maslow Voice web tasks
+
+set -e
+
+# Pinned so a later npm release cannot change what the agents run without review.
+PLAYWRIGHT_MCP="@playwright/mcp@0.0.83"
+CODEX_CONFIG="${CODEX_HOME:-$HOME/.codex}/config.toml"
+
+# Browsing steps Codex may take without asking. Running page JavaScript, file
+# uploads, drag and drop, network inspection and page dialogs still ask.
+BROWSING_TOOLS=(
+  browser_navigate browser_navigate_back browser_snapshot browser_find browser_click browser_type
+  browser_fill_form browser_select_option browser_press_key browser_hover browser_wait_for browser_tabs
+  browser_take_screenshot browser_resize browser_close
+)
+
+if omarchy-cmd-missing codex; then
+  echo "Codex is not installed. Install it from Hub setup first."
+  exit 1
+fi
+
+if omarchy-cmd-missing npx; then
+  echo "Browser tasks need Node.js. Install it with: omarchy-pkg-add nodejs npm"
+  exit 1
+fi
+
+echo "This adds the Playwright browser tool ($PLAYWRIGHT_MCP) to your coding agents."
+echo "Web tasks then run in a visible browser window with a fresh profile: no saved logins, cookies or cards."
+echo "Codex may browse (open pages, read, click, type, select) without asking each step."
+echo "It still asks before running page scripts, uploading files or answering page pop-ups,"
+echo "and Voice tells it to stop before any purchase, sign-in or personal details."
+echo ""
+
+if gum confirm "Set up the browser tool for Codex?"; then
+  # Replace any earlier playwright entry, including remembered tool answers.
+  if codex mcp get playwright &>/dev/null; then
+    codex mcp remove playwright >/dev/null
+  fi
+  mkdir -p "$(dirname "$CODEX_CONFIG")"
+  {
+    echo ""
+    echo "[mcp_servers.playwright]"
+    echo "command = \"npx\""
+    echo "args = [\"$PLAYWRIGHT_MCP\", \"--isolated\"]"
+    echo "env_vars = [\"WAYLAND_DISPLAY\", \"DISPLAY\", \"XDG_RUNTIME_DIR\"]"
+    for tool in "${BROWSING_TOOLS[@]}"; do
+      echo ""
+      echo "[mcp_servers.playwright.tools.$tool]"
+      echo "approval_mode = \"approve\""
+    done
+  } >>"$CODEX_CONFIG"
+  echo "Codex can now browse in a visible window. Restart any open Codex session to load it."
+fi
+
+if omarchy-cmd-present claude; then
+  if claude mcp get playwright &>/dev/null; then
+    echo "Claude Code already has a browser tool named playwright."
+  elif gum confirm "Add the browser tool to Claude Code?"; then
+    claude mcp add -s user playwright -- npx "$PLAYWRIGHT_MCP" --isolated
+  fi
+fi

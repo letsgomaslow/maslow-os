@@ -68,18 +68,19 @@ class GeminiTypedTranscriptTests(unittest.IsolatedAsyncioTestCase):
 
     async def test_typed_notice_uses_finished_handle_instead_of_stale_sdk_state(self):
         self.provider._started = True
-        reply = AsyncMock()
-        self.provider._session = SimpleNamespace(agent_state="speaking", current_speech=None, generate_reply=reply)
+        sent = []
+        self.provider._realtime = SimpleNamespace(_send_client_event=sent.append)
+        self.provider._session = SimpleNamespace(agent_state="speaking", current_speech=None)
         self.assertTrue(await self.provider.notify_task("Completed"))
         self.provider._typed_turn = "active-input"
         self.assertFalse(await self.provider.notify_task("Completed"))
-        self.assertEqual(reply.await_count, 1)
+        self.assertEqual(len(sent), 1)
         self.provider._typed_turn = None
         self.provider._session.current_speech = SimpleNamespace(done=lambda: False)
         self.assertFalse(await self.provider.notify_task("Completed"))
         self.provider._session.current_speech = SimpleNamespace(done=lambda: True)
         self.assertTrue(await self.provider.notify_task("Completed"))
-        self.assertEqual(reply.await_count, 2)
+        self.assertEqual(len(sent), 2)
 
     async def test_stop_clears_unconsumed_typed_item_marker(self):
         self.provider._pending_typed_items.add("typed request")

@@ -313,8 +313,9 @@ Item {
   function stateText() {
     if (voice.error || controller.connectionLost) return "Connection lost · click to retry"
     if (voice.paused === true) return "Paused · click to resume"
+    if (voice.action_caption) return voice.action_caption
     if (disabled) return "Connect Voice"
-    if (voice.state === "connecting") return "Connecting"
+    if (voice.state === "connecting") return "Connecting · click to cancel"
     if (voice.state === "thinking") return "Thinking"
     if (voice.speaking === true || voice.state === "speaking" || voice.state === "talking") return "Speaking"
     if (voice.state === "listening") return voice.extended === true ? "Listening · extended" : "Listening"
@@ -897,7 +898,7 @@ Item {
       focusPolicy: Qt.StrongFocus
       Accessible.name: text
       background: Rectangle { color: root.surfaceColor; radius: 12; border.width: parent.activeFocus ? 2 : 0; border.color: root.accentTextColor }
-      contentItem: Text { text: parent.text; color: root.textColor; font.pixelSize: 12; horizontalAlignment: Text.AlignHCenter; verticalAlignment: Text.AlignVCenter }
+      contentItem: Text { text: parent.text; color: root.textColor; font.pixelSize: 12; elide: Text.ElideRight; leftPadding: 10; rightPadding: 10; horizontalAlignment: Text.AlignHCenter; verticalAlignment: Text.AlignVCenter }
       onClicked: {
         if (!root.conversationReady && !root.conversation && !root.voice.error && !controller.connectionLost) root.openSettings("Connect Voice")
         else root.startFromOrb()

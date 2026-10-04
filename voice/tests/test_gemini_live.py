@@ -80,6 +80,43 @@ class GeminiSdkTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(json.loads(response)["status"], "not_performed")
         self.assertEqual(self.provider._submit_callback.await_count, 1)
 
+    async def test_desktop_tool_forwards_website_only_when_given(self):
+        self.provider._started = True
+        self.provider._tool_turns["web-call"] = "final-turn"
+        context = SimpleNamespace(function_call=SimpleNamespace(call_id="web-call"),
+                                  speech_handle=SimpleNamespace(interrupted=False))
+        await self.provider._agent.desktop_action(context, "browser", "https://github.com")
+        self.provider._submit_callback.assert_awaited_once_with(
+            {"operation": "desktop", "application": "browser", "url": "https://github.com"}, "final-turn")
+        self.provider._tool_turns["close-call"] = "final-turn"
+        context.function_call.call_id = "close-call"
+        await self.provider._agent.desktop_action(context, "codex", "", "close")
+        self.provider._submit_callback.assert_awaited_with(
+            {"operation": "desktop", "application": "codex", "action": "close"}, "final-turn")
+
+    async def test_briefing_and_compression_reach_the_real_model(self):
+        self.provider.config["voice_briefing"] = 'Maslow state: Web task web-1 "find cheap flights": working.'
+        session = self.provider._create_agent_session(self.agents, "", "")
+        self.addAsyncCleanup(session.aclose)
+        self.assertTrue(self.provider._agent.instructions.endswith('Web task web-1 "find cheap flights": working.'))
+        self.assertIsNotNone(session.llm._opts.context_window_compression.sliding_window)
+
+    async def test_tell_agent_forwards_words_and_relays_waiting_prompt(self):
+        self.provider._started = True
+        self.provider._tool_turns["tell-call"] = "final-turn"
+        self.provider._submit_callback.return_value = {"status": "needs_answer", "prompt": "Would you like to run the following command?"}
+        context = SimpleNamespace(function_call=SimpleNamespace(call_id="tell-call"),
+                                  speech_handle=SimpleNamespace(interrupted=False))
+        response = json.loads(await self.provider._agent.tell_agent(context, "run the tests", "codex", "none"))
+        self.provider._submit_callback.assert_awaited_once_with(
+            {"operation": "agent", "agent": "codex", "text": "run the tests", "reply": ""}, "final-turn")
+        self.provider._tool_turns["web-call"] = "final-turn"
+        context.function_call.call_id = "web-call"
+        await self.provider._agent.tell_agent(context, "find cheap flights to Austin next week", "codex", "none", "web_task")
+        self.provider._submit_callback.assert_awaited_with(
+            {"operation": "agent", "agent": "codex", "text": "find cheap flights to Austin next week", "reply": "", "kind": "web_task"}, "final-turn")
+        self.assertEqual(response["status"], "needs_answer")
+
     async def test_interrupted_task_control_cannot_mutate_job(self):
         self.provider._started = True
         self.provider._tool_turns["control-call"] = "final-turn"
@@ -89,20 +126,44 @@ class GeminiSdkTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(json.loads(response)["status"], "not_performed")
         self.provider._submit_callback.assert_not_awaited()
 
-    async def test_completion_speech_has_no_action_tools_and_waits_for_user(self):
+    async def test_completion_speech_is_realtime_text_and_waits_for_a_quiet_moment(self):
+        from google.genai import types
         self.provider._started = True
         self.provider._audio_enabled = True
         original = self.provider._session
         fake = SimpleNamespace(user_state="speaking", agent_state="listening", generate_reply=AsyncMock())
+        sent = []
+        self.provider._realtime = SimpleNamespace(_send_client_event=sent.append)
         self.provider._session = fake
         try:
             self.assertFalse(await self.provider.notify_task("Completed"))
-            fake.generate_reply.assert_not_awaited()
             fake.user_state = "listening"
             self.assertTrue(await self.provider.notify_task("Completed"))
-            self.assertEqual(fake.generate_reply.call_args.kwargs["tools"], [])
+            # "away" is LiveKit's state after 15 seconds of silence: still quiet.
+            fake.user_state = "away"
+            self.assertTrue(await self.provider.notify_task("Completed"))
+            self.assertEqual(len(sent), 2)
+            self.assertIsInstance(sent[0], types.LiveClientRealtimeInput)
+            self.assertTrue(sent[0].text.endswith("Completed"))
+            self.assertIn("not spoken by the person", sent[0].text)
+            # Never the generate_reply(instructions=...) path that broke 3.8 sessions.
+            fake.generate_reply.assert_not_awaited()
+            self.provider._realtime = None
+            self.assertFalse(await self.provider.notify_task("Completed"))
         finally:
             self.provider._session = original
+
+    async def test_real_realtime_session_is_kept_and_accepts_status_text(self):
+        from google.genai import types
+        model = self.provider._session.llm
+        with patch.object(self.RealtimeSession, "_main_task", new=AsyncMock()):
+            realtime = model.session()
+            try:
+                self.assertIs(self.provider._realtime, realtime)
+                # The private send used for status updates exists on the pinned plugin.
+                realtime._send_client_event(types.LiveClientRealtimeInput(text="status"))
+            finally:
+                await realtime.aclose()
 
     async def test_real_native_start_attaches_audio_and_mute_controls_capture(self):
         from maslow_voice.audio import PcmFrame
@@ -214,8 +275,23 @@ class GeminiSdkTests(unittest.IsolatedAsyncioTestCase):
         self.assertIsNotNone(model._opts.output_audio_transcription)
         schema = self.agents.ToolContext(self.provider._agent.tools).parse_function_tools("openai", strict=True)
         tools = {item["function"]["name"]: item["function"]["parameters"]["properties"] for item in schema}
-        self.assertEqual(set(tools), {"submit_intent", "desktop_action", "task_control"})
+        self.assertEqual(set(tools), {"submit_intent", "desktop_action", "task_control", "tell_agent", "agent_status"})
+        self.assertEqual(set(tools["tell_agent"]), {"text", "agent", "reply", "kind", "job"})
+        self.assertEqual(set(tools["agent_status"]), {"job", "show"})
+        # Gemini Live refuses the whole session when any enum value is empty.
+        def enums(value):
+            if isinstance(value, dict):
+                yield from value.get("enum", [])
+                for item in value.values():
+                    yield from enums(item)
+            elif isinstance(value, list):
+                for item in value:
+                    yield from enums(item)
+        google_tools = self.agents.ToolContext(self.provider._agent.tools).parse_function_tools("google")
+        self.assertTrue(list(enums(google_tools)))
+        self.assertNotIn("", [str(value) for value in enums(google_tools)])
         self.assertEqual(set(tools["submit_intent"]), set(BRIEF) | {"project_name", "new_project"})
+        self.assertEqual(set(tools["desktop_action"]), {"application", "url", "action"})
         for parameters in tools.values():
             self.assertNotIn("context", parameters)
         with patch.object(self.RealtimeSession, "_main_task", new=AsyncMock()):

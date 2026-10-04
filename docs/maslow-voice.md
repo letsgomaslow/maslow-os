@@ -1,6 +1,6 @@
 # Maslow Voice
 
-Maslow Voice is an optional, consent-led conversational coordinator for Maslow AI-OS. The conversation provider can answer normally or emit one validated work brief; it cannot run commands, open applications, approve requests, or execute coding work. The daemon binds each brief to the captured user turn, selected project, mode, and original words, then routes the persisted task to Codex, Hermes, or Claude through a separate execution boundary.
+Maslow Voice is an optional, consent-led conversational coordinator for Maslow AI-OS. The conversation provider can answer normally, emit one validated work brief, or call a few bounded desktop tools: open an allowlisted application or a website, and pass the person's words to a visible Codex terminal. It cannot run shell commands or execute coding work itself, and it answers a Codex decision only with a fixed approve or deny after the person says so. The daemon binds each brief to the captured user turn, selected project, mode, and original words, then routes the persisted task to Codex, Hermes, or Claude through a separate execution boundary.
 
 Current status: the source integration is merged and its default conversation path is Gemini 3.8 Live. Local package `0.1.5-7` is installed on the Lenovo development laptop and its service, glass Orb, saved movement, restart persistence, reset and QML loading were directly inspected. Physical pointer drag, a real Gemini conversation, selected-agent artifact completion, the full Lenovo acceptance matrix, package promotion, stable-channel publication and a verified-ISO rebuild remain open. Use the [September 19 integration handoff](handoffs/2026-09-19-gemini-voice-orb-integration.md), [development index](maslow-development.md) and [Voice testing guide](../agents/skills/voice-development.md) when preparing acceptance.
 
@@ -19,6 +19,16 @@ These are the implemented placement/lifecycle rules. Fast fixture-driven Quicksh
 The panel has Talk, Type, Tasks, and Advanced Voice settings pages. Tasks expose status, one-request approval or denial, steering where the selected executor supports it, cancellation, continuation, dismissal, and the offline review/export flow. `omarchy-launch-voice [talk|type|tasks|settings]` summons the existing shell plugin. If Voice is not installed, the launcher opens Hub's Voice page instead. The default desktop binding is `Super+Shift+V`.
 
 Hub's Voice page is the installation and readiness entry point. It reads a reduced status snapshot through `omarchy-voice-control`, opens the Voice plugin, and launches package installation in a visible terminal. Hub does not receive or store Voice credentials.
+
+## Websites, Codex and browser tasks
+
+- "Go to github.com" or "search for tmux" opens the default browser at that page. Voice only opens pages; it does not click or type in them.
+- "Close Codex" (or Files, Terminal, the browser) closes that window.
+- "Open Codex" shows Codex in a terminal window that Voice can talk to. Closing the window keeps Codex running, and the next "open Codex" brings the same session back.
+- "Tell Codex to add a dark mode toggle" types those words into Codex and submits them, so you can watch Codex work. "Open Claude" and "tell Claude to …" work the same way with Claude Code.
+- When Codex asks for a decision, Voice reads it out and waits. Say "approve" or "deny"; Voice sends a one-time answer only, never "always allow".
+- Web tasks such as "find cheap flights from Newark to Austin next week or the week after" work after running `omarchy setup voice browser`. Each request becomes its own task with its own visible browser, so "also find things to do in Austin" runs alongside it (up to three at once). Changes such as "make the flights Dallas instead" go to that task only. "How are my tasks going?" lists them, and "show me the flight search" opens its agent window. When a task finishes you get a notification, and Voice also tells you if a conversation is open. A new conversation remembers running tasks. Agents never buy, book or sign in; they stop and tell you what is needed. This is an early version: some rough edges remain.
+- The orb's status line names each action as it starts, for example "Opening github.com…" or "Telling Codex: …".
 
 ## Conversation modes
 

@@ -58,6 +58,7 @@ The build flow is `maslow-os source` -> `maslow-os-pkgs package recipes` -> `mas
 - Keep bundled `omadock` and `tyrsolution.app-launcher` IDs, upstream credits, themes, Git metadata, and update compatibility. Preserve Super+A and existing shortcuts; keep approved Maslow display branding separate from upstream identity.
 - Keep Codex, Claude Code, and Hermes installation, configuration, readiness, provider sign-in, and elevated permission consent distinct. Do not treat a preinstalled binary or prototype UI as successful onboarding. Dictation and extra plugin scope remain deferred.
 - Treat the Lenovo as the native acceptance target, not a hand-configured product fork. Fix confirmed defects in the owning source repository; do not rebuild this verified ISO solely for the recorded output-ownership cleanup defect.
+- Voice drives agents only through its private tmux server and documented boundaries in [`voice/docs/execution.md`](voice/docs/execution.md): never type into a shell, never send "always"/"session" approvals, keep the spoken-answer guard, leave Codex MCP tool dialogs to the window, and keep web jobs in their isolated pre-approved browser profile. Confirm agent delivery and results from the screen or journal, not from keystrokes or log wording.
 - Leave unrelated `concepts/` work out of candidate commits unless explicitly scoped and reviewed. Source pushes do not authorize publishing ISOs, packages, credentials, or local build logs.
 
 # Documentation Layout
