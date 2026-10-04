@@ -386,12 +386,128 @@ class MvpServiceTests(unittest.IsolatedAsyncioTestCase):
         self.assertFalse(self.service.session_expired(now=quiet))
         self.assertTrue(self.service.session_expired(now=self.service.session_started + 30 * 60))
 
+    async def test_slow_action_answers_quickly_and_reports_only_failures_or_questions(self):
+        notices = []
+        async def notice(content):
+            notices.append(content)
+            return "sent to the conversation"
+        self.service.conversation_notice = notice
+        release = asyncio.Event()
+        async def slow_open(application, url=None):
+            await release.wait()
+            return {"application": application, "status": "opened"}
+        self.service.desktop.open.side_effect = slow_open
+        started = time.monotonic()
+        result = await self.service.conversation_action({"operation": "desktop", "application": "browser"}, "first")
+        self.assertLess(time.monotonic() - started, 2)
+        self.assertEqual((result["status"], result["verification"]), ("started", "in_progress"))
+        # A retry of the same call gets the same receipt and launches nothing new.
+        self.assertEqual(await self.service.conversation_action({"operation": "desktop", "application": "browser"}, "first"), result)
+        self.assertEqual(self.service.desktop.open.await_count, 1)
+        release.set()
+        await asyncio.sleep(0)
+        await asyncio.gather(*self.service.work, return_exceptions=True)
+        self.assertEqual(notices, [], "A successful action says nothing more")
+
+        async def slow_failure(application, url=None):
+            await asyncio.sleep(1)
+            raise VoiceError("APPLICATION_NOT_OBSERVED", "The window did not appear.")
+        self.service.desktop.open.side_effect = slow_failure
+        await self.turn("files", "Open Files")
+        result = await self.service.conversation_action({"operation": "desktop", "application": "files"}, "files")
+        self.assertEqual(result["status"], "started")
+        await asyncio.sleep(1.2)
+        self.assertEqual(notices[-1]["state"], "failed")
+        self.assertEqual(notices[-1]["reason"], "The window did not appear.")
+        self.assertEqual(notices[-1]["action"], "Opening Files")
+
+        async def slow_question(seat, *args, **kwargs):
+            await asyncio.sleep(1)
+            return {"agent": seat, "status": "needs_answer", "prompt": "Trust this folder?"}
+        self.service.desktop.tell.side_effect = slow_question
+        self.service.notes_vault = lambda: self.root
+        await self.turn("rant", "Plan my week around the launch, the hiring calls and finally fixing my sleep schedule please")
+        result = await self.service.conversation_action({"operation": "note", "request": "plan my week", "research": "no"}, "rant")
+        self.assertEqual(result["status"], "started")
+        await asyncio.sleep(1.2)
+        self.assertEqual((notices[-1]["state"], notices[-1]["prompt"]), ("waiting for the person's answer", "Trust this folder?"))
+        self.assertIn("reply approve and job note-1", notices[-1]["note"])
+        self.assertEqual(self.service.jobs["note-1"]["state"], "waiting")
+
+    def test_final_answer_is_the_closing_message_without_tool_activity(self):
+        screen = """• Browsing the web
+• Searched the web for dog walking software pricing
+• Edited 2 files (+184 -0)
+  └ Research/Dog walker - Research.md (+121 -0)
+• Ran python - <<'PY' …
+  └ Checked structure
+• Saved Voice Notes/2026-10-04 Dog walker idea.md
+  Your focus is the orb testing. I added a linked research note
+  with competitors and pricing.
+  Worked for 2m 36s · 4:12 PM
+                                  Tip: Use /status to see the current model"""
+        self.assertEqual(VoiceService.final_answer(screen),
+                         "Saved Voice Notes/2026-10-04 Dog walker idea.md Your focus is the orb testing. I added a linked research note with competitors and pricing.")
+        self.assertEqual(VoiceService.final_answer("• Working (3s • esc to interrupt)"), "• Working (3s • esc to interrupt)")
+        self.assertLessEqual(len(VoiceService.final_answer("• " + "word " * 500)), 900)
+
+    async def test_dropped_gemini_session_reconnects_with_the_conversation(self):
+        await self.service.provider_event({"type": "transcript", "role": "assistant", "text": "Which park do you mean?", "final": True})
+        self.service.voice["extended"] = True
+        self.service.session_started -= 60
+        first, session = self.service.provider, self.service.session["id"]
+        configs = []
+        original = self.service.provider_factory
+        def factory(config, *args):
+            configs.append(config)
+            return original(config, *args)
+        self.service.provider_factory = factory
+        await self.service.provider_event({"type": "error", "code": "GEMINI_CONNECTION_FAILED", "message": "Gemini Voice disconnected."})
+        await asyncio.gather(*self.service.work, return_exceptions=True)
+        self.assertIsNot(self.service.provider, first)
+        self.assertIsNotNone(self.service.provider)
+        self.assertEqual((self.service.voice["error"], self.service.voice["extended"], self.service.voice["enabled"]), ("", True, False))
+        self.assertNotIn("action_caption", self.service.voice)
+        self.assertEqual(self.service.session["id"], session, "The same conversation continues")
+        self.assertIn("Which park do you mean?", [line["text"] for line in self.service.session["transcript"]])
+        briefing = configs[-1]["voice_briefing"]
+        self.assertIn("has been restored", briefing)
+        self.assertIn("do not greet the person", briefing)
+        self.assertIn("assistant: Which park do you mean?", briefing)
+        self.assertNotIn("has been restored", self.service.briefing())
+        # A second drop reconnects too; a third inside the window is reported.
+        for expected in (False, True):
+            self.service.session_started -= 60
+            await self.service.provider_event({"type": "error", "code": "GEMINI_CONNECTION_FAILED", "message": "Gemini Voice disconnected."})
+            await asyncio.gather(*self.service.work, return_exceptions=True)
+            self.assertEqual(self.service.provider is None, expected)
+        self.assertEqual(self.service.voice["error"], "Gemini Voice disconnected.")
+
+    async def test_failed_start_or_other_errors_are_not_retried(self):
+        for code, started in (("GEMINI_CONNECTION_FAILED", 0), ("AUDIO_FAILED", 60)):
+            if not self.service.provider:
+                await self.service.start_voice(audio=False)
+            self.service.session_started = time.monotonic() - started
+            await self.service.provider_event({"type": "error", "code": code, "message": "Voice needs attention."})
+            await asyncio.gather(*self.service.work, return_exceptions=True)
+            self.assertIsNone(self.service.provider, code)
+            self.assertEqual(self.service.voice["error"], "Voice needs attention.")
+        self.assertEqual(self.service.reconnects, [])
+
     async def test_action_caption_fades_even_after_failure(self):
-        self.service.desktop.open.side_effect = VoiceError("APPLICATION_NOT_OBSERVED", "no window")
-        with patch("maslow_voice.daemon.asyncio.sleep", AsyncMock()):
+        seen = []
+        async def fail(application, url=None):
+            seen.append(self.service.voice.get("action_caption"))
+            raise VoiceError("APPLICATION_NOT_OBSERVED", "no window")
+        self.service.desktop.open.side_effect = fail
+        real_sleep = asyncio.sleep
+        async def yield_once(*_):
+            await real_sleep(0)
+        # Each fade wait yields once, so the action still runs before it ends.
+        with patch("maslow_voice.daemon.asyncio.sleep", AsyncMock(side_effect=yield_once)):
             with self.assertRaises(VoiceError):
                 await self.service.conversation_action({"operation": "desktop", "application": "files"}, "first")
-            self.assertEqual(self.service.voice["action_caption"], "Opening Files…")
+            self.assertEqual(seen, ["Opening Files…"])
             await asyncio.gather(*self.service.work)
         self.assertNotIn("action_caption", self.service.voice)
 
