@@ -152,6 +152,25 @@ Live Codex 0.157.1 findings, observed directly through Voice's tmux session:
   - Voice's tmux server was restarted to load its configuration.
 - **Setup command not yet installed:** the updated `omarchy-setup-voice-browser` belongs to the runtime package and is not installed. Run it from the source checkout. The current Codex entry is the earlier non-isolated server with display forwarding and no saved approvals.
 
+## Setup, fresh-start delivery and a real-site run (0.1.5-23)
+
+- **Browser setup:** the source `bin/omarchy-setup-voice-browser` was run with a yes-answering `gum` shim, after backing up the Codex and Claude configs to the session scratchpad.
+  - Codex now has a single `@playwright/mcp@0.0.83 --isolated` entry, forwards the display variables, and pre-approves the 15 browsing tools.
+  - Claude Code reports the isolated server as connected.
+- **Fresh-start delivery bug:** on a fresh Codex start the words were dropped, because they were pasted before the input box was drawn, and Voice still said "sent".
+  - `56688834` waits for the input box ("for shortcuts" for Codex, `❯` for Claude).
+  - It now requires the words in the conversation or the agent working, pastes once more, and otherwise reports `NOT_DELIVERED`.
+  - Pinned suite: 402 tests passed (two expected skips).
+  - Live retest from a fresh start: delivered, no dialog, and a visible "Example Domain" Chrome window.
+- **Package:** recipe `f97794b` advances to `0.1.5-23` from `56688834`.
+  - Archive SHA-256 `04c54f34b47a2900fdf89da7b9307d9016cd1a72064014a54dc2da4091d306a2`.
+  - Installed with `pkexec`: 0 altered files among 9124. Plugin refreshed.
+- **Real-site run with the installed code**, using the daemon's `web_task_text` framing: "Go to maslow.ai and tell me what Maslow is, what products it offers, and how to get started."
+  - Codex browsed www.maslow.ai in a visible window ("Book a workflow conversation | Maslow AI - Google Chrome") with no permission dialog, in about a minute.
+  - It answered with dated options and links, and ended: "I stopped before booking or submitting anything."
+  - The Codex config still holds exactly the 15 pre-approvals.
+  - This run bypassed Gemini, so spoken routing, the watcher's spoken result and the notification fallback remain the person's live voice test.
+
 ## Not verified
 
 - No live Gemini conversation called the new tools.
