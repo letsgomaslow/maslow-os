@@ -40,12 +40,16 @@ CHOICE = re.compile(r"^\W*1\.\s+Yes")
 BUSY = "esc to interrupt"
 SCROLLED = "Back to bottom"
 QUEUE = "tab to queue message"  # Codex is starting or busy; Tab queues the words.
+# Drawn only once the input box accepts text. Words pasted earlier, while the
+# agent is still starting, are silently dropped.
+INPUT_READY = {"codex": ("for shortcuts",), "claude": ("❯",)}
 # One fixed key per answer: the first, one-time option or cancel. "Always" and
 # "for this session" options are never sent.
 KEYS = {"codex": {"approve": "y", "deny": "Escape"}, "claude": {"approve": "1", "deny": "Escape"}}
 MAX_TEXT = 2000
 ENTER_DELAY = 0.25
 SUBMIT_CHECKS = 3
+INPUT_WAIT = 20  # Codex can take several seconds to start its tools.
 
 
 def session(agent):
@@ -117,6 +121,26 @@ def pending_prompt(agent, text):
     return ""
 
 
+async def input_ready(run, agent, wait=0):
+    deadline = asyncio.get_running_loop().time() + wait
+    while True:
+        text = await screen(run, agent)
+        if any(marker in text for marker in INPUT_READY[agent]):
+            return True
+        if asyncio.get_running_loop().time() >= deadline:
+            return False
+        await asyncio.sleep(0.25)
+
+
+def flat(text):
+    return " ".join(text.split())
+
+
+def delivered(text, words):
+    """The words reached the conversation, or the agent started working on them."""
+    return BUSY in text or flat(words)[-24:] in flat(text)
+
+
 def waiting_in_input(text, words):
     """True while the end of the words still sits in the input box at the bottom."""
     tail = " ".join(words.split())[-24:]
@@ -129,29 +153,39 @@ async def type_line(run, agent, text):
     async def key(name):
         await run(*tmux("send-keys", "-t", target(agent), name))
 
-    # A scrolled transcript turns Enter into "return to latest". Return first,
-    # while the input box is still empty.
-    if SCROLLED in await screen(run, agent):
-        await key("Enter")
-        await asyncio.sleep(ENTER_DELAY)
-    # Bracketed paste tells the agent this is pasted text, so the following
-    # Enter submits instead of becoming a newline.
-    await run(*tmux("set-buffer", "-b", SOCKET, "--", text))
-    await run(*tmux("paste-buffer", "-p", "-d", "-b", SOCKET, "-t", target(agent)))
-    await asyncio.sleep(ENTER_DELAY)
-    await key("Enter")
-    for _ in range(SUBMIT_CHECKS):
-        await asyncio.sleep(ENTER_DELAY * 2)
-        current = await screen(run, agent)
-        # Never press anything while a decision is on screen.
-        if pending_prompt(agent, current):
-            return
-        if QUEUE in current:
-            await key("Tab")
-        elif SCROLLED in current or waiting_in_input(current, text):
+    async def paste():
+        # A scrolled transcript turns Enter into "return to latest". Return
+        # first, while the input box is still empty.
+        if SCROLLED in await screen(run, agent):
             await key("Enter")
-        else:
+            await asyncio.sleep(ENTER_DELAY)
+        # Bracketed paste tells the agent this is pasted text, so the
+        # following Enter submits instead of becoming a newline.
+        await run(*tmux("set-buffer", "-b", SOCKET, "--", text))
+        await run(*tmux("paste-buffer", "-p", "-d", "-b", SOCKET, "-t", target(agent)))
+        await asyncio.sleep(ENTER_DELAY)
+        await key("Enter")
+        for _ in range(SUBMIT_CHECKS):
+            await asyncio.sleep(ENTER_DELAY * 2)
+            current = await screen(run, agent)
+            # Never press anything while a decision is on screen.
+            if pending_prompt(agent, current):
+                return current
+            if QUEUE in current:
+                await key("Tab")
+            elif SCROLLED in current or waiting_in_input(current, text):
+                await key("Enter")
+            else:
+                return current
+        return await screen(run, agent)
+
+    if not await input_ready(run, agent, INPUT_WAIT):
+        raise VoiceError("AGENT_NOT_READY", "The agent's input box is not ready yet. Try again in a moment.")
+    for _ in range(2):
+        current = await paste()
+        if pending_prompt(agent, current) or delivered(current, text):
             return
+    raise VoiceError("NOT_DELIVERED", "The words did not reach the agent. Check its window and try again.")
 
 
 async def press(run, agent, reply):

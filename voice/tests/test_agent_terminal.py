@@ -19,9 +19,13 @@ APPROVAL = """• Running tests
 class FakeDesktop:
     """A tmux server and window list that record every command."""
 
-    def __init__(self, states=("0|codex",), screen="› Ask Codex to do anything", window="maslow.voice.codex", screens=()):
+    def __init__(self, states=("0|codex",), screen="› Ask Codex to do anything\n  ? for shortcuts", window="maslow.voice.codex",
+                 screens=(), drops=0):
         self.window = window
         self.screens = list(screens)
+        self.buffer = ""
+        self.submitted = []
+        self.drops = drops  # Pastes the agent swallows while starting.
         self.calls = []
         self.states = list(states)
         self.screen = screen
@@ -38,8 +42,20 @@ class FakeDesktop:
             if not state:
                 raise VoiceError("DESKTOP_FAILED", "no session")
             return state + "\n"
+        if "set-buffer" in args:
+            self.buffer = args[-1]
+        if "send-keys" in args and args[-1] == "Enter" and self.buffer:
+            if self.drops:
+                self.drops -= 1
+            else:
+                self.submitted.append(self.buffer)
+            self.buffer = ""
         if "capture-pane" in args:
-            return self.screens.pop(0) if self.screens else self.screen
+            if self.screens:
+                return self.screens.pop(0)
+            if self.submitted:
+                return "\n".join("› " + words for words in self.submitted) + "\n• Working (1s • esc to interrupt)\n" + self.screen
+            return self.screen
         return ""
 
     def keys(self):
@@ -56,9 +72,10 @@ class AgentTerminalTests(unittest.IsolatedAsyncioTestCase):
         patcher = patch("maslow_voice.desktop.shutil.which", return_value="/usr/bin/found")
         patcher.start()
         self.addCleanup(patcher.stop)
-        delay = patch.object(agent_terminal, "ENTER_DELAY", 0)
-        delay.start()
-        self.addCleanup(delay.stop)
+        for name, value in (("ENTER_DELAY", 0), ("INPUT_WAIT", 0.3)):
+            patcher = patch.object(agent_terminal, name, value)
+            patcher.start()
+            self.addCleanup(patcher.stop)
 
     def desktop(self, fake):
         return DesktopActions(fake.run, timeout=0.5, agent_cwd=Path(self.temp.name) / "Maslow Voice")
@@ -140,29 +157,49 @@ class AgentTerminalTests(unittest.IsolatedAsyncioTestCase):
         launch = next(call for call in fake.calls if call[0] == "setsid")
         self.assertIn("--app-id=maslow.voice.claude", launch)
         self.assertIn("--title=Maslow Claude Code", launch)
-        fake = FakeDesktop(states=["0|claude"], screen="> ", window="maslow.voice.claude")
+        fake = FakeDesktop(states=["0|claude"], screen="❯ ", window="maslow.voice.claude")
         await self.desktop(fake).tell("claude", "add a dark mode toggle")
         self.assertEqual(fake.pasted(), ["add a dark mode toggle"])
 
     async def test_unsubmitted_words_scrolled_view_and_startup_are_recovered(self):
-        idle = "› Ask Codex to do anything"
+        idle = "› Ask Codex to do anything\n  ? for shortcuts"
+        scrolled = "• old reply\n  ↓ Back to bottom · esc\n  ? for shortcuts"
+        working = "› check the build\n• Working (1s • esc to interrupt)\n  ? for shortcuts"
         # Scrolled away: return to latest before pasting, so Enter then submits.
-        fake = FakeDesktop(screens=["• old reply\n  ↓ Back to bottom · esc", "• old reply\n  ↓ Back to bottom · esc", idle, idle])
+        fake = FakeDesktop(screens=[idle, idle, scrolled, working])
         await self.desktop(fake).tell("codex", "check the build")
         self.assertEqual(fake.keys(), [("-t", "=maslow-codex:", "Enter"), ("-t", "=maslow-codex:", "Enter")])
         # Enter became a newline: the words are still in the input box, so submit again.
-        stuck = "› check whether example.com is reachable\n  GPT · ~/Projects"
-        fake = FakeDesktop(screens=[idle, idle, stuck, "• Working (1s • esc to interrupt)"])
+        stuck = "› check whether example.com is reachable\n  ? for shortcuts"
+        fake = FakeDesktop(screens=[idle, idle, idle, stuck, "• Working (1s • esc to interrupt)"])
         await self.desktop(fake).tell("codex", "check whether example.com is reachable")
         self.assertEqual(fake.keys(), [("-t", "=maslow-codex:", "Enter"), ("-t", "=maslow-codex:", "Enter")])
-        # Codex still starting: Tab queues the message.
-        fake = FakeDesktop(screens=[idle, idle, "› check\n  tab to queue message", "• Working (1s • esc to interrupt)"])
+        # Codex still starting its tools: Tab queues the message.
+        fake = FakeDesktop(screens=[idle, idle, idle, "› check\n  tab to queue message", "• Working (1s • esc to interrupt)"])
         await self.desktop(fake).tell("codex", "check")
         self.assertEqual(fake.keys(), [("-t", "=maslow-codex:", "Enter"), ("-t", "=maslow-codex:", "Tab")])
 
+    async def test_words_swallowed_during_startup_are_pasted_again_or_reported(self):
+        fake = FakeDesktop(drops=1)
+        self.assertEqual((await self.desktop(fake).tell("codex", "find cheap flights"))["status"], "sent")
+        self.assertEqual(fake.pasted(), ["find cheap flights", "find cheap flights"])
+        self.assertEqual(fake.submitted, ["find cheap flights"])
+        fake = FakeDesktop(drops=2)
+        with self.assertRaises(VoiceError) as raised:
+            await self.desktop(fake).tell("codex", "find cheap flights")
+        self.assertEqual(raised.exception.code, "NOT_DELIVERED")
+
+    async def test_nothing_is_pasted_before_the_input_box_is_drawn(self):
+        fake = FakeDesktop(screen="  Booting MCP server: playwright")
+        with self.assertRaises(VoiceError) as raised:
+            await self.desktop(fake).tell("codex", "hello")
+        self.assertEqual(raised.exception.code, "AGENT_NOT_READY")
+        self.assertEqual(fake.pasted(), [])
+
     async def test_no_key_is_pressed_once_a_decision_appears_after_submitting(self):
-        dialog = '› check\n  Allow the playwright MCP server to run tool "browser_navigate"?\n  › 1. Allow'
-        fake = FakeDesktop(screens=["› Ask Codex", "› Ask Codex", dialog, dialog])
+        dialog = '› check\n  Allow the playwright MCP server to run tool "browser_navigate"?\n  › 1. Allow\n  ? for shortcuts'
+        ready = "› Ask Codex\n  ? for shortcuts"
+        fake = FakeDesktop(screens=[ready, ready, ready, dialog, dialog])
         await self.desktop(fake).tell("codex", "check")
         self.assertEqual(fake.keys(), [("-t", "=maslow-codex:", "Enter")])
 
