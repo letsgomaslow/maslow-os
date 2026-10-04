@@ -65,6 +65,11 @@ assert.match(orb, /onInterruptionSequenceChanged/);
 assert.match(orb, /onCompletionSequenceChanged/);
 assert.match(orb, /root.reactionTime >=/);
 assert.match(orb, /import "OrbFrame.js" as OrbFrame/);
+// Motion follows real frame time at the display's rate, not a 25 fps timer.
+assert.equal((orb.match(/FrameAnimation \{/g) || []).length, 3);
+assert.doesNotMatch(orb, /interval: 40/);
+assert.match(orb, /root\.phase \+= Math\.min\(frameTime, 0\.1\)/);
+assert.match(orb, /Behavior on xScale \{ enabled: !root\.reducedMotion; SmoothedAnimation/);
 // A conversation starting from ready or setup wakes once; reduced motion never does.
 // The state at creation is recorded, so the first conversation after loading wakes.
 assert.match(orb, /Component\.onCompleted: \{[^}]*previousStateMode = stateMode/);

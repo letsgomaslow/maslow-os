@@ -82,6 +82,18 @@ class GeminiSdkTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(json.loads(response)["status"], "not_performed")
         self.assertEqual(self.provider._submit_callback.await_count, 1)
 
+    async def test_follow_up_call_without_a_spoken_turn_is_told_to_stop_without_an_error_event(self):
+        self.provider._started = True
+        context = SimpleNamespace(function_call=SimpleNamespace(call_id="unbound-call"),
+                                  speech_handle=SimpleNamespace(interrupted=False))
+        response = json.loads(await self.provider._agent.write_note(context, "put this in Obsidian", "auto"))
+        self.assertEqual((response["status"], response["error"]), ("not_performed", "NO_SPOKEN_REQUEST"))
+        self.assertIn("Do not call any tool again now", response["message"])
+        self.assertNotIn("repeat", response["message"])
+        self.provider._submit_callback.assert_not_awaited()
+        # No error banner flicker for each refused retry.
+        self.assertFalse(any(event.get("type") == "task_error" for event in self.events))
+
     async def test_desktop_tool_forwards_website_only_when_given(self):
         self.provider._started = True
         self.provider._tool_turns["web-call"] = "final-turn"

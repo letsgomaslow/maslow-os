@@ -213,7 +213,10 @@ class DesktopActions:
         # window was closed, so nothing is typed out of sight.
         await self.open(agent, title=title, cwd=cwd)
         name = agent_terminal.NAMES[agent]
-        if not await agent_terminal.ready(self.run, agent, self.timeout):
+        # A background agent can take longer to start, especially while
+        # another job is busy, so its seat gets the longer input wait.
+        wait = max(self.timeout, agent_terminal.INPUT_WAIT) if agent in agent_terminal.BACKGROUND_SEATS else self.timeout
+        if not await agent_terminal.ready(self.run, agent, wait):
             raise VoiceError("AGENT_NOT_READY", f"{name} is not ready in its terminal yet. Check its window and try again.")
         prompt = agent_terminal.pending_prompt(agent, await agent_terminal.settled_screen(self.run, agent, agent_terminal.INPUT_WAIT))
         if reply:

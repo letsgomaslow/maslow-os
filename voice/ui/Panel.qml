@@ -116,7 +116,22 @@ Item {
   readonly property bool offlineMode: String(settings.mode || "") === "offline"
   readonly property bool conversationReady: root.conversationReadiness().ready === true
   readonly property bool disabled: voice.enabled !== true && !conversationReady
-  readonly property string orbState: voice.error || controller.connectionLost ? "error" : voice.paused === true ? "paused" : (voice.state === "listening" && voice.microphone !== true ? "muted" : String(voice.state || "idle"))
+  // Agents flick between listening, thinking and speaking within a turn.
+  // The orb and status text show a conversation state only once it has held
+  // for a moment; every other state, such as connecting or an error, shows at once.
+  readonly property var settlingStates: ["listening", "thinking", "speaking", "talking"]
+  property string settledState: String(voice.state || "idle")
+  readonly property string liveState: String(voice.state || "idle")
+  onLiveStateChanged: {
+    if (settlingStates.indexOf(liveState) >= 0 && settlingStates.indexOf(settledState) >= 0) {
+      stateSettle.restart()
+    } else {
+      stateSettle.stop()
+      settledState = liveState
+    }
+  }
+  Timer { id: stateSettle; interval: 250; onTriggered: root.settledState = root.liveState }
+  readonly property string orbState: voice.error || controller.connectionLost ? "error" : voice.paused === true ? "paused" : (settledState === "listening" && voice.microphone !== true ? "muted" : settledState)
   property bool controllerOpen: false
   readonly property int heldDiameter: conversation ? 88 : 56
   property bool localOrbPositionActive: false
@@ -316,9 +331,9 @@ Item {
     if (voice.action_caption) return voice.action_caption
     if (disabled) return "Connect Voice"
     if (voice.state === "connecting") return "Connecting · click to cancel"
-    if (voice.state === "thinking") return "Thinking"
-    if (voice.speaking === true || voice.state === "speaking" || voice.state === "talking") return "Speaking"
-    if (voice.state === "listening") return voice.extended === true ? "Listening · extended" : "Listening"
+    if (settledState === "thinking") return "Thinking"
+    if (settledState === "speaking" || settledState === "talking") return "Speaking"
+    if (settledState === "listening") return voice.extended === true ? "Listening · extended" : "Listening"
     return "Ready · click to talk"
   }
   function send(action, extra) {

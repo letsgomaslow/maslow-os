@@ -94,24 +94,21 @@ Item {
     previousStateMode = stateMode
   }
   onCompletionSequenceChanged: if (completionSequence > 0) react("completed")
-  Timer {
-    interval: 40
+  // Motion advances once per displayed frame by the real frame time, so it
+  // stays smooth at the display's refresh rate. A long stall is capped so the
+  // face never jumps ahead.
+  FrameAnimation {
     running: root.moving
-    repeat: true
-    onTriggered: root.phase += 0.04
+    onTriggered: root.phase += Math.min(frameTime, 0.1)
   }
-  Timer {
-    interval: 40
+  FrameAnimation {
     running: root.visible && !root.reducedMotion && root.blendTime < 0.3
-    repeat: true
-    onTriggered: root.blendTime += 0.04
+    onTriggered: root.blendTime += Math.min(frameTime, 0.1)
   }
-  Timer {
+  FrameAnimation {
     id: reactionTimer
-    interval: 40
-    repeat: true
     onTriggered: {
-      root.reactionTime += 0.04
+      root.reactionTime += Math.min(frameTime, 0.1)
       if (root.reactionTime >= (root.reaction === "completed" ? root.doneLength : root.reaction === "wake" ? root.wakeLength : 0.4)) { root.reaction = ""; stop() }
     }
   }
@@ -121,7 +118,12 @@ Item {
     width: parent.width
     height: parent.height
     opacity: root.stateMode === 7 ? 0.55 : 1
-    transform: Scale { origin.x: body.width / 2; origin.y: body.height / 2; xScale: root.stretch; yScale: root.squash }
+    // Ease size changes, such as entering thinking, instead of jumping.
+    transform: Scale {
+      origin.x: body.width / 2; origin.y: body.height / 2; xScale: root.stretch; yScale: root.squash
+      Behavior on xScale { enabled: !root.reducedMotion; SmoothedAnimation { velocity: 0.8 } }
+      Behavior on yScale { enabled: !root.reducedMotion; SmoothedAnimation { velocity: 0.8 } }
+    }
     Canvas {
       id: fluidFallback
       anchors.fill: parent
