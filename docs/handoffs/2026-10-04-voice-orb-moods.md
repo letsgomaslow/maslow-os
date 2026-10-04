@@ -29,6 +29,10 @@ Date: 2026-10-04. Goal: make the orb's face expressive by porting the eye choreo
 - Live states other than ready on the installed orb: connecting, listening, thinking, speaking, paused, error, completion and interruption on a real conversation. These are covered by fixtures only.
 - Display resize/scale change, drag, and long-run CPU use (the face recomputes at the existing 25 fps tick).
 
+## First live feedback
+
+The person held a Gemini conversation at 15:26–15:31 and reported that the eyes and mouth still felt like the older version. Confirmed: an offscreen side-by-side of 5f422bd4 and 35204afb in listening and speaking with the same simulated envelope is nearly identical. Listening and speaking map to the idle mood, whose glances move the eyes about 2 px at 88 px, and the mouth was intentionally unchanged. The new moods sit on states a Gemini voice conversation rarely shows: connecting lasted 0.35–0.72 s per the audit log (shorter than the blend plus look-around), Gemini emits thinking only for typed turns (`livekit_gemini.py`), and error, completion and paused need those events. Step 2 (lighting) would not change this; the conversation states need their own moods (step 3).
+
 ## Next action
 
-The person tries the installed orb in a real conversation (connect, talk, pause, a delegated task finishing) and reports how each state feels; then step 2 (orbiting light and grain in the shader and Canvas fallback).
+Give listening and speaking their own visible moods (step 3) before lighting (step 2).
