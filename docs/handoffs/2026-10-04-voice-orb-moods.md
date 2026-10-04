@@ -33,6 +33,28 @@ Date: 2026-10-04. Goal: make the orb's face expressive by porting the eye choreo
 
 The person held a Gemini conversation at 15:26–15:31 and reported that the eyes and mouth still felt like the older version. Confirmed: an offscreen side-by-side of 5f422bd4 and 35204afb in listening and speaking with the same simulated envelope is nearly identical. Listening and speaking map to the idle mood, whose glances move the eyes about 2 px at 88 px, and the mouth was intentionally unchanged. The new moods sit on states a Gemini voice conversation rarely shows: connecting lasted 0.35–0.72 s per the audit log (shorter than the blend plus look-around), Gemini emits thinking only for typed turns (`livekit_gemini.py`), and error, completion and paused need those events. Step 2 (lighting) would not change this; the conversation states need their own moods (step 3).
 
+## Conversation moods and Obsidian notes (0.1.5-29)
+
+The person asked for complete implementation of the conversation moods and for spoken brainstorms to become structured, researched Obsidian notes written by an agent.
+
+**Orb (`bd881a77`).** Listening keeps eyes about 10% larger that dart (±4 units), tilt (±7°) and widen and lift with the input level; speaking nods as the turn starts, sways (±6°), lifts and squints the eyes and bobs the body with the playback level, and opens the mouth rounder. A conversation started from ready or setup plays a 1.3 s wake (half-shut eyes open, look left and right, settle). The first render of step 3 showed the wake never playing because the previous state was only recorded on change; it is now recorded at creation, which would also have affected the installed orb's first conversation. An offscreen side-by-side of the old and new orb with the same simulated envelope, and a states × time sheet, were inspected: listening and speaking are now clearly distinct from ready.
+
+**Notes (`8c7b8d34`).** Gemini's `write_note(request, research)` starts a background Codex seat (`note-1`/`note-2`) in the open Obsidian vault (`~/.config/obsidian/obsidian.json`). The daemon writes a private brief with the whole conversation (plus the previous one if it ended under 30 minutes ago) and fixed rules: read the vault, interpret intent and subtext, mark inferences, structure by content, frontmatter/summary/"What you're focused on"/next actions/open questions, link related notes, optional linked research note with sources, only new files inside the vault, finish with "Saved <path>". Obsidian is also an allowlisted app. Details are in `voice/docs/execution.md`.
+
+Two defects were found while testing against real Codex 0.157.1 and fixed with regression tests:
+- Codex's "Trust this folder?" dialog ignores `y` and `1`; Enter accepts it. Approve now sends Enter for that dialog. The first note in a vault holds its instruction until the person answers, then sends it after the dialog closes; a refusal ends the seat.
+- A fresh agent shows that dialog a few seconds after its pane exists, so `tell` checked too early and then waited for an input box that never appeared (`AGENT_NOT_READY`). `tell` now waits for the input box or a question first.
+
+Evidence:
+- Tests: 426 Python tests OK (two expected skips), orb contract and frame tests, UI/controller and launcher checks, `git diff --check`.
+- Real Codex (source, throwaway vault with two seed notes, a five-turn brainstorm with "Obsedian" misheard, research yes): trust prompt detected and approved, instruction delivered, finished in 2 min 36 s. It wrote `Voice Notes/2026-10-04 Maslow priorities and dog walker idea.md` (day plan, focus, inferred subtext, links to existing notes) and `Research/Dog walker business tool - Research.md` (APPA market context, competitor pricing table with links, positioning, launch plan, three experiments, risks); existing notes were unchanged. The two probe trust entries added to `~/.codex/config.toml` were removed; the file matches its pre-session content.
+- Real Gemini 3.8 Live text session from source (temporary state, stubbed seat): two brainstorm turns got short reflective replies and no action; "put all of this into my Obsidian, plan tomorrow and research…" produced one `write_note` with research `yes` and the request in the person's words; the brief contained all three messages.
+- Package: recipe `1fb190a` (`0.1.5-29`), archive SHA-256 `411b07c14bce042ab8f34bcdf34f1465c863ab15892c355805bf088779556df1`; packaged UI and Python files match `8c7b8d34`. Logs: `voice-mvp-build/voice-orb-notes-29/`.
+
+- Installed: `pkexec pacman -U` installed `0.1.5-29`; `pacman -Qkk` reports 9126 files, 0 altered. The service was restarted to load the new Python and the plugin rescanned behind the unlocked-desktop guard; the manifest points at `0.1.5-29/Panel.qml` and the ready orb was observed with open eyes. Mistake: idleness was checked before the install but not again before the restart, and the restart ended a conversation the person had started 36 s earlier (16:25:35–16:26:12; no completed exchange in the audit log). Check Voice state immediately before any service restart.
+
+Not verified: spoken (audio) note requests, the first trust answer by voice in the person's real vault, the spoken result announcement for a note, and Claude Code or Hermes as note writers (Codex only).
+
 ## Next action
 
-Give listening and speaking their own visible moods (step 3) before lighting (step 2).
+The person tests a spoken brainstorm ending in "put this in Obsidian" (first use asks to trust the vault) and the new orb moods in a real conversation.
