@@ -21,6 +21,7 @@ def create_agent(provider, agents, base):
                 "To visit a website, call desktop_action with browser and a complete https URL, for example https://github.com. "
                 "To search the web with no site named, use https://duckduckgo.com/?q= followed by the URL-encoded query. "
                 "desktop_action only opens pages; it cannot click, type or fill forms. "
+                "To close an application window, call desktop_action with action close. Closing Codex only hides its window; Codex keeps running. "
                 "Opening Codex shows a live Codex terminal the user can watch. It is NOT the delegated job; use task_control show for that job. "
                 "Use tell_agent to pass the user's words to that terminal Codex; it opens Codex when needed. "
                 "When the user addresses Codex directly or has opened Codex in this conversation, use tell_agent rather than submit_intent. "
@@ -78,11 +79,14 @@ def create_agent(provider, agents, base):
                 return "SUBMITTED: Task saved for review. No work has started."
             return "SUBMITTED: " + json.dumps(result)
 
-        async def desktop_action(self, context, application: Literal["browser", "files", "hub", "terminal", "codex"], url: str = "") -> str:
-            """Open or focus a desktop application. With browser, url opens that complete https address. Codex opens an independent CLI terminal."""
+        async def desktop_action(self, context, application: Literal["browser", "files", "hub", "terminal", "codex"], url: str = "",
+                                 action: Literal["open", "close"] = "open") -> str:
+            """Open, focus or close a desktop application window. With browser, url opens that complete https address."""
             payload = {"operation": "desktop", "application": application}
             if url:
                 payload["url"] = url
+            if action == "close":
+                payload["action"] = "close"
             return json.dumps(await self._call(context, payload))
 
         async def task_control(self, context, operation: Literal["status", "show", "steer", "cancel", "continue", "show_result"], text: str = "") -> str:

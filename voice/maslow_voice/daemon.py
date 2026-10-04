@@ -8,6 +8,7 @@ import os
 import secrets
 import shutil
 import signal
+import sys
 import time
 import uuid
 from pathlib import Path
@@ -387,6 +388,8 @@ class VoiceService:
             words = " ".join(str(intent.get("text", "")).split())
             return "Telling Codex: " + (words[:60] + "…" if len(words) > 60 else words)
         application = str(intent.get("application", ""))
+        if intent.get("action") == "close":
+            return f"Closing {application.title()[:20]}…"
         url = intent.get("url")
         if url:
             try:
@@ -396,6 +399,21 @@ class VoiceService:
             if host:
                 return f"Opening {host.removeprefix('www.')}…"
         return f"Opening {application.title()[:20]}…"
+
+    @staticmethod
+    def action_label(intent):
+        if not isinstance(intent, dict):
+            return "invalid"
+        allowed = {"browser", "files", "hub", "terminal", "codex", "open", "close", "status", "show", "steer", "cancel",
+                   "continue", "show_result", "approve", "deny"}
+        parts = [str(intent.get("operation", "submit"))]
+        for key in ("application", "action", "agent", "reply"):
+            value = intent.get(key)
+            if value:
+                parts.append(value if value in allowed else "other")
+        if intent.get("url"):
+            parts.append("url")
+        return " ".join(parts)
 
     async def show_caption(self, caption):
         """Publish a short line naming the action before it runs, then let it fade."""
@@ -422,7 +440,7 @@ class VoiceService:
             if turn["mode"] != "gemini_live":
                 raise VoiceError("ACTION_UNAVAILABLE", "These conversation controls are available in Gemini Voice.")
             operation = intent.get("operation")
-            fields = {"desktop": {"operation", "application", "url"}, "agent": {"operation", "agent", "text", "reply"},
+            fields = {"desktop": {"operation", "application", "url", "action"}, "agent": {"operation", "agent", "text", "reply"},
                       "task": {"operation", "action", "text"},
                       "submit": {"operation", "brief", "project_name", "new_project"}}
             if operation not in fields or set(intent) - fields[operation]:
@@ -432,7 +450,12 @@ class VoiceService:
             cacheable = not (operation == "task" and intent.get("action") == "status")
             if cacheable and key in self.action_receipts:
                 return self.action_receipts[key]
-            if operation == "desktop":
+            if operation == "desktop" and intent.get("action", "open") == "close":
+                await self.show_caption(self.action_caption(intent))
+                result = await self.desktop.close(intent.get("application"))
+            elif operation == "desktop":
+                if intent.get("action", "open") != "open":
+                    raise VoiceError("INVALID_REQUEST", "Desktop actions can open or close an application.")
                 await self.show_caption(self.action_caption(intent))
                 result = await self.desktop.open(intent.get("application"), intent.get("url") or None)
             elif operation == "agent":
@@ -662,7 +685,17 @@ class VoiceService:
                 transport = self.audio_transport_factory(microphone_device=config["microphone_device"],
                                                          speaker_device=config["speaker_device"], on_error=audio_error)
                 async def submit(intent, turn_id):
-                    return await self.conversation_action(intent, turn_id, epoch=epoch)
+                    # One journal line per model action: allowlisted names and
+                    # outcomes only, never the person's words or tool text.
+                    label = self.action_label(intent)
+                    try:
+                        result = await self.conversation_action(intent, turn_id, epoch=epoch)
+                    except VoiceError as error:
+                        print(f"Voice action {label}: {error.code}", file=sys.stderr, flush=True)
+                        raise
+                    status = result.get("status") or result.get("state") if isinstance(result, dict) else ""
+                    print(f"Voice action {label}: {status or 'done'}", file=sys.stderr, flush=True)
+                    return result
                 provider = self.provider_factory(config, values, emit, submit, transport)
                 self.provider = provider
                 await provider.start(audio=audio)

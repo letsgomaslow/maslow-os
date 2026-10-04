@@ -57,6 +57,26 @@ class DesktopTests(unittest.IsolatedAsyncioTestCase):
             await desktop.open("files", "https://github.com")
         runner.assert_not_awaited()
 
+    async def test_close_targets_one_window_and_reports_when_none_is_open(self):
+        windows = [{"address": "0xa", "class": "maslow.voice.codex", "mapped": True, "focusHistoryID": 3},
+                   {"address": "0xb", "class": "maslow.voice.codex", "mapped": True, "focusHistoryID": 1},
+                   {"address": "0xc", "class": "org.gnome.nautilus", "mapped": True, "focusHistoryID": 0}]
+        calls = []
+        async def run(*args):
+            calls.append(args)
+            return json.dumps(windows) if args[:3] == ("hyprctl", "-j", "clients") else "ok"
+        desktop = DesktopActions(run)
+        receipt = await desktop.close("codex")
+        self.assertEqual(receipt["status"], "closed")
+        self.assertIn("keeps running", receipt["note"])
+        closes = [c for c in calls if c[:2] == ("hyprctl", "dispatch")]
+        self.assertEqual(closes, [("hyprctl", "dispatch", 'hl.dsp.window.close({ window = "address:0xb" })')])
+        windows.clear()
+        self.assertEqual((await desktop.close("files"))["status"], "not_open")
+        for target in ("hub", "unknown", "codex; rm"):
+            with self.assertRaises(VoiceError):
+                await desktop.close(target)
+
     async def test_unobserved_launch_is_not_success(self):
         desktop = DesktopActions(AsyncMock(return_value="[]"), timeout=0)
         with self.assertRaisesRegex(VoiceError, "window did not appear"):

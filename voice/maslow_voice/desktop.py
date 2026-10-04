@@ -88,12 +88,8 @@ class DesktopActions:
             if application == "hub":
                 await self.run("omarchy-launch-hub", "setup")
                 return {"application": application, "status": "requested", "verification": "shell_acknowledged"}
-            classes = await self.browser_classes() if application == "browser" else {
-                "files": {"org.gnome.nautilus"}, "terminal": {"maslow.voice.terminal"}, "codex": {"maslow.voice.codex"},
-            }[application]
+            matching = await self.matcher(application)
             clients = await self.clients()
-            def matching(client):
-                return bool(client.get("mapped", True)) and any(str(client.get(key, "")).casefold() in classes for key in ("class", "initialClass"))
             cached = self.windows.get(application)
             found = next((c for c in clients if c.get("address") == cached and matching(c)), None)
             found = found or next((c for c in clients if matching(c)), None)
@@ -129,6 +125,43 @@ class DesktopActions:
                 if time.monotonic() >= deadline:
                     raise VoiceError("APPLICATION_NOT_OBSERVED", "The launch was requested, but its window did not appear. Check the desktop before trying again.")
                 await asyncio.sleep(0.1)
+
+    async def matcher(self, application):
+        classes = await self.browser_classes() if application == "browser" else {
+            "files": {"org.gnome.nautilus"}, "terminal": {"maslow.voice.terminal"}, "codex": {"maslow.voice.codex"},
+        }[application]
+        def matching(client):
+            return bool(client.get("mapped", True)) and any(str(client.get(key, "")).casefold() in classes for key in ("class", "initialClass"))
+        return matching
+
+    async def close(self, application):
+        """Close one window of an allowlisted application: the one Voice opened, else the most recently used."""
+        if not isinstance(application, str) or application.casefold() not in self.APPLICATIONS:
+            raise VoiceError("APPLICATION_NOT_ALLOWED", "Voice can close Browser, Files, Terminal, or Codex.")
+        application = application.casefold()
+        if application == "hub":
+            raise VoiceError("APPLICATION_NOT_ALLOWED", "Close Hub from its own window.")
+        async with self.lock:
+            matching = await self.matcher(application)
+            clients = [c for c in await self.clients() if matching(c)]
+            cached = self.windows.get(application)
+            found = next((c for c in clients if c.get("address") == cached), None)
+            found = found or min(clients, key=lambda c: c.get("focusHistoryID", 1 << 30), default=None)
+            if not found:
+                return {"application": application, "status": "not_open"}
+            address = found.get("address", "")
+            if not re.fullmatch(r"0x[0-9a-fA-F]+", address):
+                raise VoiceError("DESKTOP_UNAVAILABLE", "The application window identity is invalid.")
+            try:
+                await self.run("hyprctl", "dispatch", 'hl.dsp.window.close({ window = "address:' + address + '" })')
+            except VoiceError:
+                await self.run("hyprctl", "dispatch", "closewindow", "address:" + address)
+            self.windows.pop(application, None)
+            receipt = {"application": application, "status": "closed", "verification": "close_requested"}
+            if application in agent_terminal.AGENTS:
+                # Only the viewer detaches; the tmux session keeps the agent running.
+                receipt["note"] = "Codex keeps running. Opening Codex again brings the same session back."
+            return receipt
 
     def agent_folder(self):
         # The same managed root as Voice projects, with the same refusal of

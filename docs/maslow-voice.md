@@ -23,6 +23,7 @@ Hub's Voice page is the installation and readiness entry point. It reads a reduc
 ## Websites, Codex and browser tasks
 
 - "Go to github.com" or "search for tmux" opens the default browser at that page. Voice only opens pages; it does not click or type in them.
+- "Close Codex" (or Files, Terminal, the browser) closes that window.
 - "Open Codex" shows Codex in a terminal window that Voice can talk to. Closing the window keeps Codex running, and the next "open Codex" brings the same session back.
 - "Tell Codex to add a dark mode toggle" types those words into Codex and submits them, so you can watch Codex work.
 - When Codex asks for a decision, Voice reads it out and waits. Say "approve" or "deny"; Voice sends a one-time answer only, never "always allow".

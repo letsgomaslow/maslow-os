@@ -88,6 +88,11 @@ class GeminiSdkTests(unittest.IsolatedAsyncioTestCase):
         await self.provider._agent.desktop_action(context, "browser", "https://github.com")
         self.provider._submit_callback.assert_awaited_once_with(
             {"operation": "desktop", "application": "browser", "url": "https://github.com"}, "final-turn")
+        self.provider._tool_turns["close-call"] = "final-turn"
+        context.function_call.call_id = "close-call"
+        await self.provider._agent.desktop_action(context, "codex", "", "close")
+        self.provider._submit_callback.assert_awaited_with(
+            {"operation": "desktop", "application": "codex", "action": "close"}, "final-turn")
 
     async def test_tell_agent_forwards_words_and_relays_waiting_prompt(self):
         self.provider._started = True
@@ -249,7 +254,7 @@ class GeminiSdkTests(unittest.IsolatedAsyncioTestCase):
         self.assertTrue(list(enums(google_tools)))
         self.assertNotIn("", [str(value) for value in enums(google_tools)])
         self.assertEqual(set(tools["submit_intent"]), set(BRIEF) | {"project_name", "new_project"})
-        self.assertEqual(set(tools["desktop_action"]), {"application", "url"})
+        self.assertEqual(set(tools["desktop_action"]), {"application", "url", "action"})
         for parameters in tools.values():
             self.assertNotIn("context", parameters)
         with patch.object(self.RealtimeSession, "_main_task", new=AsyncMock()):

@@ -77,6 +77,20 @@ class MvpServiceTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(self.service.action_caption({"operation": "agent", "reply": "approve"}), "Approving in Codex…")
         self.assertEqual(self.service.action_caption({"operation": "agent", "text": "x" * 80}), "Telling Codex: " + "x" * 60 + "…")
 
+    async def test_close_is_routed_and_captioned(self):
+        seen = []
+        async def close(application):
+            seen.append((application, self.service.voice.get("action_caption")))
+            return {"application": application, "status": "closed"}
+        self.service.desktop.close.side_effect = close
+        await self.service.conversation_action({"operation": "desktop", "application": "codex", "action": "close"}, "first")
+        self.assertEqual(seen, [("codex", "Closing Codex…")])
+        self.service.desktop.open.assert_not_awaited()
+        with self.assertRaises(VoiceError):
+            await self.service.conversation_action({"operation": "desktop", "application": "codex", "action": "kill"}, "first")
+        self.assertEqual(self.service.action_label({"operation": "desktop", "application": "browser", "url": "https://x.example"}), "desktop browser url")
+        self.assertEqual(self.service.action_label({"operation": "agent", "agent": "codex", "text": "secret words", "reply": ""}), "agent codex")
+
     async def test_action_caption_fades_even_after_failure(self):
         self.service.desktop.open.side_effect = VoiceError("APPLICATION_NOT_OBSERVED", "no window")
         with patch("maslow_voice.daemon.asyncio.sleep", AsyncMock()):

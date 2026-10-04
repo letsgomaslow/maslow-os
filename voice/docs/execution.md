@@ -107,7 +107,7 @@ Artifact links are constrained to the task workspace and checked again before op
 
 ## Websites and action captions
 
-`desktop_action` accepts an optional `url` only with `browser`. The daemon checks it with `validate_url` (complete HTTP or HTTPS, no embedded credentials or control characters) and always passes it to `omarchy-launch-browser`, which reuses and focuses a running browser itself. The model writes search requests as ordinary search-page URLs. Opening a page never clicks, types or submits anything.
+`desktop_action` accepts an optional `url` only with `browser`. The daemon checks it with `validate_url` (complete HTTP or HTTPS, no embedded credentials or control characters) and always passes it to `omarchy-launch-browser`, which reuses and focuses a running browser itself. The model writes search requests as ordinary search-page URLs. Opening a page never clicks, types or submits anything. `action` `close` closes one window of an allowlisted application (the one Voice opened, else the most recently used); closing Codex only detaches its viewer. Each model action writes one journal line naming the operation, allowlisted target and outcome, without the person's words or tool text.
 
 Before a desktop or agent action runs, the daemon publishes `voice.action_caption`, a short line such as "Opening github.com…" or "Telling Codex: …" composed from the validated fields, never written by the model. The orb's status pill shows it after connection errors and pause, and it fades four seconds after the most recent caption whether or not the action succeeded.
 
