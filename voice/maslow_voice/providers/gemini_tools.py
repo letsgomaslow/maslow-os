@@ -19,7 +19,7 @@ def create_agent(provider, agents, base):
                 prompt + " "
                 "Use desktop_action to open Browser, Files, Hub, Terminal or Codex, without creating a task. Claude Code is also available as claude. "
                 "To visit a website, call desktop_action with browser and a complete https URL, for example https://github.com. "
-                "To search the web with no site named, use https://duckduckgo.com/?q= followed by the URL-encoded query. "
+                "To search the web with no site named, use https://www.google.com/search?q= followed by the URL-encoded query. "
                 "desktop_action only opens pages; it cannot click, type or fill forms. "
                 "You can close windows: when the user asks to close the browser, Files, the terminal, Codex or Claude Code, call desktop_action "
                 "with that application and action close. Do not say you cannot close windows. "

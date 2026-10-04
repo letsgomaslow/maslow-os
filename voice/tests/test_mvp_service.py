@@ -93,6 +93,24 @@ class MvpServiceTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(self.service.action_label({"operation": "desktop", "application": "browser", "url": "https://x.example"}), "desktop browser url")
         self.assertEqual(self.service.action_label({"operation": "agent", "agent": "codex", "text": "secret words", "reply": ""}), "agent codex")
 
+    async def test_agent_decisions_need_the_persons_own_answer(self):
+        self.service.desktop.tell.return_value = {"agent": "claude", "status": "answered"}
+        approve = {"operation": "agent", "agent": "claude", "text": "", "reply": "approve"}
+        # The turn that asked Claude for work did not answer anything.
+        with self.assertRaises(VoiceError) as raised:
+            await self.service.conversation_action(approve, "first")
+        self.assertEqual(raised.exception.code, "ANSWER_NOT_HEARD")
+        self.service.desktop.tell.assert_not_awaited()
+        await self.turn("ambiguous", "Don't approve that yet")
+        with self.assertRaises(VoiceError):
+            await self.service.conversation_action(approve, "ambiguous")
+        await self.turn("yes", "Yes, go ahead")
+        await self.service.conversation_action(approve, "yes")
+        self.service.desktop.tell.assert_awaited_once_with("claude", "", "approve")
+        await self.turn("no", "No, deny it")
+        await self.service.conversation_action(approve | {"reply": "deny"}, "no")
+        self.assertEqual(self.service.desktop.tell.await_count, 2)
+
     async def test_action_caption_fades_even_after_failure(self):
         self.service.desktop.open.side_effect = VoiceError("APPLICATION_NOT_OBSERVED", "no window")
         with patch("maslow_voice.daemon.asyncio.sleep", AsyncMock()):

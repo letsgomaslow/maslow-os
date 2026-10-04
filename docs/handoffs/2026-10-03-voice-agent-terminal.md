@@ -16,7 +16,7 @@ Date: 2026-10-03. Goal: make Maslow Voice useful beyond conversation while keepi
 
 - **Websites:** `desktop_action` accepts an optional `url` for Browser.
   - `validate_url` checks it, and it always goes through `omarchy-launch-browser <url>`.
-  - The model writes searches as DuckDuckGo search URLs.
+  - The model writes searches as Google search URLs (DuckDuckGo was an early placeholder).
 - **Captions:** before a desktop or agent action, the daemon publishes `voice.action_caption`, composed from validated fields.
   - The status pill shows it after errors and pause, elides long text, and clears it four seconds after the latest caption.
 - **Visible Codex:** "Open Codex" runs `tmux -L maslow-voice new-session -A -s maslow-codex -c ~/Projects/Maslow Voice -- codex` inside the `maslow.voice.codex` terminal.

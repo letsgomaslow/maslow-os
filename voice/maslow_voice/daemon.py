@@ -5,6 +5,7 @@ import fcntl
 import hashlib
 import json
 import os
+import re
 import secrets
 import shutil
 import signal
@@ -403,6 +404,20 @@ class VoiceService:
                 return f"Opening {host.removeprefix('www.')}…"
         return f"Opening {label}…"
 
+    APPROVE_WORDS = re.compile(r"\b(approve|approved|yes|yeah|yep|allow|accept|okay|ok|sure|proceed|confirm|go ahead|do it|trust it)\b")
+    DENY_WORDS = re.compile(r"\b(deny|denied|no|nope|don't|dont|do not|reject|decline|cancel|block|refuse|stop)\b")
+
+    @classmethod
+    def require_spoken_answer(cls, reply, words):
+        """An agent decision is answered only when the person's own words in this turn say so."""
+        words = str(words).casefold().replace("\u2019", "'")
+        if reply == "approve":
+            heard = bool(cls.APPROVE_WORDS.search(words)) and not cls.DENY_WORDS.search(words)
+        else:
+            heard = bool(cls.DENY_WORDS.search(words))
+        if not heard:
+            raise VoiceError("ANSWER_NOT_HEARD", "The person has not answered the agent's question. Read it to them and wait for their answer.")
+
     @staticmethod
     def action_label(intent):
         if not isinstance(intent, dict):
@@ -462,6 +477,8 @@ class VoiceService:
                 await self.show_caption(self.action_caption(intent))
                 result = await self.desktop.open(intent.get("application"), intent.get("url") or None)
             elif operation == "agent":
+                if intent.get("reply"):
+                    self.require_spoken_answer(intent["reply"], turn["source"])
                 await self.show_caption(self.action_caption(intent))
                 result = await self.desktop.tell(intent.get("agent"), intent.get("text", ""), intent.get("reply", ""))
                 if result.get("status") == "needs_answer":
