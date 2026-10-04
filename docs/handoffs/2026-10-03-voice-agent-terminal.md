@@ -1,6 +1,6 @@
 # Voice websites, visible Codex terminal and action captions
 
-Date: 2026-10-03 to 2026-10-04. Goal: make Maslow Voice useful beyond conversation while keeping the design simple. **Iteration status: closed as good enough for now, not complete.** Remaining gates are listed at the end and are the starting point for the next iteration. Source was developed on `voice-agent-terminal` in `maslow-os` and `maslow-os-pkgs` and the runtime branch was merged into local `main` at the person's request. Nothing was pushed or published; `maslow-voice 0.1.5-27` is installed locally on the Lenovo only.
+Date: 2026-10-03 to 2026-10-04. Goal: make Maslow Voice useful beyond conversation while keeping the design simple. **Iteration status: closed as good enough for now, not complete.** Remaining gates are listed at the end and are the starting point for the next iteration. Source was developed on `voice-agent-terminal` in `maslow-os` and `maslow-os-pkgs`. At the person's request, the runtime branch was merged into `main` (`9c906e69`) and pushed to GitHub as a backup for continuing elsewhere. The package recipe branch is not merged or pushed. Nothing was published; `maslow-voice 0.1.5-27` is installed locally on the Lenovo only.
 
 
 ## Iteration summary
