@@ -602,7 +602,7 @@ class VoiceService:
                 if await provider.notify_task(content):
                     # Give the person time to answer before the idle timeout.
                     self.last_activity = time.monotonic()
-                    spoken = "spoken"
+                    spoken = "sent to the conversation"
                     break
                 await asyncio.sleep(0.5)
         print(f"Voice notice {agent} {state}: {notified}, {spoken}", file=sys.stderr, flush=True)

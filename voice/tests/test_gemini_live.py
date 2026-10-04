@@ -126,23 +126,44 @@ class GeminiSdkTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(json.loads(response)["status"], "not_performed")
         self.provider._submit_callback.assert_not_awaited()
 
-    async def test_completion_speech_has_no_action_tools_and_waits_for_user(self):
+    async def test_completion_speech_is_realtime_text_and_waits_for_a_quiet_moment(self):
+        from google.genai import types
         self.provider._started = True
         self.provider._audio_enabled = True
         original = self.provider._session
         fake = SimpleNamespace(user_state="speaking", agent_state="listening", generate_reply=AsyncMock())
+        sent = []
+        self.provider._realtime = SimpleNamespace(_send_client_event=sent.append)
         self.provider._session = fake
         try:
             self.assertFalse(await self.provider.notify_task("Completed"))
-            fake.generate_reply.assert_not_awaited()
             fake.user_state = "listening"
             self.assertTrue(await self.provider.notify_task("Completed"))
             # "away" is LiveKit's state after 15 seconds of silence: still quiet.
             fake.user_state = "away"
             self.assertTrue(await self.provider.notify_task("Completed"))
-            self.assertEqual(fake.generate_reply.call_args.kwargs["tools"], [])
+            self.assertEqual(len(sent), 2)
+            self.assertIsInstance(sent[0], types.LiveClientRealtimeInput)
+            self.assertTrue(sent[0].text.endswith("Completed"))
+            self.assertIn("not spoken by the person", sent[0].text)
+            # Never the generate_reply(instructions=...) path that broke 3.8 sessions.
+            fake.generate_reply.assert_not_awaited()
+            self.provider._realtime = None
+            self.assertFalse(await self.provider.notify_task("Completed"))
         finally:
             self.provider._session = original
+
+    async def test_real_realtime_session_is_kept_and_accepts_status_text(self):
+        from google.genai import types
+        model = self.provider._session.llm
+        with patch.object(self.RealtimeSession, "_main_task", new=AsyncMock()):
+            realtime = model.session()
+            try:
+                self.assertIs(self.provider._realtime, realtime)
+                # The private send used for status updates exists on the pinned plugin.
+                realtime._send_client_event(types.LiveClientRealtimeInput(text="status"))
+            finally:
+                await realtime.aclose()
 
     async def test_real_native_start_attaches_audio_and_mute_controls_capture(self):
         from maslow_voice.audio import PcmFrame
