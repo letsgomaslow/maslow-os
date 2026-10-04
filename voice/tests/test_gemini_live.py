@@ -95,7 +95,7 @@ class GeminiSdkTests(unittest.IsolatedAsyncioTestCase):
         self.provider._submit_callback.return_value = {"status": "needs_answer", "prompt": "Would you like to run the following command?"}
         context = SimpleNamespace(function_call=SimpleNamespace(call_id="tell-call"),
                                   speech_handle=SimpleNamespace(interrupted=False))
-        response = json.loads(await self.provider._agent.tell_agent(context, "run the tests"))
+        response = json.loads(await self.provider._agent.tell_agent(context, "run the tests", "codex", "none"))
         self.provider._submit_callback.assert_awaited_once_with(
             {"operation": "agent", "agent": "codex", "text": "run the tests", "reply": ""}, "final-turn")
         self.assertEqual(response["status"], "needs_answer")
@@ -236,6 +236,18 @@ class GeminiSdkTests(unittest.IsolatedAsyncioTestCase):
         tools = {item["function"]["name"]: item["function"]["parameters"]["properties"] for item in schema}
         self.assertEqual(set(tools), {"submit_intent", "desktop_action", "task_control", "tell_agent"})
         self.assertEqual(set(tools["tell_agent"]), {"text", "agent", "reply"})
+        # Gemini Live refuses the whole session when any enum value is empty.
+        def enums(value):
+            if isinstance(value, dict):
+                yield from value.get("enum", [])
+                for item in value.values():
+                    yield from enums(item)
+            elif isinstance(value, list):
+                for item in value:
+                    yield from enums(item)
+        google_tools = self.agents.ToolContext(self.provider._agent.tools).parse_function_tools("google")
+        self.assertTrue(list(enums(google_tools)))
+        self.assertNotIn("", [str(value) for value in enums(google_tools)])
         self.assertEqual(set(tools["submit_intent"]), set(BRIEF) | {"project_name", "new_project"})
         self.assertEqual(set(tools["desktop_action"]), {"application", "url"})
         for parameters in tools.values():

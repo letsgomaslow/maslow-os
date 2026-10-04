@@ -90,9 +90,11 @@ def create_agent(provider, agents, base):
             return json.dumps(await self._call(context, {"operation": "task", "action": operation, "text": text}))
 
         async def tell_agent(self, context, text: str = "", agent: Literal["codex"] = "codex",
-                             reply: Literal["", "approve", "deny"] = "") -> str:
-            """Type the user's words into the visible Codex terminal, or answer its waiting prompt with reply approve or deny."""
-            return json.dumps(await self._call(context, {"operation": "agent", "agent": agent, "text": text, "reply": reply}))
+                             reply: Literal["none", "approve", "deny"] = "none") -> str:
+            """Type the user's words into the visible Codex terminal. Use reply approve or deny only to answer its waiting prompt; otherwise none."""
+            # Gemini rejects empty enum values, so "none" stands for no answer.
+            answer = "" if reply == "none" else reply
+            return json.dumps(await self._call(context, {"operation": "agent", "agent": agent, "text": text, "reply": answer}))
 
     for name in ("submit_intent", "desktop_action", "task_control", "tell_agent"):
         method = getattr(GeminiAgent, name)
