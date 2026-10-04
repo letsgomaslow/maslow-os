@@ -1,0 +1,37 @@
+#!/bin/bash
+
+# omarchy:summary=Let Codex and Claude Code drive a visible browser for Maslow Voice web tasks
+
+set -e
+
+# Pinned so a later npm release cannot change what the agents run without review.
+PLAYWRIGHT_MCP="@playwright/mcp@0.0.83"
+
+if omarchy-cmd-missing codex; then
+  echo "Codex is not installed. Install it from Hub setup first."
+  exit 1
+fi
+
+if omarchy-cmd-missing npx; then
+  echo "Browser tasks need Node.js. Install it with: omarchy-pkg-add nodejs npm"
+  exit 1
+fi
+
+echo "This adds the Playwright browser tool ($PLAYWRIGHT_MCP) to your coding agents."
+echo "When you ask Codex for a web task, it opens a visible browser window you can watch."
+echo "Your agents keep their own approval settings. npx downloads the tool the first time it runs."
+echo ""
+
+if codex mcp get playwright &>/dev/null; then
+  echo "Codex already has a browser tool named playwright."
+elif gum confirm "Add the browser tool to Codex?"; then
+  codex mcp add playwright -- npx "$PLAYWRIGHT_MCP"
+fi
+
+if omarchy-cmd-present claude; then
+  if claude mcp get playwright &>/dev/null; then
+    echo "Claude Code already has a browser tool named playwright."
+  elif gum confirm "Add the browser tool to Claude Code?"; then
+    claude mcp add -s user playwright -- npx "$PLAYWRIGHT_MCP"
+  fi
+fi
