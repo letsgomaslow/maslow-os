@@ -70,20 +70,29 @@ class DesktopActions:
                 break
         return names
 
-    async def open(self, application, url=None):
-        if not isinstance(application, str) or application.casefold() not in self.APPLICATIONS:
+    async def open(self, application, url=None, *, title=None, view=False):
+        # Web task seats are opened only by Voice itself. They run in the
+        # background at a fixed size: the browser is what the person watches,
+        # and Voice always has a full screen to read. view attaches a window.
+        if not isinstance(application, str) or application.casefold() not in self.APPLICATIONS | set(agent_terminal.WEB_SEATS):
             raise VoiceError("APPLICATION_NOT_ALLOWED", "Voice can open Browser, Files, Hub, Terminal, Codex, or Claude Code.")
         application = application.casefold()
         if url is not None:
             if application != "browser":
                 raise VoiceError("INVALID_REQUEST", "Only the browser can open a website address.")
             url = validate_url(url)
-        if application == "codex" and not shutil.which("codex"):
+        if agent_terminal.program(application) == "codex" and not shutil.which("codex"):
             raise VoiceError("CODEX_MISSING", "Codex is not installed. Open Hub setup to install or repair it.")
         if application == "claude" and not shutil.which("claude"):
             raise VoiceError("CLAUDE_MISSING", "Claude Code is not installed. Open Hub setup to install or repair it.")
-        if application in agent_terminal.AGENTS and not shutil.which("tmux"):
+        if application in agent_terminal.SEATS and not shutil.which("tmux"):
             raise VoiceError("APPLICATION_UNAVAILABLE", "Voice needs tmux to keep coding agents visible. Install tmux and try again.")
+        if application in agent_terminal.WEB_SEATS and not view:
+            async with self.lock:
+                if not await agent_terminal.exists(self.run, application):
+                    await self.run(*agent_terminal.detached_argv(application, self.agent_folder()))
+                    await self.run(*agent_terminal.tmux("set-option", "-w", "-t", agent_terminal.target(application), "window-size", "manual"))
+            return {"application": application, "status": "started", "verification": "session_started"}
         async with self.lock:
             # Hub is a Quickshell surface, not a Hyprland client. Successful IPC
             # means its summon was accepted; do not invent window-ready evidence.
@@ -98,16 +107,16 @@ class DesktopActions:
             # A website always goes through the launcher, which reuses and
             # focuses a running browser itself. An agent window whose session
             # has ended is only closing; start a fresh one instead.
-            if found and application in agent_terminal.AGENTS and not await agent_terminal.exists(self.run, application):
+            if found and application in agent_terminal.SEATS and not await agent_terminal.exists(self.run, application):
                 found = None
             if found and url is None:
                 await self.focus(found)
                 self.windows[application] = found["address"]
                 return {"application": application, "status": "focused", "verification": "window_observed"}
-            if application == "terminal" or application in agent_terminal.AGENTS:
-                title = "Maslow " + agent_terminal.NAMES.get(application, application.title())
+            if application == "terminal" or application in agent_terminal.SEATS:
+                title = "Maslow " + (title or agent_terminal.NAMES.get(application, application.title()))
                 argv = ["uwsm-app", "--", "xdg-terminal-exec", f"--app-id=maslow.voice.{application}", "--title=" + title]
-                if application in agent_terminal.AGENTS:
+                if application in agent_terminal.SEATS:
                     # Attach to the running agent, or start it here so it
                     # inherits this desktop session's environment.
                     argv += ["--", *agent_terminal.attach_argv(application, self.agent_folder())]
@@ -136,7 +145,7 @@ class DesktopActions:
         classes = await self.browser_classes() if application == "browser" else {
             "files": {"org.gnome.nautilus"}, "terminal": {"maslow.voice.terminal"},
             "codex": {"maslow.voice.codex"}, "claude": {"maslow.voice.claude"},
-        }[application]
+        }.get(application) or {"maslow.voice." + application}
         def matching(client):
             return bool(client.get("mapped", True)) and any(str(client.get(key, "")).casefold() in classes for key in ("class", "initialClass"))
         return matching
@@ -165,7 +174,7 @@ class DesktopActions:
                 await self.run("hyprctl", "dispatch", "closewindow", "address:" + address)
             self.windows.pop(application, None)
             receipt = {"application": application, "status": "closed", "verification": "close_requested"}
-            if application in agent_terminal.AGENTS:
+            if application in agent_terminal.SEATS:
                 # Only the viewer detaches; the tmux session keeps the agent running.
                 name = agent_terminal.NAMES[application]
                 receipt["note"] = f"{name} keeps running. Opening {name} again brings the same session back."
@@ -179,16 +188,16 @@ class DesktopActions:
         self.agent_cwd.mkdir(parents=True, exist_ok=True)
         return self.agent_cwd
 
-    async def tell(self, agent, text="", reply=""):
+    async def tell(self, agent, text="", reply="", *, title=None, busy_ok=True):
         """Type the person's words into the visible agent, or answer its waiting prompt."""
-        if agent not in agent_terminal.AGENTS:
+        if agent not in agent_terminal.SEATS:
             raise VoiceError("APPLICATION_NOT_ALLOWED", "Voice can talk to Codex or Claude Code.")
-        if reply not in {"", *agent_terminal.KEYS[agent]}:
+        if reply not in {"", *agent_terminal.KEYS[agent_terminal.program(agent)]}:
             raise VoiceError("INVALID_REQUEST", "Answer with approve or deny.")
         words = "" if reply else agent_terminal.clean(text)
         # Opening first keeps the agent on screen, reattaching a session whose
         # window was closed, so nothing is typed out of sight.
-        await self.open(agent)
+        await self.open(agent, title=title)
         name = agent_terminal.NAMES[agent]
         if not await agent_terminal.ready(self.run, agent, self.timeout):
             raise VoiceError("AGENT_NOT_READY", f"{name} is not ready in its terminal yet. Check its window and try again.")
@@ -196,7 +205,7 @@ class DesktopActions:
         if reply:
             if not prompt:
                 raise VoiceError("NO_PENDING_PROMPT", f"{name} is not waiting for an answer.")
-            if any(marker in prompt for marker in agent_terminal.WINDOW_ONLY[agent]):
+            if any(marker in prompt for marker in agent_terminal.WINDOW_ONLY[agent_terminal.program(agent)]):
                 raise VoiceError("ANSWER_IN_WINDOW", f"{name} would remember this answer permanently. Answer it in the {name} window.")
             await agent_terminal.press(self.run, agent, reply)
             return {"agent": agent, "status": "answered", "reply": reply, "verification": "keys_delivered"}
@@ -204,12 +213,24 @@ class DesktopActions:
             # Never type words into a decision screen; they could pick an option.
             return {"agent": agent, "status": "needs_answer", "prompt": prompt,
                     "message": f"{name} is waiting for a decision. Nothing was typed."}
+        if not busy_ok and agent_terminal.BUSY in await agent_terminal.screen(self.run, agent):
+            # Words sent to a working agent redirect its current work. Only an
+            # explicit correction to that job may do that.
+            return {"agent": agent, "status": "busy", "message": f"{name} is still working on something else. Nothing was typed."}
         await agent_terminal.type_line(self.run, agent, words)
         return {"agent": agent, "status": "sent", "verification": "keys_delivered"}
 
+    async def end_seat(self, seat):
+        """End a finished web task's session so its seat can take a new job."""
+        if seat not in agent_terminal.WEB_SEATS:
+            raise VoiceError("APPLICATION_NOT_ALLOWED", "Only web task seats are reused.")
+        if await agent_terminal.exists(self.run, seat):
+            await self.run(*agent_terminal.tmux("kill-session", "-t", "=" + agent_terminal.session(seat)))
+        self.windows.pop(seat, None)
+
     async def agent_state(self, agent):
         """What the visible agent is doing now, read from its screen."""
-        if agent not in agent_terminal.AGENTS:
+        if agent not in agent_terminal.SEATS:
             raise VoiceError("APPLICATION_NOT_ALLOWED", "Voice can check Codex or Claude Code.")
         if not await agent_terminal.exists(self.run, agent):
             return {"agent": agent, "state": "closed"}

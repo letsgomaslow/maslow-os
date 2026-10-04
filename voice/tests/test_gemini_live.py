@@ -94,6 +94,13 @@ class GeminiSdkTests(unittest.IsolatedAsyncioTestCase):
         self.provider._submit_callback.assert_awaited_with(
             {"operation": "desktop", "application": "codex", "action": "close"}, "final-turn")
 
+    async def test_briefing_and_compression_reach_the_real_model(self):
+        self.provider.config["voice_briefing"] = 'Maslow state: Web task web-1 "find cheap flights": working.'
+        session = self.provider._create_agent_session(self.agents, "", "")
+        self.addAsyncCleanup(session.aclose)
+        self.assertTrue(self.provider._agent.instructions.endswith('Web task web-1 "find cheap flights": working.'))
+        self.assertIsNotNone(session.llm._opts.context_window_compression.sliding_window)
+
     async def test_tell_agent_forwards_words_and_relays_waiting_prompt(self):
         self.provider._started = True
         self.provider._tool_turns["tell-call"] = "final-turn"
@@ -245,8 +252,8 @@ class GeminiSdkTests(unittest.IsolatedAsyncioTestCase):
         schema = self.agents.ToolContext(self.provider._agent.tools).parse_function_tools("openai", strict=True)
         tools = {item["function"]["name"]: item["function"]["parameters"]["properties"] for item in schema}
         self.assertEqual(set(tools), {"submit_intent", "desktop_action", "task_control", "tell_agent", "agent_status"})
-        self.assertEqual(set(tools["tell_agent"]), {"text", "agent", "reply", "kind"})
-        self.assertEqual(set(tools["agent_status"]), {"agent"})
+        self.assertEqual(set(tools["tell_agent"]), {"text", "agent", "reply", "kind", "job"})
+        self.assertEqual(set(tools["agent_status"]), {"job", "show"})
         # Gemini Live refuses the whole session when any enum value is empty.
         def enums(value):
             if isinstance(value, dict):

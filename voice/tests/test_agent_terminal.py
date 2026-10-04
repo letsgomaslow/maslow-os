@@ -72,7 +72,7 @@ class AgentTerminalTests(unittest.IsolatedAsyncioTestCase):
         patcher = patch("maslow_voice.desktop.shutil.which", return_value="/usr/bin/found")
         patcher.start()
         self.addCleanup(patcher.stop)
-        for name, value in (("ENTER_DELAY", 0), ("INPUT_WAIT", 0.3)):
+        for name, value in (("ENTER_DELAY", 0), ("INPUT_WAIT", 0.3), ("STABLE_READS", 1), ("DELIVERY_WAIT", 0.2)):
             patcher = patch.object(agent_terminal, name, value)
             patcher.start()
             self.addCleanup(patcher.stop)
@@ -179,15 +179,22 @@ class AgentTerminalTests(unittest.IsolatedAsyncioTestCase):
         await self.desktop(fake).tell("codex", "check")
         self.assertEqual(fake.keys(), [("-t", "=maslow-codex:", "Enter"), ("-t", "=maslow-codex:", "Tab")])
 
-    async def test_words_swallowed_during_startup_are_pasted_again_or_reported(self):
+    async def test_words_are_pasted_once_and_an_unconfirmed_delivery_is_reported(self):
         fake = FakeDesktop(drops=1)
-        self.assertEqual((await self.desktop(fake).tell("codex", "find cheap flights"))["status"], "sent")
-        self.assertEqual(fake.pasted(), ["find cheap flights", "find cheap flights"])
-        self.assertEqual(fake.submitted, ["find cheap flights"])
-        fake = FakeDesktop(drops=2)
         with self.assertRaises(VoiceError) as raised:
             await self.desktop(fake).tell("codex", "find cheap flights")
         self.assertEqual(raised.exception.code, "NOT_DELIVERED")
+        # Never a second paste: it could submit the request twice.
+        self.assertEqual(fake.pasted(), ["find cheap flights"])
+
+    def test_words_in_the_input_box_are_not_mistaken_for_delivered(self):
+        pending = "• earlier reply\n› find cheap flights to Austin\n  GPT · ? for shortcuts"
+        echoed = "› find cheap flights to Austin\n• Searching…\n› Ask Codex to do anything\n  ? for shortcuts"
+        words = "find cheap flights to Austin"
+        self.assertFalse(agent_terminal.delivered(pending, words))
+        self.assertTrue(agent_terminal.waiting_in_input(pending, words))
+        self.assertTrue(agent_terminal.delivered(echoed, words))
+        self.assertFalse(agent_terminal.waiting_in_input(echoed, words))
 
     async def test_nothing_is_pasted_before_the_input_box_is_drawn(self):
         fake = FakeDesktop(screen="  Booting MCP server: playwright")
@@ -232,6 +239,44 @@ class AgentTerminalTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual((await DesktopActions(gone).agent_state("codex"))["state"], "closed")
         with self.assertRaises(VoiceError):
             await DesktopActions(gone).agent_state("bash")
+
+    async def test_busy_agent_is_not_redirected_unless_allowed(self):
+        working = "• Working (4s • esc to interrupt)\n› Ask Codex\n  ? for shortcuts"
+        fake = FakeDesktop(screen=working)
+        receipt = await self.desktop(fake).tell("codex", "find activities in Austin", busy_ok=False)
+        self.assertEqual(receipt["status"], "busy")
+        self.assertEqual(fake.pasted(), [])
+        fake = FakeDesktop(screen=working)
+        self.assertEqual((await self.desktop(fake).tell("codex", "make it Dallas instead"))["status"], "sent")
+
+    async def test_web_seats_run_codex_in_the_background_and_open_a_viewer_on_request(self):
+        fake = FakeDesktop(window="maslow.voice.web-2")
+        started = set()
+        original = fake.run
+        async def run(*args):
+            if "has-session" in args and "=maslow-web-2" not in started:
+                raise VoiceError("DESKTOP_FAILED", "no session")
+            if "new-session" in args and "-d" in args:
+                started.add("=maslow-web-2")
+            return await original(*args)
+        desktop = DesktopActions(run, timeout=0.5, agent_cwd=Path(self.temp.name) / "Maslow Voice")
+        receipt = await desktop.tell("web-2", "find hotels", title="Web: find hotels")
+        self.assertEqual(receipt["status"], "sent")
+        start = next(call for call in fake.calls if "new-session" in call)
+        self.assertEqual(start[start.index("new-session"):], ("new-session", "-d", "-s", "maslow-web-2", "-x", "160", "-y", "48",
+                                                              "-c", str(Path(self.temp.name) / "Maslow Voice"), "--", "codex"))
+        self.assertTrue(any("window-size" in call and "manual" in call for call in fake.calls))
+        self.assertFalse(any(call[0] == "setsid" for call in fake.calls))
+        await desktop.open("web-2", title="Web: find hotels", view=True)
+        viewer = next(call for call in fake.calls if call[0] == "setsid")
+        self.assertIn("--app-id=maslow.voice.web-2", viewer)
+        self.assertIn("--title=Maslow Web: find hotels", viewer)
+        await desktop.end_seat("web-2")
+        self.assertTrue(any("kill-session" in call and "=maslow-web-2" in call for call in fake.calls))
+        with self.assertRaises(VoiceError):
+            await desktop.end_seat("codex")
+        with self.assertRaises(VoiceError):
+            await DesktopActions(fake.run).close("web-9")
 
     async def test_answer_without_a_waiting_prompt_sends_nothing(self):
         fake = FakeDesktop()

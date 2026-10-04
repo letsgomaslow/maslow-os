@@ -75,6 +75,9 @@ class LiveKitGeminiProvider(LiveKitNativeExpressiveProvider):
             modalities=[types.Modality.AUDIO],
             input_audio_transcription=types.AudioTranscriptionConfig(),
             output_audio_transcription=types.AudioTranscriptionConfig(),
+            # A sliding window keeps long conversations within the model's
+            # context instead of ending them when it fills.
+            context_window_compression=types.ContextWindowCompressionConfig(sliding_window=types.SlidingWindow()),
         )
         self._inference_clients.append(model)
         self._agent = self._create_intent_agent(agents)
