@@ -80,6 +80,10 @@ Changes in `60a0004f`: desktop, agent and note actions answer within 0.8 s and f
 
 Evidence: 432 Python tests OK (two expected skips); real Gemini text session with a six-second action replied at 6.5 s, before the action finished at 7.1 s; a real reconnect took 0.3 s and the model still recalled details from before the drop. Recipe `7bd65c4` (`0.1.5-31`), archive SHA-256 `2037441c991f87f1c3b24ebbc0a93203fcd91e4c057d526ddbb0464fc8ecc90b`; installed with 0 altered of 9126 files; Voice idle immediately before restart; plugin rescanned; ready orb observed. Not verified: real server drops with audio and the person's perception of the flow.
 
+## Speech cut off around actions (0.1.5-32)
+
+The person reported that speech still stops mid-sentence around multi-step website requests, with the microphone physically muted. Their 19:47–19:56 sessions had no Gemini drops, and every action answered within 1 s. Six recorded real Gemini sessions through a fake sound card did not reproduce it (details in `voice/docs/execution.md`); synthetic espeak speech was misheard, so spoken turns, where Gemini may talk before acting, remain untested. `f7593996` tells Gemini to act first or finish its sentence and to batch actions, and adds a word-free speech timeline to the journal (`Voice speech state`, `Voice speech interrupted`, `Voice speech gap`). 434 Python tests OK (two expected skips). Recipe `43678b8` (`0.1.5-32`), archive SHA-256 `d0658245677fbce1bdf57740ab7a45ea609e74efd201b3d971269be32f427180`; installed with 0 altered of 9126 files; Voice idle immediately before restart; plugin rescanned; conversation ready.
+
 ## Next action
 
-The person tries a spoken session with app opens and an Obsidian note and reports whether speech still stalls and whether any drop now reconnects on its own.
+The person reproduces a cut-off once and notes the time; read the `Voice speech` and `Voice action` journal lines around it to identify the cause.
