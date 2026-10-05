@@ -382,3 +382,26 @@ class PlaybackTransportTests(unittest.IsolatedAsyncioTestCase):
         processing.process_reverse_stream(far)
         processing.process_stream(near)
         self.assertEqual(len(near.data), 480)
+
+
+class SpeechGapDiagnosticsTests(unittest.TestCase):
+    def test_gaps_inside_speech_are_reported_and_cleared_replies_are_not(self):
+        import asyncio, io, contextlib
+        from unittest.mock import patch
+        from maslow_voice.audio import PortAudioTransport
+        transport = PortAudioTransport()
+        printed = []
+        transport._loop = type("Loop", (), {"call_soon_threadsafe": lambda self, callback: callback()})()
+        clock = [100.0]
+        with patch("maslow_voice.audio.time.monotonic", lambda: clock[0]), contextlib.redirect_stderr(io.StringIO()) as err:
+            for audible, step in ((True, 0.02), (False, 1.2), (True, 0.02), (False, 0.1), (True, 0.02), (False, 9), (True, 0.02)):
+                transport._note_output(audible)
+                clock[0] += step
+            transport._note_output(False)
+            asyncio.run(transport.clear_playback())
+            clock[0] += 1
+            transport._note_output(True)
+        lines = err.getvalue().splitlines()
+        # Only the 1.2 s silence counts: 0.1 s is a breath, 9 s is a new turn,
+        # and audio after a cleared (interrupted) reply starts fresh.
+        self.assertEqual(lines, ["Voice speech gap 1.20s"])

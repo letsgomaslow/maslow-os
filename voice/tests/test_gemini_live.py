@@ -45,6 +45,7 @@ class GeminiPromptTests(unittest.TestCase):
                 self.assertTrue(agent.instructions.startswith(expected + " "))
                 self.assertIn("Use desktop_action to open Browser, Files, Hub, Terminal, Obsidian or Codex", agent.instructions)
                 self.assertIn("call write_note", agent.instructions)
+                self.assertIn("never stop in the middle of a sentence to take an action", agent.instructions)
                 self.assertIn("never summarise the content yourself", agent.instructions)
                 self.assertIn("Use submit_intent only for explicitly requested external work.", agent.instructions)
                 self.assertIn("Use task_control for progress, corrections, cancellation, continuation or results of the current job.", agent.instructions)

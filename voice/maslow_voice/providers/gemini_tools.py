@@ -19,6 +19,9 @@ def create_agent(provider, agents, base):
         def __init__(self):
             agents.Agent.__init__(self, instructions=(
                 prompt + " "
+                "Speak like a person: never stop in the middle of a sentence to take an action. When a request needs actions, "
+                "call the tools first and then speak, or finish your sentence before calling one. For several actions in one request, "
+                "call them together and then speak once, as one continuous answer. "
                 "Use desktop_action to open Browser, Files, Hub, Terminal, Obsidian or Codex, without creating a task. Claude Code is also available as claude. "
                 "To visit a website, call desktop_action with browser and a complete https URL, for example https://github.com. "
                 "To search the web with no site named, use https://www.google.com/search?q= followed by the URL-encoded query. "

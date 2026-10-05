@@ -9,6 +9,8 @@ from __future__ import annotations
 
 import asyncio
 import math
+import sys
+import time
 from array import array
 from collections import deque
 from collections.abc import Awaitable, Callable
@@ -102,6 +104,23 @@ class PortAudioTransport:
         self._meter_latest: tuple[int, bytes] | None = None
         self._meter_pending = False
         self._meter_task: asyncio.Task[None] | None = None
+        # Speech-gap diagnostics: the device callback only records times; the
+        # event loop prints. A gap is silence between two stretches of speech.
+        self._last_audio: float | None = None
+        self._gap_started: float | None = None
+
+    def _note_output(self, audible: bool) -> None:
+        """Record a speech gap from the device callback without blocking it."""
+        now = time.monotonic()
+        if audible:
+            if self._gap_started is not None and self._loop is not None:
+                gap = now - self._gap_started
+                if 0.25 <= gap <= 5:
+                    self._loop.call_soon_threadsafe(lambda: print(f"Voice speech gap {gap:.2f}s", file=sys.stderr, flush=True))
+            self._gap_started = None
+            self._last_audio = now
+        elif self._last_audio is not None and self._gap_started is None:
+            self._gap_started = now
 
     def set_playback_handler(self, handler: Callable[[float], Awaitable[None]]) -> None:
         self._playback_handler = handler
@@ -210,6 +229,7 @@ class PortAudioTransport:
                 data = bytearray(required)
                 written = 0
             self._played_samples += written // 2
+            self._note_output(written > 0)
             outdata[:] = data
             self._schedule_meter(bytes(data))
             return bytes(data)
@@ -297,6 +317,8 @@ class PortAudioTransport:
             await asyncio.sleep(0.01)
 
     async def clear_playback(self) -> None:
+        # A cleared reply is an interruption, not a gap inside speech.
+        self._last_audio = self._gap_started = None
         self._generation += 1
         self._output.clear()
         self._played_samples = 0

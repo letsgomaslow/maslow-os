@@ -183,6 +183,9 @@ class VoiceService:
                 return  # Late provider transitions cannot reopen either audio direction.
             if self.voice["speaking"] and event.get("state") == "listening":
                 self.last_activity = time.monotonic()
+            if event.get("state") != self.voice.get("state"):
+                # A speech timeline for diagnosing cut-off speech; never words.
+                print(f"Voice speech state {event.get('state')}", file=sys.stderr, flush=True)
             self.voice.update(state=event["state"], microphone=bool(event.get("microphone")), speaking=bool(event.get("speaking")))
         elif kind == "metrics":
             self.audit.record("usage", session_id=self.session["id"], provider=self.settings.value["mode"], **event.get("usage", {}))
@@ -214,6 +217,7 @@ class VoiceService:
             self.queue_level_publish()
             return
         elif kind == "interrupted":
+            print("Voice speech interrupted", file=sys.stderr, flush=True)
             was_speaking = self.voice["speaking"]
             self.voice["playback_level"] = 0
             self.voice["speaking"] = False
