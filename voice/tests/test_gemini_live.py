@@ -90,7 +90,8 @@ class GeminiSdkTests(unittest.IsolatedAsyncioTestCase):
         response = json.loads(await self.provider._agent.write_note(context, "put this in Obsidian", "auto"))
         self.assertEqual((response["status"], response["error"]), ("not_performed", "NO_SPOKEN_REQUEST"))
         self.assertIn("Do not call any tool again now", response["message"])
-        self.assertNotIn("repeat", response["message"])
+        self.assertIn("already under way", response["message"])
+        self.assertNotIn("ask again", response["message"])
         self.provider._submit_callback.assert_not_awaited()
         # No error banner flicker for each refused retry.
         self.assertFalse(any(event.get("type") == "task_error" for event in self.events))

@@ -89,8 +89,9 @@ def create_agent(provider, agents, base):
                     # turn behind it. Asking to "repeat" made the model retry in
                     # a tight loop, so tell it plainly to stop and explain.
                     return {"error": "NO_SPOKEN_REQUEST", "status": "not_performed",
-                            "message": "Actions only run directly after the person speaks. Do not call any tool again now. "
-                                       "Tell the person in one sentence what happened and let them ask again if they want."}
+                            "message": "No new action was taken: actions only run directly after the person speaks. "
+                                       "If this repeats an action you just took, it is already under way, so carry on with your answer. "
+                                       "Do not call any tool again now."}
                 if not provider._started or not turn or context.speech_handle.interrupted:
                     raise ProviderError("This conversation turn has ended. Please repeat the request.")
                 result = await provider._submit_callback(payload, turn)

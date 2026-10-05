@@ -752,7 +752,8 @@ class VoiceService:
             return task.result()
         self.background(self._finish_action(label, caption, task))
         return {"status": "started", "verification": "in_progress",
-                "message": "It is under way. Keep the conversation going; Maslow will tell you only if it fails or needs an answer."}
+                "message": "This is happening now. Treat it as done and carry on with your answer; do not call this tool again. "
+                           "Maslow will tell you later only if it fails or needs the person's answer."}
 
     async def _finish_action(self, label, caption, task):
         what = caption.rstrip("…")
