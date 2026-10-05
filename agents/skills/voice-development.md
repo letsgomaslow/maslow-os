@@ -53,6 +53,13 @@ At each checkpoint record exact source/recipe/archive identities, evidence locat
 - `voice/dev/route_eval.py` is a manual, credentialed routing check. Treat quota errors as untested cases, not failures.
 - Local package candidates: freeze a `git archive` of the runtime commit, build in the existing builder with `makepkg -d` (only runtime dependencies are absent there), compare packaged file hashes, install with `pkexec pacman -U`, restart the service and refresh the plugin through the packaged launcher. Never reload the plugin before the package manager finishes.
 
+## Orb, notes and speech diagnostics
+
+- **Orb:** render `voice/tests/orb-preview.qml` before installing (states × sizes, `GALLERY_FRAMES` for motion, `REDUCED=1`, a light theme, GPU and software paths); [the UI README](../../voice/ui/README.md) shows how to run it offscreen in the builder image when Weston is missing. Compare old and new orbs side by side with the same simulated level; a change people cannot see in listening and speaking is not done.
+- **Notes:** test against real Codex in a throwaway vault, never the person's vault. Codex's folder trust dialog accepts Enter, not `y` or `1`. Answering it saves a trust entry in `~/.codex/config.toml`: back the file up first and remove test entries afterwards.
+- **Speech:** read the journal's `Voice speech state|interrupted|gap`, `Voice action` and `Voice reconnecting` lines around the reported time before changing code. `voice/dev/speech_trace.py` replays a real Gemini session through a fake sound card. Typed turns are not spoken turns.
+- **Restarts:** check `omarchy-voice-control` status for an idle Voice in the same command that restarts the service; never rely on an earlier check.
+
 ## Product regression checklist
 
 Read [the Voice product and lessons reference](../../docs/maslow-voice-product.md) when changing conversation, task intake or agent control. Verify the journey from first entry through delegation and result, not only the task panel. Routine Gemini conversation/delegation must not require a folder or task form. Test active typing, caret/selection and approval focus while streamed updates replace task data. Preserve exact approval identities and never silently truncate a command offered for approval. Check agent configuration side effects as well as explicit sandbox/approval parameters. Keep typed, synthetic audio, physical audio, artifact existence and real browser behavior as separate evidence.

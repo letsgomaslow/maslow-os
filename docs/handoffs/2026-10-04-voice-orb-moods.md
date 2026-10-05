@@ -1,6 +1,16 @@
-# Voice orb eye moods (Moodstone port, step 1)
+# Voice orb moods, Obsidian notes and conversation flow
 
 Date: 2026-10-04. Goal: make the orb's face expressive by porting the eye choreography of [Moodstone](https://github.com/karacca/moodstone) (MIT, reviewed at `5d3d2568`, release 1.0.1) into the native QML orb, keeping Maslow's audio-reactive body, mouth, theme colors and fallback renderer. This is step 1 of the orb plan agreed in conversation; lighting (step 2), Voice-specific moods such as listening lean-in and needs-approval (step 3) and task moods on the face (step 4) remain.
+
+
+**Iteration status (October 5): closed as good enough, not complete.** The person asked to stop here and move to other areas. Runtime branch `codex/voice-orb-moods` is merged into `main` and pushed to GitHub; the recipe branch `voice-orb-moods` in `maslow-os-pkgs` (`0.1.5-33`) is pushed as a backup and not merged into `maslow`. Local `maslow-voice 0.1.5-33` is installed on the Lenovo. Nothing is published.
+
+## Iteration summary
+
+- **Orb:** Moodstone-derived eye moods (MIT) plus Maslow's own listening, speaking and wake moods that follow the live voice level; frame-clock animation; listening/thinking/speaking shown only after 250 ms so flicks within a turn do not jitter the orb or status text.
+- **Obsidian notes:** `write_note` sends the whole conversation, plus recent web task answers, to a background Codex in the open vault, which writes structured notes and, when useful, a linked research note with sources. Codex's first-use folder trust question is answered by voice.
+- **Conversation flow:** actions answer Gemini within 0.8 s and finish in the background; updates carry the agent's closing message, not its terminal screen; a dropped Gemini session reconnects quietly with the conversation; follow-up tool calls cannot loop or produce false errors.
+- **Open issue:** the person reported speech stopping mid-sentence around multi-step website requests, even with the microphone muted. It could not be reproduced. See "Known issue: speech cut off around actions" below for the playbook.
 
 ## What changed
 
@@ -84,6 +94,33 @@ Evidence: 432 Python tests OK (two expected skips); real Gemini text session wit
 
 The person reported that speech still stops mid-sentence around multi-step website requests, with the microphone physically muted. Their 19:47–19:56 sessions had no Gemini drops, and every action answered within 1 s. Six recorded real Gemini sessions through a fake sound card did not reproduce it (details in `voice/docs/execution.md`); synthetic espeak speech was misheard, so spoken turns, where Gemini may talk before acting, remain untested. `f7593996` tells Gemini to act first or finish its sentence and to batch actions, and adds a word-free speech timeline to the journal (`Voice speech state`, `Voice speech interrupted`, `Voice speech gap`). 434 Python tests OK (two expected skips). Recipe `43678b8` (`0.1.5-32`), archive SHA-256 `d0658245677fbce1bdf57740ab7a45ea609e74efd201b3d971269be32f427180`; installed with 0 altered of 9126 files; Voice idle immediately before restart; plugin rescanned; conversation ready.
 
+## Final fix and release (0.1.5-33)
+
+While the speech timeline harness (`voice/dev/speech_trace.py`, now in the repository) was being checked, it caught a new defect: a slow action's `started` answer made Gemini call the tool again from its follow-up; that call was refused and Gemini told the person the action had failed although the browser had opened. `7f3769b8` tells Gemini to treat a started action as done and makes the refusal say an earlier action is already under way. Three harness runs then gave a correct, complete answer each. 433 Python tests OK (two expected skips); orb, UI, controller and launcher checks pass. Recipe `6c3e0b8` (`0.1.5-33`), archive SHA-256 `172e959213103fd0d726caecae22216289dda81d5ef91678be2904253a6ebabc`. Installed with 0 altered of 9126 files; Voice was confirmed idle in the same command that restarted it; the plugin was rescanned behind the unlocked guard and points at `0.1.5-33/Panel.qml`; conversation readiness is true.
+
+## Known issue: speech cut off around actions
+
+Reported on October 4 and not reproduced. The person heard Maslow stop mid-sentence while working on multi-step website requests and continue later, also with the microphone physically muted, so it is not barge-in. Ruled out with recorded real Gemini sessions: typed multi-action requests (Gemini acts first, then speaks one answer), job updates (they wait for the end of speech), full CPU load (no playback gap), launch scripts (no audio side effects) and discarded generations (never logged in production). The leading hypothesis is Gemini calling a tool mid-sentence in spoken turns, which typed tests cannot show; `f7593996` instructs it to act first or finish the sentence.
+
+If it is reported again:
+1. Ask for the approximate time, then read the journal around it: `journalctl --user -u maslow-voice --since <time-2min> --until <time+2min> | grep -E "Voice (speech|action|notice|reconnecting)"`.
+2. Interpret the timeline:
+   - `Voice speech gap <s>` while speaking, close to a `Voice action … started`: Gemini paused its own reply for a tool call. Consider buffering the reply across tool calls, or answering instantly for opens.
+   - `Voice speech interrupted`: something counted as the person speaking; check echo and the input path.
+   - `Voice reconnecting`: a Gemini server drop (1011), recovered automatically; check how often it happens.
+   - None of these: the cut is outside the daemon; record the screen with sound (`omarchy screenrecord`) and compare.
+3. Try to reproduce with `voice/dev/speech_trace.py` and the same request. Spoken turns need a real person or a better synthetic voice than espeak.
+
+## Remaining gates
+
+- The person has not tested `0.1.5-31` to `0.1.5-33` (smooth flow, reconnect, false-error fix) by voice.
+- Speech cut-off around actions (above).
+- Gemini 1011 drops: the cause is unconfirmed; reconnect hides them, at most twice per three minutes.
+- Orb lighting (step 2) and task moods on the face (step 4) were not done; the orb gallery and harness are ready for them.
+- Claude Code and Hermes are not used as note writers (Codex only).
+- Carried over from the agent-terminal iteration: orb/Work view for web jobs, tidying finished browsers, Claude live keys, structured agent status instead of screen reading, memory and the wake-word decision.
+- Release work (package merge to `maslow`, signing, channel promotion, ISO) remains separately authorized.
+
 ## Next action
 
-The person reproduces a cut-off once and notes the time; read the `Voice speech` and `Voice action` journal lines around it to identify the cause.
+When Voice work resumes: have the person try one spoken session with a multi-step website request and a note on `0.1.5-33`, and if speech is cut, follow the playbook above.

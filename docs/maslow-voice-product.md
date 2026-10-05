@@ -96,6 +96,19 @@ Closed as good enough, not complete; see the [handoff](handoffs/2026-10-03-voice
 - **Verify plugin paths end to end.** Gemini 3.8 broke on the plugin's instruction injection. A raw API trial passed while the real session failed.
 - **Continuity is the daemon's job:** short sessions with a briefing, not an always-open paid connection. A local wake word is the candidate next step.
 
+## October orb, notes and flow iteration: what we learned
+
+Closed as good enough, not complete; see the [handoff](handoffs/2026-10-04-voice-orb-moods.md).
+
+- **Change what people actually see.** The first orb port changed only states a Gemini conversation rarely shows; the person rightly saw no difference. Listening and speaking are where the time goes.
+- **Flicker comes from upstream.** Agents flick between listening, thinking and speaking inside one turn. Settle those states before drawing them, and animate on the frame clock.
+- **Notes need the person's words, not a summary.** The daemon hands the agent the whole conversation and any research already done; Gemini only says what the note should be. The agent reads the vault, interprets subtext, marks inferences and only creates files.
+- **Never make the voice wait for the desktop.** Gemini Live is silent until each tool answers. Answer fast and finish in the background; say only failures and questions. Gemini's non-blocking tool mode did not help with 3.8.
+- **Word refusals carefully.** "Please repeat" caused a 30-call retry loop; "started" without "treat it as done" caused a false error report. Tool results are instructions to the model whether we mean them to be or not.
+- **Plan for server drops.** Gemini's 1011 errors are intermittent and unexplained; a quiet reconnect with the conversation is better than "Connection lost".
+- **Instrument before guessing.** Speech cut-offs could not be reproduced; a word-free speech timeline in the journal and a fake-sound-card harness now exist for the next report.
+- **Check state immediately before a restart.** A service restart once ended a conversation that had started after an earlier idle check.
+
 ## Remaining acceptance and iteration order
 
 1. Physical Lenovo journey: real microphone/speaker, one spoken new-app request, unrelated conversation during work, one spoken and one typed correction, understandable pause-time updates and a short reviewed recording. Check original transcript, task identity and resulting requirement; do not substitute typed/synthetic input.
