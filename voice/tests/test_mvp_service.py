@@ -475,24 +475,113 @@ class MvpServiceTests(unittest.IsolatedAsyncioTestCase):
         self.assertIn("do not greet the person", briefing)
         self.assertIn("assistant: Which park do you mean?", briefing)
         self.assertNotIn("has been restored", self.service.briefing())
-        # A second drop reconnects too; a third inside the window is reported.
-        for expected in (False, True):
-            self.service.session_started -= 60
-            await self.service.provider_event({"type": "error", "code": "GEMINI_CONNECTION_FAILED", "message": "Gemini Voice disconnected."})
-            await asyncio.gather(*self.service.work, return_exceptions=True)
-            self.assertEqual(self.service.provider is None, expected)
+        # Later drops reconnect too, until every attempt in the window is used.
+        with patch("maslow_voice.daemon.RECONNECT_DELAYS", (0, 0, 0, 0)):
+            for expected in (False, False, False, True):
+                await self.service.provider_event({"type": "error", "code": "GEMINI_CONNECTION_FAILED", "message": "Gemini Voice disconnected."})
+                await asyncio.gather(*self.service.work, return_exceptions=True)
+                self.assertEqual(self.service.provider is None, expected)
         self.assertEqual(self.service.voice["error"], "Gemini Voice disconnected.")
 
-    async def test_failed_start_or_other_errors_are_not_retried(self):
-        for code, started in (("GEMINI_CONNECTION_FAILED", 0), ("AUDIO_FAILED", 60)):
+    async def test_drop_right_after_start_is_retried_but_setup_and_audio_errors_are_not(self):
+        # Gemini's connection opens after start returns, so its failure can
+        # arrive at once; it is as momentary as a later drop.
+        self.service.session_started = time.monotonic()
+        await self.service.provider_event({"type": "error", "code": "GEMINI_CONNECTION_FAILED", "message": "Gemini Voice disconnected."})
+        await asyncio.gather(*self.service.work, return_exceptions=True)
+        self.assertIsNotNone(self.service.provider)
+        self.assertEqual(len(self.service.reconnects), 1)
+        for code in ("GEMINI_SETUP_REJECTED", "AUDIO_FAILED"):
             if not self.service.provider:
                 await self.service.start_voice(audio=False)
-            self.service.session_started = time.monotonic() - started
             await self.service.provider_event({"type": "error", "code": code, "message": "Voice needs attention."})
             await asyncio.gather(*self.service.work, return_exceptions=True)
             self.assertIsNone(self.service.provider, code)
             self.assertEqual(self.service.voice["error"], "Voice needs attention.")
-        self.assertEqual(self.service.reconnects, [])
+        self.assertEqual(len(self.service.reconnects), 1)
+
+    def flaky_factory(self, failures, code="GEMINI_CONNECTION_FAILED"):
+        """A provider factory whose first starts fail the way Gemini's do."""
+        attempts = []
+        class Flaky(FakeProvider):
+            async def start(self, audio=True):
+                attempts.append(code)
+                if len(attempts) <= failures:
+                    await self.emit({"type": "voice_state", "state": "connecting", "microphone": False})
+                    await self.emit({"type": "error", "code": code, "message": "Gemini Voice disconnected."})
+                    raise VoiceError(code, "Gemini Voice disconnected.")
+                await super().start(audio)
+        self.service.provider_factory = Flaky
+        return attempts
+
+    async def test_failed_start_is_retried_quietly_until_it_connects(self):
+        await self.service.end_voice()
+        attempts = self.flaky_factory(2)
+        captions = []
+        original = self.service.publish
+        async def publish():
+            captions.append((self.service.voice["state"], self.service.voice.get("action_caption")))
+            await original()
+        self.service.publish = publish
+        self.service.internet_ready = AsyncMock(return_value=True)
+        with patch("maslow_voice.daemon.RECONNECT_DELAYS", (0, 0, 0, 0)):
+            await self.service.dispatch({"action": "start_voice"})
+        self.assertEqual(len(attempts), 3)
+        self.assertIsNotNone(self.service.provider)
+        self.assertEqual(self.service.voice["error"], "")
+        self.assertNotIn("action_caption", self.service.voice)
+        self.assertIn(("connecting", "Connecting…"), captions)
+
+    async def test_start_reports_the_failure_after_the_last_attempt(self):
+        await self.service.end_voice()
+        attempts = self.flaky_factory(10)
+        self.service.internet_ready = AsyncMock(return_value=True)
+        with patch("maslow_voice.daemon.RECONNECT_DELAYS", (0, 0, 0, 0)):
+            with self.assertRaises(VoiceError):
+                await self.service.dispatch({"action": "start_voice"})
+        self.assertEqual(len(attempts), 4)
+        self.assertIsNone(self.service.provider)
+        self.assertEqual(self.service.voice["error"], "Gemini Voice disconnected.")
+        self.assertNotIn("action_caption", self.service.voice)
+
+    async def test_rejected_setup_is_not_retried(self):
+        await self.service.end_voice()
+        attempts = self.flaky_factory(10, "GEMINI_SETUP_REJECTED")
+        # The error event ends Voice at once, which cancels the start request.
+        with self.assertRaises((VoiceError, asyncio.CancelledError)):
+            await self.service.dispatch({"action": "start_voice"})
+        await asyncio.gather(*self.service.work, return_exceptions=True)
+        self.assertEqual(len(attempts), 1)
+        self.assertIsNone(self.service.provider)
+        self.assertEqual(self.service.voice["error"], "Gemini Voice disconnected.")
+
+    async def test_start_waits_for_internet_before_retrying(self):
+        await self.service.end_voice()
+        attempts = self.flaky_factory(1)
+        self.service.internet_ready = AsyncMock(side_effect=[False, True])
+        captions = []
+        original = self.service.publish
+        async def publish():
+            captions.append(self.service.voice.get("action_caption"))
+            await original()
+        self.service.publish = publish
+        with patch("maslow_voice.daemon.RECONNECT_DELAYS", (0, 0, 0, 0)):
+            await self.service.dispatch({"action": "start_voice"})
+        self.assertEqual(len(attempts), 2)
+        self.assertIn("Waiting for internet…", captions)
+        self.assertNotIn("action_caption", self.service.voice)
+
+    async def test_ending_voice_during_the_reconnect_pause_stays_ended(self):
+        self.service.session_started -= 60
+        with patch("maslow_voice.daemon.RECONNECT_DELAYS", (5, 5, 5, 5)):
+            await self.service.provider_event({"type": "error", "code": "GEMINI_CONNECTION_FAILED", "message": "Gemini Voice disconnected."})
+            await asyncio.sleep(0.05)
+            self.assertEqual((self.service.voice["state"], self.service.voice.get("action_caption")), ("connecting", "Reconnecting…"))
+            await self.service.end_voice()
+            await asyncio.gather(*self.service.work, return_exceptions=True)
+        self.assertIsNone(self.service.provider)
+        self.assertEqual(self.service.voice["state"], "disabled")
+        self.assertNotIn("action_caption", self.service.voice)
 
     async def test_action_caption_fades_even_after_failure(self):
         seen = []

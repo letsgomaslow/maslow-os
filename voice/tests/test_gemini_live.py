@@ -365,6 +365,22 @@ class GeminiSdkTests(unittest.IsolatedAsyncioTestCase):
             self.assertEqual(error.code, expected)
             self.assertNotIn("secret-value", error.message)
 
+    def test_rejected_setup_is_distinct_from_a_dropped_connection(self):
+        rejected = SimpleNamespace(code=1007, message="tools[0] enum[0]: cannot be empty")
+        self.assertEqual(self.provider._public_error(rejected).code, "GEMINI_SETUP_REJECTED")
+        # The plugin raises its own error from Google's 1007 when it gives up.
+        try:
+            try:
+                raise ValueError("1007 None. invalid argument")
+            except ValueError as google:
+                google.code = 1007
+                raise RuntimeError("Gemini Live session context exhausted (1007)") from google
+        except RuntimeError as wrapped:
+            self.assertEqual(self.provider._public_error(wrapped).code, "GEMINI_SETUP_REJECTED")
+        dropped = SimpleNamespace(code=1011, message="Internal error encountered.")
+        self.assertEqual(self.provider._public_error(dropped).code, "GEMINI_CONNECTION_FAILED")
+        self.assertEqual(self.provider._public_error(TimeoutError("timed out during opening handshake")).code, "GEMINI_CONNECTION_FAILED")
+
 
 class GeminiServiceTests(unittest.IsolatedAsyncioTestCase):
     async def asyncSetUp(self):

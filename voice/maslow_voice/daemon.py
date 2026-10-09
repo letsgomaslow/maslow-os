@@ -40,9 +40,16 @@ TASK_NOTICE_SECONDS = 30
 # person's conversation mid-sentence. Actions answer within this time and
 # finish in the background, reporting only a failure or a question.
 ACTION_ANSWER_SECONDS = 0.8
-# A server-side drop (Gemini's 1011 "internal error") reconnects quietly with
-# the conversation so far, at most this many times per window.
-RECONNECT_LIMIT, RECONNECT_WINDOW = 2, 180
+# A dropped or failed Gemini connection (its 1011 "internal error", or a
+# network timeout) is usually momentary. Voice retries quietly with the
+# conversation so far, pausing longer before each attempt in the window, and
+# reports the failure only when every attempt fails. A rejected setup or an
+# account problem has its own code and is never retried.
+RECONNECT_DELAYS, RECONNECT_WINDOW = (0, 1, 3, 6), 300
+RETRYABLE_CODES = frozenset({"GEMINI_CONNECTION_FAILED"})
+# Just after boot or wake the network may still be coming up. Wait for it
+# rather than spending attempts on handshakes that cannot succeed.
+INTERNET_WAIT_SECONDS, INTERNET_HOST = 120, "generativelanguage.googleapis.com"
 PAUSABLE_MODES = frozenset({"gemini_live", "livekit", "openai"})
 
 
@@ -77,6 +84,7 @@ class VoiceService:
         self.last_conversation = {"ended": 0, "lines": [], "transcript": []}
         self.reconnects = []
         self.reconnecting = False
+        self.reconnect_task = None
         self.notes_vault = notes.find_vault
         self.task_view_request = {"task_id": "", "sequence": time.time_ns() // 1_000_000}
         self.task_attention = {"task_id": "", "sequence": self.task_view_request["sequence"]}
@@ -193,8 +201,10 @@ class VoiceService:
             self.voice["task_error"] = {"code": event.get("code"), "message": str(event.get("message", "Task needs setup."))[:300]}
         elif kind == "error":
             self.audit.record("error", session_id=self.session["id"], provider=self.settings.value["mode"], code=event.get("code"))
+            if self.voice["state"] == "connecting" and event.get("code") in RETRYABLE_CODES:
+                return  # The failing start raises too, and start_voice retries it.
             if self.provider and self.can_reconnect(event.get("code")):
-                self.background(self.reconnect_voice())
+                self.reconnect_task = self.background(self.reconnect_voice())
                 return
             self.voice.update(error=str(event.get("message", "Voice needs attention."))[:300], microphone=False)
             # A failed connection must release physical capture immediately.
@@ -778,24 +788,29 @@ class VoiceService:
                                             "guidance": "Read the question to the person briefly and wait for their answer."})
 
     def can_reconnect(self, code):
-        """Reconnect only a Gemini conversation that was running, a few times at most."""
-        if code != "GEMINI_CONNECTION_FAILED" or self.settings.value["mode"] != "gemini_live" or self.voice.get("paused"):
+        """Reconnect only a Gemini conversation that was running, a few times per window."""
+        if code not in RETRYABLE_CODES or self.settings.value["mode"] != "gemini_live" or self.voice.get("paused"):
             return False
-        if self.voice["state"] == "connecting" or time.monotonic() - self.session_started < 3:
-            return False  # A failed start is reported, not retried.
+        if self.voice["state"] == "connecting":
+            return False  # start_voice retries its own failures.
         now = time.monotonic()
         self.reconnects = [moment for moment in self.reconnects if now - moment < RECONNECT_WINDOW]
-        return len(self.reconnects) < RECONNECT_LIMIT
+        return len(self.reconnects) < len(RECONNECT_DELAYS)
 
     async def reconnect_voice(self):
         """Replace a dropped Gemini session, keeping the conversation and its mode."""
+        delay = RECONNECT_DELAYS[min(len(self.reconnects), len(RECONNECT_DELAYS) - 1)]
         self.reconnects.append(time.monotonic())
         audio, extended = self.voice["enabled"], self.voice.get("extended", False)
-        print("Voice reconnecting after a dropped Gemini session", file=sys.stderr, flush=True)
+        print(f"Voice reconnecting after a dropped Gemini session in {delay}s", file=sys.stderr, flush=True)
         await self._stop_provider()
-        self.voice["action_caption"] = "Reconnecting…"
+        # "connecting" lets a click during the pause end Voice instead of
+        # starting a second conversation; end_voice cancels this task.
+        self.voice.update(state="connecting", action_caption="Reconnecting…")
         self.reconnecting = True
         try:
+            await self.publish()
+            await asyncio.sleep(delay)
             await self.start_voice(audio=audio)
             self.voice["extended"] = extended
             self.voice.pop("action_caption", None)
@@ -808,6 +823,10 @@ class VoiceService:
             await self.end_voice(preserve_error=True)
         finally:
             self.reconnecting = False
+            if self.voice.get("action_caption") in {"Reconnecting…", "Waiting for internet…"}:
+                self.voice.pop("action_caption", None)
+            if self.reconnect_task is asyncio.current_task():
+                self.reconnect_task = None
 
     APPROVE_WORDS = re.compile(r"\b(approve|approved|yes|yeah|yep|allow|accept|okay|ok|sure|proceed|confirm|go ahead|do it|trust it)\b")
     DENY_WORDS = re.compile(r"\b(deny|denied|no|nope|don't|dont|do not|reject|decline|cancel|block|refuse|stop)\b")
@@ -1071,6 +1090,45 @@ class VoiceService:
         return await self.hermes.ensure(task)
 
     async def start_voice(self, *, audio=True, project="", context=""):
+        """Start a conversation, retrying a momentary connection failure quietly."""
+        caption = "" if self.reconnecting else "Connecting…"
+        try:
+            for attempt, delay in enumerate((*RECONNECT_DELAYS[1:], None), start=1):
+                try:
+                    return await self._start_voice_attempt(audio=audio, project=project, context=context)
+                except VoiceError as error:
+                    if delay is None or error.code not in RETRYABLE_CODES:
+                        raise
+                print(f"Voice connection attempt {attempt} failed, retrying in {delay}s", file=sys.stderr, flush=True)
+                # "connecting" lets a click during the pause cancel this start.
+                self.voice.update(state="connecting", error="")
+                if caption:
+                    self.voice["action_caption"] = caption
+                await self.publish()
+                await self.wait_for_internet()
+                await asyncio.sleep(delay)
+        finally:
+            if caption and self.voice.get("action_caption") in {caption, "Waiting for internet…"}:
+                self.voice.pop("action_caption", None)
+
+    async def wait_for_internet(self):
+        """Wait, up to a limit, while Gemini's address cannot be looked up."""
+        deadline = time.monotonic() + INTERNET_WAIT_SECONDS
+        while not await self.internet_ready() and time.monotonic() < deadline:
+            if self.voice.get("action_caption") != "Waiting for internet…":
+                self.voice["action_caption"] = "Waiting for internet…"
+                await self.publish()
+            await asyncio.sleep(2)
+
+    @staticmethod
+    async def internet_ready():
+        try:
+            await asyncio.wait_for(asyncio.get_running_loop().getaddrinfo(INTERNET_HOST, 443), 3)
+            return True
+        except (OSError, asyncio.TimeoutError):
+            return False
+
+    async def _start_voice_attempt(self, *, audio=True, project="", context=""):
         async with self.lifecycle_lock:
             self.startup_task = asyncio.current_task()
             epoch = None
@@ -1200,6 +1258,8 @@ class VoiceService:
         pending = set(self.conversation_requests)
         if self.startup_task:
             pending.add(self.startup_task)
+        if self.reconnect_task:
+            pending.add(self.reconnect_task)
         for task in pending:
             if task is not current and not task.done():
                 task.cancel()

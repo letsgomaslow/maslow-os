@@ -208,4 +208,13 @@ class LiveKitGeminiProvider(LiveKitNativeExpressiveProvider):
             return ProviderError("Gemini Voice support is not installed. Repair Voice through Hub.", "LOCAL_DEPENDENCY_MISSING")
         if type(cause).__name__ == "PortAudioError":
             return ProviderError("Microphone or speaker access failed. Check the selected audio devices.", "AUDIO_UNAVAILABLE")
+        # 1007 means Google refused the session setup itself, such as a tool
+        # schema it no longer accepts. Retrying sends the same setup, so it is
+        # reported instead of being treated as a dropped connection.
+        chain = cause
+        while chain is not None:
+            if getattr(chain, "code", None) == 1007 or "(1007)" in str(chain):
+                return ProviderError("Gemini rejected Maslow's voice setup. Update Maslow Voice through Hub, then try again.",
+                                     "GEMINI_SETUP_REJECTED")
+            chain = getattr(chain, "__cause__", None)
         return ProviderError("Gemini Voice disconnected. Check internet access and Google AI Studio availability, then try again.", "GEMINI_CONNECTION_FAILED")
