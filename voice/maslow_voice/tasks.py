@@ -317,6 +317,13 @@ class TaskManager:
             if task["state"] not in TERMINAL:
                 raise VoiceError("TASK_ACTIVE", "Finish or stop this task before dismissing it.")
             result = self.store.update(task_id, dismissed=True)
+        elif operation == "acknowledge":
+            # Seen, not removed: the outcome leaves the orb's badge but stays
+            # in Work for later review. A task that needs a decision cannot be
+            # acknowledged away.
+            if task["state"] not in TERMINAL:
+                raise VoiceError("TASK_ACTIVE", "This task still needs you. Review it before hiding it.")
+            result = self.store.update(task_id, acknowledged=True)
         elif operation == "continue":
             if task["state"] not in TERMINAL | {"waiting_input"}:
                 raise VoiceError("TASK_ACTIVE", "Use Redirect while this task is running.")
@@ -334,7 +341,7 @@ class TaskManager:
                 if not resume_thread_id:
                     raise VoiceError("CODEX_RESUME_UNAVAILABLE", "This Codex task has no saved thread to continue. Start a new task instead.")
             result = self.store.update(task_id, state="queued", run_id=None, attempt=task.get("attempt", 0) + 1, brief=brief,
-                                       error=None, dismissed=False, resume_thread_id=resume_thread_id,
+                                       error=None, dismissed=False, acknowledged=False, resume_thread_id=resume_thread_id,
                                        resume_required=bool(resume_thread_id))
             self._start(result)
         elif operation == "cancel" and task["state"] in {"queued", "proposed"}:

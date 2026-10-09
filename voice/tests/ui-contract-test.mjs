@@ -326,7 +326,7 @@ runInNewContext(`${actionFunction}; taskAction({id:"task"}, "open_folder"); task
 assert.deepEqual(sent[2], { action: "task_action", id: "task", operation: "open_folder", text: "" });
 assert.deepEqual(sent[3], { action: "task_action", id: "task", operation: "open_artifact", text: "tracker.html" });
 const selectTaskFunction = panel.match(/function selectTask\(task\) \{[\s\S]*?\n  \}/)[0];
-const selectContext = { selectedTaskId: "", taskAction: (task, operation) => { selectContext.action = { task, operation }; }, focusSelectedTaskInstruction: () => { selectContext.focused = true; }, Qt: { callLater: (callback) => callback() } };
+const selectContext = { selectedTaskId: "", isOutcome: () => false, taskAction: (task, operation) => { selectContext.action = { task, operation }; }, focusSelectedTaskInstruction: () => { selectContext.focused = true; }, Qt: { callLater: (callback) => callback() } };
 runInNewContext(`${selectTaskFunction}; selectTask({id:"chosen"});`, selectContext);
 assert.equal(selectContext.selectedTaskId, "chosen");
 assert.equal(selectContext.action.task.id, "chosen");
@@ -449,7 +449,8 @@ for (const [settledState, liveState, waits] of [["listening", "thinking", true],
 assert.match(panel, /id: stateSettle; interval: 250/);
 assert.match(panel, /settledState === "listening" && voice\.microphone !== true \? "muted" : settledState/);
 const needsApprovalFunction = panel.match(/function needsApproval\(task\) \{[\s\S]*?\n  \}/)[0];
-const badgeFunction = panel.match(/function badgeForTasks\(items\) \{[\s\S]*?\n  \}/)[0];
+const isOutcomeFunction = panel.match(/function isOutcome\(state\) \{[\s\S]*?\n  \}/)[0];
+const badgeFunction = isOutcomeFunction + "\n" + panel.match(/function badgeForTasks\(items, now\) \{[\s\S]*?\n  \}/)[0];
 const states = ["running", "completed", "failed", "waiting_input", "awaiting_approval"];
 for (let end = 1; end <= states.length; end++) {
   const tasks = states.slice(0, end).map(state => ({id: state, state}));
@@ -460,6 +461,32 @@ for (let end = 1; end <= states.length; end++) {
 const pendingApproval = runInNewContext(`${needsApprovalFunction}; ${badgeFunction}; badgeForTasks(items);`, {items: [{id: "result", state: "completed"}, {id: "approval", state: "running", approval: {request_id: "request-1"}}]});
 assert.equal(pendingApproval.id, "approval");
 assert.equal(pendingApproval.text, "! Review approval");
+const badgeAt = (items, now) => runInNewContext(`${needsApprovalFunction}; ${badgeFunction}; badgeForTasks(items, now);`, {items, now});
+const now = 1_000_000;
+assert.equal(badgeAt([{id: "failed", state: "failed", updated_at: now - 60}], now).dismissible, true, "A fresh failure shows and can be hidden");
+assert.equal(badgeAt([{id: "failed", state: "failed", updated_at: now - 60, acknowledged: true}], now), null, "A seen failure leaves the orb");
+assert.equal(badgeAt([{id: "failed", state: "failed", updated_at: now - 3601}], now), null, "A finished outcome ages out after an hour");
+assert.equal(badgeAt([{id: "old", state: "failed", updated_at: now - 3601}, {id: "done", state: "completed", updated_at: now - 10}], now).id, "done", "A hidden outcome reveals the next one");
+for (const task of [{id: "approval", state: "running", approval: {request_id: "r"}, updated_at: now - 9999, acknowledged: true}, {id: "input", state: "waiting_input", updated_at: now - 9999}, {id: "proposed", state: "proposed", updated_at: now - 9999}]) {
+  const badge = badgeAt([task], now);
+  assert.equal(badge.id, task.id, "Work awaiting a decision never hides");
+  assert.equal(badge.dismissible, false, "Work awaiting a decision has no hide button");
+}
+assert.match(panel, /readonly property var taskBadge: badgeForTasks\(tasks, badgeClock\)/);
+assert.match(panel, /Timer \{ interval: 60000; running: true; repeat: true; onTriggered: root\.badgeClock = Date\.now\(\) \/ 1000 \}/);
+assert.match(panel, /id: badgeDismissButton[\s\S]*?visible: root\.taskBadge !== null && root\.taskBadge\.dismissible === true[\s\S]*?onClicked: root\.dismissBadge\(\)/);
+assert.match(panel, /Region \{ item: badgeDismissButton\.visible \? badgeDismissButton : null/, "The hide button is inside the input mask");
+const dismissBadgeFunction = panel.match(/function dismissBadge\(\) \{[\s\S]*?\n  \}/)[0];
+for (const [taskBadge, expected] of [[{id: "f", dismissible: true}, [["f", "acknowledge"]]], [{id: "a", dismissible: false}, []], [null, []]]) {
+  const actions = [];
+  runInNewContext(`${dismissBadgeFunction}; dismissBadge();`, {taskBadge, taskAction: (task, operation) => actions.push([task.id, operation])});
+  assert.deepEqual(actions, expected, "Hide acknowledges only finished outcomes");
+}
+for (const [task, expected] of [[{id: "f", state: "failed"}, ["select", "acknowledge"]], [{id: "s", state: "failed", acknowledged: true}, ["select"]], [{id: "r", state: "running"}, ["select"]]]) {
+  const operations = [];
+  runInNewContext(`${isOutcomeFunction}; ${selectTaskFunction}; selectTask(task);`, {task, selectedTaskId: "", taskAction: (_task, operation) => operations.push(operation), Qt: {callLater: () => {}}});
+  assert.deepEqual(operations, expected, "Opening a finished task in Work marks it seen");
+}
 assert.match(panel, /acceptedButtons: Qt.LeftButton \| Qt.RightButton/);
 assert.match(panel, /pressAndHoldInterval: 650/);
 assert.match(panel, /if \(dragging\) return[\s\S]*root\.openDetails\(\)/);
@@ -469,9 +496,13 @@ assert.match(panel, /onClicked: root.openBadgeTask\(\)/);
 assert.match(panel, /model: root.displayedTasks/);
 assert.match(panel, /selectedTask \? \[selectedTask\]\.concat/);
 const openBadgeFunction = panel.match(/function openBadgeTask\(\) \{[\s\S]*?\n  \}/)[0];
-const badgeContext = {taskBadge: {id: "priority-task"}, selectedTaskId: "other-task", taskAction: (task, operation) => { badgeContext.selection = {id: task.id, operation}; }, open: () => {}, focusSelectedTaskInstruction: () => {}, Qt: {callLater: callback => callback()}};
+const badgeContext = {taskBadge: {id: "priority-task"}, selectedTaskId: "other-task", taskAction: (task, operation) => { if (operation === "select") badgeContext.selection = {id: task.id, operation}; else badgeContext.other = operation; }, open: () => {}, focusSelectedTaskInstruction: () => {}, Qt: {callLater: callback => callback()}};
 runInNewContext(`${openBadgeFunction}; openBadgeTask();`, badgeContext);
 assert.deepEqual(badgeContext.selection, {id: "priority-task", operation: "select"}, "Badge selection must match the daemon's spoken task target");
+assert.equal(badgeContext.other, undefined, "Opening a decision badge does not acknowledge it");
+const outcomeBadgeContext = {taskBadge: {id: "failed-task", dismissible: true}, selectedTaskId: "", operations: [], taskAction: (task, operation) => outcomeBadgeContext.operations.push(operation), open: () => {}, focusSelectedTaskInstruction: () => {}, Qt: {callLater: callback => callback()}};
+runInNewContext(`${openBadgeFunction}; openBadgeTask();`, outcomeBadgeContext);
+assert.deepEqual(outcomeBadgeContext.operations, ["select", "acknowledge"], "Opening a finished outcome from its badge marks it seen");
 assert.match(panel, /id: talkAction;[\s\S]*onClicked: root.startFromOrb\(\)/);
 const microphoneFunction = panel.match(/function microphoneText\(\) \{[\s\S]*?\n  \}/)[0];
 for (const [state, microphone, expected] of [

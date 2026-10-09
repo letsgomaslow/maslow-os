@@ -1658,7 +1658,8 @@ class VoiceService:
                     self.store.update(task["id"], export_review=await asyncio.to_thread(self.offline.workspace.review))
             else:
                 await self.tasks.action(task["id"], operation, request.get("text", ""), request.get("approval_id"))
-                self.watch_gemini_task(task["id"])
+                if operation != "acknowledge":
+                    self.watch_gemini_task(task["id"])
         await self.publish()
         return {}
 

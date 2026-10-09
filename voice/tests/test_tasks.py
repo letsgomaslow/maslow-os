@@ -68,7 +68,7 @@ class HermesTests(unittest.IsolatedAsyncioTestCase):
         with tempfile.TemporaryDirectory() as root:
             store = TaskStore(root)
             task, _ = store.create("continue-codex", BRIEF, root, "gemini_live", "Fix navigation")
-            task = store.update(task["id"], state="completed", selected_agent="codex", capabilities={"steer": True, "continue": True},
+            task = store.update(task["id"], state="completed", selected_agent="codex", capabilities={"steer": True, "continue": True}, acknowledged=True,
                                 children=[{"id": "child-1", "tool": "codex", "thread_id": "thread-saved", "status": "completed"}])
             client = Client()
             manager = TaskManager(store, AsyncMock(return_value=client), AsyncMock())
@@ -80,6 +80,29 @@ class HermesTests(unittest.IsolatedAsyncioTestCase):
             self.assertEqual(client.submitted["resume_thread_id"], "thread-saved")
             self.assertTrue(client.submitted["resume_required"])
             self.assertEqual(store.get(task["id"])["result"], "continued")
+            self.assertFalse(store.get(task["id"])["acknowledged"], "A continued task's next outcome is new again")
+            await manager.close()
+            store.close()
+
+    async def test_acknowledging_a_finished_task_keeps_it_for_review(self):
+        with tempfile.TemporaryDirectory() as root:
+            store = TaskStore(root)
+            manager = TaskManager(store, AsyncMock(), AsyncMock())
+            failed, _ = store.create("seen-failure", BRIEF, root, "gemini_live", "Fix navigation")
+            self.assertFalse(failed["acknowledged"])
+            store.update(failed["id"], state="failed", error={"code": "EXECUTION_FAILED", "message": "Codex could not complete the task."})
+            await manager.action(failed["id"], "acknowledge")
+            seen = store.get(failed["id"])
+            self.assertTrue(seen["acknowledged"])
+            self.assertFalse(seen["dismissed"], "Seen work stays listed for review")
+            self.assertEqual((seen["state"], seen["error"]["code"]), ("failed", "EXECUTION_FAILED"))
+
+            waiting, _ = store.create("needs-answer", BRIEF, root, "gemini_live", "Build tracker")
+            store.update(waiting["id"], state="waiting_input")
+            with self.assertRaises(VoiceError) as raised:
+                await manager.action(waiting["id"], "acknowledge")
+            self.assertEqual(raised.exception.code, "TASK_ACTIVE")
+            self.assertFalse(store.get(waiting["id"]).get("acknowledged"))
             await manager.close()
             store.close()
 

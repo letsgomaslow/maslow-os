@@ -142,7 +142,10 @@ Item {
   readonly property bool orbManuallyPositioned: effectiveOrbPosition !== null
   readonly property bool conversation: voice.paused === true || ["connecting", "thinking", "listening", "speaking", "talking", "conversation", "paused"].indexOf(String(voice.state || "")) >= 0
   readonly property bool supportsPause: ["gemini_live", "livekit", "openai"].indexOf(String(settings.mode || "")) >= 0
-  readonly property var taskBadge: badgeForTasks(tasks)
+  readonly property var taskBadge: badgeForTasks(tasks, badgeClock)
+  // Advances once a minute so finished-work badges can age out.
+  property real badgeClock: Date.now() / 1000
+  Timer { interval: 60000; running: true; repeat: true; onTriggered: root.badgeClock = Date.now() / 1000 }
   property int completionSequence: 0
   property var previousTaskStates: ({})
   readonly property bool working: tasks.some(function(task) {
@@ -243,7 +246,12 @@ Item {
   function endFromOrb(hadConversation) {
     if (hadConversation) send("end_voice")
   }
-  function badgeForTasks(items) {
+  // A finished outcome leaves the orb once seen, or an hour after the work
+  // finished; it stays in Work for review. Anything awaiting a decision stays.
+  function isOutcome(state) {
+    return ["completed", "failed", "interrupted", "cancelled"].indexOf(String(state || "")) >= 0
+  }
+  function badgeForTasks(items, now) {
     var ranks = { awaiting_approval: 0, waiting_input: 1, failed: 2, interrupted: 2, cancelled: 2, completed: 3, proposed: 4, queued: 4, submitting: 4, accepted: 4, running: 4, stopping: 4 }
     var labels = { awaiting_approval: "! Review approval", waiting_input: "? Input needed", failed: "! Work failed", interrupted: "! Work interrupted", cancelled: "■ Work stopped", completed: "✓ Result ready", proposed: "▷ Review task" }
     var chosen = null
@@ -251,18 +259,24 @@ Item {
     for (var index = 0; index < items.length; index++) {
       var task = items[index]
       var state = needsApproval(task) ? "awaiting_approval" : task.state
+      var finished = Number(task.updated_at || 0)
+      if (isOutcome(state) && (task.acknowledged === true || (now > 0 && finished > 0 && now - finished > 3600))) continue
       var nextRank = ranks[state]
       if (nextRank !== undefined && nextRank < rank) {
         rank = nextRank
-        chosen = { id: String(task.id), state: state, text: labels[state] || "⋯ Working", rank: rank }
+        chosen = { id: String(task.id), state: state, text: labels[state] || "⋯ Working", rank: rank, dismissible: isOutcome(state) }
       }
     }
     return chosen
+  }
+  function dismissBadge() {
+    if (taskBadge && taskBadge.dismissible) taskAction({ id: taskBadge.id }, "acknowledge")
   }
   function openBadgeTask() {
     if (!taskBadge) return
     selectedTaskId = taskBadge.id
     taskAction({ id: taskBadge.id }, "select")
+    if (taskBadge.dismissible) taskAction({ id: taskBadge.id }, "acknowledge")
     open(JSON.stringify({ page: "tasks" }))
     Qt.callLater(function() { focusSelectedTaskInstruction() })
   }
@@ -374,6 +388,7 @@ Item {
   function selectTask(task) {
     selectedTaskId = String((task || {}).id || "")
     taskAction(task, "select")
+    if (isOutcome((task || {}).state) && task.acknowledged !== true) taskAction(task, "acknowledge")
     Qt.callLater(function() { focusSelectedTaskInstruction() })
   }
   function focusSelectedTaskInstruction() {
@@ -794,6 +809,7 @@ Item {
       item: orbButton
       Region { item: statusButton; intersection: Intersection.Combine }
       Region { item: taskBadgeButton.visible ? taskBadgeButton : null; intersection: Intersection.Combine }
+      Region { item: badgeDismissButton.visible ? badgeDismissButton : null; intersection: Intersection.Combine }
       Region { item: root.controllerOpen ? card : null; intersection: Intersection.Combine }
     }
 
@@ -936,15 +952,34 @@ Item {
       id: taskBadgeButton
       visible: root.taskBadge !== null
       text: root.taskBadge ? root.taskBadge.text : ""
-      width: Math.min(180, panelWindow.width - 32)
+      // The badge and its hide button stay centred under the orb as a group.
+      readonly property real groupWidth: Math.min(180, panelWindow.width - 32)
+      width: groupWidth - (badgeDismissButton.visible ? badgeDismissButton.width + 4 : 0)
       height: 30
-      x: Math.max(16, Math.min(panelWindow.width - width - 16, orbButton.x + orbButton.width / 2 - width / 2))
+      x: Math.max(16, Math.min(panelWindow.width - groupWidth - 16, orbButton.x + orbButton.width / 2 - groupWidth / 2))
       y: panelWindow.labelsAbove ? statusButton.y - height - 4 : Math.min(panelWindow.height - height - 16, statusButton.y + statusButton.height + 4)
       focusPolicy: Qt.StrongFocus
       Accessible.name: text + ". Open Work details"
       background: Rectangle { color: root.surfaceColor; radius: 12; border.width: 1; border.color: parent.activeFocus ? root.textColor : (root.taskBadge && root.taskBadge.rank < 3 ? root.alertTextColor : root.accentTextColor) }
       contentItem: Text { text: parent.text; color: root.textColor; font.pixelSize: 12; horizontalAlignment: Text.AlignHCenter; verticalAlignment: Text.AlignVCenter }
       onClicked: root.openBadgeTask()
+    }
+    Button {
+      id: badgeDismissButton
+      visible: root.taskBadge !== null && root.taskBadge.dismissible === true
+      text: "×"
+      width: 30
+      height: 30
+      x: taskBadgeButton.x + taskBadgeButton.width + 4
+      y: taskBadgeButton.y
+      focusPolicy: Qt.StrongFocus
+      Accessible.name: "Hide this notice. It stays in Work for review."
+      ToolTip.visible: hovered
+      ToolTip.delay: 500
+      ToolTip.text: "Hide · still listed in Work"
+      background: Rectangle { color: root.surfaceColor; radius: 15; border.width: 1; border.color: parent.activeFocus ? root.textColor : root.borderColor }
+      contentItem: Text { text: parent.text; color: root.secondaryTextColor; font.pixelSize: 16; horizontalAlignment: Text.AlignHCenter; verticalAlignment: Text.AlignVCenter }
+      onClicked: root.dismissBadge()
     }
 
     Rectangle {
@@ -1044,6 +1079,7 @@ Item {
                 spacing: 12
                 Text { text: "Coordinated tasks"; color: root.textColor; font.family: "Manrope"; font.pixelSize: 22; Accessible.role: Accessible.Heading }
                 Text { visible: root.tasks.length === 0; text: "No tasks are being coordinated yet."; color: root.secondaryTextColor; font.family: "Manrope" }
+                Text { visible: root.tasks.length > 0; text: "Finished work stays here for review until you dismiss it."; color: root.secondaryTextColor; font.family: "Manrope"; wrapMode: Text.Wrap; Layout.fillWidth: true }
                 Repeater {
                   model: root.displayedTasks
                   delegate: Rectangle {

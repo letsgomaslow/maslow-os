@@ -51,7 +51,7 @@ class TaskStore:
             now = time.time()
             data = dict(payload, id=task_id, request_id=request_id, title=brief["objective"][:160], summary=brief["summary"],
                         state="queued", run_id=None, session_id=None, owner="Maslow", children=[], result="", error=None,
-                        approval=None, dismissed=False, selected_agent=None, routing_reason="",
+                        approval=None, dismissed=False, acknowledged=False, selected_agent=None, routing_reason="",
                         created_at=now, updated_at=now, attempt=0)
             self.db.execute("INSERT INTO tasks VALUES (?,?,?,?,?,?)", (task_id, request_id, fingerprint, "queued", json.dumps(data), now))
             self._event(task_id, "queued", {"state": "queued"})
