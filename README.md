@@ -6,6 +6,14 @@ Maslow OS is based on [Omarchy](https://omarchy.org/) and [Arch Linux](https://a
 
 > **In development:** `0.1.0-preview.1`. The current installer is an internal x86_64 preview. There is no public installer release yet.
 
+## What makes Maslow different
+
+- **Maslow Hub** is the home for your AI setup. It shows which agents are installed and signed in, checking with each provider instead of asking you to vouch for it. It also delivers signed Hub updates you can roll back.
+- **Maslow Voice** lets you talk to your computer. Describe what you want, and Voice hands the work to Codex, Claude Code or Hermes, keeps the work visible, and asks you before anything that needs your permission. Press **Super+H** to start talking.
+- **You stay in control.** Agents explain what they can do before their first autonomous launch, approvals are always yours, and provider sign-in stays in each provider's own flow.
+
+Voice and Hub are preview features that are still being tested on hardware.
+
 ## Which computers is it for?
 
 The main target is **64-bit Intel and AMD PCs**, including laptops, desktops, and x86_64 virtual machines. **It is not Apple-only.**
