@@ -27,7 +27,7 @@ The Orb stays a simple, stable entry point. Microphone/conversation state and ba
 | Step | What the person does | What Maslow owns |
 | --- | --- | --- |
 | Connect | Complete supported provider and agent setup | Show conversation readiness separately from agent installation, authentication and permissions; retain supported billing routes |
-| Converse | Click the Orb and talk, or type a message | Keep ordinary discussion free of task/project requirements; do not turn brainstorming into execution |
+| Converse | Click the Orb and talk, or type a message; click again to pause, double-click to end | Keep ordinary discussion free of task/project requirements; do not turn brainstorming into execution |
 | Open an app | Say “Open Codex,” Browser, Files, Hub or Terminal | Use bounded registered targets, observe the window and refocus it on repeated requests; report setup or launch failure honestly |
 | Delegate | Say “Build a simple calculator app using Codex” | Preserve original words, prepare the brief, resolve/create a workspace, bind it to a durable task record, return a receipt promptly and show actual job activity |
 | Stay involved | Discuss another topic, ask for progress or give a correction | Keep conversation available; route typed and spoken instructions through the same task-control path and exact running turn |
