@@ -238,6 +238,11 @@ Item {
       send("end_voice")
     } else requestVoiceStart()
   }
+  // A double-click ends the conversation. Its first click has already paused
+  // or resumed; a double-click on an idle orb only starts Voice.
+  function endFromOrb(hadConversation) {
+    if (hadConversation) send("end_voice")
+  }
   function badgeForTasks(items) {
     var ranks = { awaiting_approval: 0, waiting_input: 1, failed: 2, interrupted: 2, cancelled: 2, completed: 3, proposed: 4, queued: 4, submitting: 4, accepted: 4, running: 4, stopping: 4 }
     var labels = { awaiting_approval: "! Review approval", waiting_input: "? Input needed", failed: "! Work failed", interrupted: "! Work interrupted", cancelled: "■ Work stopped", completed: "✓ Result ready", proposed: "▷ Review task" }
@@ -801,7 +806,7 @@ Item {
       y: root.orbManuallyPositioned ? root.orbPixel(root.effectiveOrbPosition.y, panelWindow.height, height) : parent.height - height - 20
       focusPolicy: Qt.StrongFocus
       Accessible.name: "Maslow Voice, " + root.stateText()
-      Accessible.description: "Drag to move the Voice Orb. Space or Enter starts, pauses or resumes. Right-click, hold, or Shift+F10 opens details."
+      Accessible.description: "Drag to move the Voice Orb. Space or Enter starts, pauses or resumes. Double-click or double-tap ends the conversation. Right-click, hold, or Shift+F10 opens details."
       Keys.onPressed: function(event) {
         if (event.key === Qt.Key_F10 && (event.modifiers & Qt.ShiftModifier)) { root.openDetails(); event.accepted = true }
         else if (event.key === Qt.Key_Escape) { root.close(); event.accepted = true }
@@ -834,6 +839,7 @@ Item {
         pressAndHoldInterval: 650
         property bool dragging: false
         property bool suppressClick: false
+        property bool clickHadConversation: false
         property real pressSceneX: 0
         property real pressSceneY: 0
         property real startOrbX: 0
@@ -896,7 +902,14 @@ Item {
             return
           }
           if (mouse.button === Qt.RightButton) root.openDetails()
-          else root.startFromOrb()
+          else {
+            clickHadConversation = root.conversation
+            root.startFromOrb()
+          }
+          mouse.accepted = true
+        }
+        onDoubleClicked: function(mouse) {
+          if (mouse.button === Qt.LeftButton && !dragging && !root.orbLongPress) root.endFromOrb(clickHadConversation)
           mouse.accepted = true
         }
       }

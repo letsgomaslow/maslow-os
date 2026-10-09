@@ -413,6 +413,14 @@ for (const voice of [{state: "connecting", enabled: true}, {state: "listening", 
   assert.equal(sent[0].action, "toggle_voice");
   assert.equal(context.controllerOpen, undefined, "Activation never opens details");
 }
+const endFromOrbFunction = panel.match(/function endFromOrb\(hadConversation\) \{[\s\S]*?\n  \}/)[0];
+for (const [hadConversation, expected] of [[true, [{ action: "end_voice" }]], [false, []]]) {
+  const sent = [];
+  runInNewContext(`${endFromOrbFunction}; endFromOrb(${hadConversation});`, { send: (action, body) => sent.push({ action, ...body }) });
+  assert.deepEqual(sent, expected, hadConversation ? "Double-click ends a running conversation" : "Double-click on an idle orb only starts Voice");
+}
+assert.match(panel, /clickHadConversation = root\.conversation\s*\n\s*root\.startFromOrb\(\)/, "A click remembers whether a conversation was running before it acted");
+assert.match(panel, /onDoubleClicked: function\(mouse\) \{\s*\n\s*if \(mouse\.button === Qt\.LeftButton && !dragging && !root\.orbLongPress\) root\.endFromOrb\(clickHadConversation\)/);
 const setupContext = { conversation: false, conversationReady: false, supportsPause: true, voice: {}, controller: {connectionLost: false}, send: () => assert.fail("unready orb must not start voice"), openSettings: () => assert.fail("only setup status opens settings") };
 runInNewContext(`${startFromOrbFunction}; startFromOrb();`, setupContext);
 assert.equal(setupContext.feedback, "Connect Voice to start a conversation.");
