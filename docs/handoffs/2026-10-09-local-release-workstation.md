@@ -85,7 +85,20 @@ The operator ran `sudo pacman -U` for each step; evidence is in `~/.local/share/
   - Panel back to `0.3.2/Panel.qml`; `check --manual` returns `ok`, up to date at sequence 6; rollback still available; shell PID unchanged; state preserved.
   - `pacman -Qkk` reports 2 "altered" directories (`usr/share/maslow-hub/catalog` and `observability`). The signed 0.3.2 package records them as 775 (built on macOS); the 0.3.3 container build set the stricter 755, and pacman does not loosen existing directory modes. The filesystem is stricter than 0.3.2's record; nothing else differs.
 - The installed runtime's `omarchy-launch-hub` predates the `voice` page (`Unknown Hub page`); runtime `main` already includes it.
-- **Not tested:** the over-the-air update path (Hub Update button through the privileged installer) to 0.3.3. It needs publication; publish only after the operator approves review `2c0237d9…`, then apply from Hub on the Lenovo and verify.
+### Publication and over-the-air acceptance (operator approved review `2c0237d9…`)
+- **Signing:** `maslow-release publish` (run `20261009T170029Z-publish`, tools `432f140`) signed the package, manifest (sequence 7) and catalog (sequence 3) with the operator's passphrase. It then stopped during the 475 MB `gh release create` upload, leaving a draft with only `review.json` and the signature (no tag, nothing public). Recovery hardening is not implemented yet: `publish` should resume an incomplete draft instead of refusing.
+- **Recovery:**
+  - Draft assets compared with the local signed files; all signed files re-verified against the pinned key.
+  - Package uploaded without `--clobber` (7m36s).
+  - Draft published at 2026-10-09T17:12:37Z with `immutable: true`; tag `sha256-b23f3e57…`.
+  - All three assets downloaded anonymously and matched byte for byte.
+- **Promotion:** the agent's attempt to push the channel was refused by Claude Code's permission policy (production deploy). The operator ran the promotion (`~/finish-hub-0.3.3-publish.py`, the tool's `promote()` with the same checks): `signed-staging` `fe01694` → `be994d1`; Pages serves sequence 7 with releases 0.1.3–0.3.3.
+- **Over-the-air on the Lenovo:**
+  - Hub check reported `update-available` 0.3.3; the operator clicked Apply update.
+  - Hub's privileged installer ran `pacman -U --needed --noconfirm /var/cache/maslow-hub/staging/…`, upgrading 0.3.2→0.3.3 at 17:08:38 (52 files, 0 altered).
+  - Quickshell PID 1578 unchanged; panel `0.3.3/Panel.qml`; history check ✓ and apply ✓ 0.3.2→0.3.3.
+  - Rollback available to 0.3.2; setup state unchanged; Voice reports `idle`, "Voice is ready…".
+  - Rollback via the Hub button was not exercised after this update.
 
 ## Remaining gates
 
