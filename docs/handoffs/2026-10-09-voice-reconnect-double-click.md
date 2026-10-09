@@ -44,6 +44,15 @@ The person reported a "! Work failed" badge that never went away; clicking it op
 - Commit `e5b88676` on branch `voice/badge-acknowledge` from `main` at `3263e778`. Built as `0.1.5-35` (package SHA-256 `da6b88f81bb4b798a99ffba3bdbdec3037ae16aac84eedcd0ea96bc69f900c1e`, logs in `voice-mvp-build/voice-badge-35/`) and installed; the service was restarted and the plugin points at `0.1.5-35/Panel.qml`.
 - Tests: 440 Python tests OK (two expected skips); UI contract, controller and orb contract tests passed with new badge, hide, age-out and acknowledge assertions. A desktop screenshot before install showed "! Work failed"; after install the badge was gone (the task finished on 2026-10-05) and the task remained listed. The × on a fresh outcome was not observed on screen yet.
 
+## Follow-up: the orb stands out from matching windows (0.1.5-37)
+
+The person showed the "Ready · click to talk" pill disappearing into a terminal with the same theme background: the pill was filled with the theme's popup background and had no border unless focused, and its fixed 280 px width hid the text behind it.
+
+- `Panel.qml`: the status pill, task badge and × button have a 1.5 px accent outline and a `MultiEffect` shadow (`chromeShadowColor`: an accent glow when the surface luminance is below 0.18, otherwise a dark shadow). The orb glows from a plain accent circle at 60% of its size behind it; an earlier build (`0.1.5-36`) put the effect on a layer over the orb's shader and was replaced. The pill fits its text. The idle "Ready · click to talk" label shows only while the orb or pill is hovered or focused (700 ms hide delay); hidden, it leaves the input mask.
+- Commit `ce18c669` on branch `voice/orb-contrast` from `main` at `536f36be`. Built as `0.1.5-37` (package SHA-256 `9d7847e731003c3797204e16c66ed66c61e83bd013b823186eb07b31eec369a9`, logs in `voice-mvp-build/voice-contrast-37/`) and installed; the plugin points at `0.1.5-37/Panel.qml`.
+- Tests: UI contract (new outline, shadow, glow, fit and idle-label assertions), controller and orb contract tests passed; `qmllint` reports no new errors. Screenshots over the dark terminal show the glowing orb with the idle label hidden.
+- Not verified: a light theme or light window behind the orb (not changed on the person's desktop), the hover reveal on screen (the pointer was not moved again after one test moved it while the person was working), and touch. During one plugin reload a teal square showed behind the orb for about a second while the panel opened; it was not caused by the new layers and may be the orb shader's first frame. Whether it predates this change is unconfirmed.
+
 ## Remaining gates and next action
 
 - Advance the recipe in `maslow-os-pkgs` to `0.1.5-34` before any package publication.
