@@ -35,6 +35,15 @@ Date: 2026-10-05 to 2026-10-09. Goal: find out from the installed Voice logs why
 - The person tested the installed 0.1.5-34 and confirmed it worked.
 - Not reproduced on demand: a real 1011 drop, a real network outage and touch double-tap. The reconnect paths are covered by unit tests; field evidence will come from the journal (`Voice reconnecting`, `Voice connection attempt`) and `~/.local/state/maslow-voice/voice-audit.jsonl`.
 
+## Follow-up: finished-work badges can be hidden (0.1.5-35)
+
+The person reported a "! Work failed" badge that never went away; clicking it opened the Voice panel. It came from the 2026-10-05 Codex calculator task, which stayed un-dismissed because Dismiss existed only on the selected task card in Work.
+
+- `tasks.py`/`store.py`: new `acknowledge` task action for finished tasks (`acknowledged=True`, not `dismissed`); refused with `TASK_ACTIVE` for work that still needs the person. `continue` clears it. The daemon does not start a Gemini task relay for it.
+- `Panel.qml`: outcome badges hide when seen (opened from the badge or the Work list), when the new × beside the badge is clicked, or an hour after the work finished (`badgeClock`, refreshed each minute). Approval, input and proposal badges never hide and have no ×. The × is in the layer input mask. Work says "Finished work stays here for review until you dismiss it."
+- Commit `e5b88676` on branch `voice/badge-acknowledge` from `main` at `3263e778`. Built as `0.1.5-35` (package SHA-256 `da6b88f81bb4b798a99ffba3bdbdec3037ae16aac84eedcd0ea96bc69f900c1e`, logs in `voice-mvp-build/voice-badge-35/`) and installed; the service was restarted and the plugin points at `0.1.5-35/Panel.qml`.
+- Tests: 440 Python tests OK (two expected skips); UI contract, controller and orb contract tests passed with new badge, hide, age-out and acknowledge assertions. A desktop screenshot before install showed "! Work failed"; after install the badge was gone (the task finished on 2026-10-05) and the task remained listed. The × on a fresh outcome was not observed on screen yet.
+
 ## Remaining gates and next action
 
 - Advance the recipe in `maslow-os-pkgs` to `0.1.5-34` before any package publication.
