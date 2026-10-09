@@ -421,6 +421,19 @@ for (const [hadConversation, expected] of [[true, [{ action: "end_voice" }]], [f
 }
 assert.match(panel, /clickHadConversation = root\.conversation\s*\n\s*root\.startFromOrb\(\)/, "A click remembers whether a conversation was running before it acted");
 assert.match(panel, /onDoubleClicked: function\(mouse\) \{\s*\n\s*if \(mouse\.button === Qt\.LeftButton && !dragging && !root\.orbLongPress\) root\.endFromOrb\(clickHadConversation\)/);
+// Floating labels must stand out from windows that share the theme background.
+for (const id of ["statusButton", "taskBadgeButton", "badgeDismissButton"]) {
+  const block = panel.match(new RegExp(`id: ${id}[\\s\\S]*?onClicked`))[0];
+  assert.match(block, /border\.width: parent\.activeFocus \? 2 : 1\.5/, `${id} always has an outline`);
+  assert.match(block, /layer\.effect: MultiEffect \{ shadowEnabled: true; shadowColor: root\.chromeShadowColor/, `${id} has a shadow or glow`);
+}
+assert.match(panel, /width: \(orbButton\.width - 16\) \* 0\.6;[\s\S]*?layer\.effect: MultiEffect \{ shadowEnabled: true; shadowColor: root\.chromeShadowColor[\s\S]*?\n      \}\n      contentItem: VoiceOrb/, "The orb glows from a circle behind it");
+assert.doesNotMatch(panel.match(/contentItem: VoiceOrb \{[\s\S]*?\n      \}/)[0], /layer\./, "No layer over the orb shader");
+assert.match(panel, /chromeShadowColor: luminance\(surfaceColor\) < 0\.18\s*\n\s*\? Qt\.rgba\(Color\.accent\.r, Color\.accent\.g, Color\.accent\.b, 0\.55\) : Qt\.rgba\(0, 0, 0, 0\.4\)/, "Dark themes glow in the accent; light themes cast a dark shadow");
+assert.match(panel, /width: Math\.min\(280, panelWindow\.width - 32, statusLabel\.implicitWidth \+ 4\)/, "The status pill fits its words");
+assert.match(panel, /readonly property bool statusQuiet: stateText\(\) === "Ready · click to talk"/, "Only the idle ready label hides");
+assert.match(panel, /opacity: root\.statusQuiet && !root\.statusRevealed \? 0 : 1/);
+assert.match(panel, /Region \{ item: statusButton\.visible \? statusButton : null/, "A hidden label does not take clicks");
 const setupContext = { conversation: false, conversationReady: false, supportsPause: true, voice: {}, controller: {connectionLost: false}, send: () => assert.fail("unready orb must not start voice"), openSettings: () => assert.fail("only setup status opens settings") };
 runInNewContext(`${startFromOrbFunction}; startFromOrb();`, setupContext);
 assert.equal(setupContext.feedback, "Connect Voice to start a conversation.");

@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Controls
+import QtQuick.Effects
 import QtQuick.Layouts
 import Quickshell
 import Quickshell.Wayland
@@ -17,6 +18,12 @@ Item {
   readonly property color accentTextColor: readableColor(Color.accent, controlColor)
   readonly property color alertTextColor: readableColor(Color.urgent, controlColor)
   readonly property color selectionTextColor: contrastingText(Color.accent)
+  // The orb's labels float over windows that share the theme background, so
+  // they carry an accent outline and a soft shadow: dark on light themes, an
+  // accent glow on dark ones, where a dark shadow would be invisible.
+  readonly property color chromeBorderColor: accentTextColor
+  readonly property color chromeShadowColor: luminance(surfaceColor) < 0.18
+    ? Qt.rgba(Color.accent.r, Color.accent.g, Color.accent.b, 0.55) : Qt.rgba(0, 0, 0, 0.4)
 
   function mixColor(first, second, amount) {
     return Qt.rgba(first.r * amount + second.r * (1 - amount), first.g * amount + second.g * (1 - amount), first.b * amount + second.b * (1 - amount), 1)
@@ -111,6 +118,16 @@ Item {
   readonly property var displayedTasks: selectedTask ? [selectedTask].concat(tasks.filter(function(task) { return String(task.id) !== selectedTaskId })) : tasks
   readonly property var selectedTask: tasks.find(function(task) { return String(task.id || "") === selectedTaskId }) || null
   readonly property bool reducedMotion: settings.reduced_motion === true
+  // While Voice is idle and ready, only the orb shows; hovering or focusing it
+  // reveals the label. Every other state keeps its label visible.
+  readonly property bool statusQuiet: stateText() === "Ready · click to talk"
+  property bool statusRevealed: false
+  readonly property bool statusHovered: orbPointer.containsMouse || statusHover.hovered || orbButton.activeFocus || statusButton.activeFocus
+  onStatusHoveredChanged: {
+    if (statusHovered) { statusHideDelay.stop(); statusRevealed = true }
+    else statusHideDelay.restart()
+  }
+  Timer { id: statusHideDelay; interval: 700; onTriggered: root.statusRevealed = root.statusHovered }
   readonly property bool fixedPosition: settings.fixed_position === true
   readonly property bool automaticWorkspaces: String(settings.mode || "") === "gemini_live"
   readonly property bool offlineMode: String(settings.mode || "") === "offline"
@@ -807,7 +824,7 @@ Item {
     color: "transparent"
     mask: Region {
       item: orbButton
-      Region { item: statusButton; intersection: Intersection.Combine }
+      Region { item: statusButton.visible ? statusButton : null; intersection: Intersection.Combine }
       Region { item: taskBadgeButton.visible ? taskBadgeButton : null; intersection: Intersection.Combine }
       Region { item: badgeDismissButton.visible ? badgeDismissButton : null; intersection: Intersection.Combine }
       Region { item: root.controllerOpen ? card : null; intersection: Intersection.Combine }
@@ -828,6 +845,17 @@ Item {
         else if (event.key === Qt.Key_Escape) { root.close(); event.accepted = true }
       }
       background: Item {}
+      // The same soft shadow or glow lifts the orb off matching windows. It
+      // comes from a plain circle inside the body, not a layer over the orb's
+      // shader, which could capture an empty square before the shader loads.
+      Rectangle {
+        z: -1
+        anchors.centerIn: parent
+        width: (orbButton.width - 16) * 0.6; height: width; radius: width / 2
+        color: Color.accent
+        layer.enabled: true
+        layer.effect: MultiEffect { shadowEnabled: true; shadowColor: root.chromeShadowColor; shadowBlur: 1.0; shadowScale: 1.3; shadowVerticalOffset: 1 }
+      }
       contentItem: VoiceOrb {
         width: orbButton.width - 16; height: width
         accentColor: Color.accent
@@ -935,14 +963,23 @@ Item {
     Button {
       id: statusButton
       text: (root.nativePreviewFixtureMode ? "UI preview · " : "") + root.stateText()
-      width: Math.min(280, panelWindow.width - 32)
+      // Fit the words: a wide empty pill only hides what is behind it.
+      width: Math.min(280, panelWindow.width - 32, statusLabel.implicitWidth + 4)
       height: 30
+      opacity: root.statusQuiet && !root.statusRevealed ? 0 : 1
+      visible: opacity > 0
+      Behavior on opacity { enabled: !root.reducedMotion; NumberAnimation { duration: 150 } }
+      HoverHandler { id: statusHover }
       x: Math.max(16, Math.min(panelWindow.width - width - 16, orbButton.x + orbButton.width / 2 - width / 2))
       y: panelWindow.labelsAbove ? orbButton.y - height - 4 : Math.min(panelWindow.height - height - 16, orbButton.y + orbButton.height + 4)
       focusPolicy: Qt.StrongFocus
       Accessible.name: text
-      background: Rectangle { color: root.surfaceColor; radius: 12; border.width: parent.activeFocus ? 2 : 0; border.color: root.accentTextColor }
-      contentItem: Text { text: parent.text; color: root.textColor; font.pixelSize: 12; elide: Text.ElideRight; leftPadding: 10; rightPadding: 10; horizontalAlignment: Text.AlignHCenter; verticalAlignment: Text.AlignVCenter }
+      background: Rectangle {
+        color: root.surfaceColor; radius: 12; border.width: parent.activeFocus ? 2 : 1.5; border.color: root.chromeBorderColor
+        layer.enabled: true
+        layer.effect: MultiEffect { shadowEnabled: true; shadowColor: root.chromeShadowColor; shadowBlur: 0.6; shadowVerticalOffset: 1 }
+      }
+      contentItem: Text { id: statusLabel; text: parent.text; color: root.textColor; font.pixelSize: 12; elide: Text.ElideRight; leftPadding: 10; rightPadding: 10; horizontalAlignment: Text.AlignHCenter; verticalAlignment: Text.AlignVCenter }
       onClicked: {
         if (!root.conversationReady && !root.conversation && !root.voice.error && !controller.connectionLost) root.openSettings("Connect Voice")
         else root.startFromOrb()
@@ -960,7 +997,12 @@ Item {
       y: panelWindow.labelsAbove ? statusButton.y - height - 4 : Math.min(panelWindow.height - height - 16, statusButton.y + statusButton.height + 4)
       focusPolicy: Qt.StrongFocus
       Accessible.name: text + ". Open Work details"
-      background: Rectangle { color: root.surfaceColor; radius: 12; border.width: 1; border.color: parent.activeFocus ? root.textColor : (root.taskBadge && root.taskBadge.rank < 3 ? root.alertTextColor : root.accentTextColor) }
+      background: Rectangle {
+        color: root.surfaceColor; radius: 12; border.width: parent.activeFocus ? 2 : 1.5
+        border.color: parent.activeFocus ? root.textColor : (root.taskBadge && root.taskBadge.rank < 3 ? root.alertTextColor : root.chromeBorderColor)
+        layer.enabled: true
+        layer.effect: MultiEffect { shadowEnabled: true; shadowColor: root.chromeShadowColor; shadowBlur: 0.6; shadowVerticalOffset: 1 }
+      }
       contentItem: Text { text: parent.text; color: root.textColor; font.pixelSize: 12; horizontalAlignment: Text.AlignHCenter; verticalAlignment: Text.AlignVCenter }
       onClicked: root.openBadgeTask()
     }
@@ -977,7 +1019,11 @@ Item {
       ToolTip.visible: hovered
       ToolTip.delay: 500
       ToolTip.text: "Hide · still listed in Work"
-      background: Rectangle { color: root.surfaceColor; radius: 15; border.width: 1; border.color: parent.activeFocus ? root.textColor : root.borderColor }
+      background: Rectangle {
+        color: root.surfaceColor; radius: 15; border.width: parent.activeFocus ? 2 : 1.5; border.color: parent.activeFocus ? root.textColor : root.chromeBorderColor
+        layer.enabled: true
+        layer.effect: MultiEffect { shadowEnabled: true; shadowColor: root.chromeShadowColor; shadowBlur: 0.6; shadowVerticalOffset: 1 }
+      }
       contentItem: Text { text: parent.text; color: root.secondaryTextColor; font.pixelSize: 16; horizontalAlignment: Text.AlignHCenter; verticalAlignment: Text.AlignVCenter }
       onClicked: root.dismissBadge()
     }
