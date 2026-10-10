@@ -66,8 +66,10 @@ An Apple Silicon Mac cannot run this ISO natively. Emulation is a development-on
 Use the desktop update action or run:
 
 ```bash
-omarchy update
+maslow update
 ```
+
+`maslow` is Maslow OS's command name; every `omarchy …` command keeps working too. If a package download stalls, the update retries once on its own and keeps what already downloaded.
 
 The preview temporarily holds back Maslow's desktop packages so upstream packages do not replace them. Other system packages can still update. Do not bypass this protection or switch update channels. A long-term Maslow update and recovery path is still being developed.
 
