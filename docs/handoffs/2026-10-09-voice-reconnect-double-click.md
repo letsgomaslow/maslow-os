@@ -55,6 +55,6 @@ The person showed the "Ready · click to talk" pill disappearing into a terminal
 
 ## Remaining gates and next action
 
-- Advance the recipe in `maslow-os-pkgs` to `0.1.5-34` before any package publication.
+- Recipe: `maslow-os-pkgs` branch `voice-orb-moods` advanced from `0.1.5-33` to `0.1.5-37` in `3814c81` (pushed; identical to the recipe that built the installed package). It is not merged into the product branch `maslow` and nothing is published.
 - Not done: buffering microphone audio during a reconnect, the same retry policy for the OpenAI Realtime provider, provider failover for BYOK users with more than one key, a free-key notice in setup, and keeping the reason when a Codex task fails.
 - **Next action:** after a few days of normal use, compare the audit log's drops and recoveries with the 2026-09-19 to 2026-10-05 baseline above.
