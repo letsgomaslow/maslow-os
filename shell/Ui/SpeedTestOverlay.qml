@@ -4,6 +4,7 @@ import QtQuick.Shapes
 import Quickshell
 import Quickshell.Wayland
 import qs.Commons
+import qs.Commons as Theme
 import qs.Ui
 
 // Centered speed test overlay shared by the network and disk speed tests. No
@@ -288,7 +289,7 @@ PanelWindow {
       // round caps would leave a stray dot at the foot of the scale.
       ShapePath {
         strokeWidth: dial.arcWidth * 3
-        strokeColor: dial.arcVisible ? Qt.rgba(Color.accent.r, Color.accent.g, Color.accent.b, 0.18) : "transparent"
+        strokeColor: dial.arcVisible ? Qt.rgba(Theme.Color.accent.r, Theme.Color.accent.g, Theme.Color.accent.b, 0.18) : "transparent"
         fillColor: "transparent"
         capStyle: ShapePath.RoundCap
 
@@ -305,7 +306,7 @@ PanelWindow {
       // Value: fills behind the needle.
       ShapePath {
         strokeWidth: dial.arcWidth
-        strokeColor: dial.arcVisible ? Color.accent : "transparent"
+        strokeColor: dial.arcVisible ? Theme.Color.accent : "transparent"
         fillColor: "transparent"
         capStyle: ShapePath.RoundCap
 
@@ -356,8 +357,8 @@ PanelWindow {
         radius: width / 2
 
         gradient: Gradient {
-          GradientStop { position: 0.0; color: Color.accent }
-          GradientStop { position: 0.55; color: Color.accent }
+          GradientStop { position: 0.0; color: Theme.Color.accent }
+          GradientStop { position: 0.55; color: Theme.Color.accent }
           GradientStop { position: 1.0; color: "transparent" }
         }
       }

@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Controls as QQC
 import qs.Commons
+import qs.Commons as Theme
 
 // Searchable single-select dropdown. Same trigger shape as Dropdown, but
 // the popup leads with an embedded TextField that filters the option
@@ -25,11 +26,11 @@ Item {
   property string emptyText: "No matches"
   property string triggerLabel: ""
 
-  property color foreground: Color.popups.text
-  property color background: Color.popups.background
-  property color popupBorder: Color.popups.border
-  property color accent: Color.accent
-  readonly property var popupBorderSpec: Border.localOrSurfaceSpec("popups", "border", popupBorder, Color.popups.border, Style.normalBorderWidth)
+  property color foreground: Theme.Color.popups.text
+  property color background: Theme.Color.popups.background
+  property color popupBorder: Theme.Color.popups.border
+  property color accent: Theme.Color.accent
+  readonly property var popupBorderSpec: Border.localOrSurfaceSpec("popups", "border", popupBorder, Theme.Color.popups.border, Style.normalBorderWidth)
   property string fontFamily: Style.font.family
   property int rowHeight: Style.spacing.controlHeight
   property int popupRowHeight: Style.spacing.popupRowHeight

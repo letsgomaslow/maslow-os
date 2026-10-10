@@ -2,6 +2,7 @@ import Quickshell
 import Quickshell.Wayland
 import QtQuick
 import qs.Commons
+import qs.Commons as Theme
 import qs.Ui
 import "ReminderFlowModel.js" as ReminderFlowModel
 
@@ -18,11 +19,11 @@ Item {
   property string filterText: ""
   property string fontFamily: Style.font.menuFamily
 
-  property color background: Color.menu.background
-  property color foreground: Color.menu.text
-  property color border: Color.menu.border
+  property color background: Theme.Color.menu.background
+  property color foreground: Theme.Color.menu.text
+  property color border: Theme.Color.menu.border
   property var borderSpec: Border.surfaceSpec("menu", "border", border, Math.max(1, Style.space(2)))
-  property color scrim: Color.menu.scrim
+  property color scrim: Theme.Color.menu.scrim
   readonly property int cornerRadius: Style.cornerRadius
   property int contentMargin: Style.spacing.panelPadding
   property int headerHeight: Math.max(Style.space(34), Style.font.title + Style.spacing.controlPaddingY * 2)

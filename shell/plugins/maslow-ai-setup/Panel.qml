@@ -4,6 +4,7 @@ import QtQuick.Layouts
 import Quickshell
 import Quickshell.Io
 import qs.Commons
+import qs.Commons as Theme
 import qs.Ui
 
 Item {
@@ -45,10 +46,10 @@ Item {
   property var codexChoiceButton: null
   property var desktopHermesChoiceButton: null
 
-  readonly property color foreground: Color.foreground
-  readonly property color background: Color.background
-  readonly property color accent: Color.accent
-  readonly property color urgent: Color.urgent
+  readonly property color foreground: Theme.Color.foreground
+  readonly property color background: Theme.Color.background
+  readonly property color accent: Theme.Color.accent
+  readonly property color urgent: Theme.Color.urgent
   readonly property color subdued: Qt.rgba(foreground.r, foreground.g, foreground.b, 0.74)
   readonly property color line: Qt.rgba(foreground.r, foreground.g, foreground.b, 0.18)
   readonly property color softSurface: Qt.rgba(foreground.r, foreground.g, foreground.b, 0.055)
