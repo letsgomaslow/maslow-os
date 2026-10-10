@@ -1,8 +1,18 @@
-# Voice reconnect, internet wait and double-click to end
+# Voice reconnect, internet wait, double-click to end, hideable badges and orb contrast
 
 Date: 2026-10-05 to 2026-10-09. Goal: find out from the installed Voice logs why conversations fail, check whether the failures are Google's or Maslow's (including whether the Gemini free tier is to blame), fix the Maslow side, and let the person end a conversation with a double-click on the orb.
 
-**Status: implemented, installed locally as `maslow-voice 0.1.5-34`, tested by the person ("that worked") and merged to `main`.** The package recipe change (`pkgrel=34`) was made only in the local build copy; `maslow-os-pkgs` was not changed and nothing was published.
+**Status (2026-10-10): closed and merged.** All four changes are on `maslow-os` `main`, installed on the Lenovo as `maslow-voice 0.1.5-37` and confirmed by the person (reconnect and double-click: "that worked"; badges and contrast were asked to be merged after review). The `maslow-os-pkgs` recipe is `0.1.5-37` on branch `voice-orb-moods`; it is not merged into `maslow` and nothing is published.
+
+## Resume here
+
+- **Installed:** `maslow-voice 0.1.5-37` from `maslow-os` `ce18c669` (`main` has only documentation after it). Rollback packages for `0.1.5-33` to `0.1.5-36` are under `voice-mvp-build/` (`voice-good-enough-33`, `voice-reconnect-34`, `voice-badge-35`, `voice-contrast-36`, `voice-contrast-37`).
+- **Code:** reconnect and retry in `voice/maslow_voice/daemon.py` (`RECONNECT_DELAYS`, `RETRYABLE_CODES`, `start_voice`/`_start_voice_attempt`, `wait_for_internet`, `reconnect_voice`); 1007 classification in `providers/livekit_gemini.py` (`_public_error`); `acknowledge` task action in `tasks.py`; orb double-click, badge hiding and contrast in `voice/ui/Panel.qml` (`endFromOrb`, `badgeForTasks`, `dismissBadge`, `chromeShadowColor`, `statusQuiet`).
+- **Build and install a new candidate:** `git archive` the commit into `voice-mvp-build/<name>/runtime`, copy `maslow-os-pkgs/pkgbuilds/maslow-voice/PKGBUILD` with the next `pkgrel`, run `docker run --rm -v <dir>:/work -w /work/recipe -e OMARCHY_SRC=/work/runtime maslow-voice-builder:preferences makepkg -d -f`, then `pkexec pacman -U --noconfirm <package>`. Restart `maslow-voice` for Python changes. For UI changes, `touch "$XDG_RUNTIME_DIR/maslow-voice-refresh-pending"`, run `/usr/lib/maslow-voice/launch talk` and close the panel with `omarchy-shell shell hide maslow.voice`; check `/usr/share/maslow/plugins/maslow.voice/manifest.json` names the new revision.
+- **Test:** `PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=voice /usr/lib/maslow-voice/venv/bin/python -m unittest discover -s voice/tests -p 'test_*.py'` (440 OK, two expected skips at `0.1.5-35`; `0.1.5-36`/`-37` changed only QML and its contract test), then `node voice/tests/ui-contract-test.mjs`, `ui-controller-test.mjs` and `orb-contract-test.mjs`.
+- **Field evidence:** `journalctl --user -u maslow-voice` lines `Voice reconnecting`, `Voice connection attempt` and `Gemini server indicates disconnection soon`; `~/.local/state/maslow-voice/voice-audit.jsonl` (`session_started`, `session_ended`, `error` with `code`). Compare with the baseline under Iteration summary.
+- **Working with the person:** they use the Lenovo while agents work. Do not move the pointer or change their theme for visual checks; take passive `grim` screenshots instead. Ask before merging, pushing or publishing; they have approved fast-forward merges of `main` for each checkpoint so far.
+- **Open items:** see Remaining gates at the end and backlog rows V5 to V7 in [the development index](../maslow-development.md).
 
 ## Iteration summary
 
@@ -55,6 +65,8 @@ The person showed the "Ready · click to talk" pill disappearing into a terminal
 
 ## Remaining gates and next action
 
-- Recipe: `maslow-os-pkgs` branch `voice-orb-moods` advanced from `0.1.5-33` to `0.1.5-37` in `3814c81` (pushed; identical to the recipe that built the installed package). It is not merged into the product branch `maslow` and nothing is published.
-- Not done: buffering microphone audio during a reconnect, the same retry policy for the OpenAI Realtime provider, provider failover for BYOK users with more than one key, a free-key notice in setup, and keeping the reason when a Codex task fails.
+- Recipe: `maslow-os-pkgs` branch `voice-orb-moods` advanced from `0.1.5-33` to `0.1.5-37` in `3814c81` (pushed; identical to the recipe that built the installed package). Merging it into `maslow` and publishing need the person's separate approval.
+- Unverified on screen: the orb and labels over a light theme or light window, the hover reveal of the idle label, the badge × on a fresh outcome, and touch double-tap.
+- Unexplained: a teal square behind the orb for about a second while the panel opened during one plugin reload (see the contrast follow-up above). Reproduce on a reload with `0.1.5-35` (no contrast layers) to learn whether it predates the change.
+- Not done (backlog V5 to V7): buffering microphone audio during a reconnect, the same retry policy for the OpenAI Realtime provider, provider failover for BYOK users with more than one key, a free-key notice in setup, and keeping the reason when a Codex task fails (the 2026-10-05 calculator task stored only `EXECUTION_FAILED`).
 - **Next action:** after a few days of normal use, compare the audit log's drops and recoveries with the 2026-09-19 to 2026-10-05 baseline above.
