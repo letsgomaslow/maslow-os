@@ -35,6 +35,23 @@ if sudo env LC_ALL=C OMARCHY_UPDATE_PACMAN=1 pacman -Syu --noconfirm "${runtime_
 fi
 cat "$errors" >&2
 
+# A mirror that stalls on one large package makes pacman abandon the whole
+# upgrade after ten seconds without progress. Retry once without that cutoff;
+# pacman resumes partial downloads, and the held runtime stays held.
+if grep -q "failed retrieving file" "$errors" && [[ ${OMARCHY_UPDATE_DOWNLOAD_RETRY:-} != 1 ]]; then
+  echo -e "\e[33mA package download stalled. Retrying without the stall cutoff; finished downloads are kept.\e[0m"
+  if sudo env LC_ALL=C OMARCHY_UPDATE_PACMAN=1 pacman -Syu --noconfirm --disable-download-timeout "${runtime_hold_args[@]}" \
+    --overwrite '/usr/share/omarchy/*' 2>"$errors"; then
+    cat "$errors" >&2
+    exit 0
+  fi
+  cat "$errors" >&2
+  if grep -q "failed retrieving file" "$errors"; then
+    echo "A package mirror is still not delivering. Your system is unchanged; try the update again later." >&2
+    exit 1
+  fi
+fi
+
 # The handler takes it from here: it clears files pacman doesn't own yet and
 # runs this again, and puts a package conflict to whoever started the update.
 # Anything else, including a second failure, is for a human.
