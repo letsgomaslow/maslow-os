@@ -5,7 +5,8 @@
   "source_revisions": {
     "pdfcraft": "53a5880386789fc3531e54f6e6ffdef9a8e41f1a",
     "photocraft": "79261615956ab21334e49ca1d384390272e647da",
-    "connect-draft-rejected": "21fdf8ae46de11cfc8b0a634d4489cf6abd0e937"
+    "connect-draft-rejected": "21fdf8ae46de11cfc8b0a634d4489cf6abd0e937",
+    "connect-repair-under-review": "eb7012f338b3e7c3d8e29df27a33a363298c3426"
   },
   "artifacts": [
     {
@@ -19,7 +20,7 @@
       "upstream_tag": "v0.6.0",
       "upstream_revision": "53a5880386789fc3531e54f6e6ffdef9a8e41f1a",
       "upstream_archive_sha256": "9a136e71e37b459ed5746dbe19a364ce84cf5d995c6f6c98af6147d818390a53",
-      "evidence_status": "built-and-unpacked-smoke-only",
+      "evidence_status": "built-offline-container-install-cli-and-bounded-x11-wayland-gui; native-vm-hardware-and-integration-gates-open",
       "accepted_capabilities": []
     },
     {
@@ -33,7 +34,7 @@
       "upstream_tag": "v0.7.0",
       "upstream_revision": "79261615956ab21334e49ca1d384390272e647da",
       "upstream_archive_sha256": "641f831252fd31b43ee1a12e572d7442e5652c2e5bf623de085741c370f0c91d",
-      "evidence_status": "built-and-unpacked-smoke-only",
+      "evidence_status": "built-offline-container-install-cli-and-bounded-x11-wayland-gui; native-vm-hardware-and-integration-gates-open",
       "accepted_capabilities": []
     },
     {
