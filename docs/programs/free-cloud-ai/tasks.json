@@ -67,13 +67,13 @@
       "path": "/home/maslow/Projects/Maslow/free-ai-packages",
       "base_revision": "448856485e710caedfc24f544a027aea8652dd33",
       "branch": "codex/free-cloud-ai",
-      "implementation_revision": "2cfc7ad47731d37d4246ca69957aee6d4ac0c243"
+      "implementation_revision": "f4df4dad2da480ce95c7e53a3fc263b79a87c5c0"
     },
     "connect": {
-      "path": "/home/maslow/Projects/Maslow/free-ai-connect",
+      "path": "/home/maslow/Projects/Maslow/free-ai-connect-current",
       "base_revision": "7545ba68c0b6759a7f65c88ccb1390777df5b812",
-      "branch": "codex/free-cloud-ai-accounts",
-      "accepted_source_reference": "7545ba68c0b6759a7f65c88ccb1390777df5b812",
+      "branch": "codex/free-cloud-ai-connect-current",
+      "accepted_source_reference": "2e872f50a28706e70c159380e2b7186869415b7f",
       "native_package_accepted_for_this_program": false,
       "accepted_native_baseline": {
         "version": "0.1.0-3",
@@ -81,7 +81,14 @@
         "scope": "Craft source + native synthetic/container checks only; not FreeAI managed account/live acceptance"
       },
       "preserved_source_checkout": "/home/maslow/Projects/Maslow/craft-connect",
-      "implementation_revision": "646aa1149f36050a470ded7e3658ad0b0a38bcbb"
+      "implementation_revision": "97ac20eed146a8c6b37e33c2c29901a00f3045ff",
+      "previous_managed_worktree": "/home/maslow/Projects/Maslow/free-ai-connect",
+      "previous_managed_revision": "646aa1149f36050a470ded7e3658ad0b0a38bcbb",
+      "accepted_craft_native_reference": {
+        "version": "0.1.0-5",
+        "sha256": "a9ccb3a7d4577d673941dd717bfee23977f63a390f65a3ebad133f826cda68de",
+        "scope": "Craft bounded native container checks only; no managed account marker/live acceptance"
+      }
     },
     "iso": {
       "path": "/home/maslow/Projects/Maslow/maslow-os-iso",
@@ -474,31 +481,38 @@
       "status": "implementation-complete",
       "owner": "root",
       "session": "2026-10-11-free-cloud-ai-root",
-      "worker": "boundary_review",
-      "actual_model": "gpt-6-astra/high",
+      "worker": "root integration; boundary_review independent review",
+      "actual_model": "coordinator; gpt-6-astra/high independent review",
       "attempt": 1,
-      "last_checkpoint": "2026-10-11T15:56:05.839365+00:00",
-      "base_revision": "eb7012f",
-      "branch": null,
-      "worktree": "/home/maslow/Projects/Maslow/free-ai-connect",
+      "last_checkpoint": "2026-10-11T20:52:17.856Z",
+      "base_revision": "2e872f50a28706e70c159380e2b7186869415b7f",
+      "branch": "codex/free-cloud-ai-connect-current",
+      "worktree": "/home/maslow/Projects/Maslow/free-ai-connect-current",
       "implementation_commits": [
         "646aa1149f36050a470ded7e3658ad0b0a38bcbb"
       ],
-      "integration_commits": [],
+      "integration_commits": [
+        "97ac20eed146a8c6b37e33c2c29901a00f3045ff"
+      ],
       "tests": [
         {
           "check": "Owning checks328pass/10environmentskips; actualSDK mocked-HTTP serialization exactaccount-ID andfixedGET",
+          "result": "pass"
+        },
+        {
+          "check": "Accepted Craft2e872 plus managed646 replay:369pass/10existing skips, full typecheck/build; Astra preserves158unaffected baseline files, lock/manifests unchanged",
           "result": "pass"
         }
       ],
       "evidence": [
         "docs/programs/free-cloud-ai/evidence/2026-10-11-account-ui-source-checkpoint.json",
         "docs/programs/free-cloud-ai/evidence/2026-10-11-account-recovery-review.json",
-        "/home/maslow/Projects/Maslow/free-ai-connect/docs/evidence/2026-10-11-managed-accounts.json"
+        "/home/maslow/Projects/Maslow/free-ai-connect/docs/evidence/2026-10-11-managed-accounts.json",
+        "docs/programs/free-cloud-ai/evidence/2026-10-11-connect-current-integration.json"
       ],
       "artifact_hashes": {},
       "blocker": "No accepted managed native package/root marker/liveaccount proof.",
-      "next_action": "Reconcile additive CLI/accounts changes with accepted Craft lifecycle source before native package; require actual live metadata/binding."
+      "next_action": "Review additive candidate managed Connect package recipe, then native marker/self-contained package and real selected-account/revocation gates."
     },
     {
       "id": "FCAI-P4-RECOVERY",
@@ -657,6 +671,45 @@
       "artifact_hashes": {},
       "blocker": "Candidate remains not-ready until all required gates have direct evidence and independent review passes.",
       "next_action": "Finalize exact candidate manifest and operator release instructions"
+    },
+    {
+      "id": "FCAI-P3-CONNECT-PACKAGE",
+      "objective": "Prepare managed Connect package on the accepted Craft native5 source",
+      "repository": "packages",
+      "permitted_files": [
+        "pkgbuilds/maslow-connect/**"
+      ],
+      "dependencies": [
+        "FCAI-P3-CONNECT"
+      ],
+      "acceptance": "Exact accepted Craft lifecycle plus additive managed account source; fixed root-owned marker, unchanged dependencies/signature policy, self-contained deployed tree. Native and live acceptance remain separate.",
+      "phase": 3,
+      "status": "implementation-complete",
+      "owner": "root",
+      "session": "2026-10-11-free-cloud-ai-root",
+      "worker": "hub_worker",
+      "actual_model": "gpt-6.1-sol/medium",
+      "attempt": 1,
+      "last_checkpoint": "2026-10-11T20:54:58.343Z",
+      "base_revision": "2cfc7ad47731d37d4246ca69957aee6d4ac0c243",
+      "branch": "codex/free-cloud-ai",
+      "worktree": "/home/maslow/Projects/Maslow/free-ai-packages",
+      "implementation_commits": [
+        "f4df4dad2da480ce95c7e53a3fc263b79a87c5c0"
+      ],
+      "integration_commits": [],
+      "tests": [
+        {
+          "check": "Two marker tests including ten tamper inputs, syntax, owning packaging invariants, exact source/archive and accepted build/launcher preservation; Astra independent review plus eight capability validator controls",
+          "result": "pass"
+        }
+      ],
+      "evidence": [
+        "docs/programs/free-cloud-ai/evidence/2026-10-11-connect-package-preparation-review.json"
+      ],
+      "artifact_hashes": {},
+      "blocker": "Preparation only; native build slot and installed/live account gates remain unavailable.",
+      "next_action": "Serialize native candidate build and actual deployed marker/closure/ownership/overlap checks; no native/live acceptance inferred."
     }
   ],
   "coordination": {

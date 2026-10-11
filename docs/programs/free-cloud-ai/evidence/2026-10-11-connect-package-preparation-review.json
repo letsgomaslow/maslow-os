@@ -1,0 +1,65 @@
+{
+  "schema": 1,
+  "date": "2026-10-11",
+  "reviewer": "independent boundary review worker",
+  "status": "scoped-preparation-review-passed-not-built",
+  "scope": "Only pkgbuilds/maslow-connect preparation delta from accepted Craft native5 recipe to combined-source candidate6. No broad security audit or native acceptance.",
+  "acceptedCraftRecipeCommit": "4c6862a2f5ea032191e1b1612a101c69fca03425",
+  "recipeBaseCommit": "2cfc7ad47731d37d4246ca69957aee6d4ac0c243",
+  "candidatePackageVersion": "0.1.0-6",
+  "sourceRevision": "97ac20eed146a8c6b37e33c2c29901a00f3045ff",
+  "sourceArchiveSha256": "8a9929b9d9652bd38bc36b8426df6cc2783fadc9c5246ccbfa26599d74351906",
+  "sourceLockSha256": "79a99838174e1ea36662534d370f778ff121835a5bf0a9c5b4515abc4194d5cf",
+  "candidateInputSha256": {
+    "PKGBUILD": "733d169db81b57fc749acfd1e09f22ec2a7358e3ebc33b7df75a34f06c9e1624",
+    "README.md": "441926298cc113d6bee8ba204506ca1fc49858eae4e5baeefe46f83086cff5f3",
+    "managed-accounts.json": "0f28695fa0d7a8e76868ee8443c999f63442a0cd718fb87d3cc1c60950b66230",
+    "maslow-connect": "4c9e2737570353489bc29a1468f6d0a0d9ee95be0e64240d31d0cdaf139b674e",
+    "maslow-connect-mcp": "dc604af3dce9912237ab4870edd014198f9998f3a7d6e78cee31ab9eee2e015c",
+    "test_marker.py": "e86b67fae7439f229b04ea90d5da3036d9e5ec60eab1bb5c096e397e1296fc72"
+  },
+  "externalPreparationEvidence": {
+    "directory": "/home/maslow/Maslow-ai-os/free-ai-build/connect-package-prep",
+    "proofSha256": "28f20a2bbec5ce00a06c0723ad8ef45421d90054daca9358ac4ad538c5505240",
+    "commandsSha256": "d049de9d1cf6c4da36fce43caa02be2deeba39f9f69b50b350a8d5d818300a14",
+    "honestyCheck": "Prepared-not-built; deployedCapabilitiesCheckRun, nativeBuildRun, installedGateEnabled and liveAcceptanceClaimed are false. Owning source-suite results are explicitly coordinator-reported, not independently rerun here."
+  },
+  "verified": [
+    "All six candidate inputs and three accepted Craft recipe inputs match their recorded hashes.",
+    "Saved connect-97ac20ee.tar and independently generated git archive match the exact source digest; tar PAX comment equals the full accepted combined source commit. Archived lock matches the recorded digest.",
+    "Source checkout is clean at the exact revision. Native5 build() is byte-identical; both fixed launchers, dependency declarations, architecture, pnpm10.33.3 checksum, frozen dependency resolution and deployment/link handling are unchanged.",
+    "Marker content is exactly schema1, policy maslow-everyday-1, one calendar.events.list operation and the full combined source revision; makepkg input checksum pins its bytes. Prepare/check/package explicitly validate it.",
+    "Recipe installs the marker at the fixed runtime path with mode0644. Root ownership and regular unaliased packaged entry remain actual archive acceptance requirements, not a completed result.",
+    "New deployed-capabilities check requires the fixed read-only Calendar contract, one-hour expiry, explicit Groq consent and no speech authorization. It performs no grant or sign-in by design."
+  ],
+  "independentChecks": [
+    {
+      "command": "python3 -B pkgbuilds/maslow-connect/test_marker.py",
+      "result": "passed",
+      "tests": 2,
+      "controls": "One valid marker accepted; ten schema/policy/source/operation/extra-field/duplicate/malformed cases rejected."
+    },
+    {
+      "command": "bash -n pkgbuilds/maslow-connect/PKGBUILD pkgbuilds/maslow-connect/maslow-connect pkgbuilds/maslow-connect/maslow-connect-mcp",
+      "result": "passed"
+    },
+    {
+      "command": "./test/maslow-packaging; git diff --check",
+      "result": "passed"
+    },
+    {
+      "command": "Exact JSCAPABILITIES recipe block executed with /usr/bin/node against scratch JSON inputs",
+      "result": "passed",
+      "controls": 8,
+      "limits": "One fixed envelope accepted; seven invalid schema/operation/readOnly/expiry/speech/extra-field/ok variants rejected. This checks the validator only, not the deployed CLI or dependency closure."
+    }
+  ],
+  "remainingConfirmedScopedFindings": [],
+  "remainingGates": [
+    "Serialized native build permission and exact candidate build.",
+    "Actual deployed CLI capability check, production dependency/link closure, archive ownership/modes/regular-file checks, file inventory and overlap.",
+    "Normal signatures and authorized installation; no marker or runtime gate activation by this review.",
+    "Native account/privacy/revocation/recovery and live-account acceptance."
+  ],
+  "operations": "Reviewer edited only this report. No recipe/source edit, commit, native build, host installation, secret access, live account/provider request, signing or publication."
+}

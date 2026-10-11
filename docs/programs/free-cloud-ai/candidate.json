@@ -36,9 +36,11 @@
     "connect_native3_baseline_not_managed_account_acceptance": "7545ba68c0b6759a7f65c88ccb1390777df5b812",
     "runtime_current_source": "61b13cc175427abce79555dcc0e41e3d5999297f",
     "hub_current_source": "7e14cbaf091e847db07b2726694f27fe5e7d1837",
-    "packages_current_source": "2cfc7ad47731d37d4246ca69957aee6d4ac0c243",
-    "connect_managed_source": "646aa1149f36050a470ded7e3658ad0b0a38bcbb",
-    "hub_recovery_design": "0aafacbc8915d5db64e92bdb5a97bd604c76e6e1"
+    "packages_current_source": "f4df4dad2da480ce95c7e53a3fc263b79a87c5c0",
+    "connect_managed_source": "97ac20eed146a8c6b37e33c2c29901a00f3045ff",
+    "hub_recovery_design": "0aafacbc8915d5db64e92bdb5a97bd604c76e6e1",
+    "connect_previous_managed_source": "646aa1149f36050a470ded7e3658ad0b0a38bcbb",
+    "connect_accepted_craft_baseline": "2e872f50a28706e70c159380e2b7186869415b7f"
   },
   "artifacts": [
     {
@@ -91,7 +93,9 @@
     "docs/programs/free-cloud-ai/evidence/2026-10-11-provider-docs.json",
     "docs/programs/free-cloud-ai/evidence/2026-10-11-pending-status-review.json",
     "docs/programs/free-cloud-ai/evidence/2026-10-11-hub-stage1-checkpoint.json",
-    "docs/programs/free-cloud-ai/evidence/2026-10-11-package-preparation-review.json"
+    "docs/programs/free-cloud-ai/evidence/2026-10-11-package-preparation-review.json",
+    "docs/programs/free-cloud-ai/evidence/2026-10-11-connect-current-integration.json",
+    "docs/programs/free-cloud-ai/evidence/2026-10-11-connect-package-preparation-review.json"
   ],
   "passed_source_gates": [
     "every-dispatch-provider-and-model-policy",
@@ -108,5 +112,19 @@
     },
     "built": false,
     "slot_admitted": false
+  },
+  "prepared_connect_build": {
+    "package_revision": "f4df4dad2da480ce95c7e53a3fc263b79a87c5c0",
+    "source_revision": "97ac20eed146a8c6b37e33c2c29901a00f3045ff",
+    "source_archive_sha256": "8a9929b9d9652bd38bc36b8426df6cc2783fadc9c5246ccbfa26599d74351906",
+    "version": "0.1.0-6",
+    "built": false,
+    "installed_accepted": false,
+    "matched_hub_required": true,
+    "compatible_existing_craft_identity": {
+      "version": "0.1.0-5",
+      "source_revision": "2e872f50a28706e70c159380e2b7186869415b7f"
+    },
+    "review": "docs/programs/free-cloud-ai/evidence/2026-10-11-connect-package-preparation-review.json"
   }
 }
