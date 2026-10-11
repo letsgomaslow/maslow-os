@@ -12,6 +12,8 @@ Evidence: `docs/programs/free-cloud-ai/evidence/2026-10-11-account-ui-source-che
 
 Blocker: Privileged interrupted package/database/key restoration, fresh-install undo and installed systemd/guest/hardware/live gates remain unverified. Historical restore after admission resumes is deliberately unavailable.
 
-Next action: Review the guarded Hub recovery source/components after freeze, then prove exact native package/database/key restoration and fresh undo before enabling delivery.
+Guarded Hub source `2a8c6eda15d92078fdd8656a879b1e93dd786a1d` now passes scoped independent review and230owning/77focused/UI/22original/30recovery component checks. [Checkpoint](../evidence/2026-10-11-hub-recovery-source-checkpoint.json) binds exact hashes and synthetic-service/inert-package limits. Both public gates remain false.
+
+Next action: Build the exact supported package pair when the shared Craft workload settles, then prove actual native package/database/key restoration and fresh undo before enabling delivery. Preserved state with the package absent remains an unsupported reinstall gate.
 
 Source tests and synthetic service/package fixtures cannot establish live accounts, heard audio, installed hardware, signed delivery or paired package recovery. The candidate remains not-ready.

@@ -35,12 +35,13 @@
     "runtime_implementation": "e7b8831a4fc81f6fdf0a1b8369dcc748274d9112",
     "connect_native3_baseline_not_managed_account_acceptance": "7545ba68c0b6759a7f65c88ccb1390777df5b812",
     "runtime_current_source": "61b13cc175427abce79555dcc0e41e3d5999297f",
-    "hub_current_source": "7e14cbaf091e847db07b2726694f27fe5e7d1837",
+    "hub_current_source": "c856c683de8e66a43d326b435bbf73504f5ca6a2",
     "packages_current_source": "f4df4dad2da480ce95c7e53a3fc263b79a87c5c0",
     "connect_managed_source": "97ac20eed146a8c6b37e33c2c29901a00f3045ff",
     "hub_recovery_design": "0aafacbc8915d5db64e92bdb5a97bd604c76e6e1",
     "connect_previous_managed_source": "646aa1149f36050a470ded7e3658ad0b0a38bcbb",
-    "connect_accepted_craft_baseline": "2e872f50a28706e70c159380e2b7186869415b7f"
+    "connect_accepted_craft_baseline": "2e872f50a28706e70c159380e2b7186869415b7f",
+    "hub_accepted_craft_baseline": "2666609002dce8bb6cc16511ef2125bccb18dbe9"
   },
   "artifacts": [
     {
@@ -95,7 +96,9 @@
     "docs/programs/free-cloud-ai/evidence/2026-10-11-hub-stage1-checkpoint.json",
     "docs/programs/free-cloud-ai/evidence/2026-10-11-package-preparation-review.json",
     "docs/programs/free-cloud-ai/evidence/2026-10-11-connect-current-integration.json",
-    "docs/programs/free-cloud-ai/evidence/2026-10-11-connect-package-preparation-review.json"
+    "docs/programs/free-cloud-ai/evidence/2026-10-11-connect-package-preparation-review.json",
+    "docs/programs/free-cloud-ai/evidence/2026-10-11-hub-recovery-source-checkpoint.json",
+    "docs/programs/free-cloud-ai/evidence/2026-10-11-hub-current-integration-checkpoint.json"
   ],
   "passed_source_gates": [
     "every-dispatch-provider-and-model-policy",
@@ -111,7 +114,9 @@
       "maslow-voice": "0.1.5-39"
     },
     "built": false,
-    "slot_admitted": false
+    "slot_admitted": false,
+    "build_context_proof": "/home/maslow/Maslow-ai-os/free-ai-build/native-2-39/build-context-proof.json",
+    "native_admission_blocker": "Actual running Craftupbeat_bell container; contexts and bounded commands prepared only."
   },
   "prepared_connect_build": {
     "package_revision": "f4df4dad2da480ce95c7e53a3fc263b79a87c5c0",
@@ -125,6 +130,9 @@
       "version": "0.1.0-5",
       "source_revision": "2e872f50a28706e70c159380e2b7186869415b7f"
     },
-    "review": "docs/programs/free-cloud-ai/evidence/2026-10-11-connect-package-preparation-review.json"
+    "review": "docs/programs/free-cloud-ai/evidence/2026-10-11-connect-package-preparation-review.json",
+    "context_proof": "/home/maslow/Maslow-ai-os/free-ai-build/connect-package-prep/native/build-context-proof.json",
+    "matched_hub_source": "c856c683de8e66a43d326b435bbf73504f5ca6a2",
+    "matched_hub_recognizes_candidate6": false
   }
 }

@@ -58,10 +58,12 @@
       "implementation_revision": "61b13cc175427abce79555dcc0e41e3d5999297f"
     },
     "hub": {
-      "path": "/home/maslow/Projects/Maslow/free-ai-hub",
+      "path": "/home/maslow/Projects/Maslow/free-ai-hub-current",
       "base_revision": "33940d2e8740b172b953cc3e091cbae1ba1cd303",
-      "branch": "codex/free-cloud-ai",
-      "implementation_revision": "7e14cbaf091e847db07b2726694f27fe5e7d1837"
+      "branch": "codex/free-cloud-ai-hub-current",
+      "implementation_revision": "c856c683de8e66a43d326b435bbf73504f5ca6a2",
+      "previous_free_ai_worktree": "/home/maslow/Projects/Maslow/free-ai-hub",
+      "accepted_craft_source_reference": "2666609002dce8bb6cc16511ef2125bccb18dbe9"
     },
     "packages": {
       "path": "/home/maslow/Projects/Maslow/free-ai-packages",
@@ -351,8 +353,8 @@
         "/home/maslow/Maslow-ai-os/free-ai-build/native/maslow-free-ai-0.1.0-1-x86_64.pkg.tar.zst": "5b2d989d58451ac9744f9c0e8c2c3dcde5f99657d1fef931d2c4a348fb5e4143",
         "/home/maslow/Maslow-ai-os/free-ai-build/voice38/maslow-voice-0.1.5-38-x86_64.pkg.tar.zst": "3593c33d16574fae8667da41617c3d7facfda29b3dbaa8672f03f3a7da53f0f2"
       },
-      "blocker": "Native rebuild/owning/artifact checks unperformed; shared Craft pilot ISO task has not released a serialized slot.",
-      "next_action": "Grant a serialized native slot only after Craft coordination; build exact source and recipes, then execute all prepared owning/artifact checks.",
+      "blocker": "Native builds deferred: actual unrelated Craft containerupbeat_bell (imagec556,CPU2/RAM6GiB) running at last observation. All three exact build contexts prepared only.",
+      "next_action": "Reconcile running Craft workload before one bounded native build at a time; execute prepared owning/artifact/capsule/ABI/overlap checks without host installation.",
       "coordinator_only": false
     },
     {
@@ -368,7 +370,16 @@
         "docs/free-cloud-ai.md",
         "docs/free-ai-current-operation-recovery.md",
         "docs/evidence/**",
-        "tests/free_ai_transaction_probe.py"
+        "tests/free_ai_transaction_probe.py",
+        "helper/hubctl.py",
+        "helper/apps.py",
+        "ui/Panel.qml",
+        "ui/CraftApps.qml",
+        "ui/manifest.json",
+        "release/version.json",
+        "tests/test_apps*.py",
+        "tests/ui-contract-test.mjs",
+        "docs/helper-contract.md"
       ],
       "dependencies": [
         "FCAI-P1-PROVIDER",
@@ -380,21 +391,24 @@
       "status": "active",
       "owner": "root",
       "session": "2026-10-11-free-cloud-ai-root",
-      "worker": "current_recovery (guarded recovery)",
-      "actual_model": "gpt-6.1-sol/high",
+      "worker": "root (native/visual waiting); current_recovery source integration complete",
+      "actual_model": "coordinator; gpt-6.1-sol/high implementation and gpt-6-astra/high independent review",
       "attempt": 2,
-      "last_checkpoint": "2026-10-11T19:11:20.265138+00:00",
-      "base_revision": "7e14cbaf",
-      "branch": "codex/free-cloud-ai",
-      "worktree": "/home/maslow/Projects/Maslow/free-ai-hub",
+      "last_checkpoint": "2026-10-11T21:18:24.682Z",
+      "base_revision": "2a8c6eda15d92078fdd8656a879b1e93dd786a1d",
+      "branch": "codex/free-cloud-ai-hub-current",
+      "worktree": "/home/maslow/Projects/Maslow/free-ai-hub-current",
       "implementation_commits": [
         "e69ee52",
         "732c235",
         "8a0d02497f9766e42cfe098476b08845c7b5df27",
         "0aafacbc8915d5db64e92bdb5a97bd604c76e6e1",
-        "7e14cbaf091e847db07b2726694f27fe5e7d1837"
+        "7e14cbaf091e847db07b2726694f27fe5e7d1837",
+        "2a8c6eda15d92078fdd8656a879b1e93dd786a1d"
       ],
-      "integration_commits": [],
+      "integration_commits": [
+        "c856c683de8e66a43d326b435bbf73504f5ca6a2"
+      ],
       "tests": [
         {
           "check": "8a0d0249 source: 198 unit +24 lifecycle +UI checks; 16 actual multi-UID namespace/pacman cases with inert packages and synthetic service/keyring inputs",
@@ -403,16 +417,26 @@
         {
           "check": "7e14cbaf Hub owning212/focused59/UI +22 namespace component cases; root independently13 contract cases/source review",
           "result": "pass"
+        },
+        {
+          "check": "2a8c6ed:230owning/77focused/UI/compile/diff;22original+30recovery namespace scenarios; independent publication/source review. Inert packages/synthetic services/keyring, not installed-native proof",
+          "result": "pass"
+        },
+        {
+          "check": "Combined Hubc856:265owning/UI/compile/diff pass; independent 80unchanged baseline+9recovery file checks,1native6denial+5parser controls. Real visual/native gates pending",
+          "result": "pass"
         }
       ],
       "evidence": [
         "docs/programs/free-cloud-ai/evidence/2026-10-11-source-package-checkpoint.json",
         "docs/programs/free-cloud-ai/evidence/2026-10-11-account-ui-source-checkpoint.json",
-        "docs/programs/free-cloud-ai/evidence/2026-10-11-hub-stage1-checkpoint.json"
+        "docs/programs/free-cloud-ai/evidence/2026-10-11-hub-stage1-checkpoint.json",
+        "docs/programs/free-cloud-ai/evidence/2026-10-11-hub-recovery-source-checkpoint.json",
+        "docs/programs/free-cloud-ai/evidence/2026-10-11-hub-current-integration-checkpoint.json"
       ],
       "artifact_hashes": {},
       "blocker": "Actual package/database/key interruption recovery, fresh undo and installed signed delivery remain unverified. Unsupported historical or preserved-state-with-package-absent cases must not be treated as fresh.",
-      "next_action": "Implement fixed supported previous-pair recovery and guarded fresh undo with a pinned previous-only verifier; keep recovery/install gates false until native proof and independent review."
+      "next_action": "Reconcile shared workload before admitting exact bounded native builds sequentially; then artifact/owning/overlap and real combined Quickshell checks. Verify native6 before adding its exact identity to the matched Hub while preserving native5."
     },
     {
       "id": "FCAI-P2-WORK",
