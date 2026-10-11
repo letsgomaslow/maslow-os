@@ -132,6 +132,36 @@ class RecoveryTests(unittest.IsolatedAsyncioTestCase):
         self.assertFalse(self.recovery.pending())
         self.assertEqual(self.database.read_bytes(),b'not SQLite')
 
+    async def test_current_prepared_database_restore_and_lost_key_recovery_keep_gate_closed(self):
+        receipt = await self.recovery.snapshot(self.database, artifacts=self.artifacts)
+        self.database.write_bytes(b"corrupt after interrupted package change")
+        self.keys.get.return_value = None
+        async def restore_key(value):
+            self.keys.get.return_value = value
+        self.keys.create = AsyncMock(side_effect=restore_key)
+        result = await self.recovery.restore_prepared(receipt['id'], artifacts=self.artifacts)
+        self.assertTrue(result['restored'])
+        self.keys.create.assert_awaited_once_with(KEY)
+        with closing(sqlite3.connect(self.database)) as db:
+            self.assertEqual(db.execute("SELECT value FROM settings WHERE key='quota'").fetchone(), ('7',))
+        await self.recovery.verify_key(self.database, KEY)
+        self.assertTrue(self.recovery.pending())
+        self.assertFalse(self.state.value['enabled'])
+        self.assertEqual(self.state.value['verified_routes'], [])
+
+    async def test_restore_does_not_replace_a_changed_key_or_replay_historical_state(self):
+        receipt = await self.recovery.snapshot(self.database, artifacts=self.artifacts)
+        original = self.database.read_bytes()
+        self.keys.get.return_value = 'b' * 64
+        with self.assertRaises(FreeAIError) as error:
+            await self.recovery.restore_prepared(receipt['id'], artifacts=self.artifacts)
+        self.assertEqual(error.exception.code, 'RECOVERY_KEY_CHANGED')
+        self.assertEqual(self.database.read_bytes(), original)
+        self.recovery.abandon()
+        with self.assertRaises(FreeAIError) as error:
+            await self.recovery.restore_prepared(receipt['id'], artifacts=self.artifacts)
+        self.assertEqual(error.exception.code, 'RECOVERY_NOT_PREPARED')
+
     async def test_duplicate_prepare_does_not_replace_previous_snapshot(self):
         receipt=await self.recovery.snapshot(self.database,artifacts=self.artifacts)
         with self.assertRaises(FreeAIError) as error:

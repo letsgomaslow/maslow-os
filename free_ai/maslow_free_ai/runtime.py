@@ -220,6 +220,14 @@ class RouterRuntime:
                 raise FreeAIError("ROUTER_SHUTDOWN_FAILED", "The owned router has not stopped. Package changes are blocked.")
             return await self.recovery.snapshot(self.database, artifacts=artifacts)
 
+    async def restore_prepared(self, identity, artifacts):
+        async with self.lock:
+            if self.owners:
+                raise FreeAIError("TASKS_ACTIVE", "Finish or stop assistant requests before recovery.")
+            self.admission = False
+            await self._stop()
+            return await self.recovery.restore_prepared(identity, artifacts=artifacts)
+
     async def abandon_recovery(self):
         async with self.lock:
             if self.owners:

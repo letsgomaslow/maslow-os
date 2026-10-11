@@ -212,6 +212,61 @@ class Recovery:
         except (OSError,ValueError,TypeError,KeyError):
             raise FreeAIError('RECOVERY_INVALID', 'The recovery snapshot or package pairing is invalid. No files were changed.') from None
 
+    async def restore_prepared(self, identity, *, artifacts):
+        """Restore only the current quiesced operation after package pairing.
+
+        Historical rollback after admission resumed is deliberately unavailable:
+        replaying an older database could reset quota or resurrect retired routes.
+        The privileged installer must independently verify the exact retained
+        package hashes before calling this user-owned operation.
+        """
+        try:
+            checked_file(self.marker, 4096)
+            marker = json.loads(self.marker.read_text())
+            if marker != {"schema": 1, "id": identity, "state": "prepared"}:
+                raise ValueError()
+        except (OSError, ValueError, TypeError):
+            raise FreeAIError("RECOVERY_NOT_PREPARED", "Only the current stopped recovery operation can be restored.") from None
+        receipt = await self.verify(identity, artifacts=artifacts)
+        if receipt["kind"] != "snapshot":
+            raise FreeAIError("RECOVERY_NO_DATABASE", "This fresh-install record has no earlier router database to restore.")
+        key = await self.keys.get_recovery(identity)
+        current = await self.keys.get()
+        if current is not None and fingerprint(current) != receipt["key_fingerprint"]:
+            raise FreeAIError("RECOVERY_KEY_CHANGED", "The current encryption key changed. It was not overwritten; inspect the retained snapshot before continuing.")
+        source = self.root / identity / "router.sqlite3"
+        target = self.state.directory / "router.sqlite3"
+        replacement = self.state.directory / (".restore-" + identity)
+        try:
+            if target.exists() or target.is_symlink():
+                checked_file(target)
+            for suffix in ("-wal", "-shm"):
+                sidecar = Path(str(target) + suffix)
+                if sidecar.exists() or sidecar.is_symlink():
+                    checked_file(sidecar)
+            await asyncio.to_thread(backup_database, source, replacement)
+            await self.verify_key(replacement, key)
+            if current is None:
+                await self.keys.create(key)
+            if await self.keys.get() != key:
+                raise FreeAIError("RECOVERY_KEY_CHANGED", "The active key does not match the snapshot. Admission stays closed.")
+            # Keep the marker through every replacement/failure. A crash here
+            # cannot start the router against a partially restored pair.
+            for suffix in ("-wal", "-shm"):
+                Path(str(target) + suffix).unlink(missing_ok=True)
+            os.replace(replacement, target)
+            sync_directory(self.state.directory)
+            # Use current user confirmation/settings; never restore old enables.
+            self.state.update(enabled=False, verified_routes=[])
+            return {"schema": 1, "id": identity, "restored": True,
+                    "database_sha256": file_hash(target), "connection_check_required": True}
+        except FreeAIError:
+            raise
+        except (OSError, sqlite3.Error, ValueError, TimeoutError):
+            raise FreeAIError("RECOVERY_RESTORE_FAILED", "Recovery could not finish. Admission remains closed and the snapshot was retained.") from None
+        finally:
+            replacement.unlink(missing_ok=True)
+
     def abandon(self):
         """Close a failed/prepared operation, retaining snapshots for diagnosis.
 
