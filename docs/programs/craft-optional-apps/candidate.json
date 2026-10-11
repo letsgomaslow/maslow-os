@@ -4,7 +4,8 @@
   "platform": "x86_64-maslow-os-hyprland",
   "source_revisions": {
     "pdfcraft": "53a5880386789fc3531e54f6e6ffdef9a8e41f1a",
-    "photocraft": "79261615956ab21334e49ca1d384390272e647da"
+    "photocraft": "79261615956ab21334e49ca1d384390272e647da",
+    "connect-draft-rejected": "21fdf8ae46de11cfc8b0a634d4489cf6abd0e937"
   },
   "artifacts": [
     {
@@ -34,6 +35,19 @@
       "upstream_archive_sha256": "641f831252fd31b43ee1a12e572d7442e5652c2e5bf623de085741c370f0c91d",
       "evidence_status": "built-and-unpacked-smoke-only",
       "accepted_capabilities": []
+    },
+    {
+      "app": "maslow-connect",
+      "kind": "native-package-draft",
+      "version": "0.1.0-1",
+      "path": "/home/maslow/Maslow-ai-os/craft-build/connect/recipe/maslow-connect-0.1.0-1-x86_64.pkg.tar.zst",
+      "sha256": "35db43440f3e9bbfe4a289f1bdef73a7bd9f0cffa9be608d88ac1044d4f7f04a",
+      "size": 7634192,
+      "recipe_revision": "5a3f49a",
+      "source_revision": "21fdf8ae46de11cfc8b0a634d4489cf6abd0e937",
+      "evidence_status": "built-installed-cli-only-rejected-isolation",
+      "accepted_capabilities": [],
+      "rejection": "outer nproc; writable aliases; original project directory contains host IPC special files; repair/review/new source pin required"
     }
   ],
   "accepted_capabilities": [],

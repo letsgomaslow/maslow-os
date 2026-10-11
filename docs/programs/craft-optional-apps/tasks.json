@@ -287,13 +287,37 @@
       "base_revision": "4488564",
       "branch": "codex/craft-packages",
       "worktree": "/home/maslow/Projects/Maslow/craft-packages",
-      "implementation_commits": [],
+      "implementation_commits": [
+        "494f045",
+        "57337fb",
+        "cf4748f",
+        "72bb828",
+        "4487785",
+        "5a3f49a"
+      ],
       "integration_commits": [],
-      "tests": [],
-      "evidence": [],
-      "artifact_hashes": {},
+      "tests": [
+        {
+          "check": "pinned source/tool/checksums; frozen dependency/deployment integrity; containment; no private build shims; clean makepkg",
+          "result": "pass"
+        },
+        {
+          "check": "disposable offline registered version/ownership/mtree, catalog and disconnected status; no development source mount",
+          "result": "pass"
+        },
+        {
+          "check": "three draft package file ownership overlap",
+          "result": "pass"
+        }
+      ],
+      "evidence": [
+        "docs/programs/craft-optional-apps/tasks/CRAFT-CORE-PACKAGE.md"
+      ],
+      "artifact_hashes": {
+        "/home/maslow/Maslow-ai-os/craft-build/connect/recipe/maslow-connect-0.1.0-1-x86_64.pkg.tar.zst": "35db43440f3e9bbfe4a289f1bdef73a7bd9f0cffa9be608d88ac1044d4f7f04a"
+      },
       "blocker": null,
-      "next_action": "Package native optional Connect independently of development paths"
+      "next_action": "After boundary repair/review, bump pkgrel2, pin exact new source and rebuild; old draft not accepted for Craft"
     },
     {
       "id": "CRAFT-CORE-SANDBOX",
