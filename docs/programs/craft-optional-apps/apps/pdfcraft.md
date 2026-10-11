@@ -33,3 +33,7 @@ Acceptance must declare the exact formats/features tested and preserve originals
 Exact tag `v0.6.0` is `53a5880386789fc3531e54f6e6ffdef9a8e41f1a`; its archive SHA-256 is `9a136e71e37b459ed5746dbe19a364ce84cf5d995c6f6c98af6147d818390a53`. Native package `pdfcraft 0.6.0-1` built from recipes `f211378f416f50d63d4352b2049758a7aaa0996e`, SHA-256 `afa9eb1146696fd1feb0840fdbd8a6b3dc5cec6751dd86d6198b07a826f445c2`. Direct ELF paths `/usr/bin/pdfcraft` and `/usr/bin/pdfcraft-cli`; desktop, icons, MIME, AppStream and notices retained. Upstream update checks do not replace package files. See [package task](../tasks/CRAFT-PDF-PACKAGE.md) for clean build, same-publisher digest, notices and offline unpacked MCP evidence.
 
 Disposition remains evaluating. Package is built; registered install, lifecycle, GUI, confinement, actual agents/Voice and fresh VM/Lenovo gates are open. No accepted capabilities or release-readiness change.
+
+## Bounded GUI/CLI evidence, 2026-10-11
+
+[GUI/CLI report](../tasks/CRAFT-PDF-GUI-CLI.md) records offline installed source-tag artifacts, software X11/Wayland rendering, real inspected save/reopen captures and a small known-answer fixture. PDF metadata/rotation/text was independently checked with Poppler; GUI save retained exact fixture bytes. Native portal/clipboard, exact Maslow VM/Lenovo and representative complex-format corpus gates remain open. GUI evidence does not waive the failed first confinement implementation. Disposition remains evaluating.

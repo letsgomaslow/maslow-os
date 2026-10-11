@@ -57,7 +57,8 @@
       "path": "/home/maslow/Projects/Maslow/maslow-connect",
       "base_revision": "0c6f7b98a062870e36503f55512d04e0b8576a69",
       "branch": "codex/local-connect",
-      "preserved_status": []
+      "preserved_status": [],
+      "candidate_worktree": "/home/maslow/Projects/Maslow/craft-connect"
     },
     "hub": {
       "path": "/home/maslow/Projects/Maslow/maslow-hub",
@@ -69,7 +70,8 @@
       "path": "/home/maslow/Projects/Maslow/maslow-os-pkgs",
       "base_revision": "448856485e710caedfc24f544a027aea8652dd33",
       "branch": "maslow",
-      "preserved_status": []
+      "preserved_status": [],
+      "candidate_worktree": "/home/maslow/Projects/Maslow/craft-packages"
     },
     "iso": {
       "path": "/home/maslow/Projects/Maslow/maslow-os-iso",
@@ -612,7 +614,7 @@
       ],
       "acceptance": "Fresh optional install before OS update, offline GUI/CLI, upgrade/remove/reinstall, app-specific save/reopen fidelity, VM/Lenovo evidence",
       "phase": 1,
-      "status": "active",
+      "status": "blocked",
       "owner": "gui-worker",
       "session": "2026-10-11-craft-root",
       "worker": "/root/pilot_gui",
@@ -624,11 +626,26 @@
       "worktree": "/home/maslow/Projects/Maslow/craft-packages",
       "implementation_commits": [],
       "integration_commits": [],
-      "tests": [],
-      "evidence": [],
+      "tests": [
+        {
+          "check": "offline installed CLI/GUI known-file save/reopen and independent fidelity assertions; inspected X11/Wayland software-rendered screenshots",
+          "result": "pass"
+        },
+        {
+          "check": "exact fresh Maslow/Hyprland/portal/clipboard/scaling/Lenovo and complex corpus",
+          "result": "unavailable"
+        }
+      ],
+      "evidence": [
+        "docs/programs/craft-optional-apps/tasks/CRAFT-PDF-GUI-CLI.md"
+      ],
       "artifact_hashes": {},
-      "blocker": null,
-      "next_action": "Verify packaged pdfcraft GUI/CLI and file fidelity"
+      "blocker": {
+        "type": "environment",
+        "summary": "Fresh exact Maslow VM and Lenovo/native portal/clipboard/scaling/representative corpus gates not exercised by bounded disposable container tests"
+      },
+      "next_action": "Run exact installed VM/Lenovo gates after shared foundation; retain bounded fixture evidence",
+      "worker_status": "finished-partial"
     },
     {
       "id": "CRAFT-PDF-CONFINEMENT",
@@ -824,7 +841,7 @@
       ],
       "acceptance": "Fresh optional install before OS update, offline GUI/CLI, upgrade/remove/reinstall, app-specific save/reopen fidelity, VM/Lenovo evidence",
       "phase": 1,
-      "status": "active",
+      "status": "blocked",
       "owner": "gui-worker",
       "session": "2026-10-11-craft-root",
       "worker": "/root/pilot_gui",
@@ -836,11 +853,26 @@
       "worktree": "/home/maslow/Projects/Maslow/craft-packages",
       "implementation_commits": [],
       "integration_commits": [],
-      "tests": [],
-      "evidence": [],
+      "tests": [
+        {
+          "check": "offline installed CLI/GUI known-file save/reopen and independent fidelity assertions; inspected X11/Wayland software-rendered screenshots",
+          "result": "pass"
+        },
+        {
+          "check": "exact fresh Maslow/Hyprland/portal/clipboard/scaling/Lenovo and complex corpus",
+          "result": "unavailable"
+        }
+      ],
+      "evidence": [
+        "docs/programs/craft-optional-apps/tasks/CRAFT-PHOTO-GUI-CLI.md"
+      ],
       "artifact_hashes": {},
-      "blocker": null,
-      "next_action": "Verify packaged photocraft GUI/CLI and file fidelity"
+      "blocker": {
+        "type": "environment",
+        "summary": "Fresh exact Maslow VM and Lenovo/native portal/clipboard/scaling/representative corpus gates not exercised by bounded disposable container tests"
+      },
+      "next_action": "Run exact installed VM/Lenovo gates after shared foundation; retain bounded fixture evidence",
+      "worker_status": "finished-partial"
     },
     {
       "id": "CRAFT-PHOTO-CONFINEMENT",
