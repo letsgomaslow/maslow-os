@@ -108,7 +108,8 @@
     "docs/programs/free-cloud-ai/evidence/2026-10-11-next-slot-compatibility-review.json",
     "docs/programs/free-cloud-ai/evidence/2026-10-11-qt612-package-repin-review.json",
     "docs/programs/free-cloud-ai/evidence/2026-10-11-final-native-context-review.json",
-    "docs/programs/free-cloud-ai/evidence/2026-10-11-guided-hub-source-checkpoint.json"
+    "docs/programs/free-cloud-ai/evidence/2026-10-11-guided-hub-source-checkpoint.json",
+    "docs/programs/free-cloud-ai/evidence/2026-10-11-reinstall-design-checkpoint.json"
   ],
   "passed_source_gates": [
     "every-dispatch-provider-and-model-policy",

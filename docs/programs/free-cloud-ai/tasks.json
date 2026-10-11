@@ -624,11 +624,12 @@
         "docs/programs/free-cloud-ai/evidence/2026-10-11-account-recovery-review.json",
         "docs/programs/free-cloud-ai/evidence/2026-10-11-runtime-delivery-review.json",
         "docs/programs/free-cloud-ai/evidence/2026-10-11-delivery-recovery-checkpoint.json",
-        "docs/programs/free-cloud-ai/evidence/2026-10-11-hub-stage1-checkpoint.json"
+        "docs/programs/free-cloud-ai/evidence/2026-10-11-hub-stage1-checkpoint.json",
+        "docs/programs/free-cloud-ai/evidence/2026-10-11-reinstall-design-checkpoint.json"
       ],
       "artifact_hashes": {},
-      "blocker": "Privileged interrupted package/database/key restoration, fresh-install undo and installed systemd/guest/hardware/live gates remain unverified. Historical restore after admission resumes is deliberately unavailable.",
-      "next_action": "Review the guarded Hub recovery source/components after freeze, then prove exact native package/database/key restoration and fresh undo before enabling delivery.",
+      "blocker": "Native interrupted package/database/key restoration and fresh undo remain unverified. Preserved-state reinstall is design-only; manual/unrecorded removal remains unsupported. Both delivery gates stay false.",
+      "next_action": "Complete exact current native artifacts and installed recovery checks, then implement/review the bounded managed-removal and same-artifact reinstall proposal using new current-state provenance and a fresh checkpoint. Never reinterpret fresh absence or replay an old snapshot.",
       "coordinator_only": true
     },
     {

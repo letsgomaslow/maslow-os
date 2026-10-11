@@ -1,0 +1,15 @@
+{
+  "schema": 1,
+  "date": "2026-10-11",
+  "status": "proposal-recorded-implementation-and-native-acceptance-pending",
+  "report_path": "/home/maslow/Projects/Maslow/free-ai-hub-current/docs/evidence/2026-10-11-preserved-state-reinstall-design.json",
+  "report_sha256": "7f0f8286ffdf5bb574b87aac696f83e86576df4d1f5d05902e17adbaf8a5bdb7",
+  "report_commit": "83f0a699abf08cbe6452c823db733b0f9a010f4c",
+  "reviewed_hub_implementation": "947348f0bfb285427936729d2c1861d0f03aa4e5",
+  "coordinator_check": "Final report digest and four Hub/two recipe source hashes match. Earlier report hash was superseded before freezing; final frozen report was staged and committed. No implementation or native test inferred.",
+  "disposition": "Use this as the bounded starting proposal for managed removal and same-artifact reinstall after actual package checks. Review the new lifecycle protocol and durable ordering before code acceptance. Preserve current exact build sources and both false gates. Do not broaden fresh_check or replay historical snapshots.",
+  "scope_limit": "Manual/unrecorded removal remains unsupported in this proposal. Final user guidance and acceptance must state the supported product flow; no general reinstall claim.",
+  "next_action": "Complete the currently admitted native batch and checks first; then implement/review the minimum explicit lifecycle contract and prove actual package/database/key preservation in the disposable installed environment.",
+  "implemented": false,
+  "acceptance_passed": false
+}
