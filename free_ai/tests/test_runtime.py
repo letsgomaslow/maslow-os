@@ -1,4 +1,5 @@
 import asyncio
+from contextlib import closing
 import hashlib
 import json
 import os
@@ -49,6 +50,30 @@ while True: time.sleep(1)
     async def asyncTearDown(self):
         await self.runtime.close()
         self.temp.cleanup()
+
+    async def test_recovery_closes_admission_survives_restart_and_requires_recheck(self):
+        self.keys.get.return_value = None
+        receipt = await self.runtime.prepare_recovery({"maslow-free-ai": "1" * 64})
+        self.assertEqual(receipt["kind"], "fresh")
+        self.assertEqual(self.runtime.status()["state"], "maintenance")
+        restarted = RouterRuntime(self.runtime.state.directory, keys=self.keys, package=self.package, port=self.port)
+        self.assertFalse(restarted.admission)
+        with self.assertRaises(FreeAIError):
+            await restarted.acquire("new-task")
+        await restarted.abandon_recovery()
+        self.assertFalse(restarted.status()["ready"])
+        self.assertFalse(restarted.status()["enabled"])
+        await restarted.close()
+
+    async def test_recovery_rejects_owner_without_terminating_task(self):
+        self.runtime.state.update(enabled=True, configured=True, free_plan="user-confirmed", verified_routes=list(MODELS))
+        await self.runtime.acquire("active-task")
+        process = self.runtime.process
+        with self.assertRaises(FreeAIError) as error:
+            await self.runtime.prepare_recovery({"maslow-free-ai": "1" * 64})
+        self.assertEqual(error.exception.code, "TASKS_ACTIVE")
+        self.assertIsNone(process.returncode)
+        self.assertFalse(self.runtime.recovery.pending())
 
     async def test_status_never_starts_router_or_reads_keyring(self):
         self.assertFalse(self.runtime.status()["ready"])
@@ -129,7 +154,7 @@ while True: time.sleep(1)
 
     async def test_shared_cooldown_blocks_new_work_without_starting_a_provider(self):
         self.runtime.state.update(enabled=True, configured=True, free_plan="user-confirmed", verified_routes=list(MODELS))
-        with sqlite3.connect(self.runtime.database) as db:
+        with closing(sqlite3.connect(self.runtime.database)) as db, db:
             db.execute("CREATE TABLE settings(key TEXT PRIMARY KEY,value TEXT)")
             db.execute("INSERT INTO settings VALUES(?,?)", ("maslow_groq_cooldown_until", str(int((time.time() + 3600) * 1000))))
         self.runtime.database.chmod(0o600)

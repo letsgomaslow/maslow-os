@@ -16,6 +16,7 @@ from pathlib import Path
 from .credentials import EncryptionKey
 from .errors import FreeAIError
 from .state import State
+from .recovery import Recovery
 
 MODELS = ("openai/gpt-oss-120b", "openai/gpt-oss-20b")
 PACKAGE = Path("/usr/lib/maslow-free-ai")
@@ -30,7 +31,8 @@ class RouterRuntime:
         self.owners = set()
         self.lock = asyncio.Lock()
         self.idle_stop = None
-        self.admission = True
+        self.recovery = Recovery(self.state, self.keys, self.package / "node/bin/node")
+        self.admission = not self.recovery.pending()
 
     @property
     def database(self):
@@ -41,7 +43,8 @@ class RouterRuntime:
         value = self.state.value
         task_support = self.task_supported()
         ready = installed and task_support and value["configured"] and set(value["verified_routes"]) == set(MODELS) and value["free_plan"] == "user-confirmed"
-        state = "working" if self.owners else "disabled" if not value["enabled"] and ready else "ready" if ready else "needs-setup"
+        ready = ready and not self.recovery.pending()
+        state = "maintenance" if self.recovery.pending() else "working" if self.owners else "disabled" if not value["enabled"] and ready else "ready" if ready else "needs-setup"
         return {"installed": installed, "configured": value["configured"], "ready": ready, "enabled": value["enabled"],
                 "state": state, "free_plan": value["free_plan"], "provider": "groq", "task_support": task_support}
 
@@ -66,6 +69,8 @@ class RouterRuntime:
         return None
 
     async def _start(self, groq_key=None):
+        if self.recovery.pending():
+            raise FreeAIError("RECOVERY_PENDING", "Finish or abandon the pending recovery operation first.")
         if self.process and self.process.returncode is None:
             return {"endpoint": f"http://127.0.0.1:{self.port}/v1", "token": self.token, "model": MODELS[0]}
         if not self.status()["installed"]:
@@ -132,7 +137,7 @@ class RouterRuntime:
 
     async def acquire(self, owner):
         async with self.lock:
-            if not self.admission or not self.state.value["enabled"] or not self.status()["ready"]:
+            if not self.admission or self.recovery.pending() or not self.state.value["enabled"] or not self.status()["ready"]:
                 raise FreeAIError("FREE_AI_SETUP_REQUIRED", "Finish Free cloud AI setup and enable it through Hub first.")
             if self.owners - {owner}:
                 raise FreeAIError("ASSISTANT_TASK_ACTIVE", "Finish or stop the active assistant request first.")
@@ -163,6 +168,8 @@ class RouterRuntime:
                 self.idle_stop = None
 
     async def setup(self, key, confirmed, probe):
+        if self.recovery.pending():
+            raise FreeAIError("RECOVERY_PENDING", "Finish or abandon the pending recovery operation first.")
         if not isinstance(key, str) or not re.fullmatch(r"gsk_[A-Za-z0-9_-]{16,256}", key) or confirmed is not True:
             raise FreeAIError("FREE_PLAN_CONFIRMATION_REQUIRED", "Confirm your Groq account is on Free and enter its key in private setup.")
         async with self.lock:
@@ -180,6 +187,8 @@ class RouterRuntime:
         return self.status()
 
     async def test(self, probe):
+        if self.recovery.pending():
+            raise FreeAIError("RECOVERY_PENDING", "Finish or abandon the pending recovery operation first.")
         async with self.lock:
             if self.owners:
                 raise FreeAIError("TASKS_ACTIVE", "Finish or stop assistant tasks before testing setup.")
@@ -197,6 +206,28 @@ class RouterRuntime:
                 raise FreeAIError("FREE_AI_SETUP_REQUIRED", "Connect and check your Free cloud AI account first.")
             self.state.update(enabled=enabled)
         return self.status()
+
+    async def prepare_recovery(self, artifacts):
+        async with self.lock:
+            if self.owners:
+                raise FreeAIError("TASKS_ACTIVE", "Finish or stop assistant requests before package changes.")
+            self.admission = False
+            if self.idle_stop:
+                self.idle_stop.cancel()
+                self.idle_stop = None
+            await self._stop()
+            if self.process is not None:
+                raise FreeAIError("ROUTER_SHUTDOWN_FAILED", "The owned router has not stopped. Package changes are blocked.")
+            return await self.recovery.snapshot(self.database, artifacts=artifacts)
+
+    async def abandon_recovery(self):
+        async with self.lock:
+            if self.owners:
+                raise FreeAIError("TASKS_ACTIVE", "Finish or stop assistant requests before recovery.")
+            await self._stop()
+            self.recovery.abandon()
+            self.admission = True
+            return self.status()
 
     async def close(self):
         if self.idle_stop:
