@@ -55,13 +55,13 @@
         " M docs/programs/craft-optional-apps/tasks/CRAFT-CORE-SANDBOX.md",
         "?? docs/handoffs/2026-10-11-freellmapi-review.md"
       ],
-      "implementation_revision": "76fb5d08ca65662be1b16da1cce1eb0eee13f37b"
+      "implementation_revision": "61b13cc175427abce79555dcc0e41e3d5999297f"
     },
     "hub": {
       "path": "/home/maslow/Projects/Maslow/free-ai-hub",
       "base_revision": "33940d2e8740b172b953cc3e091cbae1ba1cd303",
       "branch": "codex/free-cloud-ai",
-      "implementation_revision": "8a0d02497f9766e42cfe098476b08845c7b5df27"
+      "implementation_revision": "7e14cbaf091e847db07b2726694f27fe5e7d1837"
     },
     "packages": {
       "path": "/home/maslow/Projects/Maslow/free-ai-packages",
@@ -202,7 +202,8 @@
       "permitted_files": [
         "free_ai/maslow_free_ai/**",
         "free_ai/bin/**",
-        "free_ai/tests/test_runtime.py"
+        "free_ai/tests/test_runtime.py",
+        "free_ai/tests/test_control.py"
       ],
       "dependencies": [
         "FCAI-P0-INVENTORY"
@@ -225,14 +226,21 @@
         "90c0745a",
         "784eca20",
         "c4098a60",
-        "3e59f687"
+        "3e59f687",
+        "61b13cc175427abce79555dcc0e41e3d5999297f"
       ],
       "integration_commits": [],
-      "tests": [],
+      "tests": [
+        {
+          "check": "61b13cc1 independently39 backend tests; pending ticket polling creates no fresh state, setup/check mutations do not prompt or start service",
+          "result": "pass"
+        }
+      ],
       "evidence": [
         "docs/programs/free-cloud-ai/evidence/2026-10-11-source-package-checkpoint.json",
         "docs/programs/free-cloud-ai/evidence/2026-10-11-account-ui-source-checkpoint.json",
-        "docs/programs/free-cloud-ai/evidence/2026-10-11-account-recovery-review.json"
+        "docs/programs/free-cloud-ai/evidence/2026-10-11-account-recovery-review.json",
+        "docs/programs/free-cloud-ai/evidence/2026-10-11-pending-status-review.json"
       ],
       "artifact_hashes": {},
       "blocker": "Real keyring/installed lifecycle acceptance unavailable.",
@@ -358,33 +366,39 @@
       "status": "active",
       "owner": "root",
       "session": "2026-10-11-free-cloud-ai-root",
-      "worker": "boundary_review (fixed delivery)",
-      "actual_model": "gpt-6-astra/high",
-      "attempt": 1,
-      "last_checkpoint": "2026-10-11T18:27:18.949361+00:00",
-      "base_revision": "33940d2",
-      "branch": null,
+      "worker": "current_recovery (guarded recovery)",
+      "actual_model": "gpt-6.1-sol/high",
+      "attempt": 2,
+      "last_checkpoint": "2026-10-11T19:11:20.265138+00:00",
+      "base_revision": "7e14cbaf",
+      "branch": "codex/free-cloud-ai",
       "worktree": "/home/maslow/Projects/Maslow/free-ai-hub",
       "implementation_commits": [
         "e69ee52",
         "732c235",
         "8a0d02497f9766e42cfe098476b08845c7b5df27",
-        "0aafacbc8915d5db64e92bdb5a97bd604c76e6e1"
+        "0aafacbc8915d5db64e92bdb5a97bd604c76e6e1",
+        "7e14cbaf091e847db07b2726694f27fe5e7d1837"
       ],
       "integration_commits": [],
       "tests": [
         {
           "check": "8a0d0249 source: 198 unit +24 lifecycle +UI checks; 16 actual multi-UID namespace/pacman cases with inert packages and synthetic service/keyring inputs",
           "result": "pass"
+        },
+        {
+          "check": "7e14cbaf Hub owning212/focused59/UI +22 namespace component cases; root independently13 contract cases/source review",
+          "result": "pass"
         }
       ],
       "evidence": [
         "docs/programs/free-cloud-ai/evidence/2026-10-11-source-package-checkpoint.json",
-        "docs/programs/free-cloud-ai/evidence/2026-10-11-account-ui-source-checkpoint.json"
+        "docs/programs/free-cloud-ai/evidence/2026-10-11-account-ui-source-checkpoint.json",
+        "docs/programs/free-cloud-ai/evidence/2026-10-11-hub-stage1-checkpoint.json"
       ],
       "artifact_hashes": {},
-      "blocker": "Signed bundle and installed acceptance absent.",
-      "next_action": "Finish reserved snapshot binding, durable mask publication, no-restore commit decision and strict recovery-only evidence parsing; actual restore and installation remain gated."
+      "blocker": "Actual package/database/key interruption recovery, fresh undo and installed signed delivery remain unverified. Unsupported historical or preserved-state-with-package-absent cases must not be treated as fresh.",
+      "next_action": "Implement fixed supported previous-pair recovery and guarded fresh undo with a pinned previous-only verifier; keep recovery/install gates false until native proof and independent review."
     },
     {
       "id": "FCAI-P2-WORK",
@@ -508,7 +522,7 @@
       "worker": "root",
       "actual_model": "coordinator not exposed",
       "attempt": 1,
-      "last_checkpoint": "2026-10-11T18:27:18.949361+00:00",
+      "last_checkpoint": "2026-10-11T19:11:20.265138+00:00",
       "base_revision": "09721dff",
       "branch": "codex/free-cloud-ai",
       "worktree": "/home/maslow/Maslow-ai-os/free-ai-runtime",
@@ -539,11 +553,12 @@
         "docs/programs/free-cloud-ai/evidence/2026-10-11-account-ui-source-checkpoint.json",
         "docs/programs/free-cloud-ai/evidence/2026-10-11-account-recovery-review.json",
         "docs/programs/free-cloud-ai/evidence/2026-10-11-runtime-delivery-review.json",
-        "docs/programs/free-cloud-ai/evidence/2026-10-11-delivery-recovery-checkpoint.json"
+        "docs/programs/free-cloud-ai/evidence/2026-10-11-delivery-recovery-checkpoint.json",
+        "docs/programs/free-cloud-ai/evidence/2026-10-11-hub-stage1-checkpoint.json"
       ],
       "artifact_hashes": {},
       "blocker": "Privileged interrupted package/database/key restoration, fresh-install undo and installed systemd/guest/hardware/live gates remain unverified. Historical restore after admission resumes is deliberately unavailable.",
-      "next_action": "Review Hub durable mask/commit-decision and recovery-only evidence changes, then implement and prove fixed current-operation native package recovery while the install gate remains false.",
+      "next_action": "Review the guarded Hub recovery source/components after freeze, then prove exact native package/database/key restoration and fresh undo before enabling delivery.",
       "coordinator_only": true
     },
     {
@@ -643,8 +658,7 @@
     "worker_limit": 2,
     "integration": "No product/shared merge, host installation, production signing or publication. Program completed source commits only.",
     "active_workers": [
-      "boundary_review: gpt-6-astra/high, isolated Hub source implementation",
-      "current_recovery: gpt-6.1-sol/high, read-only next-stage contract design"
+      "current_recovery: isolated Hub guarded package/state recovery implementation, actual gpt-6.1-sol/high"
     ]
   }
 }
