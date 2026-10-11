@@ -1,0 +1,31 @@
+{
+  "schema": 1,
+  "date": "2026-10-11",
+  "status": "scoped-source-review-passed-native-visual-pending",
+  "donorCommit": "6ff87135409e8ba9360d148dfa08069376a8c020",
+  "reviewBase": "076604c4",
+  "scope": "Only three frozen Voice Qt compatibility files; alias qualification and the exact donor contract-test delta.",
+  "sourceSha256": {
+    "voice/ui/Panel.qml": "caea97b749c3c4237a19b30a40993378280238ec962b827f61b276c2b39e10d7",
+    "voice/tests/orb-preview.qml": "bcad2cf2d2815a443ff97d0bb7a2cbe2e7a9fb302d1b645e1bd3d1c5a97cbd8f",
+    "voice/tests/ui-contract-test.mjs": "58b67e82c776e8144b0a5c373dbed5c59fc3e9688cf071f6e73745525fd057d9"
+  },
+  "independentChecks": [
+    "Removing the new Theme import and reversing Theme.Color qualification recovers both original Panel.qml and orb-preview.qml byte for byte.",
+    "All23 Panel and7 orb-preview theme accesses are qualified. No bare Color property reads remain, including additional FreeAI composer controls.",
+    "The ui-contract-test.mjs edit sequence equals the accepted donor commit delta exactly; unrelated FreeAI contract tests remain intact.",
+    "node voice/tests/ui-contract-test.mjs passed.",
+    "node voice/tests/ui-controller-test.mjs passed.",
+    "node voice/tests/ui-work-composer-test.mjs passed.",
+    "node voice/tests/orb-contract-test.mjs passed.",
+    "node voice/tests/orb-frame-test.mjs passed.",
+    "Frozen file hashes and git diff --check passed."
+  ],
+  "remainingConfirmedScopedFindings": [],
+  "remainingGates": [
+    "Actual Qt6.12/Quickshell combined Voice/FreeAI visual inspection after workload admission.",
+    "Commit the reviewed source and refresh runtime archive, recipe source manifests/checksums, copied build contexts and runner proof pins before any queued build.",
+    "Native artifact, installed, provider/account and physical audio acceptance remain separate."
+  ],
+  "operations": "Reviewer edited only this report for this Qt review. No QML/test source edits, backend/full-suite repeat, Docker/native UI, host configuration, credential/provider access or build."
+}

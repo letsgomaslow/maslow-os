@@ -41,6 +41,11 @@
         "task": "current_recovery",
         "model": "gpt-6.1-sol",
         "reasoning": "high"
+      },
+      {
+        "task": "qt_voice",
+        "model": "gpt-6.1-sol",
+        "reasoning": "medium"
       }
     ]
   },
@@ -55,13 +60,13 @@
         " M docs/programs/craft-optional-apps/tasks/CRAFT-CORE-SANDBOX.md",
         "?? docs/handoffs/2026-10-11-freellmapi-review.md"
       ],
-      "implementation_revision": "61b13cc175427abce79555dcc0e41e3d5999297f"
+      "implementation_revision": "c2b03842a81645998a79cbca525c03ddf67813b4"
     },
     "hub": {
       "path": "/home/maslow/Projects/Maslow/free-ai-hub-current",
       "base_revision": "33940d2e8740b172b953cc3e091cbae1ba1cd303",
       "branch": "codex/free-cloud-ai-hub-current",
-      "implementation_revision": "c856c683de8e66a43d326b435bbf73504f5ca6a2",
+      "implementation_revision": "947348f0bfb285427936729d2c1861d0f03aa4e5",
       "previous_free_ai_worktree": "/home/maslow/Projects/Maslow/free-ai-hub",
       "accepted_craft_source_reference": "2666609002dce8bb6cc16511ef2125bccb18dbe9"
     },
@@ -69,7 +74,7 @@
       "path": "/home/maslow/Projects/Maslow/free-ai-packages",
       "base_revision": "448856485e710caedfc24f544a027aea8652dd33",
       "branch": "codex/free-cloud-ai",
-      "implementation_revision": "f4df4dad2da480ce95c7e53a3fc263b79a87c5c0"
+      "implementation_revision": "333f4f83ddcba6651687a7723c6778f68023cc5b"
     },
     "connect": {
       "path": "/home/maslow/Projects/Maslow/free-ai-connect-current",
@@ -236,12 +241,17 @@
         "784eca20",
         "c4098a60",
         "3e59f687",
-        "61b13cc175427abce79555dcc0e41e3d5999297f"
+        "61b13cc175427abce79555dcc0e41e3d5999297f",
+        "c2b03842a81645998a79cbca525c03ddf67813b4"
       ],
       "integration_commits": [],
       "tests": [
         {
           "check": "61b13cc1 independently39 backend tests; pending ticket polling creates no fresh state, setup/check mutations do not prompt or start service",
+          "result": "pass"
+        },
+        {
+          "check": "c2b03842 truly read-only status: all 49 backend tests passed; independent isolated CLI preservation, malformed/deep JSON and descriptor leak checks passed.",
           "result": "pass"
         }
       ],
@@ -249,7 +259,8 @@
         "docs/programs/free-cloud-ai/evidence/2026-10-11-source-package-checkpoint.json",
         "docs/programs/free-cloud-ai/evidence/2026-10-11-account-ui-source-checkpoint.json",
         "docs/programs/free-cloud-ai/evidence/2026-10-11-account-recovery-review.json",
-        "docs/programs/free-cloud-ai/evidence/2026-10-11-pending-status-review.json"
+        "docs/programs/free-cloud-ai/evidence/2026-10-11-pending-status-review.json",
+        "docs/programs/free-cloud-ai/evidence/2026-10-11-readonly-status-review.json"
       ],
       "artifact_hashes": {},
       "blocker": "Real keyring/installed lifecycle acceptance unavailable.",
@@ -324,15 +335,16 @@
       "status": "active",
       "owner": "root",
       "session": "2026-10-11-free-cloud-ai-root",
-      "worker": "root (native build waiting); hub_worker preparation complete",
+      "worker": "root sequential native admission/builds; hub_worker acceptance prep complete",
       "actual_model": "coordinator; gpt-6.1-sol/medium preparation, Astra/high review",
       "attempt": 1,
-      "last_checkpoint": "2026-10-11T15:56:05.839365+00:00",
+      "last_checkpoint": "2026-10-11T23:18:19.728430+00:00",
       "base_revision": "448856485e710caedfc24f544a027aea8652dd33",
       "branch": "codex/free-cloud-ai",
       "worktree": "/home/maslow/Projects/Maslow/free-ai-packages",
       "implementation_commits": [
-        "2cfc7ad47731d37d4246ca69957aee6d4ac0c243"
+        "2cfc7ad47731d37d4246ca69957aee6d4ac0c243",
+        "333f4f83ddcba6651687a7723c6778f68023cc5b"
       ],
       "integration_commits": [],
       "tests": [
@@ -347,14 +359,17 @@
       ],
       "evidence": [
         "docs/programs/free-cloud-ai/evidence/2026-10-11-source-package-checkpoint.json",
-        "docs/programs/free-cloud-ai/evidence/2026-10-11-package-preparation-review.json"
+        "docs/programs/free-cloud-ai/evidence/2026-10-11-package-preparation-review.json",
+        "docs/programs/free-cloud-ai/evidence/2026-10-11-c2-package-repin-review.json",
+        "docs/programs/free-cloud-ai/evidence/2026-10-11-c2-final-context-inventory.json",
+        "docs/programs/free-cloud-ai/evidence/2026-10-11-native-sequence-admission.json"
       ],
       "artifact_hashes": {
         "/home/maslow/Maslow-ai-os/free-ai-build/native/maslow-free-ai-0.1.0-1-x86_64.pkg.tar.zst": "5b2d989d58451ac9744f9c0e8c2c3dcde5f99657d1fef931d2c4a348fb5e4143",
         "/home/maslow/Maslow-ai-os/free-ai-build/voice38/maslow-voice-0.1.5-38-x86_64.pkg.tar.zst": "3593c33d16574fae8667da41617c3d7facfda29b3dbaa8672f03f3a7da53f0f2"
       },
-      "blocker": "Native builds deferred: actual unrelated Craft containerupbeat_bell (imagec556,CPU2/RAM6GiB) running at last observation. All three exact build contexts prepared only.",
-      "next_action": "Reconcile running Craft workload before one bounded native build at a time; execute prepared owning/artifact/capsule/ABI/overlap checks without host installation.",
+      "blocker": "Craft owner must release its newly started ISO container and acknowledge the handoff. Both containers are currently paused. The runner rejects even paused foreign containers before the next stage.",
+      "next_action": "After the Craft owner releases the slot, verify full container ID, image and session label and unpause only the owned Free AI container. Finish Free AI, Voice and Connect sequentially, then audit actual archives and compiled runtimes.",
       "coordinator_only": false
     },
     {
@@ -391,10 +406,10 @@
       "status": "active",
       "owner": "root",
       "session": "2026-10-11-free-cloud-ai-root",
-      "worker": "root (native/visual waiting); current_recovery source integration complete",
-      "actual_model": "coordinator; gpt-6.1-sol/high implementation and gpt-6-astra/high independent review",
+      "worker": "current_recovery implementation complete; boundary_review independent source review complete; root integration",
+      "actual_model": "gpt-6.1-sol/high implementation; gpt-6-astra/high independent review",
       "attempt": 2,
-      "last_checkpoint": "2026-10-11T21:18:24.682Z",
+      "last_checkpoint": "2026-10-11T23:18:19.728430+00:00",
       "base_revision": "2a8c6eda15d92078fdd8656a879b1e93dd786a1d",
       "branch": "codex/free-cloud-ai-hub-current",
       "worktree": "/home/maslow/Projects/Maslow/free-ai-hub-current",
@@ -404,10 +419,12 @@
         "8a0d02497f9766e42cfe098476b08845c7b5df27",
         "0aafacbc8915d5db64e92bdb5a97bd604c76e6e1",
         "7e14cbaf091e847db07b2726694f27fe5e7d1837",
-        "2a8c6eda15d92078fdd8656a879b1e93dd786a1d"
+        "2a8c6eda15d92078fdd8656a879b1e93dd786a1d",
+        "947348f0bfb285427936729d2c1861d0f03aa4e5"
       ],
       "integration_commits": [
-        "c856c683de8e66a43d326b435bbf73504f5ca6a2"
+        "c856c683de8e66a43d326b435bbf73504f5ca6a2",
+        "ae0473ecc07b3a3cdaf1563ad9ae3159ef2c0d13"
       ],
       "tests": [
         {
@@ -425,6 +442,10 @@
         {
           "check": "Combined Hubc856:265owning/UI/compile/diff pass; independent 80unchanged baseline+9recovery file checks,1native6denial+5parser controls. Real visual/native gates pending",
           "result": "pass"
+        },
+        {
+          "check": "947348f guided setup: 304 owning tests, 114 focused tests, UI contract and 12 changed-scope namespace cases passed; independent 21 targeted tests and lock/absence/persistence controls passed. Neither production gate enabled.",
+          "result": "pass"
         }
       ],
       "evidence": [
@@ -432,11 +453,12 @@
         "docs/programs/free-cloud-ai/evidence/2026-10-11-account-ui-source-checkpoint.json",
         "docs/programs/free-cloud-ai/evidence/2026-10-11-hub-stage1-checkpoint.json",
         "docs/programs/free-cloud-ai/evidence/2026-10-11-hub-recovery-source-checkpoint.json",
-        "docs/programs/free-cloud-ai/evidence/2026-10-11-hub-current-integration-checkpoint.json"
+        "docs/programs/free-cloud-ai/evidence/2026-10-11-hub-current-integration-checkpoint.json",
+        "docs/programs/free-cloud-ai/evidence/2026-10-11-guided-hub-source-checkpoint.json"
       ],
       "artifact_hashes": {},
-      "blocker": "Actual package/database/key interruption recovery, fresh undo and installed signed delivery remain unverified. Unsupported historical or preserved-state-with-package-absent cases must not be treated as fresh.",
-      "next_action": "Reconcile shared workload before admitting exact bounded native builds sequentially; then artifact/owning/overlap and real combined Quickshell checks. Verify native6 before adding its exact identity to the matched Hub while preserving native5."
+      "blocker": "Native delivery, recovery, real combined UI and live acceptance remain pending; both acceptance gates are false.",
+      "next_action": "After native Connect 6 archive and deployed compatibility checks pass, add only its exact matched identity while preserving accepted native 5; then build the matched Hub candidate and verify guided setup in an installed guest."
     },
     {
       "id": "FCAI-P2-WORK",
@@ -449,7 +471,8 @@
         "voice/tests/ui-controller-test.mjs",
         "voice/tests/ui-preview.qml",
         "voice/tests/ui-work-composer-test.mjs",
-        "voice/tests/work-account-ui-evidence.py"
+        "voice/tests/work-account-ui-evidence.py",
+        "voice/tests/orb-preview.qml"
       ],
       "dependencies": [
         "FCAI-P1-HERMES",
@@ -457,18 +480,19 @@
       ],
       "acceptance": "Scoped source/nativefixture: no defaultaccounts, <=4selectedIDs, separateGroqconsent, immutable retry IDs until accepted ack, local errors, narrowlayout; installed/liveflow remains separate.",
       "phase": 2,
-      "status": "verified",
+      "status": "implementation-complete",
       "owner": "root",
       "session": "2026-10-11-free-cloud-ai-root",
-      "worker": "hub_worker",
+      "worker": "qt_voice source fix complete; root installed Qt gate",
       "actual_model": "gpt-6.1-sol/medium",
-      "attempt": 1,
-      "last_checkpoint": "2026-10-11T15:56:05.839365+00:00",
-      "base_revision": "09721dff",
+      "attempt": 2,
+      "last_checkpoint": "2026-10-11T21:50:49.380Z",
+      "base_revision": "076604c46847c6fb4ac00e0b6355c0ffe6f924db",
       "branch": "codex/free-cloud-ai",
       "worktree": "/home/maslow/Maslow-ai-os/free-ai-runtime",
       "implementation_commits": [
-        "784aea2b"
+        "784aea2b",
+        "6db3622d04a4e06bfc01b65f86e99ff91d6e1ab9"
       ],
       "integration_commits": [],
       "tests": [
@@ -478,11 +502,12 @@
         }
       ],
       "evidence": [
-        "docs/programs/free-cloud-ai/evidence/2026-10-11-account-ui-source-checkpoint.json"
+        "docs/programs/free-cloud-ai/evidence/2026-10-11-account-ui-source-checkpoint.json",
+        "docs/programs/free-cloud-ai/evidence/2026-10-11-voice-qt612-integration-review.json"
       ],
       "artifact_hashes": {},
-      "blocker": null,
-      "next_action": "Carry exactUI bytes into finalnativecandidate; installedQt6.12/user/liveaccount acceptance remainsopen."
+      "blocker": "Actual combined Qt6.12 rendering/installed workflow remains queued; three-file source qualification passed five Node suites and independent review.",
+      "next_action": "Run real combined Work fixture with approved current source after native sequence; preserve account/privacy/immutable ID controls."
     },
     {
       "id": "FCAI-P3-CONNECT",

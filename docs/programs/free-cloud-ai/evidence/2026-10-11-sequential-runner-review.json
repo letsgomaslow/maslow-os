@@ -1,0 +1,76 @@
+{
+  "schema": 1,
+  "date": "2026-10-11",
+  "status": "runner-controls-reviewed-source-hold-still-blocks-go",
+  "scope": "Bounded external sequential runner controls only. No Docker call, native build, actual container cleanup or installed acceptance.",
+  "externalDirectory": "/home/maslow/Maslow-ai-os/free-ai-build/native-2-39",
+  "finalReviewedSha256": {
+    "sequential-build.py": "91e5895c7b7826e86ecfdf44780e1462a015b7f398340abcab833c199af97e74",
+    "test_sequential_runner.py": "edfaa247737f7984acd1c3ba5e0c351dda529c4175d3ba01893c372605172cb0",
+    "runner-enospc-preparation-proof.json": "5777fcf11b29ff6d8d9ebd0143ac43fdcfd7b324c82aa16732f04b082c9766ea",
+    "runner-recovery-notes.md": "fc76dd44f1609dac76a6709c8fd280c8765d057541f7bc13c815e1be940d7d94"
+  },
+  "findings": [
+    {
+      "severity": "P2",
+      "status": "fixed-and-retested",
+      "title": "Cleanup stopped a reusable name after inspecting an owned identity",
+      "affectedRunnerSha256": "ff67a71f24e0bff8c0201e49ce573b157bdccb0ae8c5b9b307d64fd66a42f157",
+      "reproduction": "An inert Docker adapter returned an owned immutable ID; the actual cleanup function then issued docker stop against its mutable name. Replacement between inspection and stop could target another container.",
+      "fix": "Use the per-run CID file when available, validate exact image/session/immutable ID, stop only the inspected64-hex ID and reinspect only that ID. Exact NotFound is absence; permission, daemon, timeout and malformed results remain errors.",
+      "retest": "Name-reuse, foreign identity, NotFound and unknown inspection controls pass without stopping a foreign target."
+    },
+    {
+      "severity": "P2",
+      "status": "fixed-and-retested",
+      "title": "SIGTERM bypassed cleanup and failure recording",
+      "affectedRunnerSha256": "ff67a71f24e0bff8c0201e49ce573b157bdccb0ae8c5b9b307d64fd66a42f157",
+      "reproduction": "An actual owned scratch Python runner with inert process adapters received SIGTERM after entering a fake build: exit-15, durable status still running, cleanup never invoked.",
+      "fix": "SIGTERM raises a handled failure, repeated TERM is ignored during bounded cleanup, and previous signal handling is restored afterward. Failure state is written atomically with file/directory fsync when storage permits.",
+      "retest": "Actual scratch runner and inert child receive SIGTERM; original error propagates, exact-ID cleanup facade is invoked and the inert child is gone. This is not real Docker cleanup proof."
+    },
+    {
+      "severity": "P2",
+      "status": "fixed-and-retested",
+      "title": "Failure or identity journaling errors could prevent cleanup",
+      "affectedRunnerSha256": "a83df6fdb49da41a47beb22156e9289decd20be1cad2b1892a6ecf135267e597",
+      "reproduction": "Actual run_sequence with real scratch files and inert process adapters: inject ENOSPC only when writing stopped-on-failure. The exception escaped before stop_owned_container was called. Identity journaling had the same ordering dependency.",
+      "fix": "Failure and cleanup identity journaling are best-effort. Persistence errors are retained in memory/reported where possible and cannot prevent verified exact-ID cleanup or replace the original build/termination error.",
+      "retest": "Original scratch reproduction now invokes cleanup once and preserves the original CalledProcessError. Eleven controls also cover transient/persistent ENOSPC during actual inert SIGTERM plus foreign/absent/unknown inspection safety under failing journals."
+    }
+  ],
+  "independentChecks": [
+    {
+      "command": "python3 -B test_sequential_runner.py",
+      "tests": 11,
+      "result": "passed",
+      "limits": "Real scratch files/locks, real SIGTERM and inert Python children; synthetic Docker facade, no actual container. Expected injected journal/inspection errors appear in test output."
+    },
+    {
+      "check": "Independent reproduction retake: persistent failure-journal ENOSPC with original build exception",
+      "result": "cleanup invoked once; original exception identity preserved"
+    },
+    {
+      "check": "Independent existing-log and actual advisory-flock conflict controls",
+      "result": "prior log bytes preserved; no process launch when either guard rejects"
+    },
+    {
+      "check": "Explicit GO argument and superseded-source hold",
+      "result": "controls reject before acquiring the shared production lock or starting work"
+    }
+  ],
+  "inputAndResourceReview": {
+    "supersededContextProofSha256": "0c1657b61d43ae23b5cf8f73043479cb8b6a15088affce1356a405cb09fc5ea1",
+    "preQtPreparationChecks": "Both proof copies and all27 input hashes matched. Three pinned-image plans preserve FreeAI2→Voice39→Connect6 order, CPU2, RAM4GiB, RAM-plus-swap6GiB and MAKEFLAGS=-j2; runtime/Connect sources are read-only mounts. Actual image inspection was not run by this reviewer.",
+    "currentAdmission": "Blocked by SOURCE_HOLD. The reviewed runner still references superseded7d contexts. Root must commit/repin the accepted Qt source/archive/manifests, refresh copied contexts and both proof hashes, update runner pins, and obtain the bounded independent identity retake before clearing the hold.",
+    "coordinatorAuthority": "An empty workload inventory, advisory lock or successful control test is not admission. Root owns GO after reconciling the active Craft ISO slot; no dependency on finishing the entire Craft program is introduced."
+  },
+  "remainingConfirmedScopedCodeFindings": [],
+  "limitations": [
+    "SIGKILL, machine failure and total runner loss cannot run cleanup. Reconcile only exact recorded CID/image/session evidence; never stop by mutable name or broad process/container patterns.",
+    "Persistent ENOSPC can leave stale durable running state even after cleanup. The report and tests do not claim a failure receipt can be persisted onto a failing filesystem.",
+    "Actual Docker ownership/cleanup behavior, immutable builder image identities and resource enforcement remain untested by this no-Docker review.",
+    "Runner build completion means acceptance-pending. Owning tests, archive/ABI/capsule/dependency/notice/overlap and native/live checks remain separately required."
+  ],
+  "operations": "Reviewer edited only this report for the runner review. No runner/source modification, shared lock acquisition, Docker/VM operation, native build, host install, credential access or provider request."
+}

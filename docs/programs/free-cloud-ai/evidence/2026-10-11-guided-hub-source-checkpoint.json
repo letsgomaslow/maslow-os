@@ -1,0 +1,28 @@
+{
+  "schema": 1,
+  "date": "2026-10-11",
+  "status": "source-committed-native-acceptance-pending",
+  "source_revision": "947348f0bfb285427936729d2c1861d0f03aa4e5",
+  "worktree": "/home/maslow/Projects/Maslow/free-ai-hub-current",
+  "reports_sha256": {
+    "docs/evidence/2026-10-11-free-ai-guided-delivery-wiring-review.json": "a1031cc7ecd2d83cc19a073e05412f3475927708c1e59fc1305f681b24eb02aa",
+    "docs/evidence/2026-10-11-free-ai-guided-delivery-review.json": "0852c5a0a863e9eb8a036a07eda29a10f0322fdc615bcd7cccafc12d18ddf596"
+  },
+  "freeze_path": "/home/maslow/Maslow-ai-os/free-ai-build/hub-current-integration/guided-revised-source-freeze.json",
+  "freeze_sha256": "7f3213177dfd9b77d90cc2fad442c81c7dae06f153e5a2b7c137b413ab1aa51f",
+  "coordinator_check": "14 source hashes, 12 unchanged invariants and all four reported test log hashes matched before explicit scoped commit; staged diff check passed; Hub worktree clean. Tests inspected, not redundantly rerun.",
+  "tests": {
+    "owning": 304,
+    "focused": 114,
+    "new_namespace_cases": 12,
+    "independent_targeted": 21,
+    "ui_contract": "pass"
+  },
+  "preservation": "Existing Craft apps, updater, Featured catalog and native 5 identity preserved. No native 6 admission. No host installation or publication.",
+  "gates": {
+    "installation_accepted": false,
+    "recovery_accepted": false,
+    "visual_installed_live": "pending"
+  },
+  "next_action": "Complete native archives and deployed Connect compatibility proof before matched Hub packaging/installed acceptance."
+}

@@ -1,0 +1,53 @@
+{
+  "schema": 1,
+  "date": "2026-10-11",
+  "status": "scoped-provenance-review-passed-not-built",
+  "scope": "Six frozen FreeAI/Voice package-preparation files repinned to the committed, independently reviewed read-only status change. No new implementation or native acceptance.",
+  "recipeBaseCommit": "3b7004282c17b44cb44db8e08d600b248d221b1c",
+  "runtimeSourceCommit": "c2b03842a81645998a79cbca525c03ddf67813b4",
+  "runtimeArchiveSha256": "c7dd7013a33f264a9f9523af70e4ae82e982490644d37494ad416d2bf5562bc1",
+  "freezeProof": {
+    "path": "/home/maslow/Maslow-ai-os/free-ai-build/native-2-39/repin-c2b03842/freeze-proof.json",
+    "sha256": "f34ed5d54fcc570b318002f52dcf3148762ec0574e0f36b101fc03b557013d4c"
+  },
+  "filesSha256": {
+    "pkgbuilds/maslow-free-ai/PKGBUILD": "235eed6a7e87ea13cb08f838ab2fc1df87c0b5d7cc82ad9035e8ace84f217049",
+    "pkgbuilds/maslow-free-ai/README.md": "902025b4119241ff8b2fb762938adbcf15098b041edb98cbaedff0cd22712134",
+    "pkgbuilds/maslow-free-ai/source-integrity.json": "176016eac685253bd0046fe9f2e515d3565b4d37334369294c0945a14d2dd30d",
+    "pkgbuilds/maslow-voice/PKGBUILD": "044fc90125ecf61f21cfe460277fa6ea7041c4a446d7d308769d1089616f3d9b",
+    "pkgbuilds/maslow-voice/README.md": "6c1d3dd362c2741fa815b60e594d7c1ff766a4efff7862f03f81b6629e7c41b9",
+    "pkgbuilds/maslow-voice/source-integrity.json": "fa5ec7362b4f7efc1f4acc328f6bb5e937840109acf8065cd2b8769b011cfb8a"
+  },
+  "independentVerification": [
+    "Exactly the six declared files are changed, and all frozen file/proof hashes match.",
+    "Each PKGBUILD equals its parent bytes after only archive/source-manifest digest substitution. Helpers, dependency declarations/locks, package versions, constants, source-selection and build/check/package behavior are unchanged.",
+    "Saved archive digest equals an independently generated git archive of exactc2b03842; its PAX comment records that full revision.",
+    "All16 FreeAI manifest entries match archive and extracted-source bytes. Only control.py changed;15 inputs are unchanged.",
+    "All147 Voice manifest entries match archive and extracted-source bytes. Only control.py and test_control.py changed;145 inputs are unchanged.",
+    "The two committed changed leaves equal the prior independent read-only-status review hashes. The three accepted Qt qualification files remain byte-identical to6db3622d.",
+    "All six recovery capsule members retain exact reviewed sizes/hashes. Five Python members were checked directly in the new runtime archive; Node was checked directly in its checksum-verified retained archive without execution.",
+    "README edits correctly describe the combined Qt/read-only-status source and retain preparation-only limits. git diff --check passes."
+  ],
+  "priorReadOnlyReview": {
+    "path": "docs/programs/free-cloud-ai/evidence/2026-10-11-readonly-status-review.json",
+    "sha256": "32a9bfcd2e129c895a6a86a9acc5715577173ff21faa4b0008ae58a1d399c205",
+    "committedControlSha256": "ba9c880be02832125ad247112b41781faa35a8a2cddeab5e83574cd394028aed",
+    "committedControlTestsSha256": "f640c02074b194eeea08a5a963b94dc63850d9b702ddf0c34fd5f98ece3bd132"
+  },
+  "workerChecksInspectedNotRepeated": {
+    "freeAIHelperTests": 9,
+    "freeAIHelperLogSha256": "36aa392a7633d764747820775d05e5e0ff456bb07fbaee414db1fb75c56da2c5",
+    "voiceHelperTests": 6,
+    "voiceHelperLogSha256": "7d7b43d8d7a6487acef0cf64843b6f646b172eb9ce309654d622d56f79bfb13d",
+    "logHashesAndPassingResultsVerified": true,
+    "otherReportedChecks": "Eight archive-guard outcomes, source validators, Bash syntax, packaging invariants and diff check pass. No helper/Node/namespace suites were duplicated in this provenance retake."
+  },
+  "remainingConfirmedScopedFindings": [],
+  "nextRequired": "Root commits the six files; the worker then refreshes the latest copied contexts, context proofs and held runner pins for bounded identity review. No old7d/6db context is admitted by this report.",
+  "constraints": [
+    "Native source hold remains in force; this review does not admit GO, acquire a slot or alter the active Craft VM workload.",
+    "No peer acknowledgment or cross-chat communication is claimed.",
+    "Native archive/ABI/capsule/dependency/notice/overlap, real UI, installed recovery and live/provider/account/audio gates remain open."
+  ],
+  "operations": "Reviewer edited only this report. No recipe/source edit, commit, build, Docker/VM/host action, credential access or provider request. Historical inputs remain preserved."
+}

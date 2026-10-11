@@ -34,9 +34,9 @@
     "iso_base": "d96a3ee563df5a1eb76a711c7b408c0d1d0137cb",
     "runtime_implementation": "e7b8831a4fc81f6fdf0a1b8369dcc748274d9112",
     "connect_native3_baseline_not_managed_account_acceptance": "7545ba68c0b6759a7f65c88ccb1390777df5b812",
-    "runtime_current_source": "61b13cc175427abce79555dcc0e41e3d5999297f",
-    "hub_current_source": "c856c683de8e66a43d326b435bbf73504f5ca6a2",
-    "packages_current_source": "f4df4dad2da480ce95c7e53a3fc263b79a87c5c0",
+    "runtime_current_source": "c2b03842a81645998a79cbca525c03ddf67813b4",
+    "hub_current_source": "947348f0bfb285427936729d2c1861d0f03aa4e5",
+    "packages_current_source": "333f4f83ddcba6651687a7723c6778f68023cc5b",
     "connect_managed_source": "97ac20eed146a8c6b37e33c2c29901a00f3045ff",
     "hub_recovery_design": "0aafacbc8915d5db64e92bdb5a97bd604c76e6e1",
     "connect_previous_managed_source": "646aa1149f36050a470ded7e3658ad0b0a38bcbb",
@@ -98,7 +98,17 @@
     "docs/programs/free-cloud-ai/evidence/2026-10-11-connect-current-integration.json",
     "docs/programs/free-cloud-ai/evidence/2026-10-11-connect-package-preparation-review.json",
     "docs/programs/free-cloud-ai/evidence/2026-10-11-hub-recovery-source-checkpoint.json",
-    "docs/programs/free-cloud-ai/evidence/2026-10-11-hub-current-integration-checkpoint.json"
+    "docs/programs/free-cloud-ai/evidence/2026-10-11-hub-current-integration-checkpoint.json",
+    "docs/programs/free-cloud-ai/evidence/2026-10-11-voice-qt612-integration-review.json",
+    "docs/programs/free-cloud-ai/evidence/2026-10-11-readonly-status-review.json",
+    "docs/programs/free-cloud-ai/evidence/2026-10-11-sequential-runner-review.json",
+    "docs/programs/free-cloud-ai/evidence/2026-10-11-c2-package-repin-review.json",
+    "docs/programs/free-cloud-ai/evidence/2026-10-11-c2-final-context-inventory.json",
+    "docs/programs/free-cloud-ai/evidence/2026-10-11-native-sequence-admission.json",
+    "docs/programs/free-cloud-ai/evidence/2026-10-11-next-slot-compatibility-review.json",
+    "docs/programs/free-cloud-ai/evidence/2026-10-11-qt612-package-repin-review.json",
+    "docs/programs/free-cloud-ai/evidence/2026-10-11-final-native-context-review.json",
+    "docs/programs/free-cloud-ai/evidence/2026-10-11-guided-hub-source-checkpoint.json"
   ],
   "passed_source_gates": [
     "every-dispatch-provider-and-model-policy",
@@ -106,17 +116,20 @@
     "managed-hermes-tools-and-request-idempotency-contract"
   ],
   "prepared_build": {
-    "runtime_revision": "7d43070004f3a9182bc5e4916aee9cf4a4ba4bec",
-    "runtime_archive_sha256": "5b724b9768b31af83f65295319327fc5e443a27dc8fea9496ea87799ab0d37ad",
-    "package_revision": "2cfc7ad47731d37d4246ca69957aee6d4ac0c243",
+    "runtime_revision": "c2b03842a81645998a79cbca525c03ddf67813b4",
+    "runtime_archive_sha256": "c7dd7013a33f264a9f9523af70e4ae82e982490644d37494ad416d2bf5562bc1",
+    "package_revision": "333f4f83ddcba6651687a7723c6778f68023cc5b",
     "versions": {
       "maslow-free-ai": "0.1.0-2",
       "maslow-voice": "0.1.5-39"
     },
     "built": false,
-    "slot_admitted": false,
-    "build_context_proof": "/home/maslow/Maslow-ai-os/free-ai-build/native-2-39/build-context-proof.json",
-    "native_admission_blocker": "Actual running Craftupbeat_bell container; contexts and bounded commands prepared only."
+    "slot_admitted": true,
+    "build_context_proof": "/home/maslow/Maslow-ai-os/free-ai-build/native-2-39/build-context-proof-c2b03842.json",
+    "native_admission_blocker": "Craft owner must release its newly started ISO container and acknowledge the handoff. Both containers are currently paused. The runner rejects even paused foreign containers before the next stage.",
+    "build_context_sha256": "08bca127d23a3cdd7e193d0a05dbc5a4a09d4d6213faa2e227155b600a3aea65",
+    "sequence_session": "200e3daafe734d22a6aa2b2f5881f1c2",
+    "current_status": "Free AI 2 compilation started, then its exact owned container was paused after a new Craft ISO started. Runner and exclusive lock remain held; Voice and Connect have not started."
   },
   "prepared_connect_build": {
     "package_revision": "f4df4dad2da480ce95c7e53a3fc263b79a87c5c0",
@@ -131,8 +144,8 @@
       "source_revision": "2e872f50a28706e70c159380e2b7186869415b7f"
     },
     "review": "docs/programs/free-cloud-ai/evidence/2026-10-11-connect-package-preparation-review.json",
-    "context_proof": "/home/maslow/Maslow-ai-os/free-ai-build/connect-package-prep/native/build-context-proof.json",
-    "matched_hub_source": "c856c683de8e66a43d326b435bbf73504f5ca6a2",
+    "context_proof": "/home/maslow/Maslow-ai-os/free-ai-build/connect-package-prep/native/build-context-proof-c2b03842.json",
+    "matched_hub_source": "947348f0bfb285427936729d2c1861d0f03aa4e5",
     "matched_hub_recognizes_candidate6": false
   }
 }

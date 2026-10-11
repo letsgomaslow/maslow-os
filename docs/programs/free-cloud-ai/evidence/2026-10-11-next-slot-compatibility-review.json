@@ -1,0 +1,85 @@
+{
+  "schema": 1,
+  "date": "2026-10-11",
+  "status": "bounded-next-step-plan-native-gates-open",
+  "scope": "Read-only investigation of exact Connect identity recognition and preservation-sensitive FreeAI uninstall/reinstall. No general audit or implementation approval.",
+  "inputs": {
+    "hubCommit": "c856c683de8e66a43d326b435bbf73504f5ca6a2",
+    "connectCombinedSource": "97ac20eed146a8c6b37e33c2c29901a00f3045ff",
+    "connectRecipeCommit": "f4df4dad2da480ce95c7e53a3fc263b79a87c5c0",
+    "freeAI2Voice39RuntimeSource": "7d43070004f3a9182bc5e4916aee9cf4a4ba4bec",
+    "hubSourceSha256": {
+      "helper/apps.py": "8293eba8404cfe8ef774d35a4b068458b56f649e86f7542bc83a039168195057",
+      "helper/free_ai_delivery.py": "d05e08070904e8103c02ac79de87ebacc025f2f81726cac34b51780aff18c49d",
+      "helper/free_ai_lifecycle.py": "a176b6cfe4ff333efe99d5e34c362dfbf8843cfc1c49feabc518f76b8db9a129",
+      "helper/free_ai_recovery.py": "df06a7b6e8d8ae41b5e3924153fc7532233b221993a5dc69a1ac9180f590ac92",
+      "docs/free-ai-current-operation-recovery.md": "c68395ac2314b5521c656b262f1114694225053f17176cadac213636f86ede3d",
+      "tests/test_apps_contract.py": "31d1b0b4f1404d4cfa971b5dbe97cbb2c566703f9403732a89deb534eaa4979c"
+    }
+  },
+  "nextHeavySlot": {
+    "sequence": ["FreeAI2", "Voice39", "Connect6"],
+    "prerequisite": "The active Craft ISO workload has ended and root has rechecked shared resources and admitted the next bounded build. This does not wait for completion of the entire Craft program.",
+    "parallelHeavyBuilds": false,
+    "hostInstallOrPromotionAuthorizedByThisReport": false
+  },
+  "matchedHubRecognition": {
+    "currentBehavior": "Apps.require_bridge accepts only maslow-connect0.1.0-5 with build.json source2e872f50. It retains fixed launcher/build-manifest regular-file, root-owner, non-writable and pacman-owner checks. Native6 currently fails CONNECT_UNVERIFIED, intentionally.",
+    "minimalFutureChange": "After native6 artifact acceptance, replace the single version/source constants with one fixed package-version to exact source-revision mapping. Select the expected source from the exact successful pacman package identity, then require build.packageVersion to equal that selected version and build.sourceRevision to equal its mapped source. Preserve every existing file/owner/mode/error and fixed-command check.",
+    "pairs": {
+      "0.1.0-5": "2e872f50a28706e70c159380e2b7186869415b7f",
+      "0.1.0-6": "97ac20eed146a8c6b37e33c2c29901a00f3045ff"
+    },
+    "constraints": [
+      "Do not use independent allowed-version and allowed-source sets; that would accept crossed identities.",
+      "Do not accept greater-than versions, arbitrary valid hashes, a developer launcher or the managed marker as a substitute for the accepted package/source pair.",
+      "Do not require a managed-accounts marker for native5 Craft use. Managed account readiness remains its separate runtime contract.",
+      "Keep both FreeAI mutation gates false. Additive Craft recognition does not grant live account, provider, recovery or physical acceptance.",
+      "Update only the matched isolated Hub source/tests/contract after proof; preserve original Craft/native5 support."
+    ],
+    "native6Prerequisites": [
+      "Build the exact source97ac20e/archive8a9929b9d9652bd38bc36b8426df6cc2783fadc9c5246ccbfa26599d74351906 with recipef4df4dad; record the resulting native archive digest rather than inventing one now.",
+      "Inspect actual archive identity, root ownership/modes, unchanged fixed launchers, build.json source/archive/lock provenance, fixed managed marker, production dependency/link closure and package overlap.",
+      "Run deployed read-only capabilities and accepted Craft native contract regressions in the admitted disposable environment, without granting accounts or using live credentials. Do not infer installed behavior from the source369-test result.",
+      "Retain native5 and exact native6 archive evidence for the subsequent matched Hub identity review."
+    ],
+    "focusedTestsRequired": [
+      "Positive5/source2e and6/source97; negative5/source97 and6/source2e; installed/build version mismatch; unknown7 and unreviewed source.",
+      "Preserve rejection of failed/malformed package queries, wrong pacman owner, user/writable/symlink launcher or manifest, missing/malformed provenance and developer fallback. Each denial precedes Connect invocation.",
+      "Exercise existing Craft inspect/connect/disconnect/removal/recovery contracts with each accepted pair using bounded fixtures; no change to command supervision, cancellation, quarantine or terminal consent.",
+      "Keep the native6 negative test until actual acceptance authorizes the mapping change, then replace only that case with the precise positive and cross-pair negatives."
+    ]
+  },
+  "preservedStateReinstall": {
+    "disposition": "Unsupported and correctly fail-closed under the current contract. Do not weaken fresh_check or enable a repair shortcut.",
+    "verifiedCodeFacts": [
+      "Fresh preparation derives previousArtifacts from actual installed packages. With only Voice present, any maslow-free-ai state directory immediately rejects before service/profile or keyring inspection; keyring-only residual items also reject through existence-only checks.",
+      "Current-operation recovery rejects an absent package when that package is recorded in previousArtifacts. Intact previous/target states are supported; arbitrary removal, missing ownership and repair are not.",
+      "Successful completion writes a terminal root receipt under the fixed transaction directory, then removes the public ticket and active free-ai-security.json. No active authority or canonical last-installed-state pointer remains merely because historical archives exist.",
+      "Terminal decisions prohibit historical snapshot replay. Current quota/settings may have advanced after that receipt; an old matching key fingerprint does not authorize replacing current data.",
+      "The existing ticket/receipt model does not separately bind an absent backend's state-verifier provenance and the actually installed previous package set. Adding the absent package to previousArtifacts would misrepresent the installed baseline; omitting it leaves the retained verifier unbound."
+    ],
+    "authoritativeEvidenceNeededBeforeAnyFutureImplementation": [
+      "An unambiguous protected root-owned record binding the original UID and the exact package/source/archive identity that owned the preserved state, with the exact retained archive still verified. Package cache names, user build.json, directory timestamps or selecting the newest historical receipt are insufficient.",
+      "A fresh authorized operation that distinguishes present package ownership from preserved state provenance and binds a new transaction/nonce/current recovery checkpoint. An expired or completed install ticket cannot be renewed into reinstall authority.",
+      "A canonical stopped Voice/router environment, admission barrier, owned service lock and private root/user lease; a user-owned verifier from the exact supported retained prior artifact, never an unverified target or developer module.",
+      "Private verification of the current database and current Secret Service key, current WAL/quota/settings and a new consistent snapshot. Root receives only bounded identities/hashes; old key/snapshot presence alone is insufficient.",
+      "Exact current package absence/ownership, fixed intended archives, normal pacman signature/dependency/hook policy and interruption recovery that explicitly preserves current data even if the backend remains absent."
+    ],
+    "minimalNextAction": "First prove the existing fresh and managed native install/current-operation recovery paths with the built artifacts in an admitted disposable environment. Then characterize removal with state/key preservation and verify refusal. Supporting reinstall requires a separately reviewed preserved-state lifecycle contract and authoritative provenance selection; that extension is outside this no-schema-change investigation. Keep the current blocker until that contract exists.",
+    "focusedTestsRequired": [
+      "Backend absent plus state directory: reject with bytes/permissions unchanged and no secret lookup; backend absent plus only keyring items: reject without retrieving secrets; locked/error keyring never means empty.",
+      "Missing previously recorded backend, partial ownership, manual files, unsupported historical FreeAI1 verifier and mismatched UID/archive/source remain unavailable.",
+      "After completed operation and new quota/settings/key changes, retained old receipts cannot restore old data, re-enable routes or resurrect account grants.",
+      "Any future paired reinstall proof must retain current ciphertext, quota and preferences across success, disk-full, key mismatch and interruption; no plaintext export, state deletion, migration, dependency sweep or target-capsule fallback.",
+      "Current-operation interrupted fresh undo remains separate from uninstall/reinstall after admission resumed. Do not mark one gate passed from the other."
+    ]
+  },
+  "independentChecks": {
+    "scratchPreservedDirectory": "Actual fresh_check rejected FREE_AI_EXISTING_STATE_UNPAIRED with an opaque temporary sentinel unchanged; profile and keyring adapters were not called.",
+    "scratchMissingPreviousBackend": "Actual package_state rejected FREE_AI_RECOVERY_PACKAGE_UNKNOWN with synthetic package-query absence before archive checking or mutation.",
+    "scope": "Two targeted source-control checks only. No full-suite repeat, native operation, Docker/VM, service/configuration change, live keyring/provider/account access or package operation."
+  },
+  "nativeAndLiveGates": false,
+  "operations": "Reviewer edited only this evidence file. Root owns integration, implementation scheduling and program records; all existing projects and source remain unchanged."
+}
