@@ -207,8 +207,9 @@ class RouterRuntime:
             self.state.update(enabled=enabled)
         return self.status()
 
-    async def prepare_recovery(self, artifacts):
+    async def prepare_recovery(self, artifacts, *, reserved_id=None, operation=None):
         self.recovery.validate_artifacts(artifacts)
+        self.recovery.validate_operation(reserved_id,operation)
         async with self.lock:
             if self.owners:
                 raise FreeAIError("TASKS_ACTIVE", "Finish or stop assistant requests before package changes.")
@@ -221,7 +222,7 @@ class RouterRuntime:
             if self.process is not None:
                 raise FreeAIError("ROUTER_SHUTDOWN_FAILED", "The owned router has not stopped. Package changes are blocked.")
             try:
-                return await self.recovery.snapshot(self.database, artifacts=artifacts)
+                return await self.recovery.snapshot(self.database, artifacts=artifacts, reserved_id=reserved_id, operation=operation)
             except BaseException:
                 if not self.recovery.pending():
                     self.admission = previous_admission

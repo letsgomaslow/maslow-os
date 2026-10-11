@@ -14,7 +14,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "free_ai"))
 
 from maslow_voice.daemon import VoiceService
 from maslow_voice.errors import VoiceError
-from maslow_voice.free_ai_delivery import barrier_present, process_start, read_ticket, startup_check
+from maslow_voice.free_ai_delivery import barrier_present, operation_binding, process_start, read_ticket, startup_check
 from maslow_free_ai.errors import FreeAIError
 
 TX = 'd' * 32
@@ -61,7 +61,7 @@ class DeliveryTests(unittest.IsolatedAsyncioTestCase):
         self.temp=tempfile.TemporaryDirectory();self.root=Path(self.temp.name)
         self.service=VoiceService(self.root/'state',self.root/'runtime',credentials=Mock())
         self.ticket=ticket()
-        self.receipt={'schema':1,'id':'c'*32,'kind':'snapshot','database_sha256':'8'*64,'settings_sha256':'9'*64,
+        self.receipt={'schema':1,'id':TX,'kind':'snapshot','database_sha256':'8'*64,'settings_sha256':'9'*64,
             'key_fingerprint':'7'*64,'artifacts':{'maslow-free-ai':'3'*64,'maslow-voice':'4'*64}}
         self.router=Mock(process=None,owners=set())
         self.router.state.directory=self.service.directory.parent/'maslow-free-ai'
@@ -97,7 +97,7 @@ class DeliveryTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(facts['uid'],os.getuid());self.assertEqual(facts['daemonPid'],os.getpid())
         self.assertTrue(facts['admissionClosed']);self.assertTrue(facts['ownedRouterStopped'])
         self.assertEqual(await self.service.dispatch(self.request('check')),response)
-        self.router.prepare_recovery.assert_awaited_once_with(self.receipt['artifacts'])
+        self.router.prepare_recovery.assert_awaited_once_with(self.receipt['artifacts'],reserved_id=TX,operation=operation_binding(self.ticket))
         with self.assertRaises(VoiceError):await self.service.dispatch(self.request())
         self.router.prepare_recovery.assert_awaited_once()
 
@@ -127,7 +127,7 @@ class DeliveryTests(unittest.IsolatedAsyncioTestCase):
 
     async def test_closure_precedes_first_await_and_blocks_every_new_workflow(self):
         entered,finish=asyncio.Event(),asyncio.Event()
-        async def snapshot(artifacts):
+        async def snapshot(artifacts, **kwargs):
             entered.set();await finish.wait();return self.receipt
         self.router.prepare_recovery.side_effect=snapshot
         pending=asyncio.create_task(self.service.dispatch(self.request()))
@@ -146,7 +146,7 @@ class DeliveryTests(unittest.IsolatedAsyncioTestCase):
 
     async def test_concurrent_or_failed_preparation_cannot_take_another_snapshot(self):
         entered, finish = asyncio.Event(), asyncio.Event()
-        async def snapshot(artifacts):
+        async def snapshot(artifacts, **kwargs):
             entered.set()
             await finish.wait()
             return self.receipt

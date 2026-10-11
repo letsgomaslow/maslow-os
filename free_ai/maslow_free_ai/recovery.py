@@ -79,6 +79,15 @@ def sync_directory(path):
         os.close(fd)
 
 
+def unique_object(pairs):
+    value = {}
+    for key, item in pairs:
+        if key in value:
+            raise ValueError('Duplicate recovery field')
+        value[key] = item
+    return value
+
+
 def backup_database(source, target):
     checked_file(source)
     for name in (str(source) + '-wal', str(source) + '-shm'):
@@ -143,7 +152,29 @@ class Recovery:
         if not isinstance(artifacts, dict) or not artifacts or any(name not in {'maslow-free-ai','maslow-voice'} or not isinstance(value,str) or not re.fullmatch(r'[a-f0-9]{64}', value) for name,value in artifacts.items()):
             raise FreeAIError('RECOVERY_ARTIFACT_REQUIRED', 'Recovery needs exact verified package identities.')
 
-    async def snapshot(self, database, *, artifacts):
+    @staticmethod
+    def validate_operation(identity, operation):
+        if identity is None and operation is None:
+            return
+        if (not isinstance(identity,str) or not SNAPSHOT_ID.fullmatch(identity) or not isinstance(operation,dict)
+                or set(operation) != {'schema','transactionId','nonce_sha256'} or type(operation['schema']) is not int
+                or operation['schema'] != 1 or operation['transactionId'] != identity
+                or not isinstance(operation['nonce_sha256'],str) or not re.fullmatch(r'[a-f0-9]{64}',operation['nonce_sha256'])):
+            raise FreeAIError('RECOVERY_BINDING_INVALID','The recovery operation identity is invalid. No snapshot was created.')
+
+    def verify_operation(self, identity, operation):
+        self.validate_operation(identity,operation)
+        try:
+            path = self.root / identity / 'operation.json'
+            checked_file(path,2048)
+            value = json.loads(path.read_text(), object_pairs_hook=unique_object)
+            self.validate_operation(identity,value)
+            if value != operation:
+                raise ValueError()
+        except (OSError,ValueError,TypeError):
+            raise FreeAIError('RECOVERY_BINDING_INVALID','The snapshot does not belong to this exact root operation. No recovery was authorized.') from None
+
+    async def snapshot(self, database, *, artifacts, reserved_id=None, operation=None):
         """Admission/shutdown are the caller's locked preconditions.
 
         A durable marker is written first. Failure deliberately leaves admission
@@ -152,11 +183,16 @@ class Recovery:
         if self.pending():
             raise FreeAIError('RECOVERY_PENDING', 'Finish or abandon the pending recovery operation first.')
         self.validate_artifacts(artifacts)
-        identity = uuid.uuid4().hex
+        self.validate_operation(reserved_id,operation)
+        identity = reserved_id or uuid.uuid4().hex
         atomic_json(self.marker, {'schema':1,'id':identity,'state':'preparing'})
         directory = self.root / identity
         directory.mkdir(mode=0o700)
         try:
+            sync_directory(self.root)
+            if operation is not None:
+                atomic_json(directory / 'operation.json',operation)
+                sync_directory(directory)
             database = Path(database)
             if not database.exists() and not database.is_symlink():
                 if self.state.value['configured']:

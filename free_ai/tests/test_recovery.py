@@ -12,7 +12,7 @@ from unittest.mock import AsyncMock, Mock, patch
 
 from maslow_free_ai.credentials import EncryptionKey
 from maslow_free_ai.errors import FreeAIError
-from maslow_free_ai.recovery import Recovery
+from maslow_free_ai.recovery import Recovery, sync_directory
 from maslow_free_ai.state import State
 
 NODE = Path('/tmp/maslow-freellmapi-tools/node-v22.23.3-linux-x64/bin/node')
@@ -161,6 +161,63 @@ class RecoveryTests(unittest.IsolatedAsyncioTestCase):
         with self.assertRaises(FreeAIError) as error:
             await self.recovery.restore_prepared(receipt['id'], artifacts=self.artifacts)
         self.assertEqual(error.exception.code, 'RECOVERY_NOT_PREPARED')
+
+    async def test_reserved_snapshot_and_nonce_binding_survive_lost_root_reply(self):
+        identity = 'e' * 32
+        operation = {'schema':1,'transactionId':identity,'nonce_sha256':'f' * 64}
+        receipt = await self.recovery.snapshot(self.database, artifacts=self.artifacts, reserved_id=identity, operation=operation)
+        self.assertEqual(receipt['id'],identity)
+        restarted = Recovery(self.state,self.keys,NODE)
+        self.assertEqual(await restarted.verify(identity,artifacts=self.artifacts),receipt)
+        restarted.verify_operation(identity,operation)
+        with self.assertRaises(FreeAIError):
+            restarted.verify_operation(identity,operation|{'nonce_sha256':'0' * 64})
+        self.assertEqual(json.loads(restarted.marker.read_text())['id'],identity)
+        self.assertNotIn(KEY,(restarted.root / identity / 'operation.json').read_text())
+
+    async def test_invalid_reserved_binding_creates_no_marker_or_snapshot(self):
+        with self.assertRaises(FreeAIError):
+            await self.recovery.snapshot(self.database, artifacts=self.artifacts, reserved_id='../bad', operation={})
+        self.assertFalse(self.recovery.pending())
+        self.assertEqual(list(self.recovery.root.iterdir()),[])
+
+    async def test_disk_operation_rejects_boolean_schema_and_duplicate_fields(self):
+        identity = 'e' * 32
+        operation = {'schema':1,'transactionId':identity,'nonce_sha256':'f' * 64}
+        await self.recovery.snapshot(self.database, artifacts=self.artifacts, reserved_id=identity, operation=operation)
+        path = self.recovery.root / identity / 'operation.json'
+        malformed = [
+            json.dumps(operation | {'schema':True}),
+            '{"schema":1,"transactionId":"' + identity + '","nonce_sha256":"' + '0' * 64 + '","nonce_sha256":"' + 'f' * 64 + '"}',
+        ]
+        for value in malformed:
+            with self.subTest(value=value):
+                path.write_text(value)
+                with self.assertRaises(FreeAIError) as error:
+                    self.recovery.verify_operation(identity,operation)
+                self.assertEqual(error.exception.code,'RECOVERY_BINDING_INVALID')
+
+    async def test_snapshot_parent_is_durable_before_key_or_database_work(self):
+        events = []
+        def synced(path):
+            events.append(Path(path))
+            sync_directory(path)
+        async def get_key():
+            self.assertEqual(events[0],self.recovery.root)
+            return KEY
+        self.keys.get.side_effect = get_key
+        with patch('maslow_free_ai.recovery.sync_directory',side_effect=synced):
+            await self.recovery.snapshot(self.database,artifacts=self.artifacts)
+        self.assertEqual(events[0],self.recovery.root)
+
+    async def test_snapshot_parent_sync_failure_blocks_database_and_key_work(self):
+        with patch('maslow_free_ai.recovery.sync_directory',side_effect=OSError(28,'No space')):
+            with self.assertRaises(FreeAIError) as error:
+                await self.recovery.snapshot(self.database,artifacts=self.artifacts)
+        self.assertEqual(error.exception.code,'RECOVERY_SNAPSHOT_FAILED')
+        self.keys.get.assert_not_awaited()
+        self.assertTrue(self.recovery.pending())
+        self.assertEqual(list(self.recovery.root.glob('*/receipt.json')),[])
 
     async def test_duplicate_prepare_does_not_replace_previous_snapshot(self):
         receipt=await self.recovery.snapshot(self.database,artifacts=self.artifacts)

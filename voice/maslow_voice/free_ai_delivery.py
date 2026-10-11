@@ -2,6 +2,7 @@
 
 import copy
 import json
+import hashlib
 import os
 from pathlib import Path
 import re
@@ -129,6 +130,11 @@ def no_agent_sessions():
         raise VoiceError('FREE_AI_PREPARATION_BUSY','Existing Voice agent sessions could not be proven idle. No preparation started.') from None
 
 
+def operation_binding(ticket):
+    return {'schema':1,'transactionId':ticket['transactionId'],
+            'nonce_sha256':hashlib.sha256(ticket['nonce'].encode('ascii')).hexdigest()}
+
+
 def process_start():
     # comm may contain spaces/parentheses; parse after its closing delimiter.
     return Path('/proc/self/stat').read_text().rsplit(')',1)[1].split()[19]
@@ -212,7 +218,9 @@ class DeliveryCoordinator:
                 self.service.offline = None
                 self.service.offline_clients.clear()
             artifacts = {name:record['sha256'] for name,record in ticket['previousArtifacts'].items()}
-            receipt = await router.prepare_recovery(artifacts)
+            receipt = await router.prepare_recovery(artifacts, reserved_id=ticket['transactionId'], operation=operation_binding(ticket))
+            if receipt.get('id') != ticket['transactionId']:
+                raise VoiceError('FREE_AI_RECOVERY_CHANGED','The snapshot identity differs from the reserved root operation.')
             self.prepared = {'ticket':copy.deepcopy(ticket),'receipt':copy.deepcopy(receipt)}
             return {'result':await self.check(ticket)}
         except VoiceError:
@@ -230,6 +238,7 @@ class DeliveryCoordinator:
         router = self.service._free_ai()
         if router.process is not None or router.owners or not router.recovery.pending():
             raise VoiceError('FREE_AI_NOT_QUIESCENT','The owned router or recovery state is not quiescent.')
+        router.recovery.verify_operation(ticket['transactionId'],operation_binding(ticket))
         receipt = await router.recovery.verify(self.prepared['receipt']['id'],artifacts=self.prepared['receipt']['artifacts'])
         if receipt != self.prepared['receipt']:
             raise VoiceError('FREE_AI_RECOVERY_CHANGED','The recovery record changed after preparation.')
