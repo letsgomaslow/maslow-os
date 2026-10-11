@@ -3058,10 +3058,10 @@
       "status": "active",
       "owner": "security-review",
       "session": "2026-10-11-craft-root",
-      "worker": "/root/boundary_repair",
-      "actual_model": "gpt-6-astra",
-      "attempt": 1,
-      "last_checkpoint": "2026-10-11T13:31:23.845475+00:00",
+      "worker": "/root/repair_code_review",
+      "actual_model": "gpt-6.1-sol",
+      "attempt": 2,
+      "last_checkpoint": "2026-10-11T13:33:46.991671+00:00",
       "base_revision": "eb7012f338b3e7c3d8e29df27a33a363298c3426",
       "branch": null,
       "worktree": "/home/maslow/Projects/Maslow/craft-review",
@@ -3073,7 +3073,16 @@
       ],
       "artifact_hashes": {},
       "blocker": null,
-      "next_action": "Read exact frozen source, run targeted independent probes, report evidence without editing source"
+      "next_action": "Independent high-reasoning Sol defensive source review fallback; bounded parser/publication/lifecycle correctness checks only",
+      "attempt_history": [
+        {
+          "attempt": 1,
+          "actual_model": "gpt-6-astra",
+          "worker": "/root/boundary_repair",
+          "outcome": "Interrupted by platform cybersecurity-content restriction; no completed review acceptance",
+          "revision": "eb7012f338b3e7c3d8e29df27a33a363298c3426"
+        }
+      ]
     }
   ]
 }
