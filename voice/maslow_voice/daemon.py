@@ -12,6 +12,7 @@ import signal
 import sys
 import time
 import uuid
+from functools import wraps
 from pathlib import Path
 from urllib.parse import urlsplit
 
@@ -35,6 +36,23 @@ from .store import TaskStore, TERMINAL
 from .tasks import TaskManager, text_field, validate_brief
 
 
+def external_work(method):
+    @wraps(method)
+    async def tracked(self, *args, **kwargs):
+        self.delivery.admit_tasks()
+        current = asyncio.current_task()
+        self.action_work[current] = self.action_work.get(current, 0) + 1
+        try:
+            return await method(self, *args, **kwargs)
+        finally:
+            remaining = self.action_work.get(current, 1) - 1
+            if remaining:
+                self.action_work[current] = remaining
+            else:
+                self.action_work.pop(current, None)
+    return tracked
+
+
 TASK_NOTICE_SECONDS = 30
 # Gemini Live waits silently for every tool result, so a slow action stops the
 # person's conversation mid-sentence. Actions answer within this time and
@@ -56,6 +74,8 @@ PAUSABLE_MODES = frozenset({"gemini_live", "livekit", "openai"})
 class VoiceService:
     def __init__(self, directory=None, runtime=None, *, provider_factory=create_provider, credentials=None, executor_factory=None,
                  audio_transport_factory=PortAudioTransport, live_planner=None):
+        from .free_ai_delivery import startup_check
+        startup_check()
         self.settings = Settings(directory)
         self.directory = self.settings.directory
         self.audit = SessionAudit(self.directory)
@@ -134,6 +154,11 @@ class VoiceService:
         self.tasks.assistant_admission = self.assistant_admission
         from .assistant_accounts import AccountBridge
         self.tasks.account_bridge = AccountBridge()
+        from .free_ai_delivery import DeliveryCoordinator
+        self.control_requests = set()
+        self.action_work = {}
+        self.delivery = DeliveryCoordinator(self)
+        self.tasks.admission = self.delivery.admit_tasks
 
     def snapshot(self):
         tasks = []
@@ -149,6 +174,8 @@ class VoiceService:
                     "task_view_request": dict(self.task_view_request), "task_attention": dict(self.task_attention),
                     "voice_preview": dict(self.voice_preview)}
         snapshot["assistant"] = self.free_ai_router.status() if self.free_ai_router else {"installed": False, "ready": False, "enabled": False}
+        if self.delivery.closed:
+            snapshot["assistant"] = dict(snapshot["assistant"], ready=False, state="maintenance")
         # Keep a busy task history within the IPC frame. Full results remain in
         # the store; approval details are never shortened for an approval decision.
         while len(tasks) > 1 and len(json.dumps(snapshot).encode()) > 3 * 1024 * 1024:
@@ -517,6 +544,7 @@ class VoiceService:
         del self.jobs[oldest["id"]]
         return oldest["id"]
 
+    @external_work
     async def agent_action(self, intent, turn):
         """Route words to a new web task, an explicitly named job, or an interactive agent."""
         kind = intent.get("kind", "instruction")
@@ -555,6 +583,7 @@ class VoiceService:
             result = await self.resume_pending(seat, reply, result)
         return result
 
+    @external_work
     async def resume_pending(self, seat, reply, receipt):
         """Send a job's held instruction once its startup question is answered."""
         job = self.jobs[seat]
@@ -588,6 +617,7 @@ class VoiceService:
             lines = list(self.last_conversation.get("transcript", [])) + lines
         return lines
 
+    @external_work
     async def note_action(self, intent):
         """Start a background agent that turns the conversation into Obsidian notes."""
         request = " ".join(str(intent.get("request", "")).split())
@@ -783,7 +813,15 @@ class VoiceService:
         continues in the background; only its failure or waiting question is
         told to the conversation, so the person's conversation never stalls.
         """
+        try:
+            self.delivery.admit_tasks()
+        except VoiceError:
+            if hasattr(coroutine, "close"):
+                coroutine.close()
+            raise
         task = self.background(coroutine)
+        self.action_work[task] = self.action_work.get(task, 0) + 1
+        task.add_done_callback(lambda finished: self.action_work.pop(finished, None))
         done, _ = await asyncio.wait({task}, timeout=ACTION_ANSWER_SECONDS)
         if done:
             return task.result()
@@ -1021,6 +1059,7 @@ class VoiceService:
         finally:
             self.task_relays.discard(key)
 
+    @external_work
     async def submit_intent(self, intent, turn_id=None, *, project_name="", new_project=False):
         brief = validate_brief(intent)
         turn = self._captured_turn(turn_id)
@@ -1206,6 +1245,7 @@ class VoiceService:
 
     async def start_voice(self, *, audio=True, project="", context=""):
         """Start a conversation, retrying a momentary connection failure quietly."""
+        self.delivery.admit_tasks()
         caption = "" if self.reconnecting else "Connecting…"
         try:
             for attempt, delay in enumerate((*RECONNECT_DELAYS[1:], None), start=1):
@@ -1244,7 +1284,9 @@ class VoiceService:
             return False
 
     async def _start_voice_attempt(self, *, audio=True, project="", context=""):
+        self.delivery.admit_tasks()
         async with self.lifecycle_lock:
+            self.delivery.admit_tasks()
             self.startup_task = asyncio.current_task()
             epoch = None
             try:
@@ -1585,6 +1627,20 @@ class VoiceService:
                 await self.publish()
 
     async def dispatch(self, request):
+        if request.get("action") == "free_ai_delivery":
+            return await self.delivery.handle(request)
+        self.delivery.admit_control(request)
+        current = asyncio.current_task()
+        tracked = request.get("action") != "status"
+        if tracked:
+            self.control_requests.add(current)
+        try:
+            return await self._dispatch_admitted(request)
+        finally:
+            if tracked:
+                self.control_requests.discard(current)
+
+    async def _dispatch_admitted(self, request):
         if self.preview_task is not None and request.get("action") not in {"status", "stop_gemini_voice_preview", "end_voice", "silence", "mute", "pause_voice", "test", "models"}:
             raise VoiceError("PREVIEW_ACTIVE", "Stop the voice preview before starting a conversation or changing settings.")
         if request.get("action") in {"configure", "configure_livekit", "configure_gemini_live", "credential"}:
@@ -1633,7 +1689,7 @@ class VoiceService:
         if action == "status":
             if Path("/usr/lib/maslow-free-ai/maslow_free_ai").is_dir():
                 self._free_ai()
-            if not self.readiness.get("checks") and self.settings.value["mode"] in {"gemini_live", "gpt_live", "livekit", "openai"}:
+            if not self.delivery.closed and not self.readiness.get("checks") and self.settings.value["mode"] in {"gemini_live", "gpt_live", "livekit", "openai"}:
                 await self.check_readiness()
             return {"snapshot": self.snapshot()}
         if action == "free_ai":
@@ -1962,6 +2018,8 @@ class VoiceService:
             pass  # The session start reports any real import problem.
 
     async def run(self):
+        from .free_ai_delivery import startup_check
+        startup_check()
         from .execution import ExecutionManager
         from .routing import AgentRouter
         self.execution = ExecutionManager(self.store, self.publish, settings=self.settings, credentials=self.credentials,

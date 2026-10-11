@@ -101,7 +101,11 @@ class TaskStore:
         return json.loads(row[0]) if row else None
 
     def active(self):
-        return [task for task in self.list(10000) if task["state"] not in TERMINAL]
+        # Filter before loading history; an old unfinished task must not vanish
+        # behind thousands of newer completed records during admission/recovery.
+        placeholders = ",".join("?" for _ in TERMINAL)
+        return [json.loads(row[0]) for row in self.db.execute(
+            f"SELECT data FROM tasks WHERE state NOT IN ({placeholders}) ORDER BY updated_at DESC", tuple(sorted(TERMINAL)))]
 
     def events(self, task_id, after=0):
         self.get(task_id)

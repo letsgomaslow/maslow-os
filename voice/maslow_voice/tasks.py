@@ -55,6 +55,7 @@ class TaskManager:
         self.project_locks = {}
         self.clients = {}
         self.closed = False
+        self.admission = None
         self.agent_selector = None
         self.assistant_factory = None
         self.assistant_admission = None
@@ -75,6 +76,8 @@ class TaskManager:
         path = Path(project).expanduser()
         if not project or not path.is_absolute() or not path.is_dir():
             raise VoiceError("PROJECT_REQUIRED", "Choose an existing project folder before delegating work.")
+        if self.admission:
+            self.admission()
         task, created = self.store.create(request_id, brief, str(path.resolve()), mode, source)
         if not created:
             return task
@@ -174,6 +177,8 @@ class TaskManager:
             return old
         if self.assistant_reservations or any(task.get("execution_connection") == "free-cloud" for task in self.store.active()):
             raise VoiceError("ASSISTANT_TASK_ACTIVE", "Finish or stop the active assistant request first.")
+        if self.admission:
+            self.admission()
         if self.assistant_admission:
             self.assistant_admission()
         if requested["accounts"]:
@@ -254,6 +259,8 @@ class TaskManager:
                 task = self.store.get(task_id)
                 if task["state"] in TERMINAL | {"proposed"}:
                     return
+                if self.admission:
+                    self.admission()
                 if task.get("execution_connection") == "free-cloud":
                     if self.assistant_admission:
                         self.assistant_admission()
@@ -396,6 +403,8 @@ class TaskManager:
             return
 
     async def action(self, task_id, operation, text="", approval_id=None):
+        if operation in {"start", "continue", "steer", "approve", "deny"} and self.admission:
+            self.admission()
         task = self.store.get(task_id)
         if operation == "start" and task["state"] == "proposed":
             if task.get("selected_agent") == "codex" and self._active_codex_task(task_id):
