@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "program": "craft-optional-apps",
-  "current_phase": 0,
+  "current_phase": 1,
   "latest_handoff": "docs/handoffs/2026-10-11-craft-optional-apps.md",
   "session": "2026-10-11-craft-root",
   "models": {
@@ -127,7 +127,9 @@
       "branch": "codex/craft-optional-apps",
       "worktree": "/home/maslow/Maslow-ai-os/maslow-os",
       "implementation_commits": [],
-      "integration_commits": [],
+      "integration_commits": [
+        "815a4a40"
+      ],
       "tests": [
         {
           "check": "repository/platform/harness inventory",
@@ -159,7 +161,7 @@
       ],
       "acceptance": "Duplicate/missing/cyclic graph, ownership, missing evidence and interrupted recovery regressions pass",
       "phase": 0,
-      "status": "active",
+      "status": "integrated",
       "owner": "records_helper",
       "session": "2026-10-11-craft-root",
       "worker": "/root/records_helper",
@@ -169,13 +171,35 @@
       "base_revision": "098948e4",
       "branch": "codex/craft-records-helper",
       "worktree": "/home/maslow/Projects/Maslow/craft-records-worker",
-      "implementation_commits": [],
-      "integration_commits": [],
-      "tests": [],
-      "evidence": [],
+      "implementation_commits": [
+        "ae3a35e5"
+      ],
+      "integration_commits": [
+        "68f1818d"
+      ],
+      "tests": [
+        {
+          "result": "pass",
+          "tests": 11,
+          "check": "python3 -m unittest discover -s docs/programs/craft-optional-apps -p test_manage.py"
+        },
+        {
+          "result": "pass",
+          "check": "manage.py --ledger central --repo-root runtime validate"
+        },
+        {
+          "result": "pass",
+          "check": "git diff --check"
+        }
+      ],
+      "evidence": [
+        "docs/programs/craft-optional-apps/tasks/CRAFT-P0-HELPER.md",
+        "docs/programs/craft-optional-apps/manage.py",
+        "docs/programs/craft-optional-apps/test_manage.py"
+      ],
       "artifact_hashes": {},
       "blocker": null,
-      "next_action": "Implement standard-library ledger validation, serialized claims, status and resume packets"
+      "next_action": "Use helper for explicit claims and resume; no automatic scheduler"
     },
     {
       "id": "CRAFT-P0-GATE",
@@ -192,30 +216,39 @@
       ],
       "acceptance": "All phase 0 records reviewed, validated and committed",
       "phase": 0,
-      "status": "queued",
-      "owner": null,
-      "session": null,
+      "status": "integrated",
+      "owner": "coordinator",
+      "session": "2026-10-11-craft-root",
       "worker": null,
-      "actual_model": null,
-      "attempt": 0,
-      "last_checkpoint": null,
-      "base_revision": null,
-      "branch": null,
-      "worktree": null,
+      "actual_model": "not-exposed",
+      "attempt": 1,
+      "last_checkpoint": "2026-10-11",
+      "base_revision": "098948e4",
+      "branch": "codex/craft-optional-apps",
+      "worktree": "/home/maslow/Maslow-ai-os/maslow-os",
       "implementation_commits": [],
       "integration_commits": [],
-      "tests": [],
-      "evidence": [],
+      "tests": [
+        {
+          "check": "all 88 unique task IDs; six gates per app; central graph validation; scoped baselines and worktrees",
+          "result": "pass"
+        }
+      ],
+      "evidence": [
+        "docs/programs/craft-optional-apps/tasks/CRAFT-P0-INVENTORY.md",
+        "docs/programs/craft-optional-apps/tasks/CRAFT-P0-HELPER.md"
+      ],
       "artifact_hashes": {},
       "blocker": null,
-      "next_action": "Review foundation and reconcile fresh-session resume"
+      "next_action": "Claim phase1 Connect and pilot package tasks"
     },
     {
       "id": "CRAFT-CORE-PACKAGE",
       "objective": "Package native optional Connect independently of development paths",
       "repository": "packages",
       "permitted_files": [
-        "pkgbuilds/maslow-connect/**"
+        "pkgbuilds/maslow-connect/**",
+        "test/craft-connect-package"
       ],
       "dependencies": [
         "CRAFT-P0-GATE"
@@ -245,8 +278,9 @@
       "objective": "Implement fixed project profiles and fail-closed sandbox launcher",
       "repository": "connect",
       "permitted_files": [
-        "packages/bridge/src/craft*.ts",
-        "packages/bridge/test/craft*.test.ts"
+        "packages/bridge/src/**",
+        "packages/bridge/test/**",
+        "docs/craft-isolation.md"
       ],
       "dependencies": [
         "CRAFT-P0-GATE"
@@ -269,7 +303,7 @@
       "evidence": [],
       "artifact_hashes": {},
       "blocker": null,
-      "next_action": "Implement fixed project profiles and fail-closed sandbox launcher"
+      "next_action": "Implement sandbox with lifecycle support in disjoint Connect worktree; coordinator packages Connect separately"
     },
     {
       "id": "CRAFT-CORE-LIFECYCLE",
