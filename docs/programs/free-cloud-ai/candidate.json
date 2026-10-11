@@ -36,7 +36,7 @@
     "connect_native3_baseline_not_managed_account_acceptance": "7545ba68c0b6759a7f65c88ccb1390777df5b812",
     "runtime_current_source": "61b13cc175427abce79555dcc0e41e3d5999297f",
     "hub_current_source": "7e14cbaf091e847db07b2726694f27fe5e7d1837",
-    "packages_current_source": "05ab21a",
+    "packages_current_source": "2cfc7ad47731d37d4246ca69957aee6d4ac0c243",
     "connect_managed_source": "646aa1149f36050a470ded7e3658ad0b0a38bcbb",
     "hub_recovery_design": "0aafacbc8915d5db64e92bdb5a97bd604c76e6e1"
   },
@@ -90,11 +90,23 @@
     "docs/programs/free-cloud-ai/evidence/2026-10-11-delivery-recovery-checkpoint.json",
     "docs/programs/free-cloud-ai/evidence/2026-10-11-provider-docs.json",
     "docs/programs/free-cloud-ai/evidence/2026-10-11-pending-status-review.json",
-    "docs/programs/free-cloud-ai/evidence/2026-10-11-hub-stage1-checkpoint.json"
+    "docs/programs/free-cloud-ai/evidence/2026-10-11-hub-stage1-checkpoint.json",
+    "docs/programs/free-cloud-ai/evidence/2026-10-11-package-preparation-review.json"
   ],
   "passed_source_gates": [
     "every-dispatch-provider-and-model-policy",
     "fetched-and-cached-catalog-policy",
     "managed-hermes-tools-and-request-idempotency-contract"
-  ]
+  ],
+  "prepared_build": {
+    "runtime_revision": "7d43070004f3a9182bc5e4916aee9cf4a4ba4bec",
+    "runtime_archive_sha256": "5b724b9768b31af83f65295319327fc5e443a27dc8fea9496ea87799ab0d37ad",
+    "package_revision": "2cfc7ad47731d37d4246ca69957aee6d4ac0c243",
+    "versions": {
+      "maslow-free-ai": "0.1.0-2",
+      "maslow-voice": "0.1.5-39"
+    },
+    "built": false,
+    "slot_admitted": false
+  }
 }

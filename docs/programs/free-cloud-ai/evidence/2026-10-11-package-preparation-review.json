@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-11",
+  "status": "reviewed-preparation-only",
+  "candidate_ready": false,
+  "package_revision": "2cfc7ad47731d37d4246ca69957aee6d4ac0c243",
+  "runtime_archive_revision": "7d43070004f3a9182bc5e4916aee9cf4a4ba4bec",
+  "runtime_archive_sha256": "5b724b9768b31af83f65295319327fc5e443a27dc8fea9496ea87799ab0d37ad",
+  "proof": {
+    "path": "/home/maslow/Maslow-ai-os/free-ai-build/recipe-prep-2-39/preparation-proof.json",
+    "sha256": "6f611c39e996a4a4afa0b229dbd778125427a9d1341708901494e78b307f6284"
+  },
+  "reviewer": "boundary_review, actual gpt-6-astra/high, read-only",
+  "checks": {
+    "voice_source_tests": 6,
+    "free_ai_helper_tests": 9,
+    "archive_guard_outcomes": 8,
+    "voice_manifest_files": 147,
+    "free_ai_manifest_files": 16,
+    "six_capsule_pins_match": true,
+    "recipe_syntax": "pass",
+    "package_invariants": "pass",
+    "diff_check": "pass"
+  },
+  "findings_fixed": [
+    "Generated caches must not invalidate later packaging; source bytecode must not execute from stale/injected caches.",
+    "Pin complete import roots, including optional backend test dependencies, to deny added startup files.",
+    "Reject symlinks and special entries before cache filtering; strip library and plugin caches.",
+    "Cache directories may not hide executable Python discovery source or unrelated data.",
+    "Prepared acceptance commands must stop on failed earlier checks; their final hash is recorded."
+  ],
+  "source_hashes": {
+    "pkgbuilds/maslow-free-ai/.omarchy/package.json": "7bed29b67b1cc5fdd4561a2d6236aacd453b147d17840504b5f3963bd7da3424",
+    "pkgbuilds/maslow-free-ai/PKGBUILD": "ea973db63138a4e3bf136dc4bec344c41922451117d8b3e0f5b005d61f7b835c",
+    "pkgbuilds/maslow-free-ai/README.md": "6a45a8a929c9d527d25bfc80638adba49c698218d6d069ad0dd5e5bed08b06d0",
+    "pkgbuilds/maslow-free-ai/package-tools.py": "e78226bde7cbd59a60c1cadc079831c7bf594a42238fe372ca51e6dc15cda9cd",
+    "pkgbuilds/maslow-free-ai/packaged-chat-proof.mjs": "d0c689e08ca03a4d4de8399e698bcc3ec601f16c093d5c322612f166484faa4b",
+    "pkgbuilds/maslow-free-ai/packaged-runtime-proof.py": "00cfea709c1c2e6526e584e706bbfa5666fbe11a67a45da4963c6d54dd7168dd",
+    "pkgbuilds/maslow-free-ai/production-lock.json": "843dcda1e14f77c8fea99598d1f16b4846b9a3c0d95bdaccc9539f8f3c63946e",
+    "pkgbuilds/maslow-free-ai/production-package.json": "3b246ab7623f358bc43a039dd4aef19b4137260d5ab9cc76dd81d58b2579bf31",
+    "pkgbuilds/maslow-free-ai/production-server.json": "610371a6cdda7bed0360e81a4591809b8f56b6224266f3bac335a55a39315475",
+    "pkgbuilds/maslow-free-ai/source-integrity.json": "712a40ee1685bec420f5ff7f0d768db2e224ceca97f2aafdd16dd8a4c183e6fe",
+    "pkgbuilds/maslow-free-ai/test-missing-sharp.mjs": "a9be1231d87504190ffe046f26fa7eb238f1b85652852447801ff88f776d1ad3",
+    "pkgbuilds/maslow-free-ai/test-only-fetch.mjs": "3b60c5902437f06387003c07ab117f1e0a07ae1a222d8d715b5dc653d8a5d258",
+    "pkgbuilds/maslow-free-ai/test_package_tools.py": "bad7a61b39e321b629b393c0b16149615c41e849aa85fc0aa5efb245c8faa853",
+    "pkgbuilds/maslow-voice/PKGBUILD": "c7217bb4208676be3d9aa1922b16b02fa4d939b71a0f330130b3996280ceb6e7",
+    "pkgbuilds/maslow-voice/README.md": "625cdb2ef576e1403ac1f98fe8c5ff41f3ccb8c79ead48d10bcf42e3f3589d8a",
+    "pkgbuilds/maslow-voice/source-integrity.json": "c5e580222ae4f1ca4725daf434ec75e12fdd710ce14f5c6af69cfb27722bbaef",
+    "pkgbuilds/maslow-voice/source-tools.py": "454cd09bf35e95eae879cada87961ec18f17c56a19979e48b90bc06ad1fc0932",
+    "pkgbuilds/maslow-voice/test_source_tools.py": "dbf02edf99f4eb85fcc1d119ff696bcfe1daf117934946c123126fd2c80aa216"
+  },
+  "dependency_scope": "No new dependencies; private Node22.23.3/upstream65ec96df/production tree unchanged. System Node unchanged.",
+  "remaining": [
+    "No build admitted: Craft-PILOT-ISO task active, even though current container/process inventory was empty.",
+    "Required exact-source owning Voice/Node/backend validation remains prepared, not executed for new artifacts.",
+    "Native file inventory/overlap/ABI/audit and actual recovery/guest/Lenovo/live/account/audio gates remain open."
+  ],
+  "next_action": "Grant a serialized native slot only after Craft coordination; build exact source and recipes, then execute all prepared owning/artifact checks."
+}
