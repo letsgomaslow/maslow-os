@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "status": "not-ready",
+  "platform": "x86_64-maslow-os-hyprland",
+  "source_revisions": {},
+  "artifacts": [],
+  "accepted_capabilities": [],
+  "app_dispositions": {
+    "pdfcraft": "evaluating",
+    "photocraft": "evaluating",
+    "vectorcraft": "evaluating",
+    "wordcraft": "evaluating",
+    "gridcraft": "evaluating",
+    "deckcraft": "evaluating",
+    "lightcraft": "evaluating",
+    "effectcraft": "evaluating",
+    "filmcraft": "evaluating",
+    "designcraft": "evaluating",
+    "cadcraft": "evaluating",
+    "soundcraft": "evaluating"
+  },
+  "required_gates": [
+    "all-12-dispositions",
+    "packages",
+    "confinement",
+    "hub",
+    "three-agent-mcp",
+    "physical-voice",
+    "fresh-vm",
+    "lenovo",
+    "independent-review"
+  ],
+  "passed_gates": [],
+  "invalidation": "Any changed source, recipe, package, profile or declared capability invalidates affected evidence. Missing artifacts are unavailable, not inferred."
+}
