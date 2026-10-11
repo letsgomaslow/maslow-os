@@ -370,12 +370,12 @@ class VoiceService:
                 elif state == "waiting_input":
                     await self._append_live_context(provider, epoch, "commentary", "The task needs more information. Review it in Voice to continue.", delegation_id)
                 elif state == "completed":
-                    result = live_update_text(task.get("result") or "The task completed with no result summary.", 400)
+                    result = "The private result is available in Work." if self.private_assistant(task) else live_update_text(task.get("result") or "The task completed with no result summary.", 400)
                     await self._append_live_context(provider, epoch, "commentary", "The task completed. " + result, delegation_id)
                     return
                 elif state in {"failed", "interrupted"}:
                     error = task.get("error") or {}
-                    message = live_update_text(error.get("message") or "The task stopped before a verified result.", 400)
+                    message = "The private task needs attention in Work." if self.private_assistant(task) else live_update_text(error.get("message") or "The task stopped before a verified result.", 400)
                     await self._append_live_context(provider, epoch, "commentary", message, delegation_id)
                     return
                 elif state == "cancelled":
@@ -415,7 +415,21 @@ class VoiceService:
         raise VoiceError("TASK_NOT_FOUND", "There is no recent delegated job. Web tasks are checked with agent_status.")
 
     @staticmethod
+    def private_assistant(task):
+        grant = task.get("granted_capabilities") or {}
+        return task.get("execution_connection") == "free-cloud" and bool(grant.get("documents") or grant.get("accounts"))
+
+    @staticmethod
     def task_summary(task):
+        # Consumer speech connections are unchanged. Selected private material
+        # and its derived output stay in local Work rather than entering an
+        # unreviewed speech provider through task status/notifications.
+        if VoiceService.private_assistant(task):
+            return {"id": task.get("id"), "state": task.get("state"), "selected_agent": "hermes",
+                "capabilities": task.get("capabilities"), "title": "Private assistant request",
+                "result": "Review this request and its private result in Work.", "activity": [], "artifacts": [],
+                "error": {"code": "PRIVATE_TASK_ATTENTION", "message": "Review the private task in Work."} if task.get("error") else None,
+                "verification": "Private content is available in local Work."}
         return {key: task.get(key) for key in ("id", "title", "state", "project", "selected_agent", "capabilities", "artifacts")} | {
             "result": str(task.get("result") or "")[:2000],
             "activity": task.get("activity", [])[-5:],

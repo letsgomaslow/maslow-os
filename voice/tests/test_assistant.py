@@ -30,6 +30,23 @@ class AssistantTests(unittest.IsolatedAsyncioTestCase):
     async def create(self, capabilities=None, identity="request"):
         return await self.manager.submit_assistant(identity, "Draft a short note", str(self.workspace), capabilities or {}, policy="review")
 
+    async def test_private_material_and_derived_results_are_withheld_from_speech_summary(self):
+        (self.workspace / "private.md").write_text("private selected bytes")
+        task = await self.create({"documents": ["private.md"]})
+        task = self.store.update(task["id"], title="private title", result="private derived result",
+            activity=[{"text": "private activity"}], error={"code": "PRIVATE_ERROR", "message": "private error"},
+            artifacts=[{"path": "private file"}])
+        summary = VoiceService.task_summary(task)
+        self.assertNotIn("private title", str(summary))
+        self.assertNotIn("private derived result", str(summary))
+        self.assertNotIn("private activity", str(summary))
+        self.assertNotIn("private error", str(summary))
+        self.assertNotIn("private file", str(summary))
+        self.assertNotIn(str(self.workspace), str(summary))
+        self.assertEqual(summary["id"], task["id"])
+        self.assertEqual(summary["state"], task["state"])
+        self.assertEqual(self.store.get(task["id"])["result"], "private derived result")
+
     async def test_grants_request_and_policy_survive_restart_and_cannot_be_changed(self):
         (self.workspace / "selected.md").write_text("selected")
         task = await self.create({"documents": ["selected.md"], "note": "new.md"})
