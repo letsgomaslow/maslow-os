@@ -5,7 +5,7 @@
   "status": "scoped-source-review-and-regressions-passed",
   "candidate_ready": false,
   "runtime_base_commit": "b192d59375e2e951b7611050e7ac4b06ffbedf80",
-  "source_snapshot": "Exact uncommitted binding-review working-tree hashes based on b192d593, plus unchanged reviewed admission inputs. Source-only review; no built/installed package approval.",
+  "source_snapshot": "Exact hash-based reviewed inputs across the admission, reserved-binding and private-probe checkpoints. Historical revisions and changed-byte evidence remain distinct; no built/installed package approval.",
   "scope": [
     "Root-ticket reader and prepare/check delivery coordinator",
     "Voice control/task admission, pending conversation/reconnect/audio work and background external actions",
@@ -117,13 +117,14 @@
     "unit_and_race_checks": "Actual service/manager/task store and real temporary SQLite; provider, ticket ownership, key-store/recovery and desktop inputs synthetic.",
     "socket_and_process_checks": "Actual same-UID Unix peer credentials and owned synthetic OS child/group; no installed service binding or privileged transaction.",
     "protected_ticket": "Existing tests show actual unprivileged file denial, plus patched root-ticket field validation. No real root-created ticket was placed on host.",
-    "final_guard": "Hub managed seal/check separately verifies full task history, private tmux sessions and canonical recovery; runtime findings do not independently prove pacman mutation."
+    "final_guard": "Hub managed seal/check separately verifies full task history, private tmux sessions and canonical recovery; runtime findings do not independently prove pacman mutation.",
+    "private_secret_service": "Independently repeated final disposable probe: actual isolated Secret Service/SQLite/Node with synthetic keys; exact helper and external receipt hashes recorded separately. Personal host keyring untouched."
   },
   "remaining_gates": [
     "Runtime reserved snapshot binding passed scoped source review; actual privileged root-crash adoption and completion/mask ordering require separate Hub review and installed acceptance.",
     "Fixed privileged installer INSTALLATION_ACCEPTED remains false; no installer/release acceptance.",
     "Fresh Voice37 must be explicitly user-stopped and pass fixed Hub helper; no older runtime or developer-launcher acceptance.",
-    "No host configuration, systemd service, package installation/build, credential/keyring/provider operation, product merge or signing/publication was performed.",
+    "No host configuration/service/package changes or personal credential/keyring/provider operation, product merge or signing/publication was performed. Actual disposable Secret Service operations used only synthetic keys.",
     "Native systemd, actual privileged root ticket, installed private runtime, paired package interruption/recovery, live provider/account, guest/Lenovo and physical audio remain unaccepted."
   ],
   "source_sha256": {
@@ -136,7 +137,8 @@
     "free_ai/maslow_free_ai/runtime.py": "45d0a28708ca7896a05f7f938b607c53fc6c096d0a1837b82dbe3f5992b29a88",
     "free_ai/maslow_free_ai/recovery.py": "f884789500354d2b09bb6bb913c285f79ea1895bc200aeb9e3318a93bd537e17",
     "free_ai/tests/test_recovery.py": "0e57cf681b137924682ea25fbf94834a6bba80d88d1aec05e6a2a9d36c9e7187",
-    "free_ai/tests/test_runtime.py": "9e6a225aee2151931a9b532084c242a1e6840b838c42efbaa8089ad1a7622ed7"
+    "free_ai/tests/test_runtime.py": "9e6a225aee2151931a9b532084c242a1e6840b838c42efbaa8089ad1a7622ed7",
+    "free_ai/tests/secret_service_probe.py": "13b8c4e0635be4cfa07300dd4b2369f809fcdf32667d5d2d9f86e3578a21c7ab"
   },
   "contract": {
     "path": "/home/maslow/Projects/Maslow/free-ai-hub/docs/free-ai-preflight-contract.md",
@@ -231,5 +233,88 @@
     "committed_b192_sha256": "5312b8a36a27aa6032a33ad8ac609643a8174cd21ba1d5c71acfbfa4ae458778",
     "difference": "One trailing space on router.state.directory fixture assignment was cleaned before b192d593. Reconstructing that trailing space from committed bytes exactly matches the historical recorded hash. Earlier 17-test result concerns pre-cleanup bytes; final binding tests concern current hashes.",
     "behavioral_source_change_in_cleanup": false
+  },
+  "private_secret_service_recovery_probe_review": {
+    "status": "scoped-helper-isolation-and-disposable-recovery-probe-passed",
+    "review_base_commit": "9323890c7c80dc19441c182aedcf50c6c609251e",
+    "helper_path": "free_ai/tests/secret_service_probe.py",
+    "helper_sha256": "13b8c4e0635be4cfa07300dd4b2369f809fcdf32667d5d2d9f86e3578a21c7ab",
+    "coordinator_receipt": {
+      "path": "/home/maslow/Maslow-ai-os/free-ai-build/secret-service-recovery-probe-final.json",
+      "sha256": "1f2e16c37a06d84acc5511abe4d60d7b2ea656b6f7a2acf4b323d7f07cd73ecf",
+      "independent_repeat_receipt_matches": true
+    },
+    "independent_receipt": {
+      "schema": 1,
+      "backend": "real GNOME Keyring / private D-Bus",
+      "missing_key": true,
+      "private_stdin_store_roundtrip": true,
+      "recovery_secret_roundtrip": true,
+      "locked_active_and_recovery_keys_rejected": true,
+      "host_keyring_touched": false,
+      "live_provider_requests": 0,
+      "installed_product_verified": false,
+      "recovery": {
+        "wal_committed_quota_retained": true,
+        "root_operation_binding_rechecked_after_restart": true,
+        "wrong_nonce_rejected": true,
+        "corrupt_database_and_missing_active_key_restored": true,
+        "matching_ciphertext_and_secret_retained": true,
+        "admission_remained_closed": true,
+        "snapshot_permissions_and_plaintext_exclusion_checked": true,
+        "historical_restore_rejected": true,
+        "package_restore_verified": false
+      }
+    },
+    "isolation_verified": [
+      "Outer --recovery creates a fresh mode-0700 temporary HOME and exact separate XDG paths, clears caller environment and starts a private dbus-run-session in a newly owned process group.",
+      "Child refuses missing private marker/non-disposable HOME or custom XDG paths before subprocess launch; synthetic guard checks verified no subprocess call.",
+      "Before GNOME launch, helper checks actual DBus daemon UID and disposable HOME/runtime; it polls NameHasOwner without Secret Service autoactivation.",
+      "Actual Secret Service owner UID/HOME/bus are validated and retained by pidfd before any key read/create/clear.",
+      "Node reports exactly v22.23.3; provider ciphertext/key/artifact/transaction inputs are synthetic. No network inference or package operation is present."
+    ],
+    "helper_findings_fixed": [
+      {
+        "id": "PR-1",
+        "priority": "P2",
+        "issue": "Outer supervisor-only timeout and unbounded helper children could leave private processes; daemon stdin setup preceded cleanup finally.",
+        "fix": "Bounded communicate kills/reaps Node/gdbus/secret-tool on timeout/cancel; daemon stdin is guarded; SIGTERM cancels probe into validated owner pidfd cleanup; outer owned group receives bounded TERM/KILL cleanup.",
+        "independent_retest": "Owned synthetic child timeout and cancellation return -9 after reap. Accelerated outer timeout terminates/reaps a synthetic supervisor and its cooperative child; owned group absent."
+      },
+      {
+        "id": "PR-2",
+        "priority": "P2",
+        "issue": "Private child flags did not require an explicitly disposable context, and readiness key reads preceded Secret Service owner capture.",
+        "fix": "Exact disposable context and actual private DBus ownership preconditions; non-activating readiness/owner validation precedes key calls; Lock uses bounded cleanup helper.",
+        "independent_retest": "Bad child HOME/custom XDG reject before spawn; final actual disposable probe succeeds with the stricter private guards."
+      }
+    ],
+    "independently_run_checks": [
+      {
+        "command": "/usr/lib/maslow-voice/venv/bin/python free_ai/tests/secret_service_probe.py --recovery under an independently owned wrapper group",
+        "result": "Final helper succeeded in about 3.8 seconds, no stderr; private owned group absent after exit; deterministic sanitized receipt matched coordinator report."
+      },
+      {
+        "command": "Instrument validated pidfd cleanup in actual private dbus-run-session and disposable HOME using final helper probe()",
+        "result": "Exactly one validated owner captured; kernel process identity confirmed exited after pidfd cleanup; private group absent after session exit."
+      },
+      {
+        "command": "Synthetic child HOME/XDG rejection and bounded child/outer timeout-cancellation fixtures",
+        "result": "Private guard checks and corrected cleanup fixtures passed; no host bus/keyring used by negative fixtures."
+      }
+    ],
+    "test_harness_note": "An initial cleanup fixture used AsyncMock incorrectly and returned an unawaited coroutine; its result was discarded. Corrected accelerated wait_for fixture passed. An exact synthetic-child process scan found no remaining child from the invalid fixture. This was a reviewer harness error, not a helper failure.",
+    "evidence_distinctions": {
+      "actual": "Private GNOME Secret Service, D-Bus, active/recovery secret items, SQLite WAL/snapshot/restore and Node AES-GCM verification are actual local operations with synthetic keys and provider ciphertext.",
+      "restart": "New State/Recovery verifier objects simulate restart/lost reply; no actual root/service crash or power loss is induced.",
+      "closed_admission_field": "The helper asserts maintenance marker retained plus enabled=false and verified_routes=[]; it does not drive actual Voice TaskManager or live daemon admission.",
+      "cleanup": "Normal private group absence and validated owner exit directly observed; synthetic timeout/cancel paths exercised. SIGKILL escalation is source-reviewed but no stubborn real keyring/escaped-owner test or interruption-at-every-instruction proof is claimed.",
+      "host": "No personal desktop bus/keyring/credentials or provider account was accessed. No installed service/config/package/build/signing/publication/product merge operation."
+    },
+    "remaining_gates": [
+      "Privileged package pairing, root receipt adoption, installed service barriers and actual interrupted package recovery remain separate Hub/native gates.",
+      "Live provider/account, installed keyring UX, guest/Lenovo and physical audio remain unaccepted.",
+      "No installer acceptance gate is enabled by this probe."
+    ]
   }
 }
