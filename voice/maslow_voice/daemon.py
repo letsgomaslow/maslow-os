@@ -128,6 +128,9 @@ class VoiceService:
         self.tasks = TaskManager(self.store, executor_factory or self.executor_client, self.publish)
         self.control = ControlServer(self.runtime / "control.sock", self.dispatch, self.snapshot)
         self.tool_server = None
+        self.free_ai_router = None
+        self.assistant_runtime = None
+        self.tasks.assistant_factory = self.assistant_client
 
     def snapshot(self):
         tasks = []
@@ -142,6 +145,7 @@ class VoiceService:
                     "tasks": tasks, "session": session, "readiness": self.readiness,
                     "task_view_request": dict(self.task_view_request), "task_attention": dict(self.task_attention),
                     "voice_preview": dict(self.voice_preview)}
+        snapshot["assistant"] = self.free_ai_router.status() if self.free_ai_router else {"installed": False, "ready": False, "enabled": False}
         # Keep a busy task history within the IPC frame. Full results remain in
         # the store; approval details are never shortened for an approval decision.
         while len(tasks) > 1 and len(json.dumps(snapshot).encode()) > 3 * 1024 * 1024:
@@ -267,6 +271,7 @@ class VoiceService:
                                             "context": self.context, "session_id": self.session["id"],
                                             "preferred_coder": self.settings.value["default_coder"],
                                             "task_policy": self.settings.value["task_policy"],
+                                            "execution_connection": self.settings.value["execution_connection"],
                                             "task_id": task_id, "task_error": task_error}
                     if len(self.turns) > 100:
                         self.turns.pop(next(iter(self.turns)))
@@ -313,8 +318,12 @@ class VoiceService:
             transcript, context=context, preferred_coder=preferred_coder, active_tasks=active), 5)
         if plan["action"] == "new":
             request_id = live_request_id(session_id, delegation_id, plan["source"])
-            task = await self.tasks.submit(request_id, plan["brief"], project, "gpt_live", plan["source"], preferred_coder,
-                                           policy=self.settings.value["task_policy"])
+            if self.settings.value["execution_connection"] == "free-cloud":
+                task = await self.tasks.submit_assistant(request_id, plan["source"], project, {}, mode="gpt_live", brief=plan["brief"],
+                    policy=self.settings.value["task_policy"])
+            else:
+                task = await self.tasks.submit(request_id, plan["brief"], project, "gpt_live", plan["source"], preferred_coder,
+                                               policy=self.settings.value["task_policy"])
         else:
             task = await self.tasks.action(plan["task_id"], plan["action"], plan.get("text", ""))
         self.voice.pop("task_error", None)
@@ -889,6 +898,8 @@ class VoiceService:
                       "submit": {"operation", "brief", "project_name", "new_project"}}
             if operation not in fields or set(intent) - fields[operation]:
                 raise VoiceError("INVALID_REQUEST", "The Voice action contains unsupported fields.")
+            if turn.get("execution_connection", "existing") == "free-cloud" and operation in {"agent", "note"}:
+                raise VoiceError("ASSISTANT_SCOPE_REQUIRED", "For Free cloud AI, submit an everyday request. Use Work to explicitly select documents or permit saving a note.")
             key = turn_id + ":" + hashlib.sha256(json.dumps(intent, sort_keys=True).encode()).hexdigest()
             # Status is a fresh read; all mutating tool retries reuse their receipt.
             cacheable = not (operation == "task" and intent.get("action") == "status") and operation != "agent_status"
@@ -998,6 +1009,17 @@ class VoiceService:
         fingerprint = hashlib.sha256(json.dumps(brief, sort_keys=True).encode()).hexdigest()[:24]
         request_id = turn["session_id"] + ":" + turn_id + ":" + fingerprint
         project = turn["project"]
+        if turn.get("execution_connection", "existing") == "free-cloud":
+            # Spoken intent can never invent selected files/accounts or a save
+            # grant. The Work composer is the explicit grant surface in v1.
+            original = turn["source"] + ("\nExplicit user context:\n" + turn["context"] if turn["context"] else "")
+            request_id = hashlib.sha256((turn["session_id"] + ":" + turn_id).encode()).hexdigest()
+            task = await self.tasks.submit_assistant(request_id, original, project, {}, mode=turn["mode"], brief=brief,
+                policy=turn.get("task_policy", "lab_auto"))
+            turn.update(task_id=task["id"], task_error=None)
+            await self.request_task_view(task["id"], explicit=False)
+            self.watch_gemini_task(task["id"])
+            return self.task_summary(task)
         if turn["mode"] == "gemini_live":
             # One explicit work request per captured turn. Tool retries cannot
             # allocate a second folder or a second job after paraphrasing a brief.
@@ -1088,6 +1110,75 @@ class VoiceService:
                         discard_process=lambda project=task["project"]: self.offline_clients.pop(project, None))
                 return self.offline_clients[task["project"]]
         return await self.hermes.ensure(task)
+
+    def _free_ai(self):
+        if self.free_ai_router is None:
+            if "/usr/lib/maslow-free-ai" not in sys.path:
+                sys.path.append("/usr/lib/maslow-free-ai")
+            try:
+                from maslow_free_ai.runtime import RouterRuntime
+            except ImportError:
+                raise VoiceError("FREE_AI_NOT_INSTALLED", "Install the reviewed Free cloud AI components through Hub first.") from None
+            self.free_ai_router = RouterRuntime()
+        return self.free_ai_router
+
+    async def assistant_client(self, task):
+        from .assistant_runtime import AssistantRuntime
+        router = self._free_ai()
+        if self.assistant_runtime is None:
+            self.assistant_runtime = AssistantRuntime(self.directory, self.tool_socket, self.tool_token, router)
+        return await self.assistant_runtime.ensure(task)
+
+    async def free_ai_probe(self, route):
+        from .http import request_json
+        verified = []
+        for model in ("openai/gpt-oss-120b", "openai/gpt-oss-20b"):
+            # One bounded request per route checks both text and a harmless
+            # function call. No filesystem/account capability is available.
+            payload = {"model": model, "messages": [{"role": "user", "content": "Call maslow_ready with value READY. This is a harmless connection test."}],
+                "max_tokens": 128, "stream": False,
+                "tools": [{"type": "function", "function": {"name": "maslow_ready", "description": "A harmless local connection test.",
+                    "parameters": {"type": "object", "properties": {"value": {"type": "string", "enum": ["READY"]}}, "required": ["value"], "additionalProperties": False}}}],
+                "tool_choice": {"type": "function", "function": {"name": "maslow_ready"}}}
+            response = await request_json(route["endpoint"] + "/chat/completions", "POST", payload, route["token"], timeout=45)
+            if response.get("model") != model:
+                raise VoiceError("FREE_AI_ROUTE_SUBSTITUTED", "The connection check used another route. The requested route was not verified.")
+            try:
+                message = response["choices"][0]["message"]
+                call = message["tool_calls"][0]["function"]
+                if call["name"] != "maslow_ready" or json.loads(call["arguments"]) != {"value": "READY"}:
+                    raise ValueError()
+            except (KeyError, IndexError, TypeError, ValueError):
+                raise VoiceError("FREE_AI_TOOL_TEST_FAILED", "An approved route did not pass its harmless function test. It was not enabled.") from None
+            verified.append(model)
+        return verified
+
+    async def free_ai_operation(self, request):
+        operation = request.get("operation")
+        if operation not in {"status", "setup", "test", "enable", "disable"}:
+            raise VoiceError("INVALID_REQUEST", "That Free cloud AI operation is unavailable.")
+        if operation != "setup" and set(request) != {"action", "operation"}:
+            raise VoiceError("INVALID_REQUEST", "This operation does not accept account information.")
+        if operation in {"setup", "test"} and any(task.get("execution_connection") == "free-cloud" for task in self.store.active()):
+            raise VoiceError("TASKS_ACTIVE", "Finish or stop assistant requests before changing or testing their connection.")
+        from maslow_free_ai.errors import FreeAIError
+        try:
+            router = self._free_ai()
+            if operation == "setup":
+                status = await router.setup(request.get("key"), request.get("free_plan_confirmed"), self.free_ai_probe)
+            elif operation == "test":
+                status = await router.test(self.free_ai_probe)
+            elif operation in {"enable", "disable"}:
+                status = await router.enable(operation == "enable")
+                # This affects new everyday tasks only, preserving current
+                # agent selections and every speech-provider setting.
+                self.settings.update({"execution_connection": "free-cloud" if operation == "enable" else "existing"})
+            else:
+                status = router.status()
+        except FreeAIError as error:
+            raise VoiceError(error.code, error.message) from None
+        await self.publish()
+        return {"status": status}
 
     async def start_voice(self, *, audio=True, project="", context=""):
         """Start a conversation, retrying a momentary connection failure quietly."""
@@ -1502,6 +1593,8 @@ class VoiceService:
             "configure_gemini_live": {"url", "api_key", "api_secret", "google_api_key"},
             "download_speech": set(), "start_voice": {"project", "context"}, "end_voice": set(), "mute": {"muted"},
             "silence": set(), "desktop_action": {"application"}, "submit_text": {"text", "project", "context"},
+            "task_submit": {"request_id", "text", "project", "execution_connection", "capabilities"},
+            "free_ai": {"operation", "key", "free_plan_confirmed"},
             "task_action": {"id", "task_id", "operation", "text", "approval_id", "child_id", "review_id", "paths"},
         }
         if action not in allowed or set(request) - allowed[action] - {"action"}:
@@ -1513,16 +1606,37 @@ class VoiceService:
             await self.stop_preview()
             return {}
         if action == "status":
+            if Path("/usr/lib/maslow-free-ai/maslow_free_ai").is_dir():
+                self._free_ai()
             if not self.readiness.get("checks") and self.settings.value["mode"] in {"gemini_live", "gpt_live", "livekit", "openai"}:
                 await self.check_readiness()
             return {"snapshot": self.snapshot()}
+        if action == "free_ai":
+            self._free_ai()  # Import only after this explicit optional action.
+            return await self.free_ai_operation(request)
+        if action == "task_submit":
+            connection = request.get("execution_connection", self.settings.value["execution_connection"])
+            if connection == "free-cloud":
+                task = await self.tasks.submit_assistant(request.get("request_id"), request.get("text"), request.get("project"),
+                    request.get("capabilities", {}), policy=self.settings.value["task_policy"])
+            elif connection == "existing":
+                if request.get("capabilities"):
+                    raise VoiceError("INVALID_CAPABILITIES", "Selected-file permissions belong to the managed everyday assistant.")
+                text = text_field(request.get("text"), "original request", 12000, True)
+                task = await self.tasks.submit(request.get("request_id"), {"objective": text[:1000], "summary": text},
+                    request.get("project"), self.settings.value["mode"], text, self.settings.value["default_coder"],
+                    policy=self.settings.value["task_policy"])
+            else:
+                raise VoiceError("INVALID_SETTINGS", "Choose an existing agent or Free cloud AI for this request.")
+            await self.request_task_view(task["id"], explicit=False)
+            return {"task": self.task_summary(task), "submitted_request_id": request.get("request_id")}
         if action in {"configure_livekit", "configure_gemini_live"}:
             return await self.configure_livekit(request, gemini=action == "configure_gemini_live")
         if action == "configure":
             changes = request.get("settings", {})
             if not isinstance(changes, dict):
                 raise VoiceError("INVALID_SETTINGS", "Settings must be an object.")
-            connection = set(changes) - {"reduced_motion", "fixed_position", "orb_position", "display", "retention_days", "idle_seconds"}
+            connection = set(changes) - {"reduced_motion", "fixed_position", "orb_position", "display", "retention_days", "idle_seconds", "execution_connection"}
             if connection and self.store.active():
                 raise VoiceError("TASKS_ACTIVE", "Finish or stop current tasks before changing their execution connection.")
             if connection:
@@ -1532,8 +1646,9 @@ class VoiceService:
                     self.offline = None
                     self.offline_clients.clear()
             self.settings.update(changes)
-            self.readiness = {"ready": False, "checks": [], "models": []}
-            if self.settings.value["mode"] in {"gemini_live", "gpt_live", "livekit", "openai"}:
+            if connection:
+                self.readiness = {"ready": False, "checks": [], "models": []}
+            if connection and self.settings.value["mode"] in {"gemini_live", "gpt_live", "livekit", "openai"}:
                 await self.check_readiness()
         elif action == "credential":
             await self.credentials.set(request.get("name"), request.get("value"))
@@ -1746,6 +1861,9 @@ class VoiceService:
         if task["state"] in TERMINAL or task["state"] in {"stopping", "queued"}:
             raise VoiceError("TASK_NOT_RUNNING", "The owning task is not running.")
         operation = request.get("operation")
+        if task.get("execution_connection") == "free-cloud":
+            from .assistant import WorkspaceTools
+            return await WorkspaceTools(self.store).handle(task, operation, request.get("params", {}))
         if operation not in {"delegate_coding", "open_application", "open_website"}:
             raise VoiceError("INVALID_TOOL", "That coordinator tool is not available.")
         return await self.execution.handle(task, operation, request.get("params", {}))
@@ -1837,6 +1955,8 @@ class VoiceService:
         finally:
             await self.end_voice()
             await self.tasks.close()
+            if self.free_ai_router:
+                await self.free_ai_router.close()
             for task in tuple(self.work):
                 task.cancel()
             await asyncio.gather(*self.work, return_exceptions=True)

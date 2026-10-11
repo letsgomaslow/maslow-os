@@ -351,6 +351,7 @@ const livekitResponsesFunction = panel.match(/function handleControlResponse\(re
 const transportErrorFunction = panel.match(/function handleTransportError\(message\) \{[\s\S]*?\n  \}/)[0];
 const livekitSent = [];
 const livekitContext = { send: (action, body) => livekitSent.push({ action, ...body }), voiceStartPending: false, livekitSetupSaving: false, livekitSetupSucceeded: false, livekitSetupStatus: "", livekitApiKeyField: { text: "key" }, livekitApiSecretField: { text: "secret" }, geminiLiveSetupSaving: false, geminiLiveSetupSucceeded: false, geminiLiveSetupStatus: "", geminiLiveGoogleApiKeyField: { text: "google" }, geminiLiveApiKeyField: { text: "key" }, geminiLiveApiSecretField: { text: "secret" } };
+Object.assign(livekitContext, { assistantRequestId: "", assistantSubmitting: false });
 runInNewContext(`${livekitSubmitFunction}; submitLiveKitSetup("wss://project.livekit.cloud", "key", "secret");`, livekitContext);
 assert.deepEqual(livekitSent[0], { action: "configure_livekit", url: "wss://project.livekit.cloud", api_key: "key", api_secret: "secret" });
 assert.equal(livekitContext.livekitSetupSaving, true);
@@ -371,6 +372,7 @@ runInNewContext(`${livekitResponsesFunction}; handleControlResponse({ ok: false,
 assert.equal(livekitContext.livekitSetupSaving, false);
 assert.equal(livekitContext.livekitSetupSucceeded, false, "Failure text containing saved must still display an error");
 const startFailureContext = { voiceStartPending: true, openSettings: (message) => { startFailureContext.message = message; } };
+Object.assign(startFailureContext, { assistantRequestId: "", assistantSubmitting: false });
 runInNewContext(`${livekitResponsesFunction}; handleControlResponse({ ok: false, error: { message: "Google AI Studio API key is missing." } });`, startFailureContext);
 assert.equal(startFailureContext.feedback, "Google AI Studio API key is missing.");
 assert.equal(startFailureContext.message, undefined, "Failure must not open settings");
@@ -386,7 +388,7 @@ assert.deepEqual(geminiSent[1], { action: "configure_gemini_live", url: "", api_
 runInNewContext(`${geminiSubmitFunction}; submitGeminiLiveSetup("wss://project.livekit.cloud", "", "", "");`, geminiContext);
 assert.deepEqual(geminiSent[2], { action: "configure_gemini_live", url: "wss://project.livekit.cloud", api_key: "", api_secret: "", google_api_key: "" });
 assert.equal(geminiContext.geminiLiveSetupSaving, true, "A blank Google field retains a saved key through the backend");
-const transportContext = { voiceStartPending: true, livekitSetupSaving: true, livekitSetupSucceeded: true, livekitSetupStatus: "", geminiLiveSetupSaving: true, geminiLiveSetupSucceeded: true, geminiLiveSetupStatus: "", openSettings: (message) => { transportContext.startMessage = message; } };
+const transportContext = { assistantSubmitting: false, voiceStartPending: true, livekitSetupSaving: true, livekitSetupSucceeded: true, livekitSetupStatus: "", geminiLiveSetupSaving: true, geminiLiveSetupSucceeded: true, geminiLiveSetupStatus: "", openSettings: (message) => { transportContext.startMessage = message; } };
 runInNewContext(`${transportErrorFunction}; handleTransportError("Voice control disconnected.");`, transportContext);
 assert.equal(transportContext.voiceStartPending, false);
 assert.equal(transportContext.livekitSetupSaving, false);

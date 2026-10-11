@@ -34,6 +34,7 @@ context.tasks = [];
 context.visibleTasks = [];
 context.session = { id: "", transcript: [] };
 context.readiness = { ready: false, checks: [] };
+context.assistant = { installed: false, ready: false, enabled: false };
 context.taskViewRequest = null;
 context.snapshot = {};
 context.applySnapshot({

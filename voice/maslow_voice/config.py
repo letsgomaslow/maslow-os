@@ -12,7 +12,7 @@ from .voices import LIVEKIT_VOICES, LIVE_VOICES, OPENAI_VOICES
 
 DEFAULTS = {
     "mode": "gemini_live", "server_kind": "ollama", "server_url": "http://127.0.0.1:11434",
-    "model": "", "execution_model": "", "default_coder": "auto",
+    "model": "", "execution_model": "", "default_coder": "auto", "execution_connection": "existing",
     "realtime_model": "gpt-realtime-2.1", "realtime_voice": "cedar", "live_voice": "marin",
     "livekit_url": "", "livekit_voice": "Ashley",
     "gemini_live_model": "gemini-3.8-live", "gemini_live_voice": "Puck", "task_policy": "lab_auto",
@@ -62,6 +62,8 @@ def validate_settings(settings: dict) -> dict:
     if not isinstance(settings, dict) or set(settings) - set(DEFAULTS):
         raise VoiceError("INVALID_SETTINGS", "Voice settings contain an unsupported field.")
     result = dict(DEFAULTS, **settings)
+    if not isinstance(result["execution_connection"], str) or result["execution_connection"] not in {"existing", "free-cloud"}:
+        raise VoiceError("INVALID_SETTINGS", "Choose an existing agent or Free cloud AI for new everyday requests.")
     for key, choices in {"mode": {"offline", "server", "livekit", "gemini_live", "openai", "gpt_live"}, "server_kind": {"ollama", "lmstudio"}, "default_coder": {"auto", "codex", "claude", "hermes"}, "task_policy": {"lab_auto", "review"}, "realtime_voice": set(OPENAI_VOICES), "live_voice": set(LIVE_VOICES), "livekit_voice": set(LIVEKIT_VOICES)}.items():
         if not isinstance(result[key], str) or result[key] not in choices:
             raise VoiceError("INVALID_SETTINGS", "Choose one of the supported Voice options.")

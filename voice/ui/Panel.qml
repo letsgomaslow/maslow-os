@@ -61,6 +61,14 @@ Item {
   property bool settingsOpen: false
   readonly property string defaultGeminiPrompt: "You are Maslow's concise voice assistant. Answer conversation directly."
   property string draft: ""
+  property string assistantDraft: ""
+  property string assistantDocuments: ""
+  property string assistantNote: ""
+  property bool assistantSaveNote: false
+  property bool assistantSubmitting: false
+  property string assistantRequestId: ""
+  property string assistantRequestFingerprint: ""
+  readonly property bool freeCloudSelected: String(settings.execution_connection || "existing") === "free-cloud"
   property string selectedProject: ""
   property string explicitContext: ""
   property string feedback: ""
@@ -383,6 +391,20 @@ Item {
     send("submit_text", { text: text, project: selectedProject, context: explicitContext })
     draft = ""
   }
+  function submitAssistant() {
+    if (assistantSubmitting || assistantDraft.trim() === "" || selectedProject.trim() === "") return
+    var documents = assistantDocuments.split("\n").map(function(path) { return path.trim() }).filter(function(path) { return path !== "" })
+    var payload = { text: assistantDraft, project: selectedProject, execution_connection: String(settings.execution_connection || "existing"),
+      capabilities: freeCloudSelected ? { documents: documents, note: assistantSaveNote ? assistantNote.trim() : null, accounts: [] } : {} }
+    var fingerprint = JSON.stringify(payload)
+    if (fingerprint !== assistantRequestFingerprint) {
+      assistantRequestId = "typed-" + Date.now().toString(36) + "-" + Math.random().toString(36).slice(2)
+      assistantRequestFingerprint = fingerprint
+    }
+    payload.request_id = assistantRequestId
+    assistantSubmitting = true
+    send("task_submit", payload)
+  }
   function taskAction(task, operation, text) {
     var request = operation === "start"
       ? { task_id: String(task.id), operation: operation, text: String(text || "") }
@@ -594,6 +616,14 @@ Item {
     return voice.microphone === true ? "Microphone on" : "Microphone off"
   }
   function handleControlResponse(response) {
+    if (response.submitted_request_id === assistantRequestId && response.ok === true) {
+      assistantSubmitting = false
+      assistantDraft = ""
+      feedback = "Request accepted. Progress and the result appear in Work."
+    } else if (assistantSubmitting && response.ok === false) {
+      assistantSubmitting = false
+      feedback = String((response.error || {}).message || "The assistant request could not be submitted.")
+    }
     if (voiceStartPending && response.ok === false) {
       voiceStartPending = false
       feedback = String((response.error || {}).message || "Connection lost · click to retry")
@@ -630,6 +660,10 @@ Item {
   }
   function handleTransportError(message) {
     var safeMessage = String(message || "Voice control needs attention.")
+    if (assistantSubmitting) {
+      assistantSubmitting = false
+      feedback = safeMessage + " Retry this request when the connection returns."
+    }
     if (voiceStartPending) {
       voiceStartPending = false
       feedback = safeMessage
@@ -671,6 +705,7 @@ Item {
     fixtureMode: root.nativePreviewFixtureMode
     onResponseReceived: function(response) { root.handleControlResponse(response) }
     onTransportErrorChanged: if (transportError !== "") root.handleTransportError(transportError)
+    onConnectionLostChanged: if (connectionLost) root.handleTransportError(transportError || "Assistant connection lost.")
   }
   Component.onCompleted: Qt.callLater(function() { controller.start() })
 
@@ -1124,6 +1159,23 @@ Item {
                 width: tasksScroll.availableWidth - 14
                 spacing: 12
                 Text { text: "Coordinated tasks"; color: root.textColor; font.family: "Manrope"; font.pixelSize: 22; Accessible.role: Accessible.Heading }
+                Text { text: "Ask or draft"; color: root.textColor; font.family: "Manrope"; font.pixelSize: 18; Accessible.role: Accessible.Heading }
+                VoiceSelect {
+                  Layout.fillWidth: true
+                  model: [{ name: "Existing agent", value: "existing" }, { name: "Free cloud AI", value: "free-cloud" }]
+                  textRole: "name"; valueRole: "value"
+                  currentIndex: root.freeCloudSelected ? 1 : 0
+                  Accessible.name: "Assistant connection for new requests"
+                  onActivated: root.send("configure", { settings: { execution_connection: currentValue } })
+                }
+                Text { visible: root.freeCloudSelected; text: controller.assistant.ready === true && controller.assistant.enabled === true ? "Free cloud AI is connected. Selected text goes to Groq; generated facts may need checking." : "Finish Free cloud AI setup in Hub before sending a request."; color: root.secondaryTextColor; font.family: "Manrope"; wrapMode: Text.WordWrap; Layout.fillWidth: true }
+                VoiceField { Layout.fillWidth: true; placeholderText: "Workspace folder"; text: root.selectedProject; onTextEdited: root.selectedProject = text; Accessible.name: "Assistant workspace folder"; enabled: !root.assistantSubmitting }
+                VoiceArea { Layout.fillWidth: true; placeholderText: "Ask a question or describe a draft"; text: root.assistantDraft; onTextChanged: root.assistantDraft = text; Accessible.name: "Everyday assistant request"; implicitHeight: 90; wrapMode: TextEdit.Wrap; enabled: !root.assistantSubmitting }
+                VoiceArea { visible: root.freeCloudSelected; Layout.fillWidth: true; placeholderText: "Selected .md or .txt paths, one per line (optional)"; text: root.assistantDocuments; onTextChanged: root.assistantDocuments = text; Accessible.name: "Documents selected for this request"; implicitHeight: 64; wrapMode: TextEdit.Wrap; enabled: !root.assistantSubmitting }
+                VoiceCheck { visible: root.freeCloudSelected; text: "Save this request as a new Markdown note"; checked: root.assistantSaveNote; onToggled: root.assistantSaveNote = checked; enabled: !root.assistantSubmitting }
+                VoiceField { visible: root.freeCloudSelected && root.assistantSaveNote; Layout.fillWidth: true; placeholderText: "New note path, for example meeting.md"; text: root.assistantNote; onTextEdited: root.assistantNote = text; Accessible.name: "Explicitly requested new note path"; enabled: !root.assistantSubmitting }
+                Text { visible: root.freeCloudSelected; text: "Only selected documents can be read. Existing files are never overwritten. Scoped connected accounts are awaiting verification."; color: root.secondaryTextColor; font.family: "Manrope"; wrapMode: Text.WordWrap; Layout.fillWidth: true }
+                VoiceButton { text: root.assistantSubmitting ? "Submitting…" : "Send assistant request"; enabled: !root.assistantSubmitting && root.assistantDraft.trim() !== "" && root.selectedProject.trim() !== "" && (!root.freeCloudSelected || (controller.assistant.ready === true && controller.assistant.enabled === true && (!root.assistantSaveNote || root.assistantNote.trim() !== ""))); onClicked: root.submitAssistant() }
                 Text { visible: root.tasks.length === 0; text: "No tasks are being coordinated yet."; color: root.secondaryTextColor; font.family: "Manrope" }
                 Text { visible: root.tasks.length > 0; text: "Finished work stays here for review until you dismiss it."; color: root.secondaryTextColor; font.family: "Manrope"; wrapMode: Text.Wrap; Layout.fillWidth: true }
                 Repeater {

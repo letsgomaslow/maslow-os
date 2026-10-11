@@ -1,0 +1,5 @@
+#!/bin/bash
+# omarchy:hidden=true
+# omarchy:summary=Control optional Free cloud AI without exposing account keys
+export PYTHONPATH=/usr/lib/maslow-free-ai
+exec /usr/bin/python -m maslow_free_ai.control "$@"

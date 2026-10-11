@@ -25,6 +25,7 @@ Item {
   property var visibleTasks: snapshot.tasks
   property var session: snapshot.session
   property var readiness: snapshot.readiness
+  property var assistant: snapshot.assistant || ({ installed: false, ready: false, enabled: false })
   // A monotonically sequenced request lets the daemon bring the matching task
   // into view without reopening the panel for every status snapshot.
   property var taskViewRequest: snapshot.task_view_request || null
@@ -102,6 +103,7 @@ Item {
     var nextTasks = reconcileTasks(tasks, Array.isArray(value.tasks) ? value.tasks : [])
     var nextSession = reuseUnchanged(session, value.session)
     var nextReadiness = reuseUnchanged(readiness, value.readiness)
+    var nextAssistant = reuseUnchanged(assistant, value.assistant || ({ installed: false, ready: false, enabled: false }))
     var nextTaskViewRequest = reuseUnchanged(taskViewRequest, value.task_view_request || null)
     if (voice !== nextVoice) voice = nextVoice
     if (settings !== nextSettings) settings = nextSettings
@@ -111,6 +113,7 @@ Item {
     }
     if (session !== nextSession) session = nextSession
     if (readiness !== nextReadiness) readiness = nextReadiness
+    if (assistant !== nextAssistant) assistant = nextAssistant
     if (taskViewRequest !== nextTaskViewRequest) taskViewRequest = nextTaskViewRequest
     snapshot = {
       schemaVersion: value.schemaVersion,
@@ -119,6 +122,7 @@ Item {
       tasks: tasks,
       session: session,
       readiness: readiness,
+      assistant: assistant,
       voice_preview: voicePreview,
       task_view_request: taskViewRequest
     }
