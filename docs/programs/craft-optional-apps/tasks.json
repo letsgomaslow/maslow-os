@@ -26,6 +26,11 @@
         "task": "CRAFT-PDF-PACKAGE/CRAFT-PHOTO-PACKAGE",
         "model": "gpt-6.1-sol",
         "reasoning": "medium"
+      },
+      {
+        "task": "CRAFT-CORE-BOUNDARY-REPAIR",
+        "model": "gpt-6-astra",
+        "reasoning": "high"
       }
     ]
   },
@@ -297,14 +302,14 @@
       ],
       "acceptance": "Explicit roots/agents; namespaces/environment/FD/mount/path attacks denied; legitimate saved exports pass",
       "phase": 1,
-      "status": "blocked",
+      "status": "active",
       "owner": "connect-worker",
       "session": "2026-10-11-craft-root",
       "worker": "/root/craft_connect",
       "actual_model": "gpt-6.1-sol",
-      "attempt": 1,
-      "last_checkpoint": "2026-10-11T11:55:14.806545+00:00",
-      "base_revision": "0c6f7b9",
+      "attempt": 2,
+      "last_checkpoint": "2026-10-11T12:40Z",
+      "base_revision": "21fdf8ae46de11cfc8b0a634d4489cf6abd0e937",
       "branch": "codex/craft-connect",
       "worktree": "/home/maslow/Projects/Maslow/craft-connect",
       "implementation_commits": [
@@ -338,7 +343,7 @@
         "type": "implementation",
         "summary": "Outer RLIMIT_NPROC=256 counts existing host-user threads (1442 here), preventing namespace start; preexisting output hardlinks permit write to outside/original inode"
       },
-      "next_action": "Independent boundary repair design, then source fix and new native package; do not accept existing profile"
+      "next_action": "Repair nproc ordering; private copied output/state and bounded synchronous MCP publication; retain exact contract"
     },
     {
       "id": "CRAFT-CORE-LIFECYCLE",
@@ -2951,7 +2956,7 @@
       ],
       "acceptance": "Independent security analysis of reproduced failures; recommended minimal repair and testable trust-boundary limits; no changed implementation",
       "phase": 1,
-      "status": "active",
+      "status": "integrated",
       "owner": "security-review",
       "session": "2026-10-11-craft-root",
       "worker": "/root/boundary_repair",
@@ -2963,11 +2968,18 @@
       "worktree": "/home/maslow/Projects/Maslow/craft-connect",
       "implementation_commits": [],
       "integration_commits": [],
-      "tests": [],
-      "evidence": [],
+      "tests": [
+        {
+          "check": "independent controlled resource/private-state/post-pinning alias reproductions, design review, git diff --check",
+          "result": "pass"
+        }
+      ],
+      "evidence": [
+        "docs/programs/craft-optional-apps/tasks/CRAFT-CORE-BOUNDARY-REPAIR.md"
+      ],
       "artifact_hashes": {},
       "blocker": null,
-      "next_action": "Independently review before implementation repair"
+      "next_action": "Implement approved bounded scratch/publication repair; review repaired source independently"
     }
   ]
 }
