@@ -1,23 +1,15 @@
 # FCAI-P4-RECOVERY
 
-## Objective
+Exercise full database, key and package recovery. Status `active`; owner root; model coordinator not exposed.
 
-Exercise full database, key and package recovery
+Acceptance: Document and execute backup/restore, missing/corrupt database, lost/rotated key, package missing/partial install/upgrade/rollback, interrupted operations and idempotent retry; preserve user data and fail closed.
 
-## Scope and acceptance
+Permittedfiles: `free_ai/maslow_free_ai/recovery.py`, `free_ai/maslow_free_ai/runtime.py`, `voice/maslow_voice/free_ai_delivery.py`, `voice/maslow_voice/daemon.py`, `voice/maslow_voice/tasks.py`, `free_ai/tests/test_recovery.py`, `free_ai/tests/test_runtime.py`, `voice/tests/test_free_ai_delivery.py`.
 
-Repository: `runtime`. Status: `active`. Owner: root. Model: coordinator not exposed. Coordinator controls transitions and integration. Dependencies: FCAI-P2-HUB, FCAI-P3-CONNECT.
+Sourcecommits: f63cdb67, 90c0745a, 784eca20. Evidence: `docs/programs/free-cloud-ai/evidence/2026-10-11-account-ui-source-checkpoint.json` and `docs/programs/free-cloud-ai/evidence/2026-10-11-account-recovery-review.json` (scope/limits differ).
 
-Document and execute backup/restore, missing/corrupt database, lost/rotated key, package missing/partial install/upgrade/rollback, interrupted operations and idempotent retry; preserve user data and fail closed.
+Blocker: User-owned current-operation snapshot/restore source passes; rootpairedinstallation/actualinterruption/historicalrollback gates remain open..
 
-Permitted files: `free_ai/maslow_free_ai/recovery.py`, `free_ai/tests/test_recovery.py`.
+Next action: Implement root-ticket reader and prepare/check RPC that closes all task/conversation/configuration admission; coordinate exactcontract withAstra Hubworker.
 
-## Checkpoint
-
-Recorded 2026-10-11T15:56:05.839365+00:00. Implementation commits: none recorded. Evidence: pending worker report.
-
-Blocker: Package/database paired recovery and installed interruption/full-disk tests remain open..
-
-Next action: Implement quiesced consistent SQLite snapshot + matching Secret Service recovery identity, fail-closed restore.
-
-Source, package and fixture results do not establish live provider/account access, hardware performance, physical audio or paired recovery. Candidate remains not-ready.
+No source/test/fixture establishes liveaccount, heardaudio, hardwareperformance, signedinstallation or pairedrecovery. Candidate remainsnot-ready.

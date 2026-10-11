@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "program": "free-cloud-ai",
-  "current_phase": 2,
+  "current_phase": 4,
   "latest_handoff": "docs/handoffs/2026-10-11-free-cloud-ai-preview.md",
   "session": "2026-10-11-free-cloud-ai-root",
   "models": {
@@ -45,17 +45,19 @@
         " M docs/programs/craft-optional-apps/tasks/CRAFT-CORE-SANDBOX.md",
         "?? docs/handoffs/2026-10-11-freellmapi-review.md"
       ],
-      "implementation_revision": "e7b8831a4fc81f6fdf0a1b8369dcc748274d9112"
+      "implementation_revision": "784aea2b453815a55b1551ab2d1b1ed84dbbf529"
     },
     "hub": {
       "path": "/home/maslow/Projects/Maslow/free-ai-hub",
       "base_revision": "33940d2e8740b172b953cc3e091cbae1ba1cd303",
-      "branch": "codex/free-cloud-ai"
+      "branch": "codex/free-cloud-ai",
+      "implementation_revision": "732c235"
     },
     "packages": {
       "path": "/home/maslow/Projects/Maslow/free-ai-packages",
       "base_revision": "448856485e710caedfc24f544a027aea8652dd33",
-      "branch": "codex/free-cloud-ai"
+      "branch": "codex/free-cloud-ai",
+      "implementation_revision": "05ab21a"
     },
     "connect": {
       "path": "/home/maslow/Projects/Maslow/free-ai-connect",
@@ -68,7 +70,8 @@
         "sha256": "541150939158c7c26966f9ddfef183fa49b1ccc2e8ff1fa2b5e2472c60357388",
         "scope": "Craft source + native synthetic/container checks only; not FreeAI managed account/live acceptance"
       },
-      "preserved_source_checkout": "/home/maslow/Projects/Maslow/craft-connect"
+      "preserved_source_checkout": "/home/maslow/Projects/Maslow/craft-connect",
+      "implementation_revision": "646aa1149f36050a470ded7e3658ad0b0a38bcbb"
     },
     "iso": {
       "path": "/home/maslow/Projects/Maslow/maslow-os-iso",
@@ -206,23 +209,35 @@
       "branch": "codex/free-cloud-ai",
       "worktree": "/home/maslow/Maslow-ai-os/free-ai-runtime",
       "implementation_commits": [
-        "e7b8831a4fc81f6fdf0a1b8369dcc748274d9112"
+        "e7b8831a",
+        "f63cdb67",
+        "90c0745a",
+        "784eca20",
+        "c4098a60",
+        "3e59f687"
       ],
       "integration_commits": [],
       "tests": [],
       "evidence": [
-        "docs/programs/free-cloud-ai/evidence/2026-10-11-source-package-checkpoint.json"
+        "docs/programs/free-cloud-ai/evidence/2026-10-11-source-package-checkpoint.json",
+        "docs/programs/free-cloud-ai/evidence/2026-10-11-account-ui-source-checkpoint.json",
+        "docs/programs/free-cloud-ai/evidence/2026-10-11-account-recovery-review.json"
       ],
       "artifact_hashes": {},
       "blocker": "Real keyring/installed lifecycle acceptance unavailable.",
-      "next_action": "Exercise actual locked/unavailable Secret Service in installed guest; recovery is separate."
+      "next_action": "Integrate reviewed runtime delivery RPC; installed keyring/paired package recovery still required."
     },
     {
       "id": "FCAI-P1-HERMES",
       "objective": "Constrain Hermes tools, dispatch contract and request idempotency",
       "repository": "runtime",
       "permitted_files": [
-        "voice/**",
+        "voice/maslow_voice/**",
+        "voice/assistant_plugin/**",
+        "voice/assistant_worker.py",
+        "voice/tests/test_assistant*.py",
+        "voice/tests/test_ipc.py",
+        "voice/tests/test_mvp_service.py",
         "free_ai/tests/hermes*"
       ],
       "dependencies": [
@@ -241,7 +256,10 @@
       "branch": "codex/free-cloud-ai",
       "worktree": "/home/maslow/Maslow-ai-os/free-ai-runtime",
       "implementation_commits": [
-        "e7b8831a4fc81f6fdf0a1b8369dcc748274d9112"
+        "e7b8831a",
+        "0121a03b",
+        "7454e3ef",
+        "da140c69"
       ],
       "integration_commits": [],
       "tests": [
@@ -252,11 +270,13 @@
       ],
       "evidence": [
         "docs/programs/free-cloud-ai/evidence/2026-10-11-source-package-checkpoint.json",
-        "docs/programs/free-cloud-ai/evidence/2026-10-11-hermes-runs.json"
+        "docs/programs/free-cloud-ai/evidence/2026-10-11-hermes-runs.json",
+        "docs/programs/free-cloud-ai/evidence/2026-10-11-account-ui-source-checkpoint.json",
+        "docs/programs/free-cloud-ai/evidence/2026-10-11-account-recovery-review.json"
       ],
       "artifact_hashes": {},
       "blocker": null,
-      "next_action": "Integrate Connect grants additively; reverify changed profile/task/UI and rebuild candidates."
+      "next_action": "Rebuild exact final source after delivery API; live usefulness remains open."
     },
     {
       "id": "FCAI-P1-PACKAGE",
@@ -298,8 +318,8 @@
         "/home/maslow/Maslow-ai-os/free-ai-build/native/maslow-free-ai-0.1.0-1-x86_64.pkg.tar.zst": "5b2d989d58451ac9744f9c0e8c2c3dcde5f99657d1fef931d2c4a348fb5e4143",
         "/home/maslow/Maslow-ai-os/free-ai-build/voice38/maslow-voice-0.1.5-38-x86_64.pkg.tar.zst": "3593c33d16574fae8667da41617c3d7facfda29b3dbaa8672f03f3a7da53f0f2"
       },
-      "blocker": null,
-      "next_action": "Commit reviewed recipes, rebuild only after new source changes; retain tested artifacts.",
+      "blocker": "Current committed source differs from preserved e7 archives. Native managed Connect source requires serialized Craft reconciliation.",
+      "next_action": "Do not build until final delivery API reviewed; FreeAI2/Voice39 tentative versions, shared machine slot must be checked.",
       "coordinator_only": false
     },
     {
@@ -307,13 +327,11 @@
       "objective": "Build fixed signed optional bundle and Hub setup/Work lifecycle",
       "repository": "hub",
       "permitted_files": [
-        "helper/free_ai.py",
-        "helper/free_ai_delivery.py",
+        "helper/free_ai*.py",
         "helper/install.py",
-        "helper/hubctl.py",
-        "tests/test_free_ai*",
-        "ui/Panel.qml",
-        "tests/ui-contract-test.mjs",
+        "bin/maslow-hub-install",
+        "tests/test_free_ai*.py",
+        "docs/free-ai-preflight-contract.md",
         "docs/free-cloud-ai.md"
       ],
       "dependencies": [
@@ -326,38 +344,92 @@
       "status": "active",
       "owner": "root",
       "session": "2026-10-11-free-cloud-ai-root",
-      "worker": "hub_worker",
-      "actual_model": "gpt-6.1-sol/medium",
+      "worker": "boundary_review (fixed delivery)",
+      "actual_model": "gpt-6-astra/high",
       "attempt": 1,
       "last_checkpoint": "2026-10-11T15:56:05.839365+00:00",
       "base_revision": "33940d2",
       "branch": null,
       "worktree": "/home/maslow/Projects/Maslow/free-ai-hub",
-      "implementation_commits": [],
+      "implementation_commits": [
+        "e69ee52",
+        "732c235"
+      ],
       "integration_commits": [],
       "tests": [],
       "evidence": [
-        "docs/programs/free-cloud-ai/evidence/2026-10-11-source-package-checkpoint.json"
+        "docs/programs/free-cloud-ai/evidence/2026-10-11-source-package-checkpoint.json",
+        "docs/programs/free-cloud-ai/evidence/2026-10-11-account-ui-source-checkpoint.json"
       ],
       "artifact_hashes": {},
       "blocker": "Signed bundle and installed acceptance absent.",
-      "next_action": "Finish dedicated fixed bundle validation and install preflight; keep update/recover fail closed."
+      "next_action": "Finish concrete fixed retained-user-helper/root-ticket/ALPM preflight; install/update/recover remain unavailable until real contract passes."
+    },
+    {
+      "id": "FCAI-P2-WORK",
+      "objective": "Explicit typed Work account selection and privacy controls",
+      "repository": "runtime",
+      "permitted_files": [
+        "voice/ui/Panel.qml",
+        "voice/ui/VoiceController.qml",
+        "voice/tests/ui-contract-test.mjs",
+        "voice/tests/ui-controller-test.mjs",
+        "voice/tests/ui-preview.qml",
+        "voice/tests/ui-work-composer-test.mjs",
+        "voice/tests/work-account-ui-evidence.py"
+      ],
+      "dependencies": [
+        "FCAI-P1-HERMES",
+        "FCAI-P3-CONNECT"
+      ],
+      "acceptance": "Scoped source/nativefixture: no defaultaccounts, <=4selectedIDs, separateGroqconsent, immutable retry IDs until accepted ack, local errors, narrowlayout; installed/liveflow remains separate.",
+      "phase": 2,
+      "status": "verified",
+      "owner": "root",
+      "session": "2026-10-11-free-cloud-ai-root",
+      "worker": "hub_worker",
+      "actual_model": "gpt-6.1-sol/medium",
+      "attempt": 1,
+      "last_checkpoint": "2026-10-11T15:56:05.839365+00:00",
+      "base_revision": "09721dff",
+      "branch": "codex/free-cloud-ai",
+      "worktree": "/home/maslow/Maslow-ai-os/free-ai-runtime",
+      "implementation_commits": [
+        "784aea2b"
+      ],
+      "integration_commits": [],
+      "tests": [
+        {
+          "check": "472owningVoice pass/2Macskips +5 Nodechecks +nativeSway/Quickshell interactions/screenshot inspection",
+          "result": "pass"
+        }
+      ],
+      "evidence": [
+        "docs/programs/free-cloud-ai/evidence/2026-10-11-account-ui-source-checkpoint.json"
+      ],
+      "artifact_hashes": {},
+      "blocker": null,
+      "next_action": "Carry exactUI bytes into finalnativecandidate; installedQt6.12/user/liveaccount acceptance remainsopen."
     },
     {
       "id": "FCAI-P3-CONNECT",
       "objective": "Implement accepted Connect package and exact-account authorization",
       "repository": "connect",
       "permitted_files": [
-        "src/**",
-        "test*",
-        "docs/**"
+        "packages/bridge/src/managed-accounts*.ts",
+        "packages/bridge/src/accounts.ts",
+        "packages/bridge/src/cli.ts",
+        "packages/bridge/test/managed-accounts.test.ts",
+        "README.md",
+        "docs/managed-read-only-accounts.md",
+        "docs/evidence/2026-10-11-managed-accounts.json"
       ],
       "dependencies": [
         "FCAI-P1-HERMES"
       ],
       "acceptance": "Only exact user-selected read-only accounts are exposed; scope is verified before each action; revocation/disconnect removes access and blocks stale sessions; no default account discovery or writes.",
       "phase": 3,
-      "status": "active",
+      "status": "implementation-complete",
       "owner": "root",
       "session": "2026-10-11-free-cloud-ai-root",
       "worker": "boundary_review",
@@ -367,13 +439,24 @@
       "base_revision": "eb7012f",
       "branch": null,
       "worktree": "/home/maslow/Projects/Maslow/free-ai-connect",
-      "implementation_commits": [],
+      "implementation_commits": [
+        "646aa1149f36050a470ded7e3658ad0b0a38bcbb"
+      ],
       "integration_commits": [],
-      "tests": [],
-      "evidence": [],
+      "tests": [
+        {
+          "check": "Owning checks328pass/10environmentskips; actualSDK mocked-HTTP serialization exactaccount-ID andfixedGET",
+          "result": "pass"
+        }
+      ],
+      "evidence": [
+        "docs/programs/free-cloud-ai/evidence/2026-10-11-account-ui-source-checkpoint.json",
+        "docs/programs/free-cloud-ai/evidence/2026-10-11-account-recovery-review.json",
+        "/home/maslow/Projects/Maslow/free-ai-connect/docs/evidence/2026-10-11-managed-accounts.json"
+      ],
       "artifact_hashes": {},
-      "blocker": "Managed session and live exact-account proof not yet available.",
-      "next_action": "Prove SDK exact account dispatch binding, then managed read-only session and revocation tests."
+      "blocker": "No accepted managed native package/root marker/liveaccount proof.",
+      "next_action": "Reconcile additive CLI/accounts changes with accepted Craft lifecycle source before native package; require actual live metadata/binding."
     },
     {
       "id": "FCAI-P4-RECOVERY",
@@ -381,7 +464,13 @@
       "repository": "runtime",
       "permitted_files": [
         "free_ai/maslow_free_ai/recovery.py",
-        "free_ai/tests/test_recovery.py"
+        "free_ai/maslow_free_ai/runtime.py",
+        "voice/maslow_voice/free_ai_delivery.py",
+        "voice/maslow_voice/daemon.py",
+        "voice/maslow_voice/tasks.py",
+        "free_ai/tests/test_recovery.py",
+        "free_ai/tests/test_runtime.py",
+        "voice/tests/test_free_ai_delivery.py"
       ],
       "dependencies": [
         "FCAI-P2-HUB",
@@ -399,13 +488,20 @@
       "base_revision": "09721dff",
       "branch": "codex/free-cloud-ai",
       "worktree": "/home/maslow/Maslow-ai-os/free-ai-runtime",
-      "implementation_commits": [],
+      "implementation_commits": [
+        "f63cdb67",
+        "90c0745a",
+        "784eca20"
+      ],
       "integration_commits": [],
       "tests": [],
-      "evidence": [],
+      "evidence": [
+        "docs/programs/free-cloud-ai/evidence/2026-10-11-account-ui-source-checkpoint.json",
+        "docs/programs/free-cloud-ai/evidence/2026-10-11-account-recovery-review.json"
+      ],
       "artifact_hashes": {},
-      "blocker": "Package/database paired recovery and installed interruption/full-disk tests remain open.",
-      "next_action": "Implement quiesced consistent SQLite snapshot + matching Secret Service recovery identity, fail-closed restore.",
+      "blocker": "User-owned current-operation snapshot/restore source passes; rootpairedinstallation/actualinterruption/historicalrollback gates remain open.",
+      "next_action": "Implement root-ticket reader and prepare/check RPC that closes all task/conversation/configuration admission; coordinate exactcontract withAstra Hubworker.",
       "coordinator_only": true
     },
     {
@@ -501,12 +597,11 @@
   ],
   "coordination": {
     "shared_owners": "Craft owns productivity/creative apps, ongoing Connect -4 candidate and shared integration. FreeAI edits only isolated runtime/Hub/Connect/package worktrees. Shared helper/install.py, Hub Panel and package recipe changes require serialized reconciliation before merge.",
-    "build_serialization": "Craft repair build finished at 2026-10-11 14:05:38 UTC before Free AI native build began. No physical audio tests have been run. Recheck live slot before new heavy builds.",
+    "build_serialization": "Owned WorkQA container stopped; no heavy build admitted. Original Craft build/removal -4 work remains separate. Do not build new Connect until serialized source reconciliation.",
     "worker_limit": 2,
-    "integration": "No shared/product branch merge, production signing, publication or installation is performed.",
+    "integration": "No product/shared merge, host installation, production signing or publication. Program completed source commits only.",
     "active_workers": [
-      "boundary_review: isolated Connect exact-account contract",
-      "hub_worker: isolated fixed delivery validation"
+      "boundary_review: fixed privileged/user delivery in isolated Hub"
     ]
   }
 }
