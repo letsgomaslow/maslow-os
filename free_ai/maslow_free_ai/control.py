@@ -77,6 +77,7 @@ def main():
                     raise FreeAIError("PRIVATE_SETUP_REQUIRED", "Connect Groq through the masked desktop terminal setup.")
                 print("Groq setup: create your own account at https://console.groq.com/keys", file=sys.stderr)
                 print("Stay on Free. Do not add billing or upgrade to Developer. Your prompts and selected documents go to Groq.", file=sys.stderr)
+                print("Review Groq privacy and optional Zero Data Retention at https://console.groq.com/docs/your-data. Maslow does not verify your retention settings.", file=sys.stderr)
                 print("Maslow cannot independently verify your billing plan. Connected accounts are optional and awaiting scoped-access verification.", file=sys.stderr)
                 if input("Confirm your account is on Free with no billing upgrade (type FREE): ") != "FREE":
                     raise FreeAIError("FREE_PLAN_CONFIRMATION_REQUIRED", "Setup was left unchanged. Confirm the Free plan when ready.")
