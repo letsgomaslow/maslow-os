@@ -1,5 +1,7 @@
 # Maslow AI-OS development: start here
 
+Free cloud AI preview (2026-10-11, active, not verified): [program and resume records](programs/free-cloud-ai/README.md), [source/package checkpoint](handoffs/2026-10-11-free-cloud-ai-preview.md). Groq-only typed assistant, explicit new notes and private native candidate are implemented in isolated worktrees. Scoped Connect, signed delivery/database recovery and installed live/guest/Lenovo/audio gates remain open. Craft ledgers and original worktrees are preserved; shared integration is serialized.
+
 Craft optional apps execution (2026-10-11, active): [approved program and resume instruction](programs/craft-optional-apps/README.md), [latest checkpoint](handoffs/2026-10-11-craft-optional-apps.md). All 12 apps have separate package, GUI/CLI, confinement, MCP, Voice and disposition tasks. The ledger and candidate manifest own status; no app is release-ready. Production signing, publication, product merges and promotion remain separate operator actions.
 
 Updated 2026-10-10. This is the current workstream index, not a stable-release announcement. Update this file at each meaningful checkpoint; keep detailed evidence in dated handoffs rather than expanding AGENTS.md into a second backlog.

@@ -1,0 +1,85 @@
+{
+  "schema_version": 1,
+  "status": "not-ready",
+  "platform": "x86_64-maslow-os-hyprland",
+  "provider_allowlist": [
+    "groq"
+  ],
+  "model_allowlist": [
+    "openai/gpt-oss-120b",
+    "openai/gpt-oss-20b"
+  ],
+  "user_capabilities": [
+    "typed-questions",
+    "typed-drafts",
+    "explicit-user-confirmed-markdown-creation",
+    "exact-selected-accounts-read-only",
+    "existing-voice-path"
+  ],
+  "optional_backend": {
+    "package": "maslow-free-ai",
+    "runtime": "Node.js 22.23.3",
+    "private": true,
+    "lazy": true,
+    "accepted": false,
+    "upstream_revision": "65ec96df6450224a95a0eabfff8b41b394b2396f",
+    "built_candidate": true
+  },
+  "source_revisions": {
+    "runtime_base": "09721dff3f412dbe643584f711da0f6eb70b384c",
+    "hub_base": "33940d2e8740b172b953cc3e091cbae1ba1cd303",
+    "packages_base": "448856485e710caedfc24f544a027aea8652dd33",
+    "connect_base": "0c6f7b98a062870e36503f55512d04e0b8576a69",
+    "iso_base": "d96a3ee563df5a1eb76a711c7b408c0d1d0137cb",
+    "runtime_implementation": "e7b8831a4fc81f6fdf0a1b8369dcc748274d9112",
+    "connect_native3_baseline_not_managed_account_acceptance": "7545ba68c0b6759a7f65c88ccb1390777df5b812"
+  },
+  "artifacts": [
+    {
+      "path": "/home/maslow/Maslow-ai-os/free-ai-build/native/maslow-free-ai-0.1.0-1-x86_64.pkg.tar.zst",
+      "name": "maslow-free-ai",
+      "version": "0.1.0-1",
+      "sha256": "5b2d989d58451ac9744f9c0e8c2c3dcde5f99657d1fef931d2c4a348fb5e4143",
+      "bytes": 46673889,
+      "source_commit": "e7b8831a4fc81f6fdf0a1b8369dcc748274d9112",
+      "signed": false,
+      "installed_acceptance": false
+    },
+    {
+      "path": "/home/maslow/Maslow-ai-os/free-ai-build/voice38/maslow-voice-0.1.5-38-x86_64.pkg.tar.zst",
+      "name": "maslow-voice",
+      "version": "0.1.5-38",
+      "sha256": "3593c33d16574fae8667da41617c3d7facfda29b3dbaa8672f03f3a7da53f0f2",
+      "bytes": 286120480,
+      "source_commit": "e7b8831a4fc81f6fdf0a1b8369dcc748274d9112",
+      "signed": false,
+      "installed_acceptance": false
+    }
+  ],
+  "accepted_capabilities": [],
+  "required_gates": [
+    "every-dispatch-provider-and-model-policy",
+    "fetched-and-cached-catalog-policy",
+    "secret-service-and-no-secret-leakage",
+    "lazy-backend-lifecycle-owned-port-and-process-recovery",
+    "managed-hermes-tools-and-request-idempotency-contract",
+    "fixed-signed-optional-bundle-and-hub-setup-work",
+    "connect-exact-selected-read-only-account-and-revocation",
+    "database-key-and-package-recovery",
+    "clean-guest-end-to-end-live-account-and-physical-audio",
+    "lenovo-end-to-end-live-account-and-physical-audio",
+    "independent-review"
+  ],
+  "passed_gates": [],
+  "invalidation": "Any change to runtime, Hub, Connect, package, provider/model policy, account scope, credentials, lifecycle or bundle inputs invalidates affected evidence. Mocks, cached-only results, package builds and undocumented reports cannot pass live, recovery, guest, Lenovo or physical-audio gates. Missing evidence means unavailable, never inferred.",
+  "source_evidence": [
+    "docs/programs/free-cloud-ai/evidence/2026-10-11-boundary-review.json",
+    "docs/programs/free-cloud-ai/evidence/2026-10-11-hermes-runs.json",
+    "docs/programs/free-cloud-ai/evidence/2026-10-11-source-package-checkpoint.json"
+  ],
+  "passed_source_gates": [
+    "every-dispatch-provider-and-model-policy",
+    "fetched-and-cached-catalog-policy",
+    "managed-hermes-tools-and-request-idempotency-contract"
+  ]
+}

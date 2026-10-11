@@ -1,0 +1,512 @@
+{
+  "schema_version": 1,
+  "program": "free-cloud-ai",
+  "current_phase": 2,
+  "latest_handoff": "docs/handoffs/2026-10-11-free-cloud-ai-preview.md",
+  "session": "2026-10-11-free-cloud-ai-root",
+  "models": {
+    "coordinator": "not exposed by execution surface",
+    "workers": [
+      {
+        "task": "program_records",
+        "model": "gpt-6-luna",
+        "reasoning": "medium"
+      },
+      {
+        "task": "provider_boundary",
+        "model": "gpt-6-astra",
+        "reasoning": "high"
+      },
+      {
+        "task": "hub_worker / package",
+        "model": "gpt-6.1-sol",
+        "reasoning": "medium"
+      },
+      {
+        "task": "boundary_review / dependency review",
+        "model": "gpt-6-astra",
+        "reasoning": "high"
+      },
+      {
+        "task": "work_ui_check",
+        "model": "gpt-6.1-sol",
+        "reasoning": "medium"
+      }
+    ]
+  },
+  "repositories": {
+    "runtime": {
+      "path": "/home/maslow/Maslow-ai-os/free-ai-runtime",
+      "base_revision": "09721dff3f412dbe643584f711da0f6eb70b384c",
+      "branch": "codex/free-cloud-ai",
+      "preserved_source_checkout": "/home/maslow/Maslow-ai-os/maslow-os",
+      "preserved_status_at_start": [
+        " M docs/maslow-development.md",
+        " M docs/programs/craft-optional-apps/tasks/CRAFT-CORE-SANDBOX.md",
+        "?? docs/handoffs/2026-10-11-freellmapi-review.md"
+      ],
+      "implementation_revision": "e7b8831a4fc81f6fdf0a1b8369dcc748274d9112"
+    },
+    "hub": {
+      "path": "/home/maslow/Projects/Maslow/free-ai-hub",
+      "base_revision": "33940d2e8740b172b953cc3e091cbae1ba1cd303",
+      "branch": "codex/free-cloud-ai"
+    },
+    "packages": {
+      "path": "/home/maslow/Projects/Maslow/free-ai-packages",
+      "base_revision": "448856485e710caedfc24f544a027aea8652dd33",
+      "branch": "codex/free-cloud-ai"
+    },
+    "connect": {
+      "path": "/home/maslow/Projects/Maslow/free-ai-connect",
+      "base_revision": "7545ba68c0b6759a7f65c88ccb1390777df5b812",
+      "branch": "codex/free-cloud-ai-accounts",
+      "accepted_source_reference": "7545ba68c0b6759a7f65c88ccb1390777df5b812",
+      "native_package_accepted_for_this_program": false,
+      "accepted_native_baseline": {
+        "version": "0.1.0-3",
+        "sha256": "541150939158c7c26966f9ddfef183fa49b1ccc2e8ff1fa2b5e2472c60357388",
+        "scope": "Craft source + native synthetic/container checks only; not FreeAI managed account/live acceptance"
+      },
+      "preserved_source_checkout": "/home/maslow/Projects/Maslow/craft-connect"
+    },
+    "iso": {
+      "path": "/home/maslow/Projects/Maslow/maslow-os-iso",
+      "base_revision": "d96a3ee563df5a1eb76a711c7b408c0d1d0137cb",
+      "branch": "codex/maslow-hub"
+    }
+  },
+  "tasks": [
+    {
+      "id": "FCAI-P0-RECORDS",
+      "objective": "Persist approved scope, gates, ledger, charters and resume procedure",
+      "repository": "runtime",
+      "permitted_files": [
+        "docs/programs/free-cloud-ai/**"
+      ],
+      "dependencies": [],
+      "acceptance": "All phases, acceptance gates, blockers and no-inference rules are durable; ledger validates; candidate is not-ready.",
+      "phase": 0,
+      "status": "integrated",
+      "owner": "root",
+      "session": "2026-10-11-free-cloud-ai-root",
+      "worker": "program_records",
+      "actual_model": "gpt-6-luna/medium",
+      "attempt": 1,
+      "last_checkpoint": "2026-10-11T15:56:05.839365+00:00",
+      "base_revision": "09721dff",
+      "branch": "codex/free-cloud-ai",
+      "worktree": "/home/maslow/Maslow-ai-os/free-ai-runtime",
+      "implementation_commits": [],
+      "integration_commits": [],
+      "tests": [],
+      "evidence": [
+        "docs/programs/free-cloud-ai/evidence/2026-10-11-source-package-checkpoint.json"
+      ],
+      "artifact_hashes": {},
+      "blocker": null,
+      "next_action": "Maintain coordinator-owned checkpoints.",
+      "coordinator_only": true
+    },
+    {
+      "id": "FCAI-P0-INVENTORY",
+      "objective": "Reconcile runtime, Hub and package baselines and inspect existing FreeLLMAPI65ec96f package",
+      "repository": "runtime",
+      "permitted_files": [
+        "docs/programs/free-cloud-ai/evidence/2026-10-11-inventory.json"
+      ],
+      "dependencies": [
+        "FCAI-P0-RECORDS"
+      ],
+      "acceptance": "Exact revisions, branches, worktrees, preserved changes, package ownership/dependencies and missing prerequisites are recorded; no implementation claimed.",
+      "phase": 0,
+      "status": "integrated",
+      "owner": "root",
+      "session": "2026-10-11-free-cloud-ai-root",
+      "worker": "root",
+      "actual_model": "coordinator not exposed",
+      "attempt": 1,
+      "last_checkpoint": "2026-10-11T15:56:05.839365+00:00",
+      "base_revision": "09721dff",
+      "branch": "codex/free-cloud-ai",
+      "worktree": "/home/maslow/Maslow-ai-os/free-ai-runtime",
+      "implementation_commits": [],
+      "integration_commits": [],
+      "tests": [],
+      "evidence": [
+        "docs/programs/free-cloud-ai/evidence/2026-10-11-inventory.json"
+      ],
+      "artifact_hashes": {},
+      "blocker": null,
+      "next_action": "Reconcile active Craft baselines before integration.",
+      "coordinator_only": true
+    },
+    {
+      "id": "FCAI-P1-PROVIDER",
+      "objective": "Implement Groq provider boundary for only gpt-oss-120b and gpt-oss-20b",
+      "repository": "runtime",
+      "permitted_files": [
+        "free_ai/router/**"
+      ],
+      "dependencies": [
+        "FCAI-P0-INVENTORY"
+      ],
+      "acceptance": "Every dispatch checks enabled provider/model policy; reject aliases, other models and provider fallback; validate from fetched and cached catalogs, stale/malformed/unavailable catalog behavior; no credential leakage.",
+      "phase": 1,
+      "status": "verified",
+      "owner": "root",
+      "session": "2026-10-11-free-cloud-ai-root",
+      "worker": "provider_boundary",
+      "actual_model": "gpt-6-astra/high",
+      "attempt": 1,
+      "last_checkpoint": "2026-10-11T15:56:05.839365+00:00",
+      "base_revision": "09721dff",
+      "branch": "codex/free-cloud-ai",
+      "worktree": "/home/maslow/Maslow-ai-os/free-ai-runtime",
+      "implementation_commits": [
+        "e7b8831a4fc81f6fdf0a1b8369dcc748274d9112"
+      ],
+      "integration_commits": [],
+      "tests": [
+        {
+          "check": "18 tests against actual patched upstream + compiled bootstrap fail-closed tests",
+          "result": "pass"
+        }
+      ],
+      "evidence": [
+        "docs/programs/free-cloud-ai/evidence/2026-10-11-boundary-review.json",
+        "docs/programs/free-cloud-ai/evidence/2026-10-11-source-package-checkpoint.json"
+      ],
+      "artifact_hashes": {},
+      "blocker": null,
+      "next_action": "Retain software policy; require live route tool probes before setup readiness."
+    },
+    {
+      "id": "FCAI-P1-SECRETS",
+      "objective": "Implement Secret Service-backed credentials and lazy optional-package lifecycle",
+      "repository": "runtime",
+      "permitted_files": [
+        "free_ai/maslow_free_ai/**",
+        "free_ai/bin/**",
+        "free_ai/tests/test_runtime.py"
+      ],
+      "dependencies": [
+        "FCAI-P0-INVENTORY"
+      ],
+      "acceptance": "Encryption material stays in Secret Service; provider key stays in upstream encrypted SQLite. No plaintext persistence/argv/environment leakage. Private Node lifecycle and collision/failure/shutdown checks pass; real keyring acceptance remains required.",
+      "phase": 1,
+      "status": "implementation-complete",
+      "owner": "root",
+      "session": "2026-10-11-free-cloud-ai-root",
+      "worker": "root",
+      "actual_model": "coordinator not exposed",
+      "attempt": 1,
+      "last_checkpoint": "2026-10-11T15:56:05.839365+00:00",
+      "base_revision": "09721dff",
+      "branch": "codex/free-cloud-ai",
+      "worktree": "/home/maslow/Maslow-ai-os/free-ai-runtime",
+      "implementation_commits": [
+        "e7b8831a4fc81f6fdf0a1b8369dcc748274d9112"
+      ],
+      "integration_commits": [],
+      "tests": [],
+      "evidence": [
+        "docs/programs/free-cloud-ai/evidence/2026-10-11-source-package-checkpoint.json"
+      ],
+      "artifact_hashes": {},
+      "blocker": "Real keyring/installed lifecycle acceptance unavailable.",
+      "next_action": "Exercise actual locked/unavailable Secret Service in installed guest; recovery is separate."
+    },
+    {
+      "id": "FCAI-P1-HERMES",
+      "objective": "Constrain Hermes tools, dispatch contract and request idempotency",
+      "repository": "runtime",
+      "permitted_files": [
+        "voice/**",
+        "free_ai/tests/hermes*"
+      ],
+      "dependencies": [
+        "FCAI-P0-INVENTORY"
+      ],
+      "acceptance": "Typed questions/drafts and explicit new notes use only managed tools with immutable contract/idempotency and checked receipt. This source gate excludes account access (separate Connect task) and live model usefulness.",
+      "phase": 1,
+      "status": "verified",
+      "owner": "root",
+      "session": "2026-10-11-free-cloud-ai-root",
+      "worker": "root + boundary_review + work_ui_check",
+      "actual_model": "gpt-6-astra/high; gpt-6.1-sol/medium",
+      "attempt": 1,
+      "last_checkpoint": "2026-10-11T15:56:05.839365+00:00",
+      "base_revision": "09721dff",
+      "branch": "codex/free-cloud-ai",
+      "worktree": "/home/maslow/Maslow-ai-os/free-ai-runtime",
+      "implementation_commits": [
+        "e7b8831a4fc81f6fdf0a1b8369dcc748274d9112"
+      ],
+      "integration_commits": [],
+      "tests": [
+        {
+          "check": "455 owning source tests, 5 environment skips; actual installed Hermes synthetic Runs/managed-tool proof; native Work fixture",
+          "result": "pass"
+        }
+      ],
+      "evidence": [
+        "docs/programs/free-cloud-ai/evidence/2026-10-11-source-package-checkpoint.json",
+        "docs/programs/free-cloud-ai/evidence/2026-10-11-hermes-runs.json"
+      ],
+      "artifact_hashes": {},
+      "blocker": null,
+      "next_action": "Integrate Connect grants additively; reverify changed profile/task/UI and rebuild candidates."
+    },
+    {
+      "id": "FCAI-P1-PACKAGE",
+      "objective": "Build private native router and coordinated Voice candidate",
+      "repository": "packages",
+      "permitted_files": [
+        "pkgbuilds/maslow-free-ai/**",
+        "pkgbuilds/maslow-voice/PKGBUILD"
+      ],
+      "dependencies": [
+        "FCAI-P1-PROVIDER",
+        "FCAI-P1-SECRETS",
+        "FCAI-P1-HERMES"
+      ],
+      "acceptance": "Exact source/archive matches; clean private Node/native SQLite and production tree; notices/advisories reconciled; no ownership overlap. Installed guest and signatures are separate gates.",
+      "phase": 1,
+      "status": "verified",
+      "owner": "root",
+      "session": "2026-10-11-free-cloud-ai-root",
+      "worker": "hub_worker",
+      "actual_model": "gpt-6.1-sol/medium",
+      "attempt": 1,
+      "last_checkpoint": "2026-10-11T15:56:05.839365+00:00",
+      "base_revision": "448856485e710caedfc24f544a027aea8652dd33",
+      "branch": "codex/free-cloud-ai",
+      "worktree": "/home/maslow/Projects/Maslow/free-ai-packages",
+      "implementation_commits": [],
+      "integration_commits": [],
+      "tests": [
+        {
+          "check": "Clean FreeAI +Voice38 builds and actual archive proofs; production audit0; owning packaging checks",
+          "result": "pass"
+        }
+      ],
+      "evidence": [
+        "docs/programs/free-cloud-ai/evidence/2026-10-11-source-package-checkpoint.json"
+      ],
+      "artifact_hashes": {
+        "/home/maslow/Maslow-ai-os/free-ai-build/native/maslow-free-ai-0.1.0-1-x86_64.pkg.tar.zst": "5b2d989d58451ac9744f9c0e8c2c3dcde5f99657d1fef931d2c4a348fb5e4143",
+        "/home/maslow/Maslow-ai-os/free-ai-build/voice38/maslow-voice-0.1.5-38-x86_64.pkg.tar.zst": "3593c33d16574fae8667da41617c3d7facfda29b3dbaa8672f03f3a7da53f0f2"
+      },
+      "blocker": null,
+      "next_action": "Commit reviewed recipes, rebuild only after new source changes; retain tested artifacts.",
+      "coordinator_only": false
+    },
+    {
+      "id": "FCAI-P2-HUB",
+      "objective": "Build fixed signed optional bundle and Hub setup/Work lifecycle",
+      "repository": "hub",
+      "permitted_files": [
+        "helper/free_ai.py",
+        "helper/free_ai_delivery.py",
+        "helper/install.py",
+        "helper/hubctl.py",
+        "tests/test_free_ai*",
+        "ui/Panel.qml",
+        "tests/ui-contract-test.mjs",
+        "docs/free-cloud-ai.md"
+      ],
+      "dependencies": [
+        "FCAI-P1-PROVIDER",
+        "FCAI-P1-SECRETS",
+        "FCAI-P1-HERMES"
+      ],
+      "acceptance": "Fixed reviewed signed bundle is optional; Hub setup/Work reflects lifecycle and truthful status; no dynamic package/model selection or base-image/ISO inclusion.",
+      "phase": 2,
+      "status": "active",
+      "owner": "root",
+      "session": "2026-10-11-free-cloud-ai-root",
+      "worker": "hub_worker",
+      "actual_model": "gpt-6.1-sol/medium",
+      "attempt": 1,
+      "last_checkpoint": "2026-10-11T15:56:05.839365+00:00",
+      "base_revision": "33940d2",
+      "branch": null,
+      "worktree": "/home/maslow/Projects/Maslow/free-ai-hub",
+      "implementation_commits": [],
+      "integration_commits": [],
+      "tests": [],
+      "evidence": [
+        "docs/programs/free-cloud-ai/evidence/2026-10-11-source-package-checkpoint.json"
+      ],
+      "artifact_hashes": {},
+      "blocker": "Signed bundle and installed acceptance absent.",
+      "next_action": "Finish dedicated fixed bundle validation and install preflight; keep update/recover fail closed."
+    },
+    {
+      "id": "FCAI-P3-CONNECT",
+      "objective": "Implement accepted Connect package and exact-account authorization",
+      "repository": "connect",
+      "permitted_files": [
+        "src/**",
+        "test*",
+        "docs/**"
+      ],
+      "dependencies": [
+        "FCAI-P1-HERMES"
+      ],
+      "acceptance": "Only exact user-selected read-only accounts are exposed; scope is verified before each action; revocation/disconnect removes access and blocks stale sessions; no default account discovery or writes.",
+      "phase": 3,
+      "status": "active",
+      "owner": "root",
+      "session": "2026-10-11-free-cloud-ai-root",
+      "worker": "boundary_review",
+      "actual_model": "gpt-6-astra/high",
+      "attempt": 1,
+      "last_checkpoint": "2026-10-11T15:56:05.839365+00:00",
+      "base_revision": "eb7012f",
+      "branch": null,
+      "worktree": "/home/maslow/Projects/Maslow/free-ai-connect",
+      "implementation_commits": [],
+      "integration_commits": [],
+      "tests": [],
+      "evidence": [],
+      "artifact_hashes": {},
+      "blocker": "Managed session and live exact-account proof not yet available.",
+      "next_action": "Prove SDK exact account dispatch binding, then managed read-only session and revocation tests."
+    },
+    {
+      "id": "FCAI-P4-RECOVERY",
+      "objective": "Exercise full database, key and package recovery",
+      "repository": "runtime",
+      "permitted_files": [
+        "free_ai/maslow_free_ai/recovery.py",
+        "free_ai/tests/test_recovery.py"
+      ],
+      "dependencies": [
+        "FCAI-P2-HUB",
+        "FCAI-P3-CONNECT"
+      ],
+      "acceptance": "Document and execute backup/restore, missing/corrupt database, lost/rotated key, package missing/partial install/upgrade/rollback, interrupted operations and idempotent retry; preserve user data and fail closed.",
+      "phase": 4,
+      "status": "active",
+      "owner": "root",
+      "session": "2026-10-11-free-cloud-ai-root",
+      "worker": "root",
+      "actual_model": "coordinator not exposed",
+      "attempt": 1,
+      "last_checkpoint": "2026-10-11T15:56:05.839365+00:00",
+      "base_revision": "09721dff",
+      "branch": "codex/free-cloud-ai",
+      "worktree": "/home/maslow/Maslow-ai-os/free-ai-runtime",
+      "implementation_commits": [],
+      "integration_commits": [],
+      "tests": [],
+      "evidence": [],
+      "artifact_hashes": {},
+      "blocker": "Package/database paired recovery and installed interruption/full-disk tests remain open.",
+      "next_action": "Implement quiesced consistent SQLite snapshot + matching Secret Service recovery identity, fail-closed restore.",
+      "coordinator_only": true
+    },
+    {
+      "id": "FCAI-P5-GUEST",
+      "objective": "Verify guest and Lenovo system acceptance including physical audio and live account",
+      "repository": "runtime",
+      "permitted_files": [
+        "docs/programs/free-cloud-ai/tasks/FCAI-P5-GUEST.md"
+      ],
+      "dependencies": [
+        "FCAI-P4-RECOVERY"
+      ],
+      "acceptance": "Clean guest install and Lenovo run cover typed question, draft, explicit Markdown creation, selected read-only account, existing Voice, revocation, recovery, physical microphone/speaker route and live authorized account; evidence observed directly, mocks cannot pass.",
+      "phase": 5,
+      "status": "queued",
+      "owner": null,
+      "session": null,
+      "worker": null,
+      "actual_model": null,
+      "attempt": 0,
+      "last_checkpoint": null,
+      "base_revision": "09721dff",
+      "branch": "codex/free-cloud-ai",
+      "worktree": null,
+      "implementation_commits": [],
+      "integration_commits": [],
+      "tests": [],
+      "evidence": [],
+      "artifact_hashes": {},
+      "blocker": "Clean guest, Lenovo, live-account, and physical microphone/speaker evidence is absent; mocks cannot satisfy these gates.",
+      "next_action": "Verify guest and Lenovo system acceptance including physical audio and live account"
+    },
+    {
+      "id": "FCAI-P6-REVIEW",
+      "objective": "Independent boundary and integration review",
+      "repository": "runtime",
+      "permitted_files": [
+        "docs/programs/free-cloud-ai/tasks/FCAI-P6-REVIEW.md"
+      ],
+      "dependencies": [
+        "FCAI-P5-GUEST"
+      ],
+      "acceptance": "Review exact runtime/Hub/package/Connect revisions, dispatch policy, secret handling, lifecycle and account revocation; findings resolved or release blocked.",
+      "phase": 6,
+      "status": "queued",
+      "owner": null,
+      "session": null,
+      "worker": null,
+      "actual_model": null,
+      "attempt": 0,
+      "last_checkpoint": null,
+      "base_revision": "09721dff",
+      "branch": "codex/free-cloud-ai",
+      "worktree": null,
+      "implementation_commits": [],
+      "integration_commits": [],
+      "tests": [],
+      "evidence": [],
+      "artifact_hashes": {},
+      "blocker": "Review requires exact integrated revisions and passed acceptance evidence, which are not yet available.",
+      "next_action": "Independent boundary and integration review"
+    },
+    {
+      "id": "FCAI-P6-RELEASE",
+      "objective": "Finalize exact candidate manifest and operator release instructions",
+      "repository": "runtime",
+      "permitted_files": [
+        "docs/programs/free-cloud-ai/tasks/FCAI-P6-RELEASE.md"
+      ],
+      "dependencies": [
+        "FCAI-P6-REVIEW"
+      ],
+      "acceptance": "All required gates pass with exact source/package hashes and evidence; optional delivery documented; signing/publication/product merges remain separate operator actions.",
+      "phase": 6,
+      "status": "queued",
+      "owner": null,
+      "session": null,
+      "worker": null,
+      "actual_model": null,
+      "attempt": 0,
+      "last_checkpoint": null,
+      "base_revision": "09721dff",
+      "branch": "codex/free-cloud-ai",
+      "worktree": null,
+      "implementation_commits": [],
+      "integration_commits": [],
+      "tests": [],
+      "evidence": [],
+      "artifact_hashes": {},
+      "blocker": "Candidate remains not-ready until all required gates have direct evidence and independent review passes.",
+      "next_action": "Finalize exact candidate manifest and operator release instructions"
+    }
+  ],
+  "coordination": {
+    "shared_owners": "Craft owns productivity/creative apps, ongoing Connect -4 candidate and shared integration. FreeAI edits only isolated runtime/Hub/Connect/package worktrees. Shared helper/install.py, Hub Panel and package recipe changes require serialized reconciliation before merge.",
+    "build_serialization": "Craft repair build finished at 2026-10-11 14:05:38 UTC before Free AI native build began. No physical audio tests have been run. Recheck live slot before new heavy builds.",
+    "worker_limit": 2,
+    "integration": "No shared/product branch merge, production signing, publication or installation is performed.",
+    "active_workers": [
+      "boundary_review: isolated Connect exact-account contract",
+      "hub_worker: isolated fixed delivery validation"
+    ]
+  }
+}

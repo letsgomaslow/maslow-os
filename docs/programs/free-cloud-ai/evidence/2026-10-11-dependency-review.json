@@ -1,0 +1,371 @@
+{
+  "schema_version": 1,
+  "review_date": "2026-10-11",
+  "reviewer": "independent boundary_review worker",
+  "status": "remediation-pending",
+  "dependency_gate_approved": false,
+  "candidate_ready": false,
+  "scope": "Existing production advisory set only, reconciled against pinned upstream, inspected package bytes and bounded compiled entry. Original boundary-review report unchanged.",
+  "inputs": {
+    "upstream_commit": "65ec96df6450224a95a0eabfff8b41b394b2396f",
+    "node_version": "22.23.3",
+    "node_builtin_undici_version_observed": "6.28.1",
+    "upstream_lock_sha256": "3e6265bd3a3346ca362fd54405e5ed404df72e6a0002cd07d2390dce54463038",
+    "current_advisory_json": "/home/maslow/Maslow-ai-os/free-ai-build/native/production-advisories.json",
+    "current_advisory_sha256": "540ca417f98f8a1cd59a06fed2b331932a339868d1eb62a895c1c20ce416e1b7",
+    "prior_advisory_json": "/tmp/maslow-freellmapi-server-audit.json",
+    "prior_advisory_sha256": "6db3fcd22ee7266bd2d7b24f4c21d9fbc96d87a05acd29a184953f120068c11c",
+    "inspected_archive": "/home/maslow/Maslow-ai-os/free-ai-build/native/maslow-free-ai-0.1.0-1-x86_64.pkg.tar.zst",
+    "archive_sha256": "3080724c466cb25a2b571e8bd60446f3a528ef36ae258247ecba376a130d245d",
+    "artifact_status": "Build 2, unaccepted and superseded by planned nested-dependency closure repair. This review is not acceptance of the archive.",
+    "compiled_entry": "usr/lib/maslow-free-ai/router/server/dist/maslow-main.js",
+    "compiled_entry_sha256": "4ab1de17ebabdabd450014cf4f8c03480b9949e40e46e697644ce3dfcaac99ca"
+  },
+  "audit_reconciliation": {
+    "prior_vulnerable_package_count": 10,
+    "production_vulnerable_package_count": 8,
+    "production_severity_counts": {
+      "info": 0,
+      "low": 0,
+      "moderate": 2,
+      "high": 5,
+      "critical": 1,
+      "total": 8
+    },
+    "excluded_prior_findings": [
+      "js-yaml",
+      "source-map-js"
+    ],
+    "counts_note": "Eight means vulnerable package records, not eight individual advisories. npm metadata covers a larger workspace graph and is not the shipped package count. The initially inspected root-only provenance manifest had 141 entries; nested server/node_modules entries were omitted. Packaging worker is separately repairing inventory, cache and archive closure.",
+    "artifact_closure_blocker": "Inspected archive lacks server/node_modules/Ajv despite the bundle importing ajv/dist/2020.js. A non-starting artifact is not a security mitigation. Reachability assessment describes the bounded entry with required dependencies correctly present."
+  },
+  "findings": [
+    {
+      "name": "compression",
+      "version": "1.8.1",
+      "archive_path": "usr/lib/maslow-free-ai/router/node_modules/compression",
+      "severity": "high",
+      "dependency_paths": [
+        "server direct dependency compression ^1.8.0"
+      ],
+      "advisories": [
+        {
+          "id": "GHSA-vc2v-76pw-4v95",
+          "url": "https://github.com/advisories/GHSA-vc2v-76pw-4v95",
+          "affected_range": "<1.8.2",
+          "severity": "high"
+        }
+      ],
+      "primary_advisories_checked_2026_10_11": [
+        "https://github.com/advisories/GHSA-vc2v-76pw-4v95"
+      ],
+      "reachability_class": "not-imported-by-artifact-entry",
+      "source_based_assessment": "Compression middleware is in excluded upstream app.ts. The shipped entry does not import compression and does not install its response middleware. The premature-close zlib-stream leak therefore has no identified activation path in the bounded entry.",
+      "dependency_fixed": false,
+      "compatible_remediation_target": "1.8.2"
+    },
+    {
+      "name": "fast-uri",
+      "version": "3.1.5",
+      "archive_path": "usr/lib/maslow-free-ai/router/node_modules/fast-uri",
+      "severity": "high",
+      "dependency_paths": [
+        "server -> server/node_modules/ajv 8.20.0 -> fast-uri ^3.0.1"
+      ],
+      "advisories": [
+        {
+          "id": "GHSA-5jgf-p345-68v8",
+          "url": "https://github.com/advisories/GHSA-5jgf-p345-68v8",
+          "affected_range": ">=3.1.3 <3.1.6",
+          "severity": "high"
+        },
+        {
+          "id": "GHSA-f65p-4m7j-42xc",
+          "url": "https://github.com/advisories/GHSA-f65p-4m7j-42xc",
+          "affected_range": ">=3.0.0 <3.1.6",
+          "severity": "high"
+        },
+        {
+          "id": "GHSA-fph4-wmhf-6fwf",
+          "url": "https://github.com/advisories/GHSA-fph4-wmhf-6fwf",
+          "affected_range": ">=3.1.2 <3.1.6",
+          "severity": "high"
+        },
+        {
+          "id": "GHSA-jqff-g426-hqxp",
+          "url": "https://github.com/advisories/GHSA-jqff-g426-hqxp",
+          "affected_range": ">=3.0.0 <3.1.6",
+          "severity": "high"
+        },
+        {
+          "id": "GHSA-qw65-cvwx-89v3",
+          "url": "https://github.com/advisories/GHSA-qw65-cvwx-89v3",
+          "affected_range": ">=3.0.0 <3.1.7",
+          "severity": "high"
+        },
+        {
+          "id": "GHSA-hrr3-gc8f-f4qj",
+          "url": "https://github.com/advisories/GHSA-hrr3-gc8f-f4qj",
+          "affected_range": ">=3.0.0 <3.1.8",
+          "severity": "moderate"
+        }
+      ],
+      "primary_advisories_checked_2026_10_11": [
+        "https://github.com/advisories/GHSA-qw65-cvwx-89v3",
+        "https://github.com/advisories/GHSA-hrr3-gc8f-f4qj"
+      ],
+      "reachability_class": "loaded-transitive-schema-parser-no-network-authority-use-identified",
+      "source_based_assessment": "Ajv 8.20.0 imports fast-uri. tool-validate creates Ajv without loadSchema and uses synchronous compile for schema identifiers/references; argument validation is off by default. No adapter URL allowlist, outbound host decision or fetch uses fast-uri. Caller-controlled schema parsing is possible if the persisted opt-in is enabled, but advisory SSRF/host-authority prerequisites were not established. Keep this required transitive dependency and patch it.",
+      "dependency_fixed": false,
+      "compatible_remediation_target": "3.1.8"
+    },
+    {
+      "name": "ip-address",
+      "version": "10.5.0",
+      "archive_path": "usr/lib/maslow-free-ai/router/node_modules/ip-address",
+      "severity": "moderate",
+      "dependency_paths": [
+        "server -> socks-proxy-agent 10.0.0 -> socks 2.8.9 -> ip-address ^10.1.1"
+      ],
+      "advisories": [
+        {
+          "id": "GHSA-rpw4-54j3-4h4q",
+          "url": "https://github.com/advisories/GHSA-rpw4-54j3-4h4q",
+          "affected_range": "<=10.5.0",
+          "severity": "moderate"
+        },
+        {
+          "id": "GHSA-2vr4-cq9g-pvrc",
+          "url": "https://github.com/advisories/GHSA-2vr4-cq9g-pvrc",
+          "affected_range": ">=10.2.0 <=10.5.0",
+          "severity": "moderate"
+        },
+        {
+          "id": "GHSA-j6r3-76f7-8jcv",
+          "url": "https://github.com/advisories/GHSA-j6r3-76f7-8jcv",
+          "affected_range": "<=10.7.0",
+          "severity": "moderate"
+        },
+        {
+          "id": "GHSA-h3mg-xc3c-68pw",
+          "url": "https://github.com/advisories/GHSA-h3mg-xc3c-68pw",
+          "affected_range": "<=10.7.0",
+          "severity": "moderate"
+        }
+      ],
+      "primary_advisories_checked_2026_10_11": [
+        "https://github.com/advisories/GHSA-j6r3-76f7-8jcv",
+        "https://github.com/advisories/GHSA-h3mg-xc3c-68pw"
+      ],
+      "reachability_class": "unused-socks-closure-in-artifact",
+      "source_based_assessment": "Only identified production parent is socks. The bundled entry has no socks-proxy-agent import after dead-code removal. Provider dispatch always uses direct global fetch; inherited/stored proxy configuration cannot activate SOCKS. The advisory classifier and oversized-string paths were not identified in permitted requests.",
+      "dependency_fixed": false,
+      "compatible_remediation_target": "10.7.1"
+    },
+    {
+      "name": "multer",
+      "version": "2.2.0",
+      "archive_path": "usr/lib/maslow-free-ai/router/node_modules/multer",
+      "severity": "high",
+      "dependency_paths": [
+        "server direct dependency multer ^2.2.0"
+      ],
+      "advisories": [
+        {
+          "id": "GHSA-wc9g-mqfw-jrwm",
+          "url": "https://github.com/advisories/GHSA-wc9g-mqfw-jrwm",
+          "affected_range": "<2.3.0",
+          "severity": "high"
+        },
+        {
+          "id": "GHSA-qfvm-cv95-jqjf",
+          "url": "https://github.com/advisories/GHSA-qfvm-cv95-jqjf",
+          "affected_range": "=2.2.0",
+          "severity": "high"
+        },
+        {
+          "id": "GHSA-qvfw-j98x-7q72",
+          "url": "https://github.com/advisories/GHSA-qvfw-j98x-7q72",
+          "affected_range": "<2.3.0",
+          "severity": "low"
+        },
+        {
+          "id": "GHSA-535w-7cp7-47q4",
+          "url": "https://github.com/advisories/GHSA-535w-7cp7-47q4",
+          "affected_range": "<2.3.0",
+          "severity": "high"
+        },
+        {
+          "id": "GHSA-3pph-fpjx-jg34",
+          "url": "https://github.com/advisories/GHSA-3pph-fpjx-jg34",
+          "affected_range": ">=2.2.0 <2.4.0",
+          "severity": "moderate"
+        }
+      ],
+      "primary_advisories_checked_2026_10_11": [
+        "https://github.com/advisories/GHSA-wc9g-mqfw-jrwm",
+        "https://github.com/advisories/GHSA-3pph-fpjx-jg34"
+      ],
+      "reachability_class": "loaded-and-middleware-constructed-but-upload-route-blocked",
+      "source_based_assessment": "proxyRouter imports multer and constructs memoryStorage transcription middleware. Its upload handler belongs to /v1/audio/transcriptions, which the outer adapter rejects before parsing. Allowed chat uses express.json; no multipart middleware is mounted on that route. Disk-storage advisory additionally lacks its diskStorage prerequisite. Required static import means deleting multer alone would break startup.",
+      "dependency_fixed": false,
+      "compatible_remediation_target": "2.4.0"
+    },
+    {
+      "name": "proxy-addr",
+      "version": "2.0.7",
+      "archive_path": "usr/lib/maslow-free-ai/router/node_modules/proxy-addr",
+      "severity": "critical",
+      "dependency_paths": [
+        "server -> express 5.2.1 -> proxy-addr ^2.0.7"
+      ],
+      "advisories": [
+        {
+          "id": "GHSA-jqcg-44mw-7w3h",
+          "url": "https://github.com/advisories/GHSA-jqcg-44mw-7w3h",
+          "affected_range": ">=1.1.0 <2.0.8",
+          "severity": "critical"
+        }
+      ],
+      "primary_advisories_checked_2026_10_11": [
+        "https://github.com/advisories/GHSA-jqcg-44mw-7w3h"
+      ],
+      "reachability_class": "loaded-critical-advisory-prerequisite-absent",
+      "source_based_assessment": "Express loads proxy-addr but defaults trust proxy to false. createMaslowApp never changes that setting, binds loopback and authenticates bearer tokens rather than client IP. The advisory requires a malformed trusted IPv6/mapped subnet; no such trust configuration is present. This is a route-specific mitigation, not a patched library.",
+      "dependency_fixed": false,
+      "compatible_remediation_target": "2.0.8"
+    },
+    {
+      "name": "qs",
+      "version": "6.15.2",
+      "archive_path": "usr/lib/maslow-free-ai/router/node_modules/qs",
+      "severity": "moderate",
+      "dependency_paths": [
+        "server -> express 5.2.1 -> qs ^6.14.0",
+        "server -> express 5.2.1 -> body-parser 2.3.0 -> qs ^6.15.2"
+      ],
+      "advisories": [
+        {
+          "id": "GHSA-x5fp-wj9c-mxmx",
+          "url": "https://github.com/advisories/GHSA-x5fp-wj9c-mxmx",
+          "affected_range": ">=6.14.2 <=6.15.3",
+          "severity": "moderate"
+        },
+        {
+          "id": "GHSA-4mjr-xmp4-gh2g",
+          "url": "https://github.com/advisories/GHSA-4mjr-xmp4-gh2g",
+          "affected_range": ">=2.2.5 <6.16.0",
+          "severity": "moderate"
+        }
+      ],
+      "primary_advisories_checked_2026_10_11": [
+        "https://github.com/advisories/GHSA-4mjr-xmp4-gh2g"
+      ],
+      "reachability_class": "loaded-but-affected-parser-roundtrip-not-used",
+      "source_based_assessment": "Express/body-parser load qs. The adapter rejects query-bearing URLs, leaves Express simple query parsing in place and installs only express.json, not urlencoded. No qs.stringify round-trip of request data was found in permitted handlers. Patched qs remains required by Express/body-parser.",
+      "dependency_fixed": false,
+      "compatible_remediation_target": "6.16.0"
+    },
+    {
+      "name": "sharp",
+      "version": "0.35.3",
+      "archive_path": "usr/lib/maslow-free-ai/router/node_modules/sharp",
+      "severity": "high",
+      "dependency_paths": [
+        "server direct dependency sharp ^0.35.3",
+        "sharp -> @img/sharp-linux-x64 0.35.3 / @img/sharp-libvips-linux-x64 1.3.2"
+      ],
+      "advisories": [
+        {
+          "id": "GHSA-rgj7-g3m4-5g8c",
+          "url": "https://github.com/advisories/GHSA-rgj7-g3m4-5g8c",
+          "affected_range": "<0.35.4",
+          "severity": "high"
+        },
+        {
+          "id": "GHSA-wq5f-xc86-pv6w",
+          "url": "https://github.com/advisories/GHSA-wq5f-xc86-pv6w",
+          "affected_range": "<0.35.5",
+          "severity": "high"
+        }
+      ],
+      "primary_advisories_checked_2026_10_11": [
+        "https://github.com/advisories/GHSA-wq5f-xc86-pv6w"
+      ],
+      "reachability_class": "loaded-on-text-path-but-image-decoding-blocked",
+      "source_based_assessment": "normalizeMessageImages dynamically loads sharp even for text-only requests. The outer policy has already rejected image/image_url parts and permits only strings or text parts, leaving no image slot to decode. Thus the libheif/librsvg malicious-image prerequisites are blocked at this entry; native vulnerable libraries are nevertheless shipped and loaded. The caught missing-sharp path is a possible tested pruning option, not an implemented fix.",
+      "dependency_fixed": false,
+      "compatible_remediation_target": "0.35.5"
+    },
+    {
+      "name": "undici",
+      "version": "6.28.0",
+      "archive_path": "usr/lib/maslow-free-ai/router/node_modules/undici",
+      "severity": "high",
+      "dependency_paths": [
+        "server direct dependency undici ^6.21.0"
+      ],
+      "advisories": [
+        {
+          "id": "GHSA-3wwx-pv8p-q78v",
+          "url": "https://github.com/advisories/GHSA-3wwx-pv8p-q78v",
+          "affected_range": ">=6.25.0 <6.28.1",
+          "severity": "moderate"
+        },
+        {
+          "id": "GHSA-r53p-7pc4-xj5r",
+          "url": "https://github.com/advisories/GHSA-r53p-7pc4-xj5r",
+          "affected_range": "<6.28.1",
+          "severity": "low"
+        },
+        {
+          "id": "GHSA-rfgv-xxqx-mfg5",
+          "url": "https://github.com/advisories/GHSA-rfgv-xxqx-mfg5",
+          "affected_range": ">=6.7.0 <6.28.1",
+          "severity": "high"
+        }
+      ],
+      "primary_advisories_checked_2026_10_11": [
+        "https://github.com/advisories/GHSA-rfgv-xxqx-mfg5"
+      ],
+      "reachability_class": "unused-npm-package-distinct-from-patched-node-built-in",
+      "source_based_assessment": "Unused proxy-agent code is absent from the bundled entry; no npm undici import remains. Provider chat and catalog sync call global fetch with redirects rejected. Pinned Node 22.23.3 reports built-in undici 6.28.1, distinct from shipped npm undici 6.28.0. No WebSocket client or retry interceptor is used by permitted routes. Removing/upgrading the npm copy does not alter the built-in copy.",
+      "dependency_fixed": false,
+      "compatible_remediation_target": "6.28.1"
+    }
+  ],
+  "overall_assessment": "No exploit of the listed advisories was established through the reviewed text/function and signed-catalog routes. Several vulnerable packages are loaded or shipped; boundary mitigations and absent prerequisites do not make those versions fixed or clear the dependency gate.",
+  "recommendation": {
+    "preferred_minimal_lock_option": "After coordinator approval of the pinned-lock exception, refresh only the eight listed package resolutions to their compatible remediation targets, preserving upstream application revision and existing declared ranges. Recompute integrity/provenance and review the exact lock delta; avoid an unrestricted npm audit fix.",
+    "pruning_alternative": "The actual bundled entry has no compression, npm undici or socks-proxy-agent imports. These roots and only exclusively owned transitives, including ip-address, are candidates for deterministic production-closure exclusion. Do not remove shared transitives. Regenerate inventory and prove startup, text, functions, catalog and rejection behavior from the resulting archive.",
+    "sharp_option": "Sharp remains a dynamic import; its missing-module handler returns unchanged messages. Excluding sharp and matching native optional packages is plausible for the text-only product but requires explicit closure choice and artifact regression verification. Otherwise update sharp to 0.35.5 and refresh its platform/native dependencies.",
+    "required_imports": "Keep Express/proxy-addr/qs, Ajv/fast-uri and multer unless separately reviewing code changes to eliminate imports. They cannot be safely deleted from the existing bundle.",
+    "minimum_followup": [
+      "Fix nested server dependency inventory/copying first.",
+      "Apply reviewed compatible lock changes or justified deterministic pruning.",
+      "Run production advisory query again against the exact closure; do not claim a clean result from this report.",
+      "Rebuild archive and verify manifest includes every nested/optional shipped dependency.",
+      "Recheck bounded bootstrap, authenticated text/function/SSE, fetched/cached catalog and rejected media/admin/proxy routes."
+    ]
+  },
+  "source_hashes": {
+    "free_ai/router/src/maslow-main.ts": "3ebe18b1d97f8974af8a4336e3e4e2e3fe9e33890e6981004839466e6716c92d",
+    "free_ai/router/src/maslow/app.ts": "78350406265c466ba1e7dac74f147e63e9469a30a248848fa335b58b5f5bac00",
+    "free_ai/router/src/maslow/policy.ts": "d9cddb2baaa86d013869578908435f64ad8438c202f416ea8448c5e29b127c70",
+    "free_ai/router/upstream.patch": "4ee84eb9d45abf695b1ab3c0792782cbf7242f4106acd0f5e039be69a31fc7bb",
+    "upstream:server/src/routes/proxy.ts": "00bb7c5362822f5dbd7e71830bd37d6515e2b1427fb135517ff4dbf9c9d52e67",
+    "upstream:server/src/lib/tool-validate.ts": "287d1720b4a655b880ec9c886728b015c28d5b523bced35c203004617b3f12e2",
+    "upstream:server/src/lib/image-normalize.ts": "4b6327722d45cd8cd8d83bba2f9a935d03fa303db9572baa13670cb5c6e6e768",
+    "upstream:server/src/lib/proxy.ts": "3507741b05edf6ae41c53d151302f959cee7d9b904b78fa8d89b8888aebe28c7",
+    "upstream:server/src/services/catalog-sync.ts": "52507da5d58e542d2fb9f568147f3570d512a22a1f7521f5a3269db7373f6bcf",
+    "upstream:server/package.json": "133fae8599f49b23c4d8dfd2710406c0098fd3202e93a3e06d841948115cfb66",
+    "upstream:package-lock.json": "3e6265bd3a3346ca362fd54405e5ed404df72e6a0002cd07d2390dce54463038"
+  },
+  "limits": [
+    "No package/dependency install, cache mutation, code change, lock change or build was performed.",
+    "Read-only archive/source inspection and primary GitHub advisory verification; no exploit reproduction was attempted.",
+    "No provider request, private credential, account access, live setup, hardware or release gate was accepted.",
+    "Compatibility targets are supported by existing semver ranges and advisory patched versions, not tested upgraded dependencies.",
+    "New package/source bytes require affected review evidence to be regenerated."
+  ]
+}

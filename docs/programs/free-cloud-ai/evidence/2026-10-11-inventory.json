@@ -1,0 +1,64 @@
+{
+  "schema": 1,
+  "date": "2026-10-11",
+  "repositories": {
+    "runtime": {
+      "path": "/home/maslow/Maslow-ai-os/free-ai-runtime",
+      "base_revision": "09721dff3f412dbe643584f711da0f6eb70b384c",
+      "branch": "codex/free-cloud-ai",
+      "preserved_source_checkout": "/home/maslow/Maslow-ai-os/maslow-os",
+      "preserved_status_at_start": [
+        " M docs/maslow-development.md",
+        " M docs/programs/craft-optional-apps/tasks/CRAFT-CORE-SANDBOX.md",
+        "?? docs/handoffs/2026-10-11-freellmapi-review.md"
+      ]
+    },
+    "hub": {
+      "path": "/home/maslow/Projects/Maslow/free-ai-hub",
+      "base_revision": "33940d2e8740b172b953cc3e091cbae1ba1cd303",
+      "branch": "codex/free-cloud-ai"
+    },
+    "packages": {
+      "path": "/home/maslow/Projects/Maslow/free-ai-packages",
+      "base_revision": "448856485e710caedfc24f544a027aea8652dd33",
+      "branch": "codex/free-cloud-ai"
+    },
+    "connect": {
+      "path": "/home/maslow/Projects/Maslow/maslow-connect",
+      "base_revision": "0c6f7b98a062870e36503f55512d04e0b8576a69",
+      "branch": "codex/local-connect",
+      "accepted_source_reference": "c3451e4f971c1c49079db35b88a5062f2e1c6612",
+      "native_package_accepted_for_this_program": false
+    },
+    "iso": {
+      "path": "/home/maslow/Projects/Maslow/maslow-os-iso",
+      "base_revision": "d96a3ee563df5a1eb76a711c7b408c0d1d0137cb",
+      "branch": "codex/maslow-hub"
+    }
+  },
+  "installed_baseline": [
+    "maslow-hub 0.3.6-1",
+    "maslow-voice 0.1.5-37",
+    "hermes-agent 0.21.6-3",
+    "glibc 2.44+r50+g1848099f063e-1",
+    "nodejs 26.11.1-1",
+    "libsecret 0.21.8.2-1",
+    "glib2 2.90.1-1"
+  ],
+  "environment": {
+    "qemu-system-x86_64": false,
+    "installed_guest_or_iso_artifact_found": false,
+    "disk_free_bytes": 373112025088
+  },
+  "secrets_read": false,
+  "provider_requests": 0,
+  "accepted_connected_account_binding": false,
+  "preserved_original_status_now": [
+    "M docs/maslow-development.md",
+    " M docs/programs/craft-optional-apps/tasks/CRAFT-CORE-LIFECYCLE-FIX.md",
+    " M docs/programs/craft-optional-apps/tasks/CRAFT-CORE-LIFECYCLE.md",
+    "?? docs/handoffs/2026-10-11-freellmapi-review.md"
+  ],
+  "shared_build_check": "Only the owned Free AI package build was active after confirmed Craft build completion.",
+  "limits": "No live keyring, live account, guest, heard audio or old-computer readiness is established."
+}
