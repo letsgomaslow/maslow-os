@@ -339,12 +339,13 @@
       "worker": "/root/craft_connect",
       "actual_model": "gpt-6.1-sol",
       "attempt": 2,
-      "last_checkpoint": "2026-10-11T12:40Z",
+      "last_checkpoint": "2026-10-11T13:31:23.845475+00:00",
       "base_revision": "21fdf8ae46de11cfc8b0a634d4489cf6abd0e937",
       "branch": "codex/craft-connect",
       "worktree": "/home/maslow/Projects/Maslow/craft-connect",
       "implementation_commits": [
-        "21fdf8ae46de11cfc8b0a634d4489cf6abd0e937"
+        "21fdf8ae46de11cfc8b0a634d4489cf6abd0e937",
+        "eb7012f338b3e7c3d8e29df27a33a363298c3426"
       ],
       "integration_commits": [],
       "tests": [
@@ -374,7 +375,7 @@
         "type": "implementation",
         "summary": "Outer RLIMIT_NPROC=256 counts existing host-user threads (1442 here), preventing namespace start; preexisting output hardlinks permit write to outside/original inode"
       },
-      "next_action": "Repair nproc ordering; private copied output/state and bounded synchronous MCP publication; retain exact contract"
+      "next_action": "Frozen repair eb7012f under independent review; finish focused/full checks and accurate docs"
     },
     {
       "id": "CRAFT-CORE-LIFECYCLE",
@@ -3041,6 +3042,38 @@
       "artifact_hashes": {},
       "blocker": null,
       "next_action": "Implement approved bounded scratch/publication repair; review repaired source independently"
+    },
+    {
+      "id": "CRAFT-CORE-REPAIR-REVIEW",
+      "objective": "Independently review frozen copied-storage, project-file, MCP relay and atomic-publication repair",
+      "repository": "runtime",
+      "permitted_files": [
+        "docs/programs/craft-optional-apps/tasks/CRAFT-CORE-REPAIR-REVIEW.md"
+      ],
+      "dependencies": [
+        "CRAFT-CORE-BOUNDARY-REPAIR"
+      ],
+      "acceptance": "Review exact repair revision; reproduce significant boundary defects or explain tested limits; findings resolved before source/package acceptance",
+      "phase": 1,
+      "status": "active",
+      "owner": "security-review",
+      "session": "2026-10-11-craft-root",
+      "worker": "/root/boundary_repair",
+      "actual_model": "gpt-6-astra",
+      "attempt": 1,
+      "last_checkpoint": "2026-10-11T13:31:23.845475+00:00",
+      "base_revision": "eb7012f338b3e7c3d8e29df27a33a363298c3426",
+      "branch": null,
+      "worktree": "/home/maslow/Projects/Maslow/craft-review",
+      "implementation_commits": [],
+      "integration_commits": [],
+      "tests": [],
+      "evidence": [
+        "docs/programs/craft-optional-apps/tasks/CRAFT-CORE-REPAIR-REVIEW.md"
+      ],
+      "artifact_hashes": {},
+      "blocker": null,
+      "next_action": "Read exact frozen source, run targeted independent probes, report evidence without editing source"
     }
   ]
 }
