@@ -1,6 +1,5 @@
 """Actual Python entry isolation with fixture install paths, no credentials."""
 import json
-import os
 from pathlib import Path
 import subprocess
 import tempfile

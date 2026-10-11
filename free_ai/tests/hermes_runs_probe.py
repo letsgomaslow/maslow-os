@@ -68,7 +68,8 @@ class FakeInference:
             if body.get("model") != MODEL:
                 raise AssertionError("Unexpected inference model")
             advertised = {tool["function"]["name"] for tool in body.get("tools", [])}
-            if advertised and advertised != TOOLS:
+            expected_tools = TOOLS | ({"maslow_read_calendar"} if self.case == "calendar" else set())
+            if advertised and advertised != expected_tools:
                 raise AssertionError("Managed advertised tool set changed: " + repr(sorted(advertised)))
             replies = [message for message in body.get("messages", []) if message.get("role") == "tool"]
             if not advertised:
@@ -78,11 +79,13 @@ class FakeInference:
                 finish = "stop"
             elif replies:
                 self.tool_replies[self.case] = replies
-                message = {"role": "assistant", "content": "Synthetic note saved." if self.case == "create" else "Unadvertised terminal tool was denied."}
+                message = {"role": "assistant", "content": "Synthetic note saved." if self.case == "create" else "Synthetic Calendar event read." if self.case == "calendar" else "Unadvertised terminal tool was denied."}
                 finish = "stop"
             else:
                 if self.case == "create":
                     name, arguments = "maslow_create_note", {"path": "proof.md", "content": NOTE.decode()}
+                elif self.case == "calendar":
+                    name, arguments = "maslow_read_calendar", {"accountId":"ca_selected", "timeMin":"2026-10-11T00:00:00Z", "timeMax":"2026-10-12T00:00:00Z"}
                 else:
                     name = "terminal"
                     arguments = {"command": "printf fixture-only > " + shlex.quote(str(self.root / "forbidden-marker"))}
@@ -140,6 +143,30 @@ class SyntheticRouter:
         return None
 
 
+class SyntheticAccounts:
+    """Explicit accepted-package/remote-account fixture, never live evidence."""
+    def __init__(self):
+        self.created, self.reads, self.revoked = [], [], []
+
+    def available(self):
+        return True
+
+    async def ensure(self, task, store):
+        self.created.append(task["id"])
+        return store.update(task["id"], connect_session={"sessionId":"d" * 64})
+
+    async def read(self, task, params):
+        assert task["granted_capabilities"]["accounts"] == ["ca_selected"]
+        assert task["requested_capabilities"]["send_to_groq_confirmed"] is True
+        assert params == {"accountId":"ca_selected", "timeMin":"2026-10-11T00:00:00Z", "timeMax":"2026-10-12T00:00:00Z"}
+        self.reads.append(task["id"])
+        return {"schemaVersion":1, "accountId":"ca_selected", "operation":"calendar.events.list",
+            "untrustedContent":True, "speechAuthorized":False, "data":{"events":[{"summary":"Synthetic selected Calendar event"}], "hasMore":False}}
+
+    async def revoke(self, task):
+        self.revoked.append(task["id"])
+
+
 def prohibited(*args, **kwargs):
     raise AssertionError("Audio, conversation provider, or consumer executor must not run")
 
@@ -166,16 +193,18 @@ async def inner(root, selected_case):
         audio_transport_factory=prohibited, executor_factory=prohibited, credentials=NoCredentials())
     runtime = AssistantRuntime(service.directory, service.tool_socket, service.tool_token, router)
     service.tasks.assistant_factory = runtime.ensure
+    accounts = SyntheticAccounts()
+    service.tasks.account_bridge = accounts
     service.tool_server = await asyncio.start_unix_server(service._tool_connection, str(service.tool_socket), limit=MAX_REQUEST + 1)
     service.tool_socket.chmod(0o600)
     cases = []
     try:
-        for case in (("create", "denied") if selected_case == "all" else (selected_case,)):
+        for case in (("create", "denied", "calendar") if selected_case == "all" else (selected_case,)):
             fixture.case = case
             workspace = root / ("workspace-" + case)
             workspace.mkdir()
             task = await service.tasks.submit_assistant("probe-" + case, "Synthetic integration request.", str(workspace),
-                {"note": "proof.md"} if case == "create" else {})
+                {"note": "proof.md"} if case == "create" else {"accounts":["ca_selected"], "send_to_groq_confirmed":True} if case == "calendar" else {})
             monitor = service.tasks.monitors[task["id"]]
             try:
                 await asyncio.wait_for(asyncio.shield(monitor), 110)
@@ -213,6 +242,15 @@ async def inner(root, selected_case):
                 facts["file_sha256"] = receipt["sha256"]
                 facts["file_bytes"] = len(NOTE)
                 facts["receipt_verified"] = True
+            elif case == "calendar":
+                if accounts.created != [task["id"]] or accounts.reads != [task["id"]] or accounts.revoked != [task["id"]]:
+                    raise AssertionError("Selected Calendar grant/read/revoke sequence differs")
+                if not any("Synthetic selected Calendar event" in reply["content"] for reply in replies):
+                    raise AssertionError("Calendar tool result did not reach the real Hermes tool bridge")
+                if "Synthetic Calendar event read." in json.dumps(service.task_summary(saved)):
+                    raise AssertionError("Private task result reached consumer speech summary")
+                facts.update(conditional_account_tool=True, exact_selected_fixture_account=True, grant_revoked=True,
+                    consumer_speech_withheld=True, live_account_verified=False)
             else:
                 if (root / "forbidden-marker").exists():
                     raise AssertionError("Unadvertised terminal tool executed")
@@ -244,7 +282,7 @@ async def inner(root, selected_case):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--inner-root", type=Path)
-    parser.add_argument("--case", choices=("all", "create", "denied"), default="all")
+    parser.add_argument("--case", choices=("all", "create", "denied", "calendar"), default="all")
     parser.add_argument("--node", type=Path, help="Pinned Node executable for optional actual router policy validation")
     parser.add_argument("--upstream", type=Path, help="Applied upstream source tree containing the existing tsx dependency")
     args = parser.parse_args()
@@ -266,7 +304,7 @@ def main():
             "--tmpfs", "/home", "--ro-bind", str(ROOT), str(ROOT), "--tmpfs", "/tmp", "--bind", str(root), str(root),
             "--tmpfs", "/run/user", "--dev", "/dev", "--proc", "/proc", "--chdir", str(root), "--",
             sys.executable, str(Path(__file__).resolve()), "--inner-root", str(root), "--case", args.case]
-        result = subprocess.run(command, env=environment, capture_output=True, text=True, timeout=260)
+        result = subprocess.run(command, env=environment, capture_output=True, text=True, timeout=370)
         print(result.stdout.strip())
         if args.node and result.returncode == 0:
             policy = args.upstream / "server/src/maslow/policy.ts"
