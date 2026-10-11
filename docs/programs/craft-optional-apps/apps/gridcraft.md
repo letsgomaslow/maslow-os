@@ -17,3 +17,13 @@ Evidence: prior source-only research in [Storytold review](../../../handoffs/202
 Blocker: prerequisites incomplete; not a final deferral. Next action: dependency-ready package evaluation.
 
 Reconsideration: final deferral/exclusion, if any, must name evidence and a concrete condition.
+
+## Starting research risks
+
+These are upstream/source-review findings from the pinned source snapshots in the prior handoff, not reproduced failures in the selected release binaries. Verify the release tag separately; later main-branch repairs do not change selected package inputs.
+
+No reviewed file-root flag. --in selects a workbook, not a sandbox. Live example port 7979 is unauthenticated; prefer independently isolated headless sessions.
+
+Upstream says real-world XLSX corpus/Excel no-repair verification is missing. Unmodelled content and chart types/options can be lost on save. Legacy .xls absent; large ~100 MB workbooks fail; calculation single-threaded; non-Latin shaping/PDF coverage incomplete. Several usability/printing/pivot/chart-depth gaps remain. Avoid treating generated outputs as audited financial calculations.
+
+Acceptance must declare the exact formats/features tested and preserve originals. A generic round-trip or MCP-presence claim cannot pass these risks. No final deferral is inferred from this starting list.

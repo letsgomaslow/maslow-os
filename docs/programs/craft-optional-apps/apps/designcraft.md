@@ -17,3 +17,13 @@ Evidence: prior source-only research in [Storytold review](../../../handoffs/202
 Blocker: prerequisites incomplete; not a final deferral. Next action: dependency-ready package evaluation.
 
 Reconsideration: final deferral/exclusion, if any, must name evidence and a concrete condition.
+
+## Starting research risks
+
+These are upstream/source-review findings from the pinned source snapshots in the prior handoff, not reproduced failures in the selected release binaries. Verify the release tag separately; later main-branch repairs do not change selected package inputs.
+
+No reviewed file-root flag. Live example 7979 lacks authentication. Basic editing and frame-threading maturity gates remain.
+
+ROADMAP/gaps report manual frame-to-frame threading unavailable; autoflow/primary-text-frame bugs remain. Engine Document::thread existing is not the same as a usable UI/MCP command. INDD cannot be opened; IDML not corpus-proven; composition not compared to InDesign; real file/layout fidelity uncertain. Basic copy/paste/context menus/caret formatting reported broken on Linux/Windows; PDF production/printing and long-document typography gaps.
+
+Acceptance must declare the exact formats/features tested and preserve originals. A generic round-trip or MCP-presence claim cannot pass these risks. No final deferral is inferred from this starting list.

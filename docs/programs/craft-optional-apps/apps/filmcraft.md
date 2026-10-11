@@ -17,3 +17,13 @@ Evidence: prior source-only research in [Storytold review](../../../handoffs/202
 Blocker: prerequisites incomplete; not a final deferral. Next action: dependency-ready package evaluation.
 
 Reconsideration: final deferral/exclusion, if any, must name evidence and a concrete condition.
+
+## Starting research risks
+
+These are upstream/source-review findings from the pinned source snapshots in the prior handoff, not reproduced failures in the selected release binaries. Verify the release tag separately; later main-branch repairs do not change selected package inputs.
+
+Docs explicitly reject PhotoCraft-style root flags. --project selects a document, not confinement. Live --bridge on 9876 lacks token authentication. Independent isolation is new work.
+
+Alpha; upstream reports 86% breadth and 56% professional readiness. Linux/Windows are explicitly less exercised than macOS; wild camera/phone files less tested than conformance streams. Cannot open .prproj; import via FCP7 XML/AAF/OTIO. No VST3/AudioUnits/OpenFX plugin hosting. GPU effects exist, but Lumetri/keys/export rendering remain CPU-heavy. Linux H264/HEVC hardware decode requires VAAPI or NVIDIA; VP9/AV1 decode is software. H264 is software delivery export; H265 requires supported hardware and AV1 export is absent.
+
+Acceptance must declare the exact formats/features tested and preserve originals. A generic round-trip or MCP-presence claim cannot pass these risks. No final deferral is inferred from this starting list.

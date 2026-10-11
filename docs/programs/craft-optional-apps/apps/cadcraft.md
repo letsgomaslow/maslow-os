@@ -17,3 +17,13 @@ Evidence: prior source-only research in [Storytold review](../../../handoffs/202
 Blocker: prerequisites incomplete; not a final deferral. Next action: dependency-ready package evaluation.
 
 Reconsideration: final deferral/exclusion, if any, must name evidence and a concrete condition.
+
+## Starting research risks
+
+These are upstream/source-review findings from the pinned source snapshots in the prior handoff, not reproduced failures in the selected release binaries. Verify the release tag separately; later main-branch repairs do not change selected package inputs.
+
+No reviewed file-root flag. Live example 7979 lacks authentication. Use scratch drawings; never overwrite the only original DWG/DXF.
+
+Pre-alpha; upstream estimates 38% full-target / 28% working 2D-drafter readiness. Four of five core workflows fail its alpha gate. Object snap tracking and basic TRIM/EXTEND/OFFSET options have gaps; block editing/REFEDIT/xrefs and plot styles incomplete. DWG save always R2000 and drops unmodeled content; no save verification in AutoCAD is documented. SHX fonts are substituted; 3D/full CAD parity is distant.
+
+Acceptance must declare the exact formats/features tested and preserve originals. A generic round-trip or MCP-presence claim cannot pass these risks. No final deferral is inferred from this starting list.

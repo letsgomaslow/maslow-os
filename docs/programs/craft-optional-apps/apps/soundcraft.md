@@ -17,3 +17,13 @@ Evidence: prior source-only research in [Storytold review](../../../handoffs/202
 Blocker: prerequisites incomplete; not a final deferral. Next action: dependency-ready package evaluation.
 
 Reconsideration: final deferral/exclusion, if any, must name evidence and a concrete condition.
+
+## Starting research risks
+
+These are upstream/source-review findings from the pinned source snapshots in the prior handoff, not reproduced failures in the selected release binaries. Verify the release tag separately; later main-branch repairs do not change selected package inputs.
+
+No reviewed file-root flag. Headless avoids requiring audio hardware but does not sandbox files. Live 7801 lacks token authentication; native plugins introduce another code-execution surface.
+
+Pre-alpha; upstream estimates 40% professional readiness and 57% essentials. Menu breadth 94% is explicitly not equivalent to finished workflows. Only default audio devices/fixed 512-sample blocks; audio interface/channel/buffer selection and durable record-to-disk path incomplete. No hardware MIDI input/output. No AAF/OMF/.ptx interchange; no ProTools fidelity harness. Compressed delivery exports, localization and platform coverage incomplete. VST3/AU support has platform-specific caveats, including macOS entitlements/editors.
+
+Acceptance must declare the exact formats/features tested and preserve originals. A generic round-trip or MCP-presence claim cannot pass these risks. No final deferral is inferred from this starting list.

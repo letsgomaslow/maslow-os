@@ -17,3 +17,13 @@ Evidence: prior source-only research in [Storytold review](../../../handoffs/202
 Blocker: prerequisites incomplete; not a final deferral. Next action: dependency-ready package evaluation.
 
 Reconsideration: final deferral/exclusion, if any, must name evidence and a concrete condition.
+
+## Starting research risks
+
+These are upstream/source-review findings from the pinned source snapshots in the prior handoff, not reproduced failures in the selected release binaries. Verify the release tag separately; later main-branch repairs do not change selected package inputs.
+
+No reviewed file-root flag. Live example port 7990 is unauthenticated. Test save/close behavior on generated copies.
+
+Upstream says PPTX has never been corpus-tested on real decks; comments/media/rewind round-trip losses and EMF/SVG image gaps. Gap report identifies edited-deck Close discarding without prompt, startup driver crashes, and no long-session soak. These are upstream documented gaps at snapshot, not independently reproduced. PDF artwork is rasterized; no native printing; English-only; limited animation/chart depth and presenter display behavior.
+
+Acceptance must declare the exact formats/features tested and preserve originals. A generic round-trip or MCP-presence claim cannot pass these risks. No final deferral is inferred from this starting list.

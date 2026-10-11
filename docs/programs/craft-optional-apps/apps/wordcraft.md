@@ -17,3 +17,13 @@ Evidence: prior source-only research in [Storytold review](../../../handoffs/202
 Blocker: prerequisites incomplete; not a final deferral. Next action: dependency-ready package evaluation.
 
 Reconsideration: final deferral/exclusion, if any, must name evidence and a concrete condition.
+
+## Starting research risks
+
+These are upstream/source-review findings from the pinned source snapshots in the prior handoff, not reproduced failures in the selected release binaries. Verify the release tag separately; later main-branch repairs do not change selected package inputs.
+
+No reviewed file-root flag. --author attributes agent edits; tracked changes can be enabled separately. Live bridge at 7981 has a per-window key, which authenticates control but does not restrict file scope.
+
+DOCX corpus/real-world pagination fidelity not proven; current gaps list says ink/drawing canvases lost, OLE preview-only, move tracking/content controls lossy. ROADMAP still says charts/SmartArt dropped, but newer gaps.md says rendered and preserved with parts after recent changes; avoid repeating the stale broader claim. Upstream reports startup crashes/freezes; fonts/columns/footnote pagination can differ from Word. Native printing is delegated to PDF system viewer.
+
+Acceptance must declare the exact formats/features tested and preserve originals. A generic round-trip or MCP-presence claim cannot pass these risks. No final deferral is inferred from this starting list.
