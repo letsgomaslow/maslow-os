@@ -2,8 +2,40 @@
   "schema_version": 1,
   "status": "not-ready",
   "platform": "x86_64-maslow-os-hyprland",
-  "source_revisions": {},
-  "artifacts": [],
+  "source_revisions": {
+    "pdfcraft": "53a5880386789fc3531e54f6e6ffdef9a8e41f1a",
+    "photocraft": "79261615956ab21334e49ca1d384390272e647da"
+  },
+  "artifacts": [
+    {
+      "app": "pdfcraft",
+      "kind": "native-package",
+      "version": "0.6.0-1",
+      "path": "/home/maslow/Maslow-ai-os/craft-build/pdf/pdfcraft-0.6.0-1-x86_64.pkg.tar.zst",
+      "sha256": "afa9eb1146696fd1feb0840fdbd8a6b3dc5cec6751dd86d6198b07a826f445c2",
+      "size": 78979529,
+      "recipe_revision": "f211378f416f50d63d4352b2049758a7aaa0996e",
+      "upstream_tag": "v0.6.0",
+      "upstream_revision": "53a5880386789fc3531e54f6e6ffdef9a8e41f1a",
+      "upstream_archive_sha256": "9a136e71e37b459ed5746dbe19a364ce84cf5d995c6f6c98af6147d818390a53",
+      "evidence_status": "built-and-unpacked-smoke-only",
+      "accepted_capabilities": []
+    },
+    {
+      "app": "photocraft",
+      "kind": "native-package",
+      "version": "0.7.0-1",
+      "path": "/home/maslow/Maslow-ai-os/craft-build/photo/photocraft-0.7.0-1-x86_64.pkg.tar.zst",
+      "sha256": "22c553446baae55603c202a4090340961044cd779d3084c2a687eb0b9a5a92c5",
+      "size": 74804173,
+      "recipe_revision": "f211378f416f50d63d4352b2049758a7aaa0996e",
+      "upstream_tag": "v0.7.0",
+      "upstream_revision": "79261615956ab21334e49ca1d384390272e647da",
+      "upstream_archive_sha256": "641f831252fd31b43ee1a12e572d7442e5652c2e5bf623de085741c370f0c91d",
+      "evidence_status": "built-and-unpacked-smoke-only",
+      "accepted_capabilities": []
+    }
+  ],
   "accepted_capabilities": [],
   "app_dispositions": {
     "pdfcraft": "evaluating",

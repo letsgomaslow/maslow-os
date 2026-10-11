@@ -520,7 +520,7 @@
       ],
       "acceptance": "Reviewed archive hash/source tag, clean build/contents/deps/ownership; same-tag locked fallback or evidenced deferral",
       "phase": 1,
-      "status": "active",
+      "status": "implementation-complete",
       "owner": "packages-worker",
       "session": "2026-10-11-craft-root",
       "worker": "/root/craft_packages",
@@ -530,13 +530,33 @@
       "base_revision": "4488564",
       "branch": "codex/craft-packages",
       "worktree": "/home/maslow/Projects/Maslow/craft-packages",
-      "implementation_commits": [],
+      "implementation_commits": [
+        "7d8dfd1",
+        "f211378f416f50d63d4352b2049758a7aaa0996e"
+      ],
       "integration_commits": [],
-      "tests": [],
-      "evidence": [],
-      "artifact_hashes": {},
+      "tests": [
+        {
+          "check": "clean disposable Docker makepkg, checksums/notices/archive safety, desktop syntax, ELF deps/ABI, CLI version/help, offline MCP init/list, original file manifests",
+          "result": "pass"
+        },
+        {
+          "check": "final PDF/Photo package ownership overlap, coordinator",
+          "result": "pass"
+        },
+        {
+          "check": "./test/maslow-packaging; bash -n; git diff --check",
+          "result": "pass"
+        }
+      ],
+      "evidence": [
+        "docs/programs/craft-optional-apps/tasks/CRAFT-PDF-PACKAGE.md"
+      ],
+      "artifact_hashes": {
+        "/home/maslow/Maslow-ai-os/craft-build/pdf/pdfcraft-0.6.0-1-x86_64.pkg.tar.zst": "afa9eb1146696fd1feb0840fdbd8a6b3dc5cec6751dd86d6198b07a826f445c2"
+      },
       "blocker": null,
-      "next_action": "Evaluate pinned pdfcraft 0.6.0 release archive, ABI, notices and native package"
+      "next_action": "Coordinator installed package verification; GUI/fidelity/confinement/agents/Voice separate"
     },
     {
       "id": "CRAFT-PDF-GUI-CLI",
@@ -705,7 +725,7 @@
       ],
       "acceptance": "Reviewed archive hash/source tag, clean build/contents/deps/ownership; same-tag locked fallback or evidenced deferral",
       "phase": 1,
-      "status": "active",
+      "status": "implementation-complete",
       "owner": "packages-worker",
       "session": "2026-10-11-craft-root",
       "worker": "/root/craft_packages",
@@ -715,13 +735,33 @@
       "base_revision": "4488564",
       "branch": "codex/craft-packages",
       "worktree": "/home/maslow/Projects/Maslow/craft-packages",
-      "implementation_commits": [],
+      "implementation_commits": [
+        "7d8dfd1",
+        "f211378f416f50d63d4352b2049758a7aaa0996e"
+      ],
       "integration_commits": [],
-      "tests": [],
-      "evidence": [],
-      "artifact_hashes": {},
+      "tests": [
+        {
+          "check": "clean disposable Docker makepkg, checksums/notices/archive safety, desktop syntax, ELF deps/ABI, CLI version/help, offline MCP init/list, original file manifests",
+          "result": "pass"
+        },
+        {
+          "check": "final PDF/Photo package ownership overlap, coordinator",
+          "result": "pass"
+        },
+        {
+          "check": "./test/maslow-packaging; bash -n; git diff --check",
+          "result": "pass"
+        }
+      ],
+      "evidence": [
+        "docs/programs/craft-optional-apps/tasks/CRAFT-PHOTO-PACKAGE.md"
+      ],
+      "artifact_hashes": {
+        "/home/maslow/Maslow-ai-os/craft-build/photo/photocraft-0.7.0-1-x86_64.pkg.tar.zst": "22c553446baae55603c202a4090340961044cd779d3084c2a687eb0b9a5a92c5"
+      },
       "blocker": null,
-      "next_action": "Evaluate pinned photocraft 0.7.0 release archive, ABI, notices and native package"
+      "next_action": "Coordinator installed package verification; GUI/fidelity/confinement/agents/Voice separate"
     },
     {
       "id": "CRAFT-PHOTO-GUI-CLI",

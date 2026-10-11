@@ -27,3 +27,9 @@ Read/write authority fails closed without explicit roots. Live bridge uses a pri
 Upstream describes early alpha, approximately 45% professional readiness; its feature counts and corpus success rates are upstream measurements, not our runtime verification. PSD render round trips are not byte-identical and the broad menu wiring metric is explicitly not behavior parity. AI/generative functions, tool coverage, typography/pro workflows and plugin compatibility remain incomplete. README documents no native Wayland file drag/drop with winit 0.30. FileOpen/paste workarounds, or XWayland via WAYLAND_DISPLAY=, are offered; verify current pinned build on Hyprland.
 
 Acceptance must declare the exact formats/features tested and preserve originals. A generic round-trip or MCP-presence claim cannot pass these risks. No final deferral is inferred from this starting list.
+
+## Package implementation, 2026-10-11
+
+Exact tag `v0.7.0` is `79261615956ab21334e49ca1d384390272e647da`; its archive SHA-256 is `641f831252fd31b43ee1a12e572d7442e5652c2e5bf623de085741c370f0c91d`. Native package `photocraft 0.7.0-1` built from recipes `f211378f416f50d63d4352b2049758a7aaa0996e`, SHA-256 `22c553446baae55603c202a4090340961044cd779d3084c2a687eb0b9a5a92c5`. Direct ELF paths `/usr/bin/photocraft` and `/usr/bin/photocraft-cli`; desktop, icons, MIME, AppStream and notices retained. Upstream update checks do not replace package files. See [package task](../tasks/CRAFT-PHOTO-PACKAGE.md) for clean build, same-publisher digest, notices and offline unpacked MCP evidence.
+
+Disposition remains evaluating. Package is built; registered install, lifecycle, GUI, confinement, actual agents/Voice and fresh VM/Lenovo gates are open. No accepted capabilities or release-readiness change.

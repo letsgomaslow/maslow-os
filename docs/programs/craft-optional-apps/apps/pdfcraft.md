@@ -27,3 +27,9 @@ Use --root explicitly; without it ordinary user file access remains. MCP is head
 Upstream reports fuzz-discovered crashes/hangs on hostile files, with regressions being fixed. Corpus success claims are upstream results, not rerun here. Encryption interoperability, existing-text editing (especially CJK/RTL), OCR beyond Latin, Office-to-PDF/export fidelity, token/online signature validation, advanced preflight/PDF-X/UA and XFA remain weak or missing. MCP progress/cancellation notifications are ignored; exports synchronous. No HTTP/SSE MCP transport found in inspected implementation.
 
 Acceptance must declare the exact formats/features tested and preserve originals. A generic round-trip or MCP-presence claim cannot pass these risks. No final deferral is inferred from this starting list.
+
+## Package implementation, 2026-10-11
+
+Exact tag `v0.6.0` is `53a5880386789fc3531e54f6e6ffdef9a8e41f1a`; its archive SHA-256 is `9a136e71e37b459ed5746dbe19a364ce84cf5d995c6f6c98af6147d818390a53`. Native package `pdfcraft 0.6.0-1` built from recipes `f211378f416f50d63d4352b2049758a7aaa0996e`, SHA-256 `afa9eb1146696fd1feb0840fdbd8a6b3dc5cec6751dd86d6198b07a826f445c2`. Direct ELF paths `/usr/bin/pdfcraft` and `/usr/bin/pdfcraft-cli`; desktop, icons, MIME, AppStream and notices retained. Upstream update checks do not replace package files. See [package task](../tasks/CRAFT-PDF-PACKAGE.md) for clean build, same-publisher digest, notices and offline unpacked MCP evidence.
+
+Disposition remains evaluating. Package is built; registered install, lifecycle, GUI, confinement, actual agents/Voice and fresh VM/Lenovo gates are open. No accepted capabilities or release-readiness change.
