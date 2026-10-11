@@ -31,6 +31,16 @@
         "task": "work_ui_check",
         "model": "gpt-6.1-sol",
         "reasoning": "medium"
+      },
+      {
+        "task": "runtime_delivery_review",
+        "model": "gpt-6.1-sol",
+        "reasoning": "high"
+      },
+      {
+        "task": "current_recovery",
+        "model": "gpt-6.1-sol",
+        "reasoning": "high"
       }
     ]
   },
@@ -45,13 +55,13 @@
         " M docs/programs/craft-optional-apps/tasks/CRAFT-CORE-SANDBOX.md",
         "?? docs/handoffs/2026-10-11-freellmapi-review.md"
       ],
-      "implementation_revision": "784aea2b453815a55b1551ab2d1b1ed84dbbf529"
+      "implementation_revision": "76fb5d08ca65662be1b16da1cce1eb0eee13f37b"
     },
     "hub": {
       "path": "/home/maslow/Projects/Maslow/free-ai-hub",
       "base_revision": "33940d2e8740b172b953cc3e091cbae1ba1cd303",
       "branch": "codex/free-cloud-ai",
-      "implementation_revision": "732c235"
+      "implementation_revision": "8a0d02497f9766e42cfe098476b08845c7b5df27"
     },
     "packages": {
       "path": "/home/maslow/Projects/Maslow/free-ai-packages",
@@ -178,7 +188,8 @@
       ],
       "evidence": [
         "docs/programs/free-cloud-ai/evidence/2026-10-11-boundary-review.json",
-        "docs/programs/free-cloud-ai/evidence/2026-10-11-source-package-checkpoint.json"
+        "docs/programs/free-cloud-ai/evidence/2026-10-11-source-package-checkpoint.json",
+        "docs/programs/free-cloud-ai/evidence/2026-10-11-provider-docs.json"
       ],
       "artifact_hashes": {},
       "blocker": null,
@@ -225,7 +236,7 @@
       ],
       "artifact_hashes": {},
       "blocker": "Real keyring/installed lifecycle acceptance unavailable.",
-      "next_action": "Integrate reviewed runtime delivery RPC; installed keyring/paired package recovery still required."
+      "next_action": "Rebuild reviewed runtime delivery/binding source; installed private keyring and paired package recovery still required."
     },
     {
       "id": "FCAI-P1-HERMES",
@@ -332,7 +343,10 @@
         "bin/maslow-hub-install",
         "tests/test_free_ai*.py",
         "docs/free-ai-preflight-contract.md",
-        "docs/free-cloud-ai.md"
+        "docs/free-cloud-ai.md",
+        "docs/free-ai-current-operation-recovery.md",
+        "docs/evidence/**",
+        "tests/free_ai_transaction_probe.py"
       ],
       "dependencies": [
         "FCAI-P1-PROVIDER",
@@ -347,23 +361,30 @@
       "worker": "boundary_review (fixed delivery)",
       "actual_model": "gpt-6-astra/high",
       "attempt": 1,
-      "last_checkpoint": "2026-10-11T15:56:05.839365+00:00",
+      "last_checkpoint": "2026-10-11T18:27:18.949361+00:00",
       "base_revision": "33940d2",
       "branch": null,
       "worktree": "/home/maslow/Projects/Maslow/free-ai-hub",
       "implementation_commits": [
         "e69ee52",
-        "732c235"
+        "732c235",
+        "8a0d02497f9766e42cfe098476b08845c7b5df27",
+        "0aafacbc8915d5db64e92bdb5a97bd604c76e6e1"
       ],
       "integration_commits": [],
-      "tests": [],
+      "tests": [
+        {
+          "check": "8a0d0249 source: 198 unit +24 lifecycle +UI checks; 16 actual multi-UID namespace/pacman cases with inert packages and synthetic service/keyring inputs",
+          "result": "pass"
+        }
+      ],
       "evidence": [
         "docs/programs/free-cloud-ai/evidence/2026-10-11-source-package-checkpoint.json",
         "docs/programs/free-cloud-ai/evidence/2026-10-11-account-ui-source-checkpoint.json"
       ],
       "artifact_hashes": {},
       "blocker": "Signed bundle and installed acceptance absent.",
-      "next_action": "Finish concrete fixed retained-user-helper/root-ticket/ALPM preflight; install/update/recover remain unavailable until real contract passes."
+      "next_action": "Finish reserved snapshot binding, durable mask publication, no-restore commit decision and strict recovery-only evidence parsing; actual restore and installation remain gated."
     },
     {
       "id": "FCAI-P2-WORK",
@@ -470,7 +491,10 @@
         "voice/maslow_voice/tasks.py",
         "free_ai/tests/test_recovery.py",
         "free_ai/tests/test_runtime.py",
-        "voice/tests/test_free_ai_delivery.py"
+        "voice/tests/test_free_ai_delivery.py",
+        "voice/maslow_voice/store.py",
+        "voice/maslow_voice/ipc.py",
+        "free_ai/tests/secret_service_probe.py"
       ],
       "dependencies": [
         "FCAI-P2-HUB",
@@ -484,24 +508,42 @@
       "worker": "root",
       "actual_model": "coordinator not exposed",
       "attempt": 1,
-      "last_checkpoint": "2026-10-11T15:56:05.839365+00:00",
+      "last_checkpoint": "2026-10-11T18:27:18.949361+00:00",
       "base_revision": "09721dff",
       "branch": "codex/free-cloud-ai",
       "worktree": "/home/maslow/Maslow-ai-os/free-ai-runtime",
       "implementation_commits": [
         "f63cdb67",
         "90c0745a",
-        "784eca20"
+        "784eca20",
+        "b192d593",
+        "9a90e545",
+        "76fb5d08ca65662be1b16da1cce1eb0eee13f37b"
       ],
       "integration_commits": [],
-      "tests": [],
+      "tests": [
+        {
+          "check": "b192d593 owning Voice wrapper: 489 tests, two expected Mac skips; newer binding separately checked",
+          "result": "pass"
+        },
+        {
+          "check": "9a90e545 binding and strict recovery: 34 backend +17 delivery tests, independent review",
+          "result": "pass"
+        },
+        {
+          "check": "76fb5d08 real disposable SecretService/WAL/Node recovery and helper isolation/cleanup review",
+          "result": "pass"
+        }
+      ],
       "evidence": [
         "docs/programs/free-cloud-ai/evidence/2026-10-11-account-ui-source-checkpoint.json",
-        "docs/programs/free-cloud-ai/evidence/2026-10-11-account-recovery-review.json"
+        "docs/programs/free-cloud-ai/evidence/2026-10-11-account-recovery-review.json",
+        "docs/programs/free-cloud-ai/evidence/2026-10-11-runtime-delivery-review.json",
+        "docs/programs/free-cloud-ai/evidence/2026-10-11-delivery-recovery-checkpoint.json"
       ],
       "artifact_hashes": {},
-      "blocker": "User-owned current-operation snapshot/restore source passes; rootpairedinstallation/actualinterruption/historicalrollback gates remain open.",
-      "next_action": "Implement root-ticket reader and prepare/check RPC that closes all task/conversation/configuration admission; coordinate exactcontract withAstra Hubworker.",
+      "blocker": "Privileged interrupted package/database/key restoration, fresh-install undo and installed systemd/guest/hardware/live gates remain unverified. Historical restore after admission resumes is deliberately unavailable.",
+      "next_action": "Review Hub durable mask/commit-decision and recovery-only evidence changes, then implement and prove fixed current-operation native package recovery while the install gate remains false.",
       "coordinator_only": true
     },
     {
@@ -596,12 +638,13 @@
     }
   ],
   "coordination": {
-    "shared_owners": "Craft owns productivity/creative apps, ongoing Connect -4 candidate and shared integration. FreeAI edits only isolated runtime/Hub/Connect/package worktrees. Shared helper/install.py, Hub Panel and package recipe changes require serialized reconciliation before merge.",
-    "build_serialization": "Owned WorkQA container stopped; no heavy build admitted. Original Craft build/removal -4 work remains separate. Do not build new Connect until serialized source reconciliation.",
+    "shared_owners": "Craft owns productivity/creative apps and its current Connect native lifecycle review (observed source2e872f50). FreeAI edits only isolated runtime/Hub/Connect/package worktrees. Shared helper/install.py, Hub Panel, package recipes and Connect CLI/accounts require serialized reconciliation before integration. The newer Craft source/package has not been accepted by this program.",
+    "build_serialization": "No heavy build admitted. Recheck current Craft build slot before FreeAI2/Voice39; managed Connect packaging waits for accepted serialized lifecycle reconciliation.",
     "worker_limit": 2,
     "integration": "No product/shared merge, host installation, production signing or publication. Program completed source commits only.",
     "active_workers": [
-      "boundary_review: fixed privileged/user delivery in isolated Hub"
+      "boundary_review: gpt-6-astra/high, isolated Hub source implementation",
+      "current_recovery: gpt-6.1-sol/high, read-only next-stage contract design"
     ]
   }
 }

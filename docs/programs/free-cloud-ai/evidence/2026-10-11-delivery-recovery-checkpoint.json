@@ -1,0 +1,101 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-11",
+  "status": "scoped-source-checkpoint-not-preview-acceptance",
+  "candidate_ready": false,
+  "runtime_revision": "76fb5d08ca65662be1b16da1cce1eb0eee13f37b",
+  "hub_reviewed_gated_source": "8a0d02497f9766e42cfe098476b08845c7b5df27",
+  "hub_pending_work": "Operation binding, durable mask publication, no-restore completion and recovery-only evidence; later bytes need review.",
+  "exact_evidence": {
+    "independent_runtime_review": {
+      "path": "docs/programs/free-cloud-ai/evidence/2026-10-11-runtime-delivery-review.json",
+      "sha256": "74a0a203ae1701e86b1c45834a98366cb7f1e61a6de8fa5db8158ed431fde0d8"
+    },
+    "private_real_recovery": {
+      "path": "/home/maslow/Maslow-ai-os/free-ai-build/secret-service-recovery-probe-final.json",
+      "sha256": "1f2e16c37a06d84acc5511abe4d60d7b2ea656b6f7a2acf4b323d7f07cd73ecf",
+      "receipt": {
+        "schema": 1,
+        "backend": "real GNOME Keyring / private D-Bus",
+        "missing_key": true,
+        "private_stdin_store_roundtrip": true,
+        "recovery_secret_roundtrip": true,
+        "locked_active_and_recovery_keys_rejected": true,
+        "host_keyring_touched": false,
+        "live_provider_requests": 0,
+        "installed_product_verified": false,
+        "recovery": {
+          "wal_committed_quota_retained": true,
+          "root_operation_binding_rechecked_after_restart": true,
+          "wrong_nonce_rejected": true,
+          "corrupt_database_and_missing_active_key_restored": true,
+          "matching_ciphertext_and_secret_retained": true,
+          "admission_remained_closed": true,
+          "snapshot_permissions_and_plaintext_exclusion_checked": true,
+          "historical_restore_rejected": true,
+          "package_restore_verified": false
+        }
+      }
+    },
+    "historical_hub_preflight": {
+      "path": "/home/maslow/Projects/Maslow/free-ai-hub/docs/evidence/2026-10-11-free-ai-preflight.json",
+      "sha256": "09e9c19dd59ce9aa7482ba40d77bd1a1255205a3af535688359d58569c3e4024",
+      "all_8_source_hashes_verified_against_commit": true
+    }
+  },
+  "checks": [
+    {
+      "revision": "b192d593",
+      "check": "Owning Voice wrapper, corrected backend test import",
+      "passed": 489,
+      "skipped": 2,
+      "skip_reason": "Expected Mac sandbox checks",
+      "scope": "Historical pre-binding source; retained log voice-delivery-final-check-corrected.log."
+    },
+    {
+      "revision": "9a90e545",
+      "check": "Backend binding +delivery focused owning suites",
+      "passed": 51,
+      "skipped": 0,
+      "scope": "34 backend +17 delivery; independent review and exact current production hashes."
+    },
+    {
+      "revision": "76fb5d08ca65662be1b16da1cce1eb0eee13f37b",
+      "check": "Actual disposable GNOME/DBus/SQLite WAL/Node22.23.3 snapshot/key restoration",
+      "result": "pass",
+      "scope": "Synthetic keys/account/artifacts; real user-owned DB/key operations, stopped maintenance marker and disabled routes, no live daemon/pacman restore."
+    },
+    {
+      "revision": "8a0d02497f9766e42cfe098476b08845c7b5df27",
+      "check": "Hub worker source +namespace tests",
+      "result": "pass",
+      "scope": "Historical198 unit,24 lifecycle/UI checks,16 actual multi-UID/pacman component cases with inert archives and synthetic services/keyring; not installed acceptance."
+    }
+  ],
+  "preserved_failures": [
+    "Initial owning Voice wrapper failed new optional-backend test import; fixed in test only and corrected wrapper passed.",
+    "Independent recovery review reproduced missing parent fsync and Boolean/duplicate disk binding; fixed and independently retested.",
+    "Helper review found timeout/pre-owner/rawchild isolation gaps; fixed before final proof. Earlier invalid AsyncMock cleanup fixture is documented by reviewer."
+  ],
+  "coordination": {
+    "active_workers": [
+      "boundary_review: gpt-6-astra/high, isolated Hub source implementation",
+      "current_recovery: gpt-6.1-sol/high, read-only next-stage contract design"
+    ],
+    "completed_review": "runtime_delivery_review: actual gpt-6.1-sol/high",
+    "worker_limit": 2,
+    "parallel_craft_source_observed": "2e872f50a28706e70c159380e2b7186869415b7f",
+    "craft_source_not_consumed": true,
+    "heavy_build_admitted": false,
+    "physical_audio_admitted": false,
+    "shared_integration": "Serialized reconciliation only; Craft originals/ledgers untouched."
+  },
+  "remaining": [
+    "Current-operation privileged package/database/key restore and fresh-install guarded undo, including interrupted/disk-full cases.",
+    "Supported exact retained verifier; historical FreeAI1 lacks recovery module.",
+    "Rebuilt exact native FreeAI/Voice plus accepted combined managed Connect package, fixed signed bundle.",
+    "Installed guest/Lenovo/systemd/keyring, real Groq and selected account/revocation, Voice heard result and resource checks.",
+    "Independent integrated acceptance; no production signing/publication/host install/merge."
+  ],
+  "next_action": "Review Hub stage1 frozen crash-order changes, then implement gated fixed native current-operation recovery from the reviewed contract."
+}
