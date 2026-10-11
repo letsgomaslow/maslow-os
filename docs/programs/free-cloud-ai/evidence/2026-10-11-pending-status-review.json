@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-11",
+  "status": "independently-reviewed-source-fix-not-installed-acceptance",
+  "reviewer": "boundary_review, actual gpt-6-astra/high, read-only",
+  "scope": "Prevent CLI/Hub status polling from creating fresh assistant state during pending fixed delivery",
+  "source_sha256": {
+    "free_ai/maslow_free_ai/control.py": "a7c61e431706b2125c61e9c42668373e496c6b58cfa4650bd575fa3f349cddd6",
+    "free_ai/tests/test_control.py": "9d016d43022eea337a5b49dad3abf888c3dce8750bc7a7236ec37678599663df"
+  },
+  "problem": "omarchy-free-ai status constructed RouterRuntime, creating State/Recovery directories; a poll after package availability could invalidate the fresh-delivery no-prior-state invariant.",
+  "fix": "Any fixed public-ticket entry, including expired/malformed/broken-symlink entries, reports maintenance with no RouterRuntime/state creation. Stat errors fail closed. Setup/test/enable/disable stop before prompting or service requests while pending.",
+  "checks": [
+    {
+      "check": "Independent final full FreeAI backend suite",
+      "passed": 39,
+      "skipped": 0
+    },
+    {
+      "check": "Five control regressions",
+      "passed": 5,
+      "skipped": 0,
+      "scope": "Includes actual isolated CLI with scratch ticket and absent state; remaining constructor/service/prompt branches use explicit mocks."
+    },
+    {
+      "check": "Independent scratch branch check",
+      "result": "pass",
+      "scope": "Pending open preserves existing tasks launcher with mocked launch; update/recover remain DELIVERY_NOT_VERIFIED. No RouterRuntime/state directory."
+    }
+  ],
+  "limits": [
+    "No actual root ticket or installed Hub polling during native pacman occurred.",
+    "Maintenance status conservatively reports unverified connection fields; stored settings/confirmation are unchanged.",
+    "Existing six-member recovery capsule pins are unaffected.",
+    "No host configuration/service/keyring/provider/package/build/merge/signing/publication action."
+  ],
+  "candidate_ready": false
+}

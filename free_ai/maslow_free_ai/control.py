@@ -12,7 +12,28 @@ import struct
 from pathlib import Path
 
 from .errors import FreeAIError
-from .runtime import RouterRuntime
+from .runtime import PACKAGE, RouterRuntime
+
+DELIVERY_TICKETS = Path('/run/maslow-hub-free-ai')
+
+
+def delivery_pending():
+    # Presence is a startup barrier even when a ticket is expired or malformed.
+    # Do not instantiate State/Recovery: fresh delivery must remain file-free.
+    try:
+        (DELIVERY_TICKETS / str(os.getuid()) / 'ticket.json').lstat()
+    except FileNotFoundError:
+        return False
+    except OSError:
+        raise FreeAIError('DELIVERY_STATUS_UNAVAILABLE', 'Package admission could not be checked. No assistant state was changed.') from None
+    return True
+
+
+def maintenance_status():
+    installed = (PACKAGE / 'node/bin/node').is_file() and (PACKAGE / 'router/server/dist/maslow-main.js').is_file()
+    task_support = Path('/usr/lib/maslow-voice/assistant_worker.py').is_file() and Path('/usr/lib/maslow-voice/assistant_plugin/plugin.yaml').is_file()
+    return {'installed':installed,'configured':False,'ready':False,'enabled':False,
+            'state':'maintenance','free_plan':'unconfirmed','provider':'groq','task_support':task_support}
 
 
 async def request(value):
@@ -62,10 +83,13 @@ def main():
         if len(sys.argv) != 2 or sys.argv[1] not in {"status", "setup", "test", "enable", "disable", "open", "update", "recover"}:
             raise FreeAIError("INVALID_ARGUMENT", "Choose status, setup, test, enable, disable, open, update, or recover.")
         operation = sys.argv[1]
+        pending = delivery_pending()
         if operation == "status":
-            result = {"ok": True, "status": RouterRuntime().status()}
+            result = {"ok": True, "status": maintenance_status() if pending else RouterRuntime().status()}
         elif operation in {"update", "recover"}:
             raise FreeAIError("DELIVERY_NOT_VERIFIED", "Package and database recovery are awaiting verification. No files were changed.")
+        elif pending and operation in {'setup','test','enable','disable'}:
+            raise FreeAIError('RECOVERY_PENDING', 'Finish the pending package operation before changing or checking the connection. No assistant state was changed.')
         elif operation == "open":
             launcher = "/usr/lib/maslow-voice/launch" if Path("/usr/lib/maslow-voice/launch").is_file() else "omarchy-launch-voice"
             subprocess.run([launcher, "tasks"], check=True, stdout=subprocess.DEVNULL)
