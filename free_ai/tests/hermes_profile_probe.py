@@ -8,6 +8,9 @@ import subprocess
 import sys
 import tempfile
 
+if sys.argv[1:] not in ([], ["--accounts"]):
+    raise SystemExit("Choose the default profile or --accounts profile.")
+
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "voice"))
 from maslow_voice.assistant_runtime import configuration
@@ -25,6 +28,7 @@ with tempfile.TemporaryDirectory(prefix="maslow-assistant-probe-") as temporary:
     env = {"PATH": "/usr/bin:/bin", "HOME": str(profile), "HERMES_HOME": str(profile), "HERMES_ENABLE_PROJECT_PLUGINS": "false",
         "HERMES_BUNDLED_PLUGINS": str(profile / "empty-plugins"), "HERMES_BUNDLED_SKILLS": str(profile / "skills"),
         "HERMES_DISABLE_LAZY_INSTALLS": "1", "HF_HUB_OFFLINE": "1", "TRANSFORMERS_OFFLINE": "1", "DO_NOT_TRACK": "1",
+        "MASLOW_ASSISTANT_ACCOUNTS": "1" if sys.argv[1:] == ["--accounts"] else "0",
         "OPENAI_API_KEY": "local-probe-only", "MASLOW_ASSISTANT_PARENT": str(os.getpid()), "PYTHONDONTWRITEBYTECODE": "1"}
     interpreter = next((str(path) for path in (Path("/opt/hermes-agent/python/bin/python3"), Path("/opt/hermes-agent/venv/bin/python")) if path.is_file()), None)
     if interpreter is None:

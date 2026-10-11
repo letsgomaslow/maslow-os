@@ -57,6 +57,8 @@ class TaskManager:
         self.closed = False
         self.agent_selector = None
         self.assistant_factory = None
+        self.assistant_admission = None
+        self.account_bridge = None
         self.assistant_reservations = set()
 
     def _active_codex_task(self, task_id):
@@ -142,7 +144,7 @@ class TaskManager:
         text_field(text, "original request", 24000, True)
         if policy not in {"lab_auto", "review"}:
             raise VoiceError("INVALID_SETTINGS", "Choose a supported task policy.")
-        if not isinstance(capabilities, dict) or set(capabilities) - {"documents", "note", "accounts"}:
+        if not isinstance(capabilities, dict) or set(capabilities) - {"documents", "note", "accounts", "send_to_groq_confirmed"}:
             raise VoiceError("INVALID_CAPABILITIES", "Choose the files and accounts for this request.")
         documents = capabilities.get("documents", [])
         if not isinstance(documents, list) or len(documents) > 32:
@@ -152,6 +154,12 @@ class TaskManager:
                      "accounts": capabilities.get("accounts", [])}
         if len(set(requested["documents"])) != len(documents) or not isinstance(requested["accounts"], list):
             raise VoiceError("INVALID_CAPABILITIES", "Choose each permitted document only once.")
+        from .assistant_accounts import account_ids
+        requested["accounts"] = account_ids(requested["accounts"])
+        if requested["accounts"]:
+            requested["send_to_groq_confirmed"] = capabilities.get("send_to_groq_confirmed") is True
+        elif "send_to_groq_confirmed" in capabilities:
+            raise VoiceError("INVALID_CAPABILITIES", "Account consent belongs to an explicitly selected account.")
         if not isinstance(project, str) or not project or "\x00" in project:
             raise VoiceError("PROJECT_REQUIRED", "Choose an existing workspace folder.")
         if not Path(os.path.expanduser(project)).is_absolute():
@@ -166,7 +174,14 @@ class TaskManager:
             return old
         if self.assistant_reservations or any(task.get("execution_connection") == "free-cloud" for task in self.store.active()):
             raise VoiceError("ASSISTANT_TASK_ACTIVE", "Finish or stop the active assistant request first.")
-        project, granted = grant_workspace(project, requested)
+        if self.assistant_admission:
+            self.assistant_admission()
+        if requested["accounts"]:
+            if not self.account_bridge or not self.account_bridge.available():
+                raise VoiceError("MANAGED_ACCOUNTS_UNAVAILABLE", "Scoped account access needs the accepted Connect package. No account was accessed.")
+            if not requested["send_to_groq_confirmed"]:
+                raise VoiceError("ACCOUNT_PRIVACY_CONFIRMATION_REQUIRED", "Confirm that information from the selected account may be sent to Groq.")
+        project, granted = grant_workspace(project, {k:v for k,v in requested.items() if k != "send_to_groq_confirmed"}, accounts_verified=bool(requested["accounts"]))
         contract = {"execution_connection": "free-cloud", "policy_revision": POLICY_REVISION,
                     "granted_capabilities": granted, "requested_capabilities": requested}
         task, _ = self.store.create(request_id, brief, project, mode, text, execution_contract=contract)
@@ -240,8 +255,17 @@ class TaskManager:
                 if task["state"] in TERMINAL | {"proposed"}:
                     return
                 if task.get("execution_connection") == "free-cloud":
+                    if self.assistant_admission:
+                        self.assistant_admission()
                     if not self.assistant_factory:
                         raise VoiceError("FREE_AI_SETUP_REQUIRED", "The managed assistant is unavailable. No other agent was used.")
+                    if task["granted_capabilities"].get("accounts"):
+                        if not self.account_bridge:
+                            raise VoiceError("MANAGED_ACCOUNTS_UNAVAILABLE", "The accepted managed account bridge is unavailable.")
+                        task = await self.account_bridge.ensure(task, self.store)
+                        task = self.store.get(task_id)
+                        if task["state"] in TERMINAL | {"stopping"}:
+                            return
                     client = await self.assistant_factory(task)
                 else:
                     client = await self.client_factory(task)
@@ -336,6 +360,15 @@ class TaskManager:
                 if callable(release):
                     await release()
                 self.assistant_reservations.discard(task_id)
+                await self._revoke_finished_accounts(self.store.get(task_id))
+
+    async def _revoke_finished_accounts(self, task):
+        if task["state"] in {"completed", "cancelled", "stopping"} and task.get("connect_session") and self.account_bridge:
+            try:
+                await self.account_bridge.revoke(task)
+            except VoiceError:
+                self.store.update(task["id"], event="account_cleanup_needed", account_cleanup_needed=True)
+                await self.publish()
 
     async def _interrupt_dead_coordinator(self, task_id, client):
         record_exit = getattr(client, "record_process_exit", None)
@@ -432,7 +465,15 @@ class TaskManager:
         else:
             if task["state"] in TERMINAL or not task.get("run_id"):
                 raise VoiceError("TASK_NOT_RUNNING", "This task has no active execution to change.")
-            client = self.clients.get(task_id) or await self.client_factory(task)
+            if task.get("execution_connection") == "free-cloud":
+                if operation == "cancel":
+                    task = self.store.update(task_id, state="stopping")
+                    await self._revoke_finished_accounts(task)
+                client = self.clients.get(task_id)
+                if client is None:
+                    raise VoiceError("ASSISTANT_NOT_RUNNING", "The owned assistant connection is unavailable. Review the stopped task; no other agent was started.")
+            else:
+                client = self.clients.get(task_id) or await self.client_factory(task)
             if operation == "cancel":
                 try:
                     await client.stop(task["run_id"])
@@ -454,6 +495,8 @@ class TaskManager:
                 result = self.store.update(task_id, event="approval_answered", approval=None)
             else:
                 raise VoiceError("INVALID_TASK_ACTION", "That task action is not supported.")
+        if operation == "cancel":
+            await self._revoke_finished_accounts(result)
         await self.publish()
         return result
 

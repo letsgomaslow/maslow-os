@@ -106,7 +106,7 @@ def _read(root_fd, relative, expected=None, *, maximum=MAX_DOCUMENT):
             os.close(fd)
 
 
-def grant_workspace(project, capabilities):
+def grant_workspace(project, capabilities, *, accounts_verified=False):
     if not isinstance(capabilities, dict) or set(capabilities) - {"documents", "note", "accounts"}:
         raise VoiceError("INVALID_CAPABILITIES", "Choose the files and accounts for this request.")
     documents, note, accounts = capabilities.get("documents", []), capabilities.get("note"), capabilities.get("accounts", [])
@@ -115,7 +115,7 @@ def grant_workspace(project, capabilities):
     names = [relative_document(item) for item in documents]
     if len(set(names)) != len(names):
         raise VoiceError("INVALID_CAPABILITIES", "Select each document only once.")
-    if not isinstance(accounts, list) or accounts:
+    if not isinstance(accounts, list) or (accounts and not accounts_verified):
         raise VoiceError("MANAGED_ACCOUNTS_UNAVAILABLE", "Scoped account access is awaiting an accepted Connect package. No account was accessed.")
     if note is not None:
         note = relative_document(note, note=True)
@@ -139,7 +139,7 @@ def grant_workspace(project, capabilities):
                     pass
                 else:
                     raise VoiceError("NOTE_EXISTS", "Choose a new note name. Existing files are never overwritten.")
-        return str(path), {"workspace_identity": _identity(os.fstat(root)), "documents": files, "note": note, "accounts": []}
+        return str(path), {"workspace_identity": _identity(os.fstat(root)), "documents": files, "note": note, "accounts": list(accounts)}
 
 
 class WorkspaceTools:

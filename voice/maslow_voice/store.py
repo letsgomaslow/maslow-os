@@ -80,6 +80,8 @@ class TaskStore:
             raise VoiceError("INVALID_TASK_STATE", "The executor returned an unsupported task state.")
         if {"id", "request_id", "mode", "source", "project", "execution_connection", "policy_revision", "granted_capabilities", "requested_capabilities"} & changes.keys():
             raise VoiceError("IMMUTABLE_TASK", "A task's identity and execution boundary cannot be changed.")
+        if "connect_session" in changes and task.get("connect_session") is not None:
+            raise VoiceError("IMMUTABLE_TASK", "The selected-account session cannot be replaced or renewed.")
         task.update(changes, updated_at=time.time())
         self.db.execute("BEGIN IMMEDIATE")
         try:

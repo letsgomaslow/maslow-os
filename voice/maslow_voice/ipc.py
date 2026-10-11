@@ -120,6 +120,10 @@ class ControlServer:
                 response = {"ok": False, "error": error.as_dict()}
             except Exception:
                 response = {"ok": False, "error": {"code": "CONTROL_FAILED", "message": "Voice could not complete this action. Check its setup and try again."}}
+            if request.get("action") == "assistant_accounts":
+                identity = request.get("account_request_id")
+                response["assistant_accounts_reply"] = True
+                response["account_request_id"] = identity if isinstance(identity, str) and len(identity) <= 128 else None
             try:
                 await self.send(writer, response)
             except (OSError, TimeoutError, VoiceError):

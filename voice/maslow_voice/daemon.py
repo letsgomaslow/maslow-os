@@ -131,6 +131,9 @@ class VoiceService:
         self.free_ai_router = None
         self.assistant_runtime = None
         self.tasks.assistant_factory = self.assistant_client
+        self.tasks.assistant_admission = self.assistant_admission
+        from .assistant_accounts import AccountBridge
+        self.tasks.account_bridge = AccountBridge()
 
     def snapshot(self):
         tasks = []
@@ -657,7 +660,8 @@ class VoiceService:
             label = "Obsidian note" if job.get("kind") == "note" else "Web task"
             lines.append(f"- {label} {job['id']} \"{job['title']}\": {job['state']}, started {minutes} min ago.")
         for task in self.store.active():
-            lines.append(f"- Delegated job \"{task.get('title', '')[:60]}\": {task['state']}.")
+            title = "Private assistant request" if self.private_assistant(task) else task.get("title", "")[:60]
+            lines.append(f"- Delegated job \"{title}\": {task['state']}.")
         if not self.jobs and not self.store.active():
             lines.append("- No tasks are running.")
         if self.reconnecting and self.session["transcript"]:
@@ -1124,6 +1128,12 @@ class VoiceService:
                         discard_process=lambda project=task["project"]: self.offline_clients.pop(project, None))
                 return self.offline_clients[task["project"]]
         return await self.hermes.ensure(task)
+
+    def assistant_admission(self):
+        if self.free_ai_router is None and Path("/usr/lib/maslow-free-ai/maslow_free_ai").is_dir():
+            self._free_ai()
+        if self.free_ai_router and (not self.free_ai_router.admission or self.free_ai_router.recovery.pending()):
+            raise VoiceError("ASSISTANT_MAINTENANCE", "Free cloud AI is preparing or recovering its package state. Finish that operation before new requests.")
 
     def _free_ai(self):
         if self.free_ai_router is None:
@@ -1609,6 +1619,7 @@ class VoiceService:
             "silence": set(), "desktop_action": {"application"}, "submit_text": {"text", "project", "context"},
             "task_submit": {"request_id", "text", "project", "execution_connection", "capabilities"},
             "free_ai": {"operation", "key", "free_plan_confirmed"},
+            "assistant_accounts": {"account_request_id"},
             "task_action": {"id", "task_id", "operation", "text", "approval_id", "child_id", "review_id", "paths"},
         }
         if action not in allowed or set(request) - allowed[action] - {"action"}:
@@ -1628,6 +1639,11 @@ class VoiceService:
         if action == "free_ai":
             self._free_ai()  # Import only after this explicit optional action.
             return await self.free_ai_operation(request)
+        if action == "assistant_accounts":
+            identity = request.get("account_request_id", "")
+            if not isinstance(identity, str) or not re.fullmatch(r"[A-Za-z0-9_-]{1,128}", identity):
+                raise VoiceError("INVALID_REQUEST", "The account-list request needs a valid identity.")
+            return await self.tasks.account_bridge.list()
         if action == "task_submit":
             connection = request.get("execution_connection", self.settings.value["execution_connection"])
             if connection == "free-cloud":
@@ -1876,6 +1892,12 @@ class VoiceService:
             raise VoiceError("TASK_NOT_RUNNING", "The owning task is not running.")
         operation = request.get("operation")
         if task.get("execution_connection") == "free-cloud":
+            if operation == "read_calendar":
+                result = await self.tasks.account_bridge.read(task, request.get("params", {}))
+                current = self.store.get(task["id"])
+                if current["state"] in TERMINAL | {"stopping", "queued"} or current.get("attempt") != task.get("attempt") or current.get("connect_session") != task.get("connect_session"):
+                    raise VoiceError("TASK_NOT_RUNNING", "The owning request stopped or changed while the account was being read. Its contents were withheld.")
+                return result
             from .assistant import WorkspaceTools
             return await WorkspaceTools(self.store).handle(task, operation, request.get("params", {}))
         if operation not in {"delegate_coding", "open_application", "open_website"}:

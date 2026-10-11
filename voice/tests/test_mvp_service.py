@@ -328,6 +328,21 @@ class MvpServiceTests(unittest.IsolatedAsyncioTestCase):
         self.service.last_conversation["ended"] -= 3600
         self.assertNotIn("Find cheap flights to Austin", self.service.briefing())
 
+    async def test_private_task_title_is_redacted_at_voice_start_and_reconnect(self):
+        marker = "private-calendar-request-marker"
+        brief = dict(BRIEF, objective=marker, summary=marker)
+        task, _ = self.service.store.create("private-account", brief, str(self.root), "typed", marker,
+            execution_contract={"execution_connection":"free-cloud", "policy_revision":"maslow-everyday-1",
+                "granted_capabilities":{"documents":{}, "accounts":["ca_private"], "note":None}})
+        await self.service.end_voice()
+        await self.service.start_voice(audio=False)
+        self.assertNotIn(marker, self.service.provider.config["voice_briefing"])
+        self.assertIn("Private assistant request", self.service.provider.config["voice_briefing"])
+        self.service.reconnecting = True
+        self.assertNotIn(marker, self.service.briefing())
+        self.assertEqual(self.service.store.get(task["id"])["title"], marker)
+        self.service.reconnecting = False
+
     async def test_an_old_finished_task_is_not_the_current_task(self):
         task, _ = self.service.store.create("old-request", dict(BRIEF), str(self.root), "gemini_live", "Build a tracker")
         task = self.service.store.update(task["id"], state="completed") or self.service.store.get(task["id"])

@@ -28,7 +28,8 @@ def install_boundary():
                 skip_memory=True, skip_background_review=True, fallback_model=None,
                 max_iterations=12, max_tokens=2048, run_budget_seconds=180, verbose_logging=False, save_trajectories=False)
             super().__init__(**kwargs)
-            if set(self.valid_tool_names) != TOOLS:
+            expected = TOOLS | ({"maslow_read_calendar"} if os.environ.get("MASLOW_ASSISTANT_ACCOUNTS") == "1" else set())
+            if set(self.valid_tool_names) != expected:
                 raise RuntimeError("Managed assistant tool compatibility gate failed: " + json.dumps(sorted(self.valid_tool_names)))
 
     run_agent.AIAgent = ManagedAgent
