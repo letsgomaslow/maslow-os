@@ -12,7 +12,7 @@ import struct
 from pathlib import Path
 
 from .errors import FreeAIError
-from .runtime import PACKAGE, RouterRuntime
+from .runtime import MODELS, PACKAGE, RouterRuntime
 
 DELIVERY_TICKETS = Path('/run/maslow-hub-free-ai')
 
@@ -34,6 +34,80 @@ def maintenance_status():
     task_support = Path('/usr/lib/maslow-voice/assistant_worker.py').is_file() and Path('/usr/lib/maslow-voice/assistant_plugin/plugin.yaml').is_file()
     return {'installed':installed,'configured':False,'ready':False,'enabled':False,
             'state':'maintenance','free_plan':'unconfirmed','provider':'groq','task_support':task_support}
+
+
+def readonly_status():
+    """Inspect private settings without initializing or repairing user storage."""
+    value = {"schema": 1, "enabled": False, "configured": False,
+             "free_plan": "unconfirmed", "verified_routes": []}
+    root = Path(os.environ.get("XDG_STATE_HOME", str(Path.home() / ".local/state")))
+    directory = (root / "maslow-free-ai").absolute()
+    descriptor = os.open(directory.anchor, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
+    pending = False
+    try:
+        for component in directory.parts[1:]:
+            try:
+                child = os.open(component, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW, dir_fd=descriptor)
+            except FileNotFoundError:
+                break
+            except OSError:
+                raise FreeAIError("UNSAFE_STATE", "Free cloud AI storage could not be safely inspected. It was left unchanged.") from None
+            os.close(descriptor)
+            descriptor = child
+        else:
+            info = os.fstat(descriptor)
+            if info.st_uid != os.getuid() or info.st_mode & 0o077:
+                raise FreeAIError("UNSAFE_STATE", "Free cloud AI storage must be private and belong to this user. It was left unchanged.")
+            try:
+                os.stat("maintenance.json", dir_fd=descriptor, follow_symlinks=False)
+                pending = True
+            except FileNotFoundError:
+                pass
+            try:
+                settings = os.open("settings.json", os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK, dir_fd=descriptor)
+            except FileNotFoundError:
+                settings = None
+            except OSError:
+                raise FreeAIError("UNSAFE_STATE", "Free cloud AI settings could not be safely inspected. They were left unchanged.") from None
+            if settings is not None:
+                try:
+                    info = os.fstat(settings)
+                    if not stat.S_ISREG(info.st_mode) or info.st_uid != os.getuid() or info.st_nlink != 1 or info.st_mode & 0o077 or info.st_size > 16384:
+                        raise FreeAIError("UNSAFE_STATE", "Free cloud AI settings must be private, bounded and unaliased. They were left unchanged.")
+                    with os.fdopen(settings, "rb", closefd=False) as stream:
+                        raw = stream.read(16385)
+                    if len(raw) > 16384:
+                        raise FreeAIError("STATE_UNREADABLE", "Free cloud AI settings need recovery. They were left unchanged.")
+                finally:
+                    os.close(settings)
+                def unique_object(pairs):
+                    result = {}
+                    for key, item in pairs:
+                        if key in result:
+                            raise ValueError()
+                        result[key] = item
+                    return result
+                try:
+                    data = json.loads(raw.decode("utf-8"), object_pairs_hook=unique_object)
+                    if not isinstance(data, dict) or set(data) != set(value) or type(data["schema"]) is not int or data["schema"] != 1:
+                        raise ValueError()
+                    if any(type(data[key]) is not bool for key in ("enabled", "configured")):
+                        raise ValueError()
+                    if data["free_plan"] not in ("unconfirmed", "user-confirmed") or not isinstance(data["verified_routes"], list):
+                        raise ValueError()
+                    routes = data["verified_routes"]
+                    if any(not isinstance(route, str) or route not in MODELS for route in routes) or len(set(routes)) != len(routes):
+                        raise ValueError()
+                    value = data
+                except (ValueError, TypeError, UnicodeError):
+                    raise FreeAIError("STATE_UNREADABLE", "Free cloud AI settings need recovery. They were left unchanged.") from None
+    finally:
+        os.close(descriptor)
+    result = maintenance_status()
+    ready = result["installed"] and result["task_support"] and value["configured"] and set(value["verified_routes"]) == set(MODELS) and value["free_plan"] == "user-confirmed" and not pending
+    result.update(configured=value["configured"], enabled=value["enabled"], free_plan=value["free_plan"], ready=ready,
+                  state="maintenance" if pending else "disabled" if ready and not value["enabled"] else "ready" if ready else "needs-setup")
+    return result
 
 
 async def request(value):
@@ -85,7 +159,7 @@ def main():
         operation = sys.argv[1]
         pending = delivery_pending()
         if operation == "status":
-            result = {"ok": True, "status": maintenance_status() if pending else RouterRuntime().status()}
+            result = {"ok": True, "status": maintenance_status() if pending else readonly_status()}
         elif operation in {"update", "recover"}:
             raise FreeAIError("DELIVERY_NOT_VERIFIED", "Package and database recovery are awaiting verification. No files were changed.")
         elif pending and operation in {'setup','test','enable','disable'}:
