@@ -170,7 +170,21 @@ ShellRoot {
       panel.assistantNote = note
       panel.assistantSaveNote = saveNote
     }
-    function composerStatus(): string { return JSON.stringify({ draft: panel.assistantDraft, project: panel.selectedProject, documents: panel.assistantDocuments, note: panel.assistantNote, saveNote: panel.assistantSaveNote, submitting: panel.assistantSubmitting, requestId: panel.assistantRequestId, feedback: panel.feedback, connection: panel.settings.execution_connection || "existing" }) }
+    function composerStatus(): string { return JSON.stringify({ draft: panel.assistantDraft, project: panel.selectedProject, documents: panel.assistantDocuments, note: panel.assistantNote, saveNote: panel.assistantSaveNote, submitting: panel.assistantSubmitting, requestId: panel.assistantRequestId, feedback: panel.feedback, connection: panel.settings.execution_connection || "existing", accountLoading: panel.assistantAccountsLoading, accountError: panel.assistantAccountsError, accounts: panel.assistantAccounts, selectedAccounts: panel.assistantSelectedAccounts, accountConsent: panel.assistantAccountConsent, accountRequestId: panel.assistantAccountsRequestId }) }
+    function refreshAccounts(): void { panel.refreshAssistantAccounts() }
+    function accountsReply(identity: string, available: bool, accountsJson: string): void { panel.voiceController.applyLine(JSON.stringify({ ok: true, assistant_accounts_reply: true, account_request_id: identity, available: available, accounts: JSON.parse(accountsJson) })) }
+    function accountsError(identity: string): void { panel.voiceController.applyLine(JSON.stringify({ ok: false, assistant_accounts_reply: true, account_request_id: identity, error: { message: "Fixture account refresh failed." } })) }
+    function accountsFixture(kind: string): void {
+      var accounts = kind === "options" ? [
+        { id: "fixture_personal", label: "Personal Calendar · preview@example.invalid" },
+        { id: "fixture_work", label: "Work Calendar · team@example.invalid" }
+      ] : kind === "changed" ? [{ id: "fixture_work", label: "Work Calendar · team@example.invalid" }] : []
+      panel.voiceController.applyLine(JSON.stringify({ ok: kind !== "error", assistant_accounts_reply: true,
+        account_request_id: panel.assistantAccountsRequestId, available: kind !== "unavailable", accounts: accounts,
+        error: { message: "Fixture account refresh failed." } }))
+    }
+    function accountSelect(identity: string, selected: bool): void { panel.selectAssistantAccount(identity, selected) }
+    function accountConsent(value: bool): void { panel.assistantAccountConsent = value }
     function composerTransportError(): void { panel.voiceController.applyLine("unreadable-fixture-response") }
     function composerResponse(ok: bool, message: string): void { panel.voiceController.applyLine(JSON.stringify({ ok: ok, submitted_request_id: panel.assistantRequestId, error: { message: message } })) }
     function requests(): string { return JSON.stringify(panel.voiceController.fixtureRequests) }
@@ -182,6 +196,7 @@ ShellRoot {
     function setupError(): void { panel.voiceController.applyLine('{"ok":false,"error":{"message":"LiveKit setup could not be saved. Check the project URL and try again."}}') }
     function position(x: real, y: real): void { panel.localOrbPositionActive = true; panel.localOrbPositionX = x; panel.localOrbPositionY = y }
     function geometry(): string { return JSON.stringify(panel.fixtureGeometry()) }
+    function workScrollEnd(): void { panel.fixtureWorkScrollEnd() }
     function status(): string { return JSON.stringify({ diameter: panel.heldDiameter, controllerOpen: panel.controllerOpen, status: panel.stateText(), badge: panel.taskBadge, state: panel.voice.state, selectedTaskId: panel.selectedTaskId, working: panel.working }) }
     function stressStatus(): string { return JSON.stringify({ taskDelegateCreations: panel.taskDelegateCreations, transcriptDelegateCreations: panel.transcriptDelegateCreations, meterFramesRemaining: meterFramesRemaining, meterLevel: panel.voice.level, taskApproval: panel.tasks[0] ? panel.tasks[0].approval.detail : "", captions: panel.transcript.length }) }
   }

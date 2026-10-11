@@ -388,7 +388,7 @@ assert.deepEqual(geminiSent[1], { action: "configure_gemini_live", url: "", api_
 runInNewContext(`${geminiSubmitFunction}; submitGeminiLiveSetup("wss://project.livekit.cloud", "", "", "");`, geminiContext);
 assert.deepEqual(geminiSent[2], { action: "configure_gemini_live", url: "wss://project.livekit.cloud", api_key: "", api_secret: "", google_api_key: "" });
 assert.equal(geminiContext.geminiLiveSetupSaving, true, "A blank Google field retains a saved key through the backend");
-const transportContext = { assistantSubmitting: false, voiceStartPending: true, livekitSetupSaving: true, livekitSetupSucceeded: true, livekitSetupStatus: "", geminiLiveSetupSaving: true, geminiLiveSetupSucceeded: true, geminiLiveSetupStatus: "", openSettings: (message) => { transportContext.startMessage = message; } };
+const transportContext = { assistantAccountsLoading: false, assistantSubmitting: false, voiceStartPending: true, livekitSetupSaving: true, livekitSetupSucceeded: true, livekitSetupStatus: "", geminiLiveSetupSaving: true, geminiLiveSetupSucceeded: true, geminiLiveSetupStatus: "", openSettings: (message) => { transportContext.startMessage = message; } };
 runInNewContext(`${transportErrorFunction}; handleTransportError("Voice control disconnected.");`, transportContext);
 assert.equal(transportContext.voiceStartPending, false);
 assert.equal(transportContext.livekitSetupSaving, false);

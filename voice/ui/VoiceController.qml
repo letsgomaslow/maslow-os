@@ -170,7 +170,7 @@ Item {
         connectionLost = false
       } else if (value && typeof value.ok === "boolean") {
         lastResponse = value
-        if (value.ok === false && value.error)
+        if (value.ok === false && value.error && value.assistant_accounts_reply !== true)
           transportError = String(value.error.message || "Voice control needs attention.")
         responseReceived(value)
       }

@@ -68,6 +68,14 @@ Item {
   property bool assistantSubmitting: false
   property string assistantRequestId: ""
   property string assistantRequestFingerprint: ""
+  property var assistantAccounts: []
+  property var assistantSelectedAccounts: []
+  property bool assistantAccountsAvailable: false
+  property bool assistantAccountsLoaded: false
+  property bool assistantAccountsLoading: false
+  property string assistantAccountsRequestId: ""
+  property string assistantAccountsError: ""
+  property bool assistantAccountConsent: false
   readonly property bool freeCloudSelected: String(settings.execution_connection || "existing") === "free-cloud"
   property string selectedProject: ""
   property string explicitContext: ""
@@ -245,10 +253,15 @@ Item {
   function fixtureGeometry() {
     if (!uiTestInstrumentation) return ({})
     return { width: panelWindow.width, height: panelWindow.height,
+      work: { y: tasksScroll.contentItem.contentY, contentHeight: tasksScroll.contentHeight, itemHeight: tasksScroll.contentItem.contentHeight, viewport: tasksScroll.availableHeight, contentWidth: tasksScroll.contentWidth },
       card: { x: card.x, y: card.y, width: card.width, height: card.height },
       orb: { x: orbButton.x, y: orbButton.y, width: orbButton.width, height: orbButton.height },
       status: { x: statusButton.x, y: statusButton.y, width: statusButton.width, height: statusButton.height },
       badge: { x: taskBadgeButton.x, y: taskBadgeButton.y, width: taskBadgeButton.width, height: taskBadgeButton.height, visible: taskBadgeButton.visible } }
+  }
+  function fixtureWorkScrollEnd() {
+    if (!uiTestInstrumentation) return
+    tasksScroll.contentItem.contentY = Math.max(0, tasksScroll.contentHeight - tasksScroll.availableHeight)
   }
   function openDetails() {
     open(JSON.stringify({ page: "type" }))
@@ -393,9 +406,15 @@ Item {
   }
   function submitAssistant() {
     if (assistantSubmitting || assistantDraft.trim() === "" || selectedProject.trim() === "") return
+    if (freeCloudSelected && assistantSelectedAccounts.length > 0 && (assistantAccountsLoading || !assistantAccountsAvailable || !assistantAccountConsent)) {
+      feedback = "Refresh supported accounts and confirm sending information from the selected accounts to Groq."
+      return
+    }
     var documents = assistantDocuments.split("\n").map(function(path) { return path.trim() }).filter(function(path) { return path !== "" })
     var payload = { text: assistantDraft, project: selectedProject, execution_connection: String(settings.execution_connection || "existing"),
-      capabilities: freeCloudSelected ? { documents: documents, note: assistantSaveNote ? assistantNote.trim() : null, accounts: [] } : {} }
+      capabilities: freeCloudSelected ? { documents: documents, note: assistantSaveNote ? assistantNote.trim() : null, accounts: assistantSelectedAccounts.slice().sort() } : {} }
+    if (freeCloudSelected && assistantSelectedAccounts.length > 0)
+      payload.capabilities.send_to_groq_confirmed = true
     var fingerprint = JSON.stringify(payload)
     if (fingerprint !== assistantRequestFingerprint) {
       assistantRequestId = "typed-" + Date.now().toString(36) + "-" + Math.random().toString(36).slice(2)
@@ -404,6 +423,61 @@ Item {
     payload.request_id = assistantRequestId
     assistantSubmitting = true
     send("task_submit", payload)
+  }
+  function refreshAssistantAccounts() {
+    if (assistantAccountsLoading || assistantSubmitting) return
+    assistantAccountsRequestId = "accounts-" + Date.now().toString(36) + "-" + Math.random().toString(36).slice(2)
+    assistantAccountsLoading = true
+    assistantAccountsError = ""
+    send("assistant_accounts", { account_request_id: assistantAccountsRequestId })
+  }
+  function selectAssistantAccount(identity, selected) {
+    if (assistantSubmitting || assistantAccountsLoading) return
+    var current = assistantSelectedAccounts.slice()
+    var index = current.indexOf(identity)
+    if (selected) {
+      if (!assistantAccountsAvailable || current.length >= 4 || index >= 0 || !assistantAccounts.some(function(account) { return account.id === identity })) return
+      current.push(identity)
+    } else {
+      if (index < 0) return
+      current.splice(index, 1)
+    }
+    assistantSelectedAccounts = current.sort()
+    assistantAccountConsent = false
+  }
+  function handleAssistantAccounts(response) {
+    if (!assistantAccountsLoading || String(response.account_request_id || "") !== assistantAccountsRequestId) return
+    assistantAccountsLoading = false
+    if (response.ok !== true || typeof response.available !== "boolean" || !Array.isArray(response.accounts) || response.accounts.length > 64) {
+      assistantAccountsAvailable = false
+      assistantAccountsError = "Supported accounts could not be refreshed. Try again; your request is kept."
+      return
+    }
+    var accounts = [], seen = []
+    for (var i = 0; i < response.accounts.length; i++) {
+      var account = response.accounts[i]
+      if (!account || typeof account.id !== "string" || !/^[A-Za-z0-9_-]{1,128}$/.test(account.id) || seen.indexOf(account.id) >= 0 || typeof account.label !== "string" || account.label.trim() === "" || account.label.length > 160 || /[\u0000-\u001f\u007f]/.test(account.label)) {
+        assistantAccountsAvailable = false
+        assistantAccountsError = "Supported accounts could not be refreshed. Try again; your request is kept."
+        return
+      }
+      seen.push(account.id)
+      accounts.push({ id: account.id, label: account.label })
+    }
+    if (response.available === false && accounts.length > 0) {
+      assistantAccountsAvailable = false
+      assistantAccountsError = "Supported accounts could not be refreshed. Try again; your request is kept."
+      return
+    }
+    accounts.sort(function(left, right) { return left.id < right.id ? -1 : left.id > right.id ? 1 : 0 })
+    var selected = assistantSelectedAccounts.filter(function(identity) { return accounts.some(function(account) { return account.id === identity }) }).sort()
+    if (JSON.stringify(accounts) !== JSON.stringify(assistantAccounts) || JSON.stringify(selected) !== JSON.stringify(assistantSelectedAccounts))
+      assistantAccountConsent = false
+    assistantAccounts = accounts
+    assistantSelectedAccounts = selected
+    assistantAccountsAvailable = response.available
+    assistantAccountsLoaded = true
+    assistantAccountsError = ""
   }
   function taskAction(task, operation, text) {
     var request = operation === "start"
@@ -616,9 +690,15 @@ Item {
     return voice.microphone === true ? "Microphone on" : "Microphone off"
   }
   function handleControlResponse(response) {
-    if (response.submitted_request_id === assistantRequestId && response.ok === true) {
+    if (response.assistant_accounts_reply === true) {
+      handleAssistantAccounts(response)
+      return
+    }
+    if (assistantRequestId !== "" && response.submitted_request_id === assistantRequestId && response.ok === true) {
       assistantSubmitting = false
       assistantDraft = ""
+      assistantRequestId = ""
+      assistantRequestFingerprint = ""
       feedback = "Request accepted. Progress and the result appear in Work."
     } else if (assistantSubmitting && response.ok === false) {
       assistantSubmitting = false
@@ -660,6 +740,11 @@ Item {
   }
   function handleTransportError(message) {
     var safeMessage = String(message || "Voice control needs attention.")
+    if (assistantAccountsLoading) {
+      assistantAccountsLoading = false
+      assistantAccountsAvailable = false
+      assistantAccountsError = "Supported accounts could not be refreshed. Try again; your request is kept."
+    }
     if (assistantSubmitting) {
       assistantSubmitting = false
       feedback = safeMessage + " Retry this request when the connection returns."
@@ -818,6 +903,11 @@ Item {
     onActiveFocusChanged: if (activeFocus) { root.clearPendingTaskInputRestore(); root.clearTaskActionFocus() }
     contentItem: Text { text: parent.text; leftPadding: parent.indicator.width + parent.spacing; color: root.textColor; font.family: "Manrope"; verticalAlignment: Text.AlignVCenter }
     background: Rectangle { color: "transparent"; radius: 6; border.width: parent.activeFocus ? 2 : 0; border.color: root.accentTextColor }
+  }
+  component VoiceAccountCheck: VoiceCheck {
+    implicitWidth: 44
+    implicitHeight: Math.max(44, contentItem.implicitHeight + 12)
+    contentItem: Text { text: parent.text; textFormat: Text.PlainText; wrapMode: Text.WordWrap; leftPadding: parent.indicator.width + parent.spacing; color: root.textColor; font.family: "Manrope"; verticalAlignment: Text.AlignVCenter }
   }
 
   component VoiceButton: Button {
@@ -1153,6 +1243,7 @@ Item {
             }
             ScrollView {
               id: tasksScroll
+              contentWidth: availableWidth
               clip: true
               ScrollBar.vertical.policy: ScrollBar.AlwaysOn
               ColumnLayout {
@@ -1174,8 +1265,24 @@ Item {
                 VoiceArea { visible: root.freeCloudSelected; Layout.fillWidth: true; placeholderText: "Selected .md or .txt paths, one per line (optional)"; text: root.assistantDocuments; onTextChanged: root.assistantDocuments = text; Accessible.name: "Documents selected for this request"; implicitHeight: 64; wrapMode: TextEdit.Wrap; enabled: !root.assistantSubmitting }
                 VoiceCheck { visible: root.freeCloudSelected; text: "Save this request as a new Markdown note"; checked: root.assistantSaveNote; onToggled: root.assistantSaveNote = checked; enabled: !root.assistantSubmitting }
                 VoiceField { visible: root.freeCloudSelected && root.assistantSaveNote; Layout.fillWidth: true; placeholderText: "New note path, for example meeting.md"; text: root.assistantNote; onTextEdited: root.assistantNote = text; Accessible.name: "Explicitly requested new note path"; enabled: !root.assistantSubmitting }
-                Text { visible: root.freeCloudSelected; text: "Only selected documents can be read. Existing files are never overwritten. Scoped connected accounts are awaiting verification."; color: root.secondaryTextColor; font.family: "Manrope"; wrapMode: Text.WordWrap; Layout.fillWidth: true }
-                VoiceButton { text: root.assistantSubmitting ? "Submitting…" : "Send assistant request"; enabled: !root.assistantSubmitting && root.assistantDraft.trim() !== "" && root.selectedProject.trim() !== "" && (!root.freeCloudSelected || (controller.assistant.ready === true && controller.assistant.enabled === true && (!root.assistantSaveNote || root.assistantNote.trim() !== ""))); onClicked: root.submitAssistant() }
+                Text { visible: root.freeCloudSelected; textFormat: Text.PlainText; text: "Calendar accounts (optional)"; color: root.textColor; font.family: "Manrope"; font.pixelSize: 16; Accessible.role: Accessible.Heading; Layout.fillWidth: true }
+                VoiceButton { visible: root.freeCloudSelected; text: root.assistantAccountsLoading ? "Refreshing supported accounts…" : "Refresh supported accounts"; enabled: !root.assistantAccountsLoading && !root.assistantSubmitting; onClicked: root.refreshAssistantAccounts() }
+                Text { visible: root.freeCloudSelected; textFormat: Text.PlainText; text: root.assistantAccountsError || (root.assistantAccountsLoading ? "Checking the supported account list. This does not grant account access." : !root.assistantAccountsLoaded ? "Refresh to choose supported read-only Calendar accounts. Nothing is selected automatically." : !root.assistantAccountsAvailable ? "Supported Calendar accounts are unavailable on this system. Ask or save a note without them." : root.assistantAccounts.length === 0 ? "No supported Calendar accounts were returned. Ask or save a note without them." : "Select up to four accounts for this request. Refreshing grants no access."); color: root.secondaryTextColor; font.family: "Manrope"; wrapMode: Text.WordWrap; Layout.fillWidth: true }
+                Repeater {
+                  model: root.freeCloudSelected ? root.assistantAccounts : []
+                  delegate: VoiceAccountCheck {
+                    required property var modelData
+                    Layout.fillWidth: true
+                    text: modelData.label
+                    Accessible.name: "Read-only Calendar account: " + modelData.label
+                    checked: root.assistantSelectedAccounts.indexOf(modelData.id) >= 0
+                    enabled: !root.assistantSubmitting && !root.assistantAccountsLoading && (checked || (root.assistantAccountsAvailable && root.assistantSelectedAccounts.length < 4))
+                    onToggled: root.selectAssistantAccount(modelData.id, checked)
+                  }
+                }
+                VoiceAccountCheck { visible: root.freeCloudSelected && root.assistantSelectedAccounts.length > 0; Layout.fillWidth: true; text: "Send information from these selected accounts to Groq"; checked: root.assistantAccountConsent; onToggled: root.assistantAccountConsent = checked; enabled: !root.assistantSubmitting && !root.assistantAccountsLoading }
+                Text { visible: root.freeCloudSelected; textFormat: Text.PlainText; text: "Only selected documents and explicitly confirmed accounts can be read. Existing files are never overwritten. Private results stay in Work; Voice reports when ready."; color: root.secondaryTextColor; font.family: "Manrope"; wrapMode: Text.WordWrap; Layout.fillWidth: true }
+                VoiceButton { text: root.assistantSubmitting ? "Submitting…" : "Send assistant request"; enabled: !root.assistantSubmitting && root.assistantDraft.trim() !== "" && root.selectedProject.trim() !== "" && (!root.freeCloudSelected || (controller.assistant.ready === true && controller.assistant.enabled === true && (!root.assistantSaveNote || root.assistantNote.trim() !== "") && (root.assistantSelectedAccounts.length === 0 || (!root.assistantAccountsLoading && root.assistantAccountsAvailable && root.assistantAccountConsent)))); onClicked: root.submitAssistant() }
                 Text { visible: root.tasks.length === 0; text: "No tasks are being coordinated yet."; color: root.secondaryTextColor; font.family: "Manrope" }
                 Text { visible: root.tasks.length > 0; text: "Finished work stays here for review until you dismiss it."; color: root.secondaryTextColor; font.family: "Manrope"; wrapMode: Text.Wrap; Layout.fillWidth: true }
                 Repeater {
