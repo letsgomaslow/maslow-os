@@ -429,7 +429,7 @@ for (const id of ["statusButton", "taskBadgeButton", "badgeDismissButton"]) {
 }
 assert.match(panel, /width: \(orbButton\.width - 16\) \* 0\.6;[\s\S]*?layer\.effect: MultiEffect \{ shadowEnabled: true; shadowColor: root\.chromeShadowColor[\s\S]*?\n      \}\n      contentItem: VoiceOrb/, "The orb glows from a circle behind it");
 assert.doesNotMatch(panel.match(/contentItem: VoiceOrb \{[\s\S]*?\n      \}/)[0], /layer\./, "No layer over the orb shader");
-assert.match(panel, /chromeShadowColor: luminance\(surfaceColor\) < 0\.18\s*\n\s*\? Qt\.rgba\(Color\.accent\.r, Color\.accent\.g, Color\.accent\.b, 0\.55\) : Qt\.rgba\(0, 0, 0, 0\.4\)/, "Dark themes glow in the accent; light themes cast a dark shadow");
+assert.match(panel, /chromeShadowColor: luminance\(surfaceColor\) < 0\.18\s*\n\s*\? Qt\.rgba\(Theme\.Color\.accent\.r, Theme\.Color\.accent\.g, Theme\.Color\.accent\.b, 0\.55\) : Qt\.rgba\(0, 0, 0, 0\.4\)/, "Dark themes glow in the accent; light themes cast a dark shadow");
 assert.match(panel, /width: Math\.min\(280, panelWindow\.width - 32, statusLabel\.implicitWidth \+ 4\)/, "The status pill fits its words");
 assert.match(panel, /readonly property bool statusQuiet: stateText\(\) === "Ready · click to talk"/, "Only the idle ready label hides");
 assert.match(panel, /opacity: root\.statusQuiet && !root\.statusRevealed \? 0 : 1/);
@@ -535,14 +535,17 @@ assert.match(panel, /preview_gemini_voice", \{ voice: geminiVoice.currentText \}
 assert.match(panel, /Use this voice/);
 
 assert.match(panel, /import qs.Commons/);
-assert.match(panel, /surfaceColor: Qt\.rgba\(Color\.popups\.background\.r/);
-assert.match(panel, /textColor: readableColor\(Color\.popups\.text, controlColor\)/);
-assert.match(panel, /accentTextColor: readableColor\(Color\.accent, controlColor\)/);
-assert.match(panel, /alertTextColor: readableColor\(Color\.urgent, controlColor\)/);
-assert.match(panel, /popupBorderColor: Color\.popups\.border/);
-assert.match(panel, /accentColor: Color\.accent/);
-assert.match(panel, /backgroundColor: Color\.background/);
-assert.match(panel, /selectionColor: Color\.accent/);
+// Qt 6.12 ships its own QtQuick `Color` type that hides the shell theme when written bare.
+assert.match(panel, /^import qs\.Commons as Theme$/m);
+assert.doesNotMatch(panel, /(^|[^.\w])Color\.[a-z]/m, "Read the theme through Theme.Color");
+assert.match(panel, /surfaceColor: Qt\.rgba\(Theme\.Color\.popups\.background\.r/);
+assert.match(panel, /textColor: readableColor\(Theme\.Color\.popups\.text, controlColor\)/);
+assert.match(panel, /accentTextColor: readableColor\(Theme\.Color\.accent, controlColor\)/);
+assert.match(panel, /alertTextColor: readableColor\(Theme\.Color\.urgent, controlColor\)/);
+assert.match(panel, /popupBorderColor: Theme\.Color\.popups\.border/);
+assert.match(panel, /accentColor: Theme\.Color\.accent/);
+assert.match(panel, /backgroundColor: Theme\.Color\.background/);
+assert.match(panel, /selectionColor: Theme\.Color\.accent/);
 assert.match(panel, /selectedTextColor: root\.selectionTextColor/);
 assert.doesNotMatch(panel, /#[0-9a-fA-F]{6}/, "Voice surfaces must follow live shell colors");
 const colorFunctions = ["mixColor", "luminance", "contrastRatio", "contrastingText", "readableColor"]

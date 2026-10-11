@@ -3,25 +3,26 @@ import QtQuick.Layouts
 import Quickshell
 import Quickshell.Io
 import qs.Commons
+import qs.Commons as Theme
 import "../ui" as Voice
 ShellRoot {
   // Apply an optional test palette after the shared Color startup read.
-  Timer { interval: 250; running: Quickshell.env("THEME_COLORS") !== ""; onTriggered: Color.loadColors(Quickshell.env("THEME_COLORS")) }
+  Timer { interval: 250; running: Quickshell.env("THEME_COLORS") !== ""; onTriggered: Theme.Color.loadColors(Quickshell.env("THEME_COLORS")) }
   // Isolated, output-only rendering fixture. It never creates a Voice controller.
   FloatingWindow {
     id: window
     visible: true
-    color: Color.background
+    color: Theme.Color.background
     implicitWidth: 640
     implicitHeight: 580
     Rectangle {
-      color: Color.background
+      color: Theme.Color.background
       id: gallery
       // Keep the captured scene complete even when a tiling compositor gives
       // the preview window less space than its requested dimensions.
       width: 640
       height: 580
-      Text { x: 16; y: 16; text: "UI preview · " + (Quickshell.env("THEME_NAME") || "current theme"); color: Color.foreground }
+      Text { x: 16; y: 16; text: "UI preview · " + (Quickshell.env("THEME_NAME") || "current theme"); color: Theme.Color.foreground }
       Column {
         anchors.centerIn: parent
         spacing: 20
@@ -49,13 +50,13 @@ ShellRoot {
                   audioLevel: 0.14
                   playbackLevel: parent.modelData === "speaking" ? 0.18 : 0
                   microphoneActive: ["listening", "thinking", "speaking"].indexOf(parent.modelData) >= 0
-                  accentColor: Color.accent
-                  backgroundColor: Color.background
+                  accentColor: Theme.Color.accent
+                  backgroundColor: Theme.Color.background
                   gpuShaderAvailable: Quickshell.env("MASLOW_VOICE_GPU_SHADER") !== "0"
                   // The completion reaction plays once from the start of the capture.
                   Component.onCompleted: if (parent.modelData === "completed") completionSequence = 1
                 }
-                Text { anchors.horizontalCenter: parent.horizontalCenter; text: parent.modelData + " " + row.modelData; color: Color.foreground; font.pixelSize: 12 }
+                Text { anchors.horizontalCenter: parent.horizontalCenter; text: parent.modelData + " " + row.modelData; color: Theme.Color.foreground; font.pixelSize: 12 }
               }
             }
           }

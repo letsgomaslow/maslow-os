@@ -155,7 +155,10 @@ ShellRoot {
 }
 QML
 
+# Measure the default type scale, not whatever theme this computer has applied.
+mkdir -p "$test_tmp/home"
 output=$(timeout 15 env \
+  HOME="$test_tmp/home" \
   QML2_IMPORT_PATH="$ROOT/shell${QML2_IMPORT_PATH:+:$QML2_IMPORT_PATH}" \
   QML_IMPORT_PATH="$ROOT/shell${QML_IMPORT_PATH:+:$QML_IMPORT_PATH}" \
   quickshell -p "$test_tmp" --no-color 2>&1) || {

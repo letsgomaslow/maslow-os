@@ -5,25 +5,26 @@ import QtQuick.Layouts
 import Quickshell
 import Quickshell.Wayland
 import qs.Commons
+import qs.Commons as Theme
 
 Item {
   id: root
   // Live shell roles preserve theme and user surface overrides on every update.
-  readonly property color surfaceColor: Qt.rgba(Color.popups.background.r, Color.popups.background.g, Color.popups.background.b, 1)
-  readonly property color textColor: readableColor(Color.popups.text, controlColor)
+  readonly property color surfaceColor: Qt.rgba(Theme.Color.popups.background.r, Theme.Color.popups.background.g, Theme.Color.popups.background.b, 1)
+  readonly property color textColor: readableColor(Theme.Color.popups.text, controlColor)
   readonly property color secondaryTextColor: readableColor(mixColor(textColor, surfaceColor, 0.72), controlColor)
-  readonly property color controlColor: mixColor(Color.popups.text, surfaceColor, 0.07)
-  readonly property color popupBorderColor: Color.popups.border
+  readonly property color controlColor: mixColor(Theme.Color.popups.text, surfaceColor, 0.07)
+  readonly property color popupBorderColor: Theme.Color.popups.border
   readonly property color borderColor: mixColor(textColor, surfaceColor, 0.4)
-  readonly property color accentTextColor: readableColor(Color.accent, controlColor)
-  readonly property color alertTextColor: readableColor(Color.urgent, controlColor)
-  readonly property color selectionTextColor: contrastingText(Color.accent)
+  readonly property color accentTextColor: readableColor(Theme.Color.accent, controlColor)
+  readonly property color alertTextColor: readableColor(Theme.Color.urgent, controlColor)
+  readonly property color selectionTextColor: contrastingText(Theme.Color.accent)
   // The orb's labels float over windows that share the theme background, so
   // they carry an accent outline and a soft shadow: dark on light themes, an
   // accent glow on dark ones, where a dark shadow would be invisible.
   readonly property color chromeBorderColor: accentTextColor
   readonly property color chromeShadowColor: luminance(surfaceColor) < 0.18
-    ? Qt.rgba(Color.accent.r, Color.accent.g, Color.accent.b, 0.55) : Qt.rgba(0, 0, 0, 0.4)
+    ? Qt.rgba(Theme.Color.accent.r, Theme.Color.accent.g, Theme.Color.accent.b, 0.55) : Qt.rgba(0, 0, 0, 0.4)
 
   function mixColor(first, second, amount) {
     return Qt.rgba(first.r * amount + second.r * (1 - amount), first.g * amount + second.g * (1 - amount), first.b * amount + second.b * (1 - amount), 1)
@@ -678,7 +679,7 @@ Item {
     implicitHeight: 44
     color: root.textColor
     placeholderTextColor: root.secondaryTextColor
-    selectionColor: Color.accent
+    selectionColor: Theme.Color.accent
     selectedTextColor: root.selectionTextColor
     font.family: "Manrope"
     font.pixelSize: 14
@@ -692,7 +693,7 @@ Item {
     Keys.onBacktabPressed: function(event) { nextItemInFocusChain(false).forceActiveFocus(Qt.BacktabFocusReason); event.accepted = true }
     color: root.textColor
     placeholderTextColor: root.secondaryTextColor
-    selectionColor: Color.accent
+    selectionColor: Theme.Color.accent
     selectedTextColor: root.selectionTextColor
     font.family: "Manrope"
     font.pixelSize: 14
@@ -712,7 +713,7 @@ Item {
     palette.text: root.textColor
     palette.buttonText: root.textColor
     palette.highlightedText: root.selectionTextColor
-    palette.highlight: Color.accent
+    palette.highlight: Theme.Color.accent
     background: Rectangle {
       radius: 8
       color: root.controlColor
@@ -750,7 +751,7 @@ Item {
       }
       background: Rectangle {
         radius: 6
-        color: option.highlighted ? Color.accent : root.controlColor
+        color: option.highlighted ? Theme.Color.accent : root.controlColor
         border.width: option.activeFocus ? 2 : 0
         border.color: root.textColor
       }
@@ -777,7 +778,7 @@ Item {
     palette.text: root.textColor
     palette.button: root.controlColor
     palette.buttonText: root.textColor
-    palette.highlight: Color.accent
+    palette.highlight: Theme.Color.accent
     palette.highlightedText: root.selectionTextColor
     implicitHeight: 44
     onActiveFocusChanged: if (activeFocus) { root.clearPendingTaskInputRestore(); root.clearTaskActionFocus() }
@@ -787,7 +788,7 @@ Item {
 
   component VoiceButton: Button {
     id: action
-    readonly property color fillColor: down ? root.mixColor(Color.accent, root.surfaceColor, 0.8) : (hovered ? root.mixColor(Color.accent, root.textColor, 0.8) : Color.accent)
+    readonly property color fillColor: down ? root.mixColor(Theme.Color.accent, root.surfaceColor, 0.8) : (hovered ? root.mixColor(Theme.Color.accent, root.textColor, 0.8) : Theme.Color.accent)
     focusPolicy: Qt.StrongFocus
     onActiveFocusChanged: if (activeFocus) { root.clearPendingTaskInputRestore(); root.clearTaskActionFocus() }
     implicitHeight: 44
@@ -852,14 +853,14 @@ Item {
         z: -1
         anchors.centerIn: parent
         width: (orbButton.width - 16) * 0.6; height: width; radius: width / 2
-        color: Color.accent
+        color: Theme.Color.accent
         layer.enabled: true
         layer.effect: MultiEffect { shadowEnabled: true; shadowColor: root.chromeShadowColor; shadowBlur: 1.0; shadowScale: 1.3; shadowVerticalOffset: 1 }
       }
       contentItem: VoiceOrb {
         width: orbButton.width - 16; height: width
-        accentColor: Color.accent
-        backgroundColor: Color.background
+        accentColor: Theme.Color.accent
+        backgroundColor: Theme.Color.background
         voiceState: root.orbState
         audioLevel: root.voice.input_level || root.voice.level || 0
         playbackLevel: root.voice.playback_level || 0
