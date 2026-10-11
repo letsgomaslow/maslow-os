@@ -6,9 +6,64 @@
   "session": "2026-10-11-craft-root",
   "models": {
     "coordinator": "not exposed by execution surface",
-    "workers": []
+    "workers": [
+      {
+        "task": "CRAFT-P0-INVENTORY",
+        "model": "gpt-6-luna",
+        "reasoning": "medium"
+      },
+      {
+        "task": "CRAFT-P0-HELPER",
+        "model": "gpt-6.1-sol",
+        "reasoning": "medium"
+      }
+    ]
   },
-  "repositories": {},
+  "repositories": {
+    "runtime": {
+      "path": "/home/maslow/Maslow-ai-os/maslow-os",
+      "base_revision": "098948e42fa7ac0c3769402ae83a7bdc7d37cf05",
+      "branch": "codex/craft-optional-apps",
+      "preserved_status": [
+        "MM docs/maslow-development.md",
+        " M docs/programs/craft-optional-apps/tasks.json",
+        " M docs/programs/craft-optional-apps/tasks/CRAFT-P0-INVENTORY.md",
+        "?? docs/handoffs/2026-10-11-craft-optional-apps.md",
+        "?? docs/handoffs/2026-10-11-freellmapi-review.md",
+        "?? docs/handoffs/2026-10-11-storytold-app-review.md"
+      ]
+    },
+    "connect": {
+      "path": "/home/maslow/Projects/Maslow/maslow-connect",
+      "base_revision": "0c6f7b98a062870e36503f55512d04e0b8576a69",
+      "branch": "codex/local-connect",
+      "preserved_status": []
+    },
+    "hub": {
+      "path": "/home/maslow/Projects/Maslow/maslow-hub",
+      "base_revision": "33940d2e8740b172b953cc3e091cbae1ba1cd303",
+      "branch": "codex/hub-0.3.6-health",
+      "preserved_status": []
+    },
+    "packages": {
+      "path": "/home/maslow/Projects/Maslow/maslow-os-pkgs",
+      "base_revision": "448856485e710caedfc24f544a027aea8652dd33",
+      "branch": "maslow",
+      "preserved_status": []
+    },
+    "iso": {
+      "path": "/home/maslow/Projects/Maslow/maslow-os-iso",
+      "base_revision": "d96a3ee563df5a1eb76a711c7b408c0d1d0137cb",
+      "branch": "codex/maslow-hub",
+      "preserved_status": []
+    },
+    "releases": {
+      "path": "/home/maslow/Projects/Maslow/maslow-releases",
+      "base_revision": "140e023baf4fccb651ca944a866af36b81b651b2",
+      "branch": "codex/local-release-workstation",
+      "preserved_status": []
+    }
+  },
   "tasks": [
     {
       "id": "CRAFT-P0-RECORDS",
@@ -20,23 +75,34 @@
       "dependencies": [],
       "acceptance": "All 12 apps/six gates represented; recovery procedure and no release claims; scoped commit",
       "phase": 0,
-      "status": "queued",
-      "owner": null,
-      "session": null,
+      "status": "integrated",
+      "owner": "coordinator",
+      "session": "2026-10-11-craft-root",
       "worker": null,
       "actual_model": null,
-      "attempt": 0,
-      "last_checkpoint": null,
-      "base_revision": null,
-      "branch": null,
-      "worktree": null,
-      "implementation_commits": [],
-      "integration_commits": [],
-      "tests": [],
-      "evidence": [],
+      "attempt": 1,
+      "last_checkpoint": "2026-10-11",
+      "base_revision": "969f2960",
+      "branch": "codex/craft-optional-apps",
+      "worktree": "/home/maslow/Maslow-ai-os/maslow-os",
+      "implementation_commits": [
+        "098948e4"
+      ],
+      "integration_commits": [
+        "098948e4"
+      ],
+      "tests": [
+        {
+          "check": "git diff --check",
+          "result": "pass"
+        }
+      ],
+      "evidence": [
+        "docs/programs/craft-optional-apps/README.md"
+      ],
       "artifact_hashes": {},
       "blocker": null,
-      "next_action": "Persist approved plan, ledger, all app records and task charters"
+      "next_action": "Validate with helper and inventory"
     },
     {
       "id": "CRAFT-P0-INVENTORY",
@@ -50,23 +116,34 @@
       ],
       "acceptance": "Exact revisions/status/worktrees, preserved changes, tool/platform inventory, ISO checkout or access blocker",
       "phase": 0,
-      "status": "queued",
-      "owner": null,
-      "session": null,
-      "worker": null,
-      "actual_model": null,
-      "attempt": 0,
-      "last_checkpoint": null,
-      "base_revision": null,
-      "branch": null,
-      "worktree": null,
+      "status": "integrated",
+      "owner": "inventory",
+      "session": "2026-10-11-craft-root",
+      "worker": "/root/inventory",
+      "actual_model": "gpt-6-luna",
+      "attempt": 1,
+      "last_checkpoint": "2026-10-11",
+      "base_revision": "098948e4",
+      "branch": "codex/craft-optional-apps",
+      "worktree": "/home/maslow/Maslow-ai-os/maslow-os",
       "implementation_commits": [],
       "integration_commits": [],
-      "tests": [],
-      "evidence": [],
+      "tests": [
+        {
+          "check": "repository/platform/harness inventory",
+          "result": "pass"
+        },
+        {
+          "check": "git diff --check",
+          "result": "pass"
+        }
+      ],
+      "evidence": [
+        "docs/programs/craft-optional-apps/tasks/CRAFT-P0-INVENTORY.md"
+      ],
       "artifact_hashes": {},
       "blocker": null,
-      "next_action": "Reconcile repository baselines and find or obtain ISO harness"
+      "next_action": "Proceed to P0 gate after helper verification"
     },
     {
       "id": "CRAFT-P0-HELPER",
@@ -82,16 +159,16 @@
       ],
       "acceptance": "Duplicate/missing/cyclic graph, ownership, missing evidence and interrupted recovery regressions pass",
       "phase": 0,
-      "status": "queued",
-      "owner": null,
-      "session": null,
-      "worker": null,
-      "actual_model": null,
-      "attempt": 0,
-      "last_checkpoint": null,
-      "base_revision": null,
-      "branch": null,
-      "worktree": null,
+      "status": "active",
+      "owner": "records_helper",
+      "session": "2026-10-11-craft-root",
+      "worker": "/root/records_helper",
+      "actual_model": "gpt-6.1-sol",
+      "attempt": 1,
+      "last_checkpoint": "2026-10-11",
+      "base_revision": "098948e4",
+      "branch": "codex/craft-records-helper",
+      "worktree": "/home/maslow/Projects/Maslow/craft-records-worker",
       "implementation_commits": [],
       "integration_commits": [],
       "tests": [],

@@ -1,0 +1,37 @@
+{
+  "level": "source-and-host-smoke",
+  "source_revision": "0c6f7b98a062870e36503f55512d04e0b8576a69",
+  "checks": [
+    {
+      "command": "npx --yes pnpm@10.33.3 install --frozen-lockfile",
+      "result": "pass",
+      "note": "Existing lockfile unchanged; no global package-manager configuration changed"
+    },
+    {
+      "command": "npx --yes pnpm@10.33.3 --filter @maslow/connect-bridge typecheck",
+      "result": "pass"
+    },
+    {
+      "command": "npx --yes pnpm@10.33.3 --filter @maslow/connect-bridge test:run",
+      "result": "pass",
+      "tests_passed": 112,
+      "tests_skipped": 1
+    },
+    {
+      "command": "bwrap --unshare-all --ro-bind /usr /usr --symlink usr/lib /lib --symlink usr/lib /lib64 --symlink usr/bin /bin --proc /proc --dev /dev -- /usr/bin/true",
+      "result": "pass",
+      "note": "Namespace smoke only, not Craft isolation acceptance"
+    },
+    {
+      "command": "docker info --format platform",
+      "result": "pass",
+      "note": "linux x86_64; no image build or VM test yet"
+    }
+  ],
+  "environment_gates": [
+    "qemu-system-x86_64 and qemu-img not available on host",
+    "Rust toolchain not present; same-tag source fallback would need isolated builder",
+    "Physical spoken Voice and itemized Lenovo acceptance require person/operator participation"
+  ],
+  "artifacts": []
+}
