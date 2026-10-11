@@ -297,7 +297,7 @@
       ],
       "acceptance": "Explicit roots/agents; namespaces/environment/FD/mount/path attacks denied; legitimate saved exports pass",
       "phase": 1,
-      "status": "implementation-complete",
+      "status": "blocked",
       "owner": "connect-worker",
       "session": "2026-10-11-craft-root",
       "worker": "/root/craft_connect",
@@ -319,14 +319,26 @@
         {
           "check": "final bridge typecheck/build +133 passing tests/1skip; true registry-save failure injection targeted test",
           "result": "pass"
+        },
+        {
+          "check": "coordinator actual launcher startup with 1442 host-user threads",
+          "result": "fail"
+        },
+        {
+          "check": "same sandbox mount/seccomp plan with synthetic preexisting output hardlinks (raw fixture process omits failing outer nproc), outside and RO original contents changed",
+          "result": "fail"
         }
       ],
       "evidence": [
-        "docs/programs/craft-optional-apps/tasks/CRAFT-CORE-SANDBOX.md"
+        "docs/programs/craft-optional-apps/tasks/CRAFT-CORE-SANDBOX.md",
+        "docs/programs/craft-optional-apps/evidence/2026-10-11-boundary-failures.json"
       ],
       "artifact_hashes": {},
-      "blocker": null,
-      "next_action": "Coordinator code/tests review and native packaged launch; independent review before phase1 gate"
+      "blocker": {
+        "type": "implementation",
+        "summary": "Outer RLIMIT_NPROC=256 counts existing host-user threads (1442 here), preventing namespace start; preexisting output hardlinks permit write to outside/original inode"
+      },
+      "next_action": "Independent boundary repair design, then source fix and new native package; do not accept existing profile"
     },
     {
       "id": "CRAFT-CORE-LIFECYCLE",
@@ -2926,6 +2938,36 @@
       "artifact_hashes": {},
       "blocker": null,
       "next_action": "Finalize verified experimental candidate and release instructions"
+    },
+    {
+      "id": "CRAFT-CORE-BOUNDARY-REPAIR",
+      "objective": "Review concrete nproc startup and writable hardlink failures and define coherent repair",
+      "repository": "runtime",
+      "permitted_files": [
+        "docs/programs/craft-optional-apps/tasks/CRAFT-CORE-BOUNDARY-REPAIR.md"
+      ],
+      "dependencies": [
+        "CRAFT-P0-GATE"
+      ],
+      "acceptance": "Independent security analysis of reproduced failures; recommended minimal repair and testable trust-boundary limits; no changed implementation",
+      "phase": 1,
+      "status": "active",
+      "owner": "security-review",
+      "session": "2026-10-11-craft-root",
+      "worker": "/root/boundary_repair",
+      "actual_model": "gpt-6-astra",
+      "attempt": 1,
+      "last_checkpoint": "2026-10-11T12:32:06.278707+00:00",
+      "base_revision": "21fdf8a",
+      "branch": null,
+      "worktree": "/home/maslow/Projects/Maslow/craft-connect",
+      "implementation_commits": [],
+      "integration_commits": [],
+      "tests": [],
+      "evidence": [],
+      "artifact_hashes": {},
+      "blocker": null,
+      "next_action": "Independently review before implementation repair"
     }
   ]
 }
