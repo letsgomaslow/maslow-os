@@ -10,7 +10,7 @@ import sqlite3
 import time
 import tempfile
 import unittest
-from unittest.mock import AsyncMock, Mock
+from unittest.mock import AsyncMock, Mock, patch
 
 from maslow_free_ai.credentials import EncryptionKey
 from maslow_free_ai.errors import FreeAIError
@@ -50,6 +50,22 @@ while True: time.sleep(1)
     async def asyncTearDown(self):
         await self.runtime.close()
         self.temp.cleanup()
+
+    async def test_failed_preparation_without_marker_preserves_admission_and_truthful_status(self):
+        self.runtime.state.update(enabled=True, configured=True, free_plan="user-confirmed", verified_routes=list(MODELS))
+        with self.assertRaises(FreeAIError):
+            await self.runtime.prepare_recovery({})
+        self.assertTrue(self.runtime.admission)
+        self.assertTrue(self.runtime.status()["ready"])
+        with patch("maslow_free_ai.recovery.atomic_json", side_effect=OSError(28, "Full")):
+            with self.assertRaises(OSError):
+                await self.runtime.prepare_recovery({"maslow-free-ai":"1" * 64})
+        self.assertFalse(self.runtime.recovery.pending())
+        self.assertTrue(self.runtime.admission)
+        self.assertTrue(self.runtime.status()["ready"])
+        self.runtime.admission = False
+        self.assertFalse(self.runtime.status()["ready"])
+        self.assertEqual(self.runtime.status()["state"], "maintenance")
 
     async def test_recovery_closes_admission_survives_restart_and_requires_recheck(self):
         self.keys.get.return_value = None

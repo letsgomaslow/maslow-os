@@ -43,8 +43,8 @@ class RouterRuntime:
         value = self.state.value
         task_support = self.task_supported()
         ready = installed and task_support and value["configured"] and set(value["verified_routes"]) == set(MODELS) and value["free_plan"] == "user-confirmed"
-        ready = ready and not self.recovery.pending()
-        state = "maintenance" if self.recovery.pending() else "working" if self.owners else "disabled" if not value["enabled"] and ready else "ready" if ready else "needs-setup"
+        ready = ready and self.admission and not self.recovery.pending()
+        state = "maintenance" if not self.admission or self.recovery.pending() else "working" if self.owners else "disabled" if not value["enabled"] and ready else "ready" if ready else "needs-setup"
         return {"installed": installed, "configured": value["configured"], "ready": ready, "enabled": value["enabled"],
                 "state": state, "free_plan": value["free_plan"], "provider": "groq", "task_support": task_support}
 
@@ -208,9 +208,11 @@ class RouterRuntime:
         return self.status()
 
     async def prepare_recovery(self, artifacts):
+        self.recovery.validate_artifacts(artifacts)
         async with self.lock:
             if self.owners:
                 raise FreeAIError("TASKS_ACTIVE", "Finish or stop assistant requests before package changes.")
+            previous_admission = self.admission
             self.admission = False
             if self.idle_stop:
                 self.idle_stop.cancel()
@@ -218,7 +220,12 @@ class RouterRuntime:
             await self._stop()
             if self.process is not None:
                 raise FreeAIError("ROUTER_SHUTDOWN_FAILED", "The owned router has not stopped. Package changes are blocked.")
-            return await self.recovery.snapshot(self.database, artifacts=artifacts)
+            try:
+                return await self.recovery.snapshot(self.database, artifacts=artifacts)
+            except BaseException:
+                if not self.recovery.pending():
+                    self.admission = previous_admission
+                raise
 
     async def restore_prepared(self, identity, artifacts):
         async with self.lock:

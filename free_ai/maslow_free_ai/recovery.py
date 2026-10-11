@@ -138,6 +138,11 @@ class Recovery:
         except (OSError, ValueError, sqlite3.Error, TimeoutError):
             raise FreeAIError('RECOVERY_KEY_MISMATCH', 'The database and encryption key do not match. Package changes are blocked.') from None
 
+    @staticmethod
+    def validate_artifacts(artifacts):
+        if not isinstance(artifacts, dict) or not artifacts or any(name not in {'maslow-free-ai','maslow-voice'} or not isinstance(value,str) or not re.fullmatch(r'[a-f0-9]{64}', value) for name,value in artifacts.items()):
+            raise FreeAIError('RECOVERY_ARTIFACT_REQUIRED', 'Recovery needs exact verified package identities.')
+
     async def snapshot(self, database, *, artifacts):
         """Admission/shutdown are the caller's locked preconditions.
 
@@ -146,8 +151,7 @@ class Recovery:
         """
         if self.pending():
             raise FreeAIError('RECOVERY_PENDING', 'Finish or abandon the pending recovery operation first.')
-        if not isinstance(artifacts, dict) or not artifacts or any(name not in {'maslow-free-ai','maslow-voice'} or not isinstance(value,str) or not re.fullmatch(r'[a-f0-9]{64}', value) for name,value in artifacts.items()):
-            raise FreeAIError('RECOVERY_ARTIFACT_REQUIRED', 'Recovery needs exact verified package identities.')
+        self.validate_artifacts(artifacts)
         identity = uuid.uuid4().hex
         atomic_json(self.marker, {'schema':1,'id':identity,'state':'preparing'})
         directory = self.root / identity
