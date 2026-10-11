@@ -9,7 +9,7 @@ Qt 6.12 black screens, Internet health and Twingate (2026-10-10; fixes installed
 - **Twingate outage:** a signed-out Twingate client held all DNS for about 305 s after every boot and switched off NetworkManager's connectivity check. Hub 0.3.6's Connections "Internet health" card reports this and offers an allow-listed disable. Twingate is still enabled.
 - **Open PRs:**
   - `maslow-hub` #2
-  - `maslow-os` #16 (`maslow` command), #17 and the docs PR
+  - `maslow-os` #16 (`maslow` command), #17 and #18 (this docs PR)
   - `maslow-releases` #3
   - `maslow-os-pkgs` #6 (Voice `0.1.5-37`)
   - `maslow-connect` #1

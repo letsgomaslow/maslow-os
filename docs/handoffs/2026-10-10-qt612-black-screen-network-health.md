@@ -84,7 +84,7 @@
 | `maslow-hub` | #2 | `main` | Hub 0.3.2–0.3.6 and Linux-safe Voice tests; supersedes #1 | `release/check.sh` passes: 153 tests, UI contract, diff check |
 | `maslow-os` | #16 | `main` | `maslow` command and update download retry | Both new shell tests pass |
 | `maslow-os` | #17 | `main` | Qt 6.12 `Theme.Color` fix | See section 1 |
-| `maslow-os` | this docs PR | `main` | This handoff and the index | Docs only |
+| `maslow-os` | #18 | `main` | This handoff and the index | Docs only |
 | `maslow-releases` | #3, marked ready | `main` | Local release workstation; includes #2's protected-workflow commit | 64 tests pass |
 | `maslow-os-pkgs` | #6 | `maslow` | `maslow-voice` recipe `0.1.5-19` → `0.1.5-37` and `tmux` | `test/maslow-packaging` passes |
 | `maslow-connect` | #1 | `codex/maslow-connect` (default) | Local MCP servers, bring-your-own Composio "Your accounts", wiring for 8 agents | `pnpm check` passes: 213 tests, 10 DB-backed skips, typecheck, build |
@@ -95,7 +95,7 @@ The automated merge was blocked by the agent's permission policy (merge without 
 
 ## Follow-ups
 
-1. Merge the PRs above in this order: `maslow-hub` #2, `maslow-releases` #3, `maslow-os` #16, #17 and this docs PR, `maslow-os-pkgs` #6, then `maslow-connect` #1.
+1. Merge the PRs above in this order: `maslow-hub` #2, `maslow-releases` #3, `maslow-os` #16, #17 and #18, `maslow-os-pkgs` #6, then `maslow-connect` #1.
 2. **Bar indicator centring:** at the Lenovo's theme scale (12 px caption, 19 px canvas), the vertical bar indicator measures 0.59 px off-centre. This is invisible but over the test's 0.5 px limit. It was hidden before because `Style` never loaded the theme.
 3. **Third-party plugins** (listed in section 1): patch omadock via `maslow-curated-plugins`, and report the rest upstream.
 4. **Runtime delivery:** publish a runtime package from merged `main` through the supported `maslow update` path. The Lenovo's r2079 is a local, hand-installed build.
