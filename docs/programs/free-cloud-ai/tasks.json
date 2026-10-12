@@ -531,8 +531,8 @@
         "docs/programs/free-cloud-ai/evidence/2026-10-12-local-preview-signatures-verified.json"
       ],
       "artifact_hashes": {},
-      "blocker": "Final QA3 Hub built and actual artifact audit passed. Final two local signatures, explicit replay-path decision, private consistent backups, protected priorVoice37 and owning native preflight/install remain required.",
-      "next_action": "Finish independent two-input signing review, open local signing terminal, then complete preservation/preflight and the selected installed-test path. No publication or replay reset."
+      "blocker": "Final QA3 Hub and manifest signatures independently verified; local replay pause explicitly accepted, private backups verified. Reviewed native Hub-only pipeline is open awaiting administrator authentication/outcome. Actual protected preflight/Voice37 retention/Hub installation and later optional components/live gates remain required.",
+      "next_action": "Inspect native-preview-prep/native-install-1 step statuses and independently verify actual installed Hub/Root provenance/rollback retention; diagnose any failure before retry. Then normal Hub optional component installation and live acceptance. No publication or replay reset."
     },
     {
       "id": "FCAI-P2-WORK",
@@ -909,12 +909,11 @@
   ],
   "coordination": {
     "shared_owners": "Craft remains paused per owner handoff; preserve Craft Hub2666609 and Connect native5/source2e872f50 compatibility. Free AI edits only isolated worktrees; coordinate shared Hub/install/helper, Connect and Voice changes before installation.",
-    "build_serialization": "Final QA3 Hub built and actual audit passed under shared lock; no active heavy job. Unchanged backend2/Voice41/Connect8 retained. Final local signatures and safe native prerequisites remain; Craft stays paused.",
+    "build_serialization": "Final QA3 Hub built/audited/signed; unchanged backend2/Voice41/Connect8 retained. Reviewed native Hub-only terminal holds heavy/user update locks while awaiting administrator participation; no concurrent build/VM. CPU1/nice10; Craft stays paused.",
     "worker_limit": 2,
     "integration": "No product/shared merge, host installation, production signing or publication. Program completed source commits only.",
     "active_workers": [
-      "rejection_forwarding: gpt-6-sol/high; final QA3 matched Hub build context, small pinned-input delta only.",
-      "boundary_review: gpt-6-astra/high; public pair review accepted; native state-preserving installation plan."
+      "rejection_forwarding: gpt-6-sol/high; bounded read-only clean-guest delivery prerequisites. Other workers stopped after focused independent reviews."
     ]
   },
   "user_priority": "Free AI through completion of approved scope. Craft development paused; do not resume it, merge product branches or publish production artifacts."
