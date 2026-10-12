@@ -67,7 +67,7 @@
       "path": "/home/maslow/Projects/Maslow/free-ai-hub-current",
       "base_revision": "33940d2e8740b172b953cc3e091cbae1ba1cd303",
       "branch": "codex/free-cloud-ai-hub-current",
-      "implementation_revision": "f3873e78b5b707c84eba919ead91360a93db71e1",
+      "implementation_revision": "715ab5d4d426508271b7458354252d1cfb94fecf",
       "previous_free_ai_worktree": "/home/maslow/Projects/Maslow/free-ai-hub",
       "accepted_craft_source_reference": "2666609002dce8bb6cc16511ef2125bccb18dbe9"
     },
@@ -467,7 +467,8 @@
         "docs/programs/free-cloud-ai/evidence/2026-10-11-hub-recovery-source-checkpoint.json",
         "docs/programs/free-cloud-ai/evidence/2026-10-11-hub-current-integration-checkpoint.json",
         "docs/programs/free-cloud-ai/evidence/2026-10-11-guided-hub-source-checkpoint.json",
-        "docs/programs/free-cloud-ai/evidence/2026-10-12-voice40-connect8-native-build-checkpoint.json"
+        "docs/programs/free-cloud-ai/evidence/2026-10-12-voice40-connect8-native-build-checkpoint.json",
+        "docs/programs/free-cloud-ai/evidence/2026-10-12-managed-source-and-owning-checkpoint.json"
       ],
       "artifact_hashes": {},
       "blocker": "Managed removal/reinstall lifecycle and installed signed delivery/recovery remain incomplete; Connect6 blocked, no new native identity admitted.",
@@ -640,11 +641,12 @@
         "docs/programs/free-cloud-ai/evidence/2026-10-11-delivery-recovery-checkpoint.json",
         "docs/programs/free-cloud-ai/evidence/2026-10-11-hub-stage1-checkpoint.json",
         "docs/programs/free-cloud-ai/evidence/2026-10-11-reinstall-design-checkpoint.json",
-        "docs/programs/free-cloud-ai/evidence/2026-10-12-voice40-connect8-native-build-checkpoint.json"
+        "docs/programs/free-cloud-ai/evidence/2026-10-12-voice40-connect8-native-build-checkpoint.json",
+        "docs/programs/free-cloud-ai/evidence/2026-10-12-managed-source-and-owning-checkpoint.json"
       ],
       "artifact_hashes": {},
-      "blocker": "Native interrupted package/database/key restoration and fresh undo remain unverified. Preserved-state reinstall is design-only; manual/unrecorded removal remains unsupported. Both delivery gates stay false.",
-      "next_action": "Finish and review retained-user current-state/key sealing and a NEW checkpoint. Then wire bounded root-managed removal/reinstall/recovery and enforce tested fresh artifact-bound Voice launch provenance (installed-file hashing alone is insufficient). Preserve V1 readers/backend2; build the new Voice artifact and verify installed package/database/key recovery. Never reinterpret fresh absence or replay an old snapshot.",
+      "blocker": "Original managed remove/reinstall source primitives pass409owning tests and independent review; public wiring/fresh recovery/crossboot and installed proof remain incomplete.",
+      "next_action": "Review the bounded fresh current-operation recovery proposal and implement the next protocol unit while serialized exact artifact checks continue.",
       "coordinator_only": true
     },
     {
