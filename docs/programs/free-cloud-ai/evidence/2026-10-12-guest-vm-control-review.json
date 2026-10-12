@@ -1,0 +1,154 @@
+{
+  "schema": 1,
+  "reviewedAtUtc": "2026-10-12T01:44:58.337266+00:00",
+  "status": "bounded-path-fix-review-passed-no-media-or-vm-admission",
+  "scope": "Independent bounded install-only VM outer-control source and fixture review. No VM/Docker/ISO/native execution.",
+  "controlRoot": "/home/maslow/Maslow-ai-os/free-ai-build/guest-baseline-prep",
+  "manifestSha256": "fa3cd64f428bd3f6d719256f7fbe8b5ae7024d4da434cc4ecbabe8482be8c03e",
+  "reviewedFiles": {
+    "vm-supervisor.py": "0b78886c3cf4c0fce00f87226b8c15435b16a6ed1156a0f12da1295d8acaf709",
+    "vm-inside.sh": "4d851d42d06799712604c5bd68259fedc3a41b037e9b8975570a3654e325af7d",
+    "VM_PLAN.md": "4368b47307a36c07f64c1073a5133c7f99bae272a82c3af939ec9fb2a46f7f2e",
+    "test_vm_controls.py": "56a4aa15def60b4c5b57699acc75cb122045bb948c1c0ca6aafd7a51d39be7dc",
+    "guest-install-only.sh": "1e7600a555bfb50079401527d09494cdcfa3324e24e47d98d5b6543931fd3d8c",
+    "harness-identity.json": "5d1cc5cf560a1bcf3e00995bda09470075f9ab4fa58691fa99fa1c5fe7b4082e",
+    "source-identities.json": "c0bf0117ccf6bd74fa627d457d7001a24052abffd1736d3a4706d5767e760749",
+    "harness/test/integration.d/base-test.sh": "7c6f15de64722c877dfdb8cb662b8e8f0b0aa7b80d8633fc5d82b1eb92240de2"
+  },
+  "proofSha256": "98e3dfddf1108ce7ee18569733f9e3f6c7eaf1e66e2d6b06f7344fe17c00cbb2",
+  "workerControlLogSha256": "7dca93ff667917ae36a3cd27eb448470afa76d9634b6ca23a1b5f695285a11cc",
+  "sharedControls": {
+    "sha256": "02cb8a13dee41fc8474253d7bb809cf6ca23c424fbb4ad51d35819ed36799394",
+    "manifestSha256": "608e3d9a1b14bb9d3869a9e3ae5463b4f1d0510c90cee0911679d3d2c9958f5f",
+    "unchangedFromPriorIndependentNineTestReview": true,
+    "signalControlsRepeated": false
+  },
+  "finding": {
+    "id": "vm-media-path-lexical-traversal",
+    "priority": "P2",
+    "location": "vm-supervisor.py media_input",
+    "description": "Path.absolute() preserves dotdot segments. Path.is_relative_to checks lexical ancestry, so an approved path lexically under snapshots/iso/release can resolve to a file outside the allowed tree. The later Docker bind uses that path.",
+    "reproduction": {
+      "kind": "Real media_input call with inert scratch file and fixture receipt; no container",
+      "suppliedPath": "SCRATCH_ROOT/snapshots/iso/release/../../../outside/maslow-os-2026.10.12-x86_64-local.iso",
+      "resolvedPath": "SCRATCH_ROOT/outside/maslow-os-2026.10.12-x86_64-local.iso",
+      "matchingHashAndReceipt": true,
+      "accepted": true,
+      "lexicallyInsideRelease": true,
+      "resolvedOutsideRelease": true,
+      "scratchAutoRemoved": true,
+      "rawStandaloneLog": false
+    },
+    "impact": "Defeats stated fixed new-independent-ISO path restriction. This alone does not bypass explicit coordinator approval of ISO/receipt hashes; no broader authority escalation claimed.",
+    "minimumFix": "Reject dot/dotdot or other noncanonical ISO input; resolve strictly and require equality with supplied absolute path, then enforce release containment and intended hub-build.XXXXXXXX directory/original safe basename. Add traversal negative fixture.",
+    "status": "fixed-and-independently-retested",
+    "resolution": "Requires absolute ISO path without dotdot, exact strict resolved equality, no symlink parents, regular single-link file, and precisely release/hub-build.<8 alphanumeric characters>/<safe original localISO basename>. The original complete matching-receipt traversal reproduction now rejects."
+  },
+  "passedChecks": [
+    "All8 VM manifest file hashes, shared supervisor02cb and shared manifest608e match frozen identities.",
+    "python3 -B -m unittest -v test_vm_controls.py:3 fixture controls pass.",
+    "Fixed argv: immutable043889 image, UID1000:1000, KVM device only, CPU2, outer6GiB/total8GiB, guest4096MiB/SMP2, no host published port/privileged flag, read-only inputs plus one fresh writable output tree.",
+    "Read-only source inspection confirms shared flock encloses idle/headroom/source/image/media admission, actual child launch and owned launch-group retirement/exactCID image/session cleanup.",
+    "Container preflight pins OVMF bytes and rehashes approved ISO; source driver uses fixed install_phase, then disposable overlay compatibility/optional absence checks without OSupdate or database refresh."
+  ],
+  "mediaReceiptContract": {
+    "status": "not-yet-created-or-accepted",
+    "requiredStatus": "verified-new-independent-baseline-media",
+    "requiredBindings": [
+      "schema exact integer1",
+      "exact canonical ISO path and approved SHA256",
+      "five exact source revisions",
+      "root-approved receipt SHA256"
+    ],
+    "requiredTrueFacts": [
+      "bootRecordsVerified",
+      "installerApiFixVerified",
+      "rootfsTargetFactsVerified",
+      "localArtifactsVerified",
+      "optionalPackagesAbsent",
+      "testTrustAbsent"
+    ],
+    "meaning": "Reader checks coordinator-approved evidence assertions and identities; it does not itself inspect boot/installer/rootfs/artifact/trust contents. Receipt must be produced only from actual newISO inspection."
+  },
+  "harnessLimits": [
+    "Harness PID/SSH/QMP lifecycle is inside disposable container and fresh output; no host PID selectors or publishedSSH port.",
+    "Inherited stop_vm can escalate from requested shutdown to QMPquit/kill, so script success does not prove clean shutdown. Review actual stop/promote/overlay evidence before accepting pristine base.",
+    "Generated SSH key and default disposable guest password are QA fixtures only; no private production signing keys or live account credentials may be introduced."
+  ],
+  "remainingGates": [
+    "Path fix review is complete; coordinator admission remains separate. No media/VMGO from this report. The single ongoing healthyISO attempt may finish; this review does not authorize newISO cycles or make ISO construction a product deliverable.",
+    "Current ISO must complete; inspect exact media and create real hash-approved receipt with all required facts.",
+    "Separate coordinator admission after heavy lock/idle/resource availability; no overlap with ISO/Connect heavy work.",
+    "Actual KVM/OVMF launch, installation result, package databases/defaults/glibcQt/Hub/signature state and clean reusable base require runtime evidence.",
+    "Optional package installation before OSupdate, UI/audio/liveGroq/managed accounts/confinement/signed delivery/recovery/physical acceptance remain separate.",
+    "Connect5/6 reported advisories remain blocked; no native6 admission or live account use inferred."
+  ],
+  "claims": {
+    "controlsApprovedForGo": false,
+    "coordinatorGoGranted": false,
+    "mediaVerified": false,
+    "VMExecuted": false,
+    "guestInstalled": false,
+    "liveAccountsOrProviderVerified": false,
+    "previewAccepted": false,
+    "controlsSourceReviewPassed": true
+  },
+  "reviewerOperations": {
+    "Docker": false,
+    "VM": false,
+    "ISOOrNativeBuild": false,
+    "network": false,
+    "hostConfigurationChange": false,
+    "secretRead": false,
+    "soleRepositoryWrite": "docs/programs/free-cloud-ai/evidence/2026-10-12-guest-vm-control-review.json"
+  },
+  "initialReview": {
+    "status": "blocked-pending-canonical-media-path-fix",
+    "manifestSha256": "eb30e129cd7a1ecc71800350db0d10fa40d6053d12bf1b1f6b0a72df6357f570",
+    "reviewedFiles": {
+      "vm-supervisor.py": "6058cfbc5ae2928def0ff65a1b393c982403932b2c62d4f18b7534ec58ce663e",
+      "vm-inside.sh": "4d851d42d06799712604c5bd68259fedc3a41b037e9b8975570a3654e325af7d",
+      "VM_PLAN.md": "4368b47307a36c07f64c1073a5133c7f99bae272a82c3af939ec9fb2a46f7f2e",
+      "test_vm_controls.py": "785cd9dfa649c6981ade59b8ab5657ee69862c5869197873d4fdd63dc6a350d9",
+      "guest-install-only.sh": "1e7600a555bfb50079401527d09494cdcfa3324e24e47d98d5b6543931fd3d8c",
+      "harness-identity.json": "5d1cc5cf560a1bcf3e00995bda09470075f9ab4fa58691fa99fa1c5fe7b4082e",
+      "source-identities.json": "c0bf0117ccf6bd74fa627d457d7001a24052abffd1736d3a4706d5767e760749",
+      "harness/test/integration.d/base-test.sh": "7c6f15de64722c877dfdb8cb662b8e8f0b0aa7b80d8633fc5d82b1eb92240de2"
+    },
+    "proofSha256": "e86b3b8a0138b7d597bfa1c5fa9591eec98b7b67c1f7b788f409689d4de20edd",
+    "workerControlLogSha256": "7dca93ff667917ae36a3cd27eb448470afa76d9634b6ca23a1b5f695285a11cc",
+    "originalReportSha256": "214f850d49d92e883ef347f0f35596ae3e53361d9cb69da50f59be18f41e8553"
+  },
+  "retake": {
+    "command": "python3 -B -m unittest -v test_vm_controls.py",
+    "testsPassed": 4,
+    "elapsedSeconds": 0.079,
+    "all8ManifestFileHashesMatched": true,
+    "shared02cbSupervisorAnd608eManifestUnchanged": true,
+    "sharedNineSignalTestsRepeated": false,
+    "additionalScratchControls": [
+      {
+        "directory": "hub-build.Abc12345",
+        "accepted": true
+      },
+      {
+        "directory": "hub-build.short",
+        "accepted": false
+      },
+      {
+        "directory": "hub-build.Abc12345/nested",
+        "accepted": false
+      },
+      {
+        "directory": "otherdir",
+        "accepted": false
+      },
+      {
+        "directory": "../../../outside",
+        "accepted": false
+      }
+    ],
+    "additionalScratchScope": "All use inert file and complete matching approved fixture receipt; no media or container. Temporary directories removed.",
+    "newScopedFindings": []
+  }
+}

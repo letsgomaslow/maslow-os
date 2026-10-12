@@ -468,7 +468,7 @@
       ],
       "artifact_hashes": {},
       "blocker": "Managed removal/reinstall lifecycle and installed signed delivery/recovery remain incomplete; Connect6 blocked, no new native identity admitted.",
-      "next_action": "After native Connect 6 archive and deployed compatibility checks pass, add only its exact matched identity while preserving accepted native 5; then build the matched Hub candidate and verify guided setup in an installed guest."
+      "next_action": "Keep Connect6 blocked. After the security replacement passes owning, native, deployed and advisory checks, add only its exact matched identity while preserving accepted native5. Complete managed lifecycle wiring and the matched Hub build before installed setup acceptance."
     },
     {
       "id": "FCAI-P2-WORK",
@@ -639,7 +639,7 @@
       ],
       "artifact_hashes": {},
       "blocker": "Native interrupted package/database/key restoration and fresh undo remain unverified. Preserved-state reinstall is design-only; manual/unrecorded removal remains unsupported. Both delivery gates stay false.",
-      "next_action": "Complete exact current native artifacts and installed recovery checks, then implement/review the bounded managed-removal and same-artifact reinstall proposal using new current-state provenance and a fresh checkpoint. Never reinterpret fresh absence or replay an old snapshot.",
+      "next_action": "Review the strict V2 lifecycle codec and Voice quiesce-only milestone, then wire bounded root-managed removal and exact-artifact reinstall with current-state provenance and a fresh checkpoint. Build the required new Voice artifact and verify installed package/database/key recovery; never reinterpret fresh absence or replay an old snapshot.",
       "coordinator_only": true
     },
     {
@@ -672,7 +672,7 @@
       ],
       "artifact_hashes": {},
       "blocker": "Independent baseline ISO currently building; actual fresh installed guest/glibc/Qt/pre-update optional installation remain unverified.",
-      "next_action": "Monitor exact supervisor/ISO batch, verify actual media and artifacts, then admit install-only4GiBguest under same serialized slot and measure compatibility beforeOSupdate."
+      "next_action": "Let the current healthy baseline finish its one bounded attempt with minimal monitoring. Prefer suitable existing verified media or a clean installed guest; an ISO is not a FreeAI deliverable or automatic prerequisite. Verify actual clean-install and pre-update optional-package behavior. No further ISO repair/rebuild without documenting why existing verified media cannot satisfy those tests; broader OS/hardware work remains excluded."
     },
     {
       "id": "FCAI-P6-REVIEW",

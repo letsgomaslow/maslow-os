@@ -147,7 +147,8 @@
     "docs/programs/free-cloud-ai/evidence/2026-10-12-native-artifact-review.json",
     "docs/programs/free-cloud-ai/evidence/2026-10-12-guest-baseline-control-review.json",
     "docs/programs/free-cloud-ai/evidence/2026-10-12-native-validation-checkpoint.json",
-    "docs/programs/free-cloud-ai/evidence/2026-10-12-baseline-admission.json"
+    "docs/programs/free-cloud-ai/evidence/2026-10-12-baseline-admission.json",
+    "docs/programs/free-cloud-ai/evidence/2026-10-12-guest-vm-control-review.json"
   ],
   "passed_source_gates": [
     "every-dispatch-provider-and-model-policy",
