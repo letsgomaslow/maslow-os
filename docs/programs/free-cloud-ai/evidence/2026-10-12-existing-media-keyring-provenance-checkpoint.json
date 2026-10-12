@@ -1,0 +1,101 @@
+{
+  "schema": 1,
+  "status": "collected-public-package-provenance-crypto-and-parent-metadata-still-required",
+  "collectionRun": "/home/maslow/Maslow-ai-os/free-ai-build/guest-baseline-prep/media-inspection/keyring-package-evidence/3f22da037e724fbba4879e2f66ee63bb",
+  "collectionStateSha256": "d26572928e25d3813da2448ecf7d25ffd5ede0e98d0fd159d3d6da8c2573b058",
+  "completedStages": 20,
+  "packages": {
+    "archlinux-keyring": {
+      "sha256": "6a8ea16f51d3b305c18322d5884ca959f12c32a3f186873090fdc18465605293",
+      "signatureSha256": "5942acd5b5e27a45051c447b8054696465872e834af1a5bd3cb85e2881cf6cf8",
+      "pkginfo": {
+        "pkgname": "archlinux-keyring",
+        "pkgver": "20260909-1",
+        "arch": "any"
+      },
+      "targetSelection": {
+        "NAME": "archlinux-keyring",
+        "VERSION": "20260909-1",
+        "FILENAME": "archlinux-keyring-20260909-1-any.pkg.tar.zst",
+        "SHA256SUM": "6a8ea16f51d3b305c18322d5884ca959f12c32a3f186873090fdc18465605293"
+      },
+      "publicMembers": {
+        "gpg": {
+          "member": "usr/share/pacman/keyrings/archlinux.gpg",
+          "sha256": "6e5e9373e4684d646f2274e2df54d7fea5f79bc0df981ad8cd7851d1d2454ba3",
+          "matchesCapturedRootfsPublicDigest": true
+        },
+        "trusted": {
+          "member": "usr/share/pacman/keyrings/archlinux-trusted",
+          "sha256": "384c7daf07a89ec6610859142b009ca5c0b3062ed3ab2d3c50629fef9d002e8f",
+          "matchesCapturedRootfsPublicDigest": true
+        },
+        "revoked": {
+          "member": "usr/share/pacman/keyrings/archlinux-revoked",
+          "sha256": "aafbc33d6be7e200dd6226dbb467623a38a00db431826258bccfaf5cebfef6a1",
+          "matchesCapturedRootfsPublicDigest": true
+        }
+      },
+      "independentlyAcceptedOfficialPackageHash": null,
+      "signatureVerified": false
+    },
+    "omarchy-keyring": {
+      "sha256": "9f45936fb1e0a13c6a7b5b15bcd27673465f8c51a8f68b8e1a6d46d586db588a",
+      "signatureSha256": "067329161d6d65d370165c123550eeeea238f5333c2de91baf619c0ee7d1eb20",
+      "pkginfo": {
+        "pkgname": "omarchy-keyring",
+        "pkgver": "20251027-1",
+        "arch": "any"
+      },
+      "targetSelection": {
+        "NAME": "omarchy-keyring",
+        "VERSION": "20251027-1",
+        "FILENAME": "omarchy-keyring-20251027-1-any.pkg.tar.zst",
+        "SHA256SUM": "9f45936fb1e0a13c6a7b5b15bcd27673465f8c51a8f68b8e1a6d46d586db588a"
+      },
+      "publicMembers": {
+        "gpg": {
+          "member": "usr/share/pacman/keyrings/omarchy.gpg",
+          "sha256": "15d6aac44df688165b2ea35fe0b23af239bbc66a6909c10a5c219e8d94b707de",
+          "matchesCapturedRootfsPublicDigest": true
+        },
+        "trusted": {
+          "member": "usr/share/pacman/keyrings/omarchy-trusted",
+          "sha256": "ab0b688815444cffd48d15ca3597c77dbb364d59763c5784fca36691520f00fd",
+          "matchesCapturedRootfsPublicDigest": true
+        },
+        "revoked": {
+          "member": "usr/share/pacman/keyrings/omarchy-revoked",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "matchesCapturedRootfsPublicDigest": true
+        }
+      },
+      "independentlyAcceptedOfficialPackageHash": null,
+      "signatureVerified": false
+    }
+  },
+  "officialReferences": [
+    {
+      "url": "https://archlinux.org/master-keys/",
+      "path": "/home/maslow/Maslow-ai-os/free-ai-build/guest-baseline-prep/media-inspection/official-keyring-root-references/master-keys.html",
+      "bytes": 70620,
+      "sha256": "fd3d2eddb62c54eef9fc118328d04ea9c7b422372f4d733a27c3968b2d4ce911"
+    },
+    {
+      "url": "https://archlinux.org/packages/core/any/archlinux-keyring/",
+      "path": "/home/maslow/Maslow-ai-os/free-ai-build/guest-baseline-prep/media-inspection/official-keyring-root-references/archlinux-keyring.html",
+      "bytes": 16647,
+      "sha256": "c73e6610cdbb1209a0f6a60d6da80af11396ac2fd9e83653e9279cf8738f97a3"
+    }
+  ],
+  "officialMasterSetMatchesCapturedTrustedFile": true,
+  "packageSignaturesVerified": false,
+  "mediaVerified": false,
+  "guestVerified": false,
+  "remaining": [
+    "Detached package signature and current signer certification/revocation verification with isolated public-only key store",
+    "Safe parent-only reader fixture/binary acceptance and actual parent metadata",
+    "Independent complete media receipt before clean installed guest"
+  ],
+  "noIsoBuildOrPrivateKeyRead": true
+}
