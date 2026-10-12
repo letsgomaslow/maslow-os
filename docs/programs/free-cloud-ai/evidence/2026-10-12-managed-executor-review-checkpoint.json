@@ -1,0 +1,22 @@
+{
+  "schema": 1,
+  "status": "original-private-executor-source-blocked-targeted-fixes-active",
+  "hubCodeBaseline": "e372d7c9ac05a359d267912862ae7fdd932f3eb4",
+  "originalExecutorSha256": "573b23d3f1ece38e34548ff2679e506a3cb9eb429fa15ee77bab0a2fdb3033d4",
+  "preservedOriginal": "/home/maslow/Maslow-ai-os/free-ai-build/hub-managed-recovery-executor/source-history/helper/free_ai_managed_recovery_executor.py",
+  "independentReview": "/home/maslow/Projects/Maslow/free-ai-hub-current/docs/evidence/2026-10-12-managed-recovery-executor-review.json",
+  "reviewSha256": "1b054419ef458c10623f522300beb5bb595e182e611437c38c87ec0e2fa1f18c",
+  "tests": {"workerFocused": 27, "workerAffected": 143, "independentFocused": 27},
+  "findings": [
+    "A sole durable sidecar decision could start the finish helper before the required root-phase promotion, blocking retry.",
+    "A sole durable sidecar completion could re-enter the user helper after marker removal, blocking terminal retry.",
+    "Socket identity captured after asynchronous startup could adopt and delete a foreign replacement."
+  ],
+  "evidenceLimits": "Passing source tests missed the real constructor/socket reproductions. Root ownership, service, package and crypto adapters are synthetic; no native or installed proof. Original source and all six failed/early logs, focused and affected logs are preserved externally.",
+  "nextAction": "Fix the three concrete defects and add actual-check regressions; independently review the new exact freeze, then run one final Hub owning/UI validation.",
+  "requiredRemaining": ["Safe initial rejection", "Reboot authority", "WAL settlement", "Uncertain staging cleanup/retry", "Missing/corrupt current DB recovery", "Global pending admission", "Actual package/database/key recovery", "Matched Hub package and full ownership checks", "Installed guest and all live/private/Voice/Lenovo gates"],
+  "craftPaused": true,
+  "newIsoBuildOrRepair": false,
+  "publicGatesOpened": false,
+  "previewComplete": false
+}

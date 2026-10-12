@@ -651,8 +651,8 @@
         "docs/programs/free-cloud-ai/evidence/2026-10-12-guarded-lease-source-checkpoint.json"
       ],
       "artifact_hashes": {},
-      "blocker": "Guarded offline lease source defects fixed and reviewed with474owning tests; Rootexecutor/server, public/initial-rejection/crossboot, WAL/staging/corrupt-state and actualinstalled recovery remain required.",
-      "next_action": "Implement/review private Root executor+authenticatedserver and separate finish-only decision/marker flow under existing global lock; no public gate opening.",
+      "blocker": "Guarded offline lease accepted; first private executor freeze has three independently reproduced retry/socket defects despite27focused/143affected passes. Targeted fixes active. Public/initial-rejection/crossboot, WAL/staging/corrupt-state and actualinstalled recovery remain required.",
+      "next_action": "Fix/review the exact executor retry and socket findings, then one final Hub owning/UI validation. Keep public gates closed and required native/live/recovery gates open.",
       "coordinator_only": true
     },
     {
