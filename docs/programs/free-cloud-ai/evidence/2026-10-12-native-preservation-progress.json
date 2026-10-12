@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "status": "private-backups-verified-native-hub-pipeline-under-review-no-package-mutation",
+  "status": "private-backups-verified-reviewed-native-hub-terminal-open-outcome-pending",
   "quiescence": {
     "prior": "Voice37 disabled/not speaking, preview idle; complete SQLite task history contained cancelled1/completed2/failed1 and zero active tasks. Private Voice tmux socket absent.",
     "stopAttempt": "Ordinary systemctl user stop was canceled and the service restarted with a new PID; old PID exited. Do not claim stopped from the first command.",
@@ -31,7 +31,16 @@
   "keyReferences": "Read-only Secret Service SearchItems/ReadAlias/Locked metadata:4 existingVoice references,0FreeAI items,default collection available/unlocked. Only reference hashes/counts saved privately; no credential values read/exported. Reference stability is not value stability or keyring storage-roundtrip proof.",
   "untouchedPaths": "Private identity-only baseline for Voice notes,managed project directory and existingConnect state;336 entries,relative names hashed,no contents read. Not a backup/content-proof and no destructive authority against them.",
   "rootPreflight": "First terminal attempt exit1/no result; user reports fingerprint authentication timed out. /run/maslow-hub is absent after reboot. Narrow independently reviewed read-only delta allows only safe absent lock paths, reports no acquired lock, retains strict private transaction/floor and ALPM guards. Source SHAeeea5d0a85394584c198f48e35d99ce87a2223f78c81d6c4ac2397a9ee52f71c. Actual privileged result remains required.",
-  "pipeline": "Root prepared fixed run-native-hub-install.py SHAfea119f06ad447d9a8bca331e8d03dca95a042ee0abd2ca9dd2a543ff58ddfc2: verified private backup prerequisites/owned idle runtime mask,heavy+user-update locks,read-only protected preflight,reviewed protectedVoice37 copy,then exact normal installed Hub apply. Independent review pending; not executed. This installs Hub only,not FreeAI/Voice41/Connect. No blanket native acceptance.",
+  "pipeline": {
+    "script": "/home/maslow/Maslow-ai-os/free-ai-build/hub-bundle-prep/native-preview-prep/run-native-hub-install.py",
+    "sha256": "cf74ee77e858002b0f66e9b386927345a7743eabda2c29ca980b1311eacf6395",
+    "guardSha256": "280559154dfb7c16615b16c513fd65a036e4a3c82d44c52d1c8b6c47064641d8",
+    "independentRetakeSha256": "68206730d9c577f3f6a8c495801791de428f31022840687651670a7ba0a02c23",
+    "resolved": "Initial review caught preflight-to-apply race and unpinned mask record. Accepted retake pins/rechecks exact runtime mask and uses a one-off guard around installed Installer.execute/apply: strict protected transaction-null/floor check occurs inside actual owning install lock immediately before unchanged apply logic. No installed helper or package source modified.",
+    "execution": "Root opened exact SHA-checked isolated pipeline through existing native terminal launcher,CPU1/nice10; owns heavy/user update locks. User normal local administrator participation requested. Actual completed-step status,Root provenance and installed files must be inspected; terminal launch is not installation success.",
+    "outputs": "/home/maslow/Maslow-ai-os/free-ai-build/hub-bundle-prep/native-preview-prep/native-install-1",
+    "scope": "Protected readonly preflight, exact previousVoice37 cache copy, then normal installed Hub package API. Hub only; no FreeAI/Voice41/Connect upgrade,publication or replay reset."
+  },
   "userChoice": "Proceed with local laptop preview and temporary Hub update pause; final two signatures independently verified. No publication or replay reset.",
   "installed": false,
   "previewComplete": false
