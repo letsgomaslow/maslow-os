@@ -1,0 +1,71 @@
+{
+  "schema": 1,
+  "date": "2026-10-12",
+  "scope": "Bounded independent retake of media-inspection output-absence guard only; no ISO/media tool execution.",
+  "priorReview": {
+    "path": "docs/programs/free-cloud-ai/evidence/2026-10-12-media-inspection-control-review.json",
+    "sha256": "ae103bed046312ac2b4c5621d07ed0ea0eb0b0c15aa02268d576927581a76f7f",
+    "unchanged": true
+  },
+  "reviewedSha256": {
+    "inspect-media.py": "212e0eaad1e7b64582cac302b6eebd8ea3f3be22831135bd0659aefc4edccd6e",
+    "manifest.json": "99648371c66bc33a43bacafeae48068925360fa603474eddc53ef9bc8509c5e4"
+  },
+  "resolvedFinding": {
+    "id": "sfs-dangling-output-entry",
+    "status": "fixed-independent-retake",
+    "change": "lstat authorizes absence only for FileNotFoundError. Every existing entry rejects before extraction; all other errors propagate.",
+    "tests": [
+      {
+        "case": "Absent output",
+        "result": "permits next stage"
+      },
+      {
+        "case": "Regular file",
+        "result": "denied and preserved"
+      },
+      {
+        "case": "Directory",
+        "result": "denied and preserved"
+      },
+      {
+        "case": "Dangling symlink",
+        "result": "denied and preserved"
+      },
+      {
+        "case": "PermissionError during lstat",
+        "result": "propagated; no extraction authorized"
+      }
+    ],
+    "method": "Compile unchanged actual Try AST from revised controller and run against scratch paths; no xorriso/ISO operation."
+  },
+  "verification": [
+    "All22 pinned source/tool/adapter/receipt/control inputs independently match current manifest; ISO not read.",
+    "Source diff is only exists-to-lstat guard replacement. Manifest diff is only updated helper hash. Fixed commands, paths, ownership/lifecycle, limits, source5 identities, tool pins and false acceptance fields unchanged.",
+    "Original19368 helper and76298 manifest remain preserved in control-history; original reviewae103 unchanged.",
+    "Seven existing inert controller tests pass again; no heavy or full shared suite repeated."
+  ],
+  "tests": {
+    "command": "nice -n10 python3 -I -B; one CPU, fresh temporary sys.pycache_prefix, explicit media-inspection path; unittest test_inspect_media",
+    "passed": 7,
+    "seconds": 0.016,
+    "additionalGuardCases": 5
+  },
+  "result": "No remaining scoped preparation blocker. Exact revised controller is suitable for coordinator-admitted read-only inspection of the existing c667 ISO only.",
+  "limits": [
+    "No ISO scan/hash/extraction, inspector execution, new media, repair, Docker/VM, network or account operation by reviewer.",
+    "All six required media facts remain unverified. Actual local9 artifacts/target DB selections/optional absence/test-trust evidence and independent media receipt remain pending.",
+    "Prepared limits retain4GiB address-space/8GiB per-file write bounds and post-completion64MiB stdout acceptance check; no broader resource claim.",
+    "No guest launch, installed facts, hardware/OS compatibility or preview acceptance follows."
+  ],
+  "claims": {
+    "workerIsoRead": false,
+    "workerInspectorExecution": false,
+    "mediaVerified": false,
+    "allSixMediaFindingsVerified": false,
+    "guestVerified": false,
+    "testTrustAbsent": false,
+    "installedVerified": false,
+    "previewComplete": false
+  }
+}
