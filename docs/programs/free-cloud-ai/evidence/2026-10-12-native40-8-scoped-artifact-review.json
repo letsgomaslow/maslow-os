@@ -1,0 +1,112 @@
+{
+  "schema": 1,
+  "date": "2026-10-12",
+  "scope": "Bounded independent final native-stage evidence reconciliation and Connect8 execution-wrapper source review. Reviewer performed no candidate archive scan, extraction, Docker/VM, network/advisory request, account or package operation.",
+  "status": "execution-preparation-blocked-pending-two-fixes",
+  "reviewedPreparation": {
+    "wrapper": "/home/maslow/Maslow-ai-os/free-ai-build/connect-package-8-prep/verification/run-deployed.py",
+    "wrapperSha256": "75fe9237844cb53161a65cd93e21cd12d32671417bb3d11f0cad66a5cd98c251",
+    "manifestSha256": "b25ba62595f003f739c68afe9f3d1ef1667aac40f75081fbc8879d70ff953a0b",
+    "sharedControlsSha256": "02cb8a13dee41fc8474253d7bb809cf6ca23c424fbb4ad51d35819ed36799394",
+    "overlapChecker": "/home/maslow/Projects/Maslow/craft-iso/builder/check-package-file-overlap.sh",
+    "overlapCheckerSha256": "e88e8c48b31308be192be2acc2803e9a5e684902105544c0c0a0c4514e69a8f0",
+    "positiveSourceChecks": [
+      "Pinned current archive/static/identity/probe/inventory/approval and exact previous backend/Voice inputs; source-only shared/archive helper imports.",
+      "Full extracted usr path/type/mode/regular-byte/single-link/symlink-target seal before candidate execution; read-only CLI/library/metadata/licenses/probe/receipt mounts.",
+      "Exact retained builder image cfd891bf262d24bac53aa489af912484a08545e38001624a94640de4e43b840f, network none, CPU2/RAM4GiB/total6GiB, isolated temporary projects/home, exclusive shared workload lock and evidence directory.",
+      "Docker stage retains reviewed LaunchGroup retirement and exact CID/image/session cleanup. Public/live/installed/admission flags remain false."
+    ]
+  },
+  "findings": [
+    {
+      "id": "overlap-unowned-process-stage",
+      "severity": "P2",
+      "status": "confirmed-awaiting-fix",
+      "reproduction": "Executed actual wrapper main with inert dependencies and no process launch: trace was owned Docker group -> retire -> exact cleanup -> overlap subprocess. At that last call both SIGTERM and SIGINT were SIG_IGN. Source launches overlap via bare subprocess.run, outside any tracked group.",
+      "impact": "Overlap shell/tar children inherit ignored termination; forced supervisor termination can release workload lock while unretired overlap work survives. Sequential execution alone does not preserve owned-process cleanup.",
+      "recommendation": "Use the reviewed owned launch-group/deferred-signal/identity/retirement pattern for the overlap stage too. Restore effective handlers before launch and retain lock until the full overlap hierarchy retires on success or failure."
+    },
+    {
+      "id": "overlap-listing-failure-false-pass",
+      "severity": "P2",
+      "status": "confirmed-awaiting-fix",
+      "reproduction": "Ran the unchanged checker on two inert scratch files with a scratch bsdtar shim: metadata queries returned valid fixture pkgname, both -tf listings exited19 with explicit errors. Checker exited0 and printed no conflicting ownership.",
+      "cause": "Bash process-substitution listing status is not propagated by set -euo pipefail into the consuming while loop.",
+      "recommendation": "Check each listing command's success explicitly before consuming its inventory, in an independently reviewed external implementation/copy. Preserve original shared Craft checker. No generic skip or assumed successful listing based on archive hash alone."
+    }
+  ],
+  "reconciledResults": {
+    "voice40": {
+      "archiveSha256": "407b4372e0d8a3de0652a59d28b0ddd38068447450abfa5309c91e431239db44",
+      "sourceCommit": "0ad62e58b889bfa0fdedc8015e2e24f6a006b358",
+      "staticReportSha256": "f64d21091d797a2eada5850df793f896f265d2300c893a9a649af272a7986c28",
+      "sourceFilesChecked": 63,
+      "archiveMembers": 9141,
+      "owningSession": "6d88a3aa74d9471b9f001eb7b0c86560",
+      "owningManifestSha256": "bea82ad87adccf48105e83c3bf42f70aabd828e9bc0960cce090a722ce32b068",
+      "owningLogSha256": "813cc38c5d6bb7e4df937f53b2152b36d64bddef602f0ad03b5b8a2b7d248fc4",
+      "testsRun": 507,
+      "passed": 502,
+      "skipped": 5,
+      "errors": 0,
+      "seconds": 122.607,
+      "uiAndComposer": "Log shows UI/orb/composer passes; successful wrapper stage recorded.",
+      "launchGroupRetired": true,
+      "failedOriginal": {
+        "session": "92f35025275a413a98b2a60711fff14f",
+        "logSha256": "5d6c161c73a23794878eb7de82d442017aa5d9b47a75b2b744e94a9c426295e5",
+        "environmentReviewSha256": "3a6bd318834961ee9253bb097b04ef6eaba72e634c921d3620987f02a0e29abb",
+        "preserved": true
+      },
+      "limits": "Aggregate log does not name all5 skips; none inferred. Static report and owning log/state were read and hashes checked, not rerun. Source/private-venv tests do not establish installed daemon/native lifecycle."
+    },
+    "connect8": {
+      "archiveSha256": "3bbd8f3218af5556dbb5d989c7375b66292d62790a841c905dde72a1f6f34dca",
+      "sourceCommit": "fd33682f3bcfdbce849a06304da0d74137b592f0",
+      "recipeCommit": "42adaeca720dd8aced00d17bd4238225c15464cd",
+      "inventorySha256": "f91ee6deba30a588ff771f9859570a3c6570141477260782b381086dc5415a89",
+      "approvalSha256": "76bc31f7d4b4d23bc9a5a8ca3245e1b785fa00834071844257e2e99611be8456",
+      "counts": {
+        "physicalPackageRoots": 106,
+        "externalNameVersionTuples": 105,
+        "regularFiles": 8789,
+        "compiledFiles": 99
+      },
+      "staticReportSha256": "e036ab4531ded57135445192c9b861c6ef1c2d1aa79a5c3e5a642c951357457c",
+      "noticePackages": 105,
+      "supplementalNoticeHashes": {
+        "@cfworker/json-schema@4.1.1": "376944252ab78ca6b41aee44ddea8894927ee67891e77e61eb9d59af63e35094",
+        "@composio/client@2.0.0-rc.8": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+      },
+      "advisory": {
+        "fileSha256": "73af8f27d19fb4f7840e414b9146b5711897e5d7d51f750ed0efecd3b212ae1a",
+        "capturedAtUtc": "2026-10-12T05:06:23.964669+00:00",
+        "httpStatus": 200,
+        "externalTuples": 105,
+        "requestSha256": "e8b964cc3d49e7c66fa67c9a9f26d15f1305c30994de3ccac90970bae22c7320",
+        "rawResponseSha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+        "rawResponseBase64": "e30=",
+        "reportedAdvisoryCount": 0,
+        "reconciliation": "Decoded raw body is{}. Request payload tuple set exactly equals105 external inventory tuples; canonical request/raw response SHA recomputed and matched. Local private workspace excluded. No network request by reviewer.",
+        "pnpmCliAuditPassed": false,
+        "fullWorkspaceLockAudited": false
+      },
+      "deployed": "Not executed at initial review; blocked on wrapper findings.",
+      "threePackageOverlap": "Not executed at initial review; blocked on wrapper/checker findings.",
+      "limits": "Known-advisory snapshot is time-bound, not universal vulnerability clearance. Native7 failure and prior native5/6 blocks remain historical. Supplemental notice origin limitations remain documented; no legal blanket acceptance."
+    }
+  },
+  "remaining": [
+    "Fix/retake both execution findings before coordinator GO.",
+    "Record actual Connect deployed probe and exact backend2/Voice40/Connect8 overlap results separately after execution.",
+    "Full Hub package overlap/matched identity, root public lifecycle/current-operation recovery, installed guest/Lenovo, provider/account/audio and independent final preview acceptance remain open."
+  ],
+  "claims": {
+    "workerCandidateScan": false,
+    "workerContainerRun": false,
+    "workerNetworkRequest": false,
+    "installedVerified": false,
+    "liveVerified": false,
+    "previewComplete": false
+  }
+}

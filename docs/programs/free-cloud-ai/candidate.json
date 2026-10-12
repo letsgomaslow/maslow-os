@@ -121,7 +121,7 @@
       "recipe_commit": "488d7cede41c309be7202f2ef0bc2f8d57ff5fc2",
       "signed": false,
       "installed_acceptance": false,
-      "status": "normal resource-limited build complete; archive/runtime/installed/live checks pending"
+      "status": "actual static/source/retained-dependency and packaged507-test owning/UI checks passed with5 skips; installed/live/recovery open"
     },
     {
       "path": "/home/maslow/Maslow-ai-os/free-ai-build/connect-package-8-prep/recipe/maslow-connect-0.1.0-8-x86_64.pkg.tar.zst",
@@ -133,7 +133,7 @@
       "recipe_commit": "42adaeca720dd8aced00d17bd4238225c15464cd",
       "signed": false,
       "installed_acceptance": false,
-      "status": "normal resource-limited build complete; archive/runtime/installed/live checks pending"
+      "status": "actual static/notice/SRI/closure/compiled checks pass; fresh105-tuple npm scan reports0; deployed/installed/live open"
     }
   ],
   "accepted_capabilities": [],
