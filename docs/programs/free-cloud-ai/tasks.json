@@ -531,8 +531,8 @@
         "docs/programs/free-cloud-ai/evidence/2026-10-12-local-preview-signatures-verified.json"
       ],
       "artifact_hashes": {},
-      "blocker": "Four local preview signatures verified and public pair accepted. Final QA3 matchedHub context/build/audit and normal state/key preservation, protected priorVoice37, servicequiescence, replay/installation and live gates remain required.",
-      "next_action": "Review exact final build context and run one bounded Hub build; preserve verified backend2/Voice41/Connect8. No Mac transfer, trust change or publication."
+      "blocker": "Final QA3 Hub built and actual artifact audit passed. Final two local signatures, explicit replay-path decision, private consistent backups, protected priorVoice37 and owning native preflight/install remain required.",
+      "next_action": "Finish independent two-input signing review, open local signing terminal, then complete preservation/preflight and the selected installed-test path. No publication or replay reset."
     },
     {
       "id": "FCAI-P2-WORK",
@@ -801,7 +801,7 @@
       ],
       "artifact_hashes": {},
       "blocker": "Native-first diligence completed,previousVoice37 exactbytecheck and reconstructedHub036 payload audit pass; Mac signatures/finalmatchedHub and actualprivate-state/quiescence prerequisites pending. Guest fresh/destructive and native/live/audio gates open.",
-      "next_action": "Finish trusted native installation preparation while user transfers public signingfolder toMac; reserve existingguest for remainingrequiredclean/faultproof."
+      "next_action": "Use retained installed guest only for required clean-install/destructive recovery proof; no further ISO cycle. Local Lenovo preview path awaits explicit replay-effect decision and concrete safe installation preflight."
     },
     {
       "id": "FCAI-P6-REVIEW",
@@ -909,7 +909,7 @@
   ],
   "coordination": {
     "shared_owners": "Craft remains paused per owner handoff; preserve Craft Hub2666609 and Connect native5/source2e872f50 compatibility. Free AI edits only isolated worktrees; coordinate shared Hub/install/helper, Connect and Voice changes before installation.",
-    "build_serialization": "No heavy build/VM. Four local preview signatures independently verified, unchanged backend2/Voice41 staged with enrolled trust; public-input scope accepted. Prepare/review final QA3 Hub context, then one bounded affected Hub build under shared lock. Native prerequisites and actual recovery/live/audio remain open.",
+    "build_serialization": "Final QA3 Hub built and actual audit passed under shared lock; no active heavy job. Unchanged backend2/Voice41/Connect8 retained. Final local signatures and safe native prerequisites remain; Craft stays paused.",
     "worker_limit": 2,
     "integration": "No product/shared merge, host installation, production signing or publication. Program completed source commits only.",
     "active_workers": [

@@ -46,6 +46,19 @@
   },
   "artifacts": [
     {
+      "path": "/home/maslow/Maslow-ai-os/free-ai-build/hub-bundle-prep/qa-hub-build-3/evidence/d2a94253527247539a797807cf44113d/work/maslow-hub-0.3.9-1-any.pkg.tar.zst",
+      "name": "maslow-hub",
+      "version": "0.3.9-1",
+      "sha256": "f5222d795673af3f10581c0b7dc65e49e12beabf1cb306ad1de7512246c339cc",
+      "bytes": 332771392,
+      "source_commit": "e0ebb476764fee5a7cabff3d0b786cbeba09838c",
+      "product_source_parent": "b222265142b585fe50743ac5a705c8da39ac2b27",
+      "recipe_commit": "8709933da1c2d89cd3c185902084b5dc3e45ad0d",
+      "signed": false,
+      "installed_acceptance": false,
+      "status": "Final QA3-only candidate: normal bounded build and actual source/metadata/signed opaque-pair/four-package audit passed; final archive signature and installed acceptance pending."
+    },
+    {
       "path": "/home/maslow/Maslow-ai-os/free-ai-build/native/maslow-free-ai-0.1.0-1-x86_64.pkg.tar.zst",
       "name": "maslow-free-ai",
       "version": "0.1.0-1",
@@ -301,11 +314,12 @@
     "status": "built and scoped-tested, blocked for installation; do not add native6 identity to Hub"
   },
   "prepared_qa_hub": {
-    "source": "f37947b8a623d323d19635904d8ac1b64275ac2a",
-    "parent": "3577c663429420ffa9c981c3c9140069397d7c48",
+    "source": "e0ebb476764fee5a7cabff3d0b786cbeba09838c",
+    "parent": "b222265142b585fe50743ac5a705c8da39ac2b27",
     "source_accepted": true,
-    "build_started": false,
+    "build_started": true,
+    "artifact_audit_passed": true,
     "installation_accepted": false,
-    "status": "f379 retained prior QA source; final derivative waits accepted postboot source/full owning and repin"
+    "status": "Final QA3 f522 candidate built normally and actual artifact audit passed; final enrolled signatures and installed/live/recovery acceptance open."
   }
 }

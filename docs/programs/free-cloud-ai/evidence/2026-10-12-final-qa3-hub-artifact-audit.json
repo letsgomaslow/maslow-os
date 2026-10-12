@@ -1,0 +1,34 @@
+{
+  "schema": 1,
+  "status": "final-QA3-Hub-built-and-scoped-artifact-audit-passed-native-preview-incomplete",
+  "candidate": {
+    "path": "/home/maslow/Maslow-ai-os/free-ai-build/hub-bundle-prep/qa-hub-build-3/evidence/d2a94253527247539a797807cf44113d/work/maslow-hub-0.3.9-1-any.pkg.tar.zst",
+    "sha256": "f5222d795673af3f10581c0b7dc65e49e12beabf1cb306ad1de7512246c339cc",
+    "bytes": 332771392,
+    "sourceCommit": "e0ebb476764fee5a7cabff3d0b786cbeba09838c",
+    "productParent": "b222265142b585fe50743ac5a705c8da39ac2b27",
+    "recipeCommit": "8709933da1c2d89cd3c185902084b5dc3e45ad0d",
+    "scope": "QA-only four literal gates; product remainsFalse. Correct enrolled-key-signed unchanged backend2/Voice41 opaque payload. Final Hub archive signature not yet produced."
+  },
+  "build": {
+    "session": "d2a94253527247539a797807cf44113d",
+    "manifestSha256": "11bb3b79d172ead9a1d2d74f36a9832404885c0094535a51e26289acce33cd4e",
+    "stateSha256": "0e6f18640e84192fa41318602c860444a859700c09b3d0814c16c237108e12f0",
+    "independentContextReviewSha256": "3a5d40b3a035511a2397f4002fe81a91a5995a04cfae7f4db69f9bb8fa006ea4",
+    "result": "Normal makepkg/controller exit0,owned launchgroup retired,exact container gone. CPU2/RAM4GiB/total6GiB/networknone/existingheavylock; no concurrent VM or build."
+  },
+  "actualAudit": {
+    "exit": 0,
+    "seconds": 30.751,
+    "approvedManifestSha256": "ca924f4c55be8ba778407ddde53d6ea18c68f57c83a224a0d6ddc2ac4d0fa116",
+    "independentAdmissionSha256": "e5b151897f2a10aca914e554ab0f961171460e956a81c12b21ba29052de63633",
+    "logSha256": "905370526bf87a1465efbedd78c5d9e6f6d5586adf5cd6ccf03210133007aac6",
+    "checked": "Actual held-FD archive SHA,PKGINFO/BUILDINFO,76 members/types/owners/modes,44 exact source-mapped files,six opaque signed pair files and four-package overlap against unchanged backend2/Voice41/Connect8. Source/state/manifest rechecks passed.",
+    "resources": "CPU1/nice10/1GiB/240s/sharedheavylock; no extraction or installation."
+  },
+  "nextAction": "Prepare/review unsigned local preview manifest and minimal finalHub/manifest signing action using existing local release tools. Plan normal state/key preservation,protected previousVoice37 and idle/stopped preflight before native admission. Offline manifest advances replay floor beyond current published9; disclose/resolve before install,no reset or silent publication.",
+  "publication": false,
+  "nativeChanges": false,
+  "openAcceptance": "Actual trustedHub installation/recovery,real Groq/account/audio/visual/Lenovo and required clean/fault guest gates remain open. Corrupt-present/unrecorded-stage recovery gaps are not waived.",
+  "previewComplete": false
+}
