@@ -5,7 +5,7 @@
   "observations": {
     "cliReadOnlyTaskInventory": "codex cloud list --json --limit20 succeeded and returned0 tasks.",
     "cliEnvironmentPicker": "Authenticated legacy CLI picker showed only All Environments (Global), no concrete configured environment. No task submitted; owned TUI exited normally.",
-    "currentCloudBrowser": "Direct existing-environment settings navigation redirected to ChatGPT sign-in. Login page retained for user participation; no credentials entered or environment created.",
+    "currentCloudBrowser": "After the user signed in, the old direct URL redirected to Home. Navigated through Profile > Settings > Codex Cloud. The authenticated Environments tab at https://chatgpt.com/settings/codex-cloud visibly reports No saved environments. No environment created, credentials read, or remote probe submitted.",
     "remoteExecutor": "No callable Codex Cloud remote shell was available in this session. Local Lenovo /dev/kvm results are not remote evidence."
   },
   "capabilities": {
@@ -28,7 +28,7 @@
     "defaultResources": "Plus/EduPlus:2vCPU,8GiB RAM,8GiB disk. Pro/Business/Enterprise/Edu/EduPro:4vCPU,16GiB RAM,32GiB disk.",
     "limits": "Resource entitlements are not measured availability. The fetched guide does not establish KVM passthrough/nested virtualization, QEMU installation, Docker device permissions or actual free space. Do not substitute separate paid Agents API sandbox specifications for Codex Cloud evidence."
   },
-  "nextAction": "User signs into existing Cloud settings and identifies an already published environment. Only a small read-only remote capability probe may then inspect device/API version, binary versions, actual disk/cgroup headroom and existing permissions without VM uploads, new environments, package/infra provisioning or paid resources. Unknown results remain no-GO.",
+  "nextAction": "No saved environment is available in the signed-in account. Keep Cloud VM transfer and execution blocked. If an already published environment becomes available, run only a small capability probe for device/API version, binary versions, actual disk/cgroup headroom and existing permissions. Do not create an environment, provision resources, install infrastructure or upload VM inputs to resolve this prerequisite. Continue independent Free AI work using the existing local test infrastructure.",
   "largeVmUploaded": false,
   "cloudTaskSubmitted": false,
   "resourcesProvisioned": false,

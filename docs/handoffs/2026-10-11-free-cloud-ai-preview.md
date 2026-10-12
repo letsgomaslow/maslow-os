@@ -1,5 +1,7 @@
 # Free cloud AI implementation checkpoint — 2026-10-11
 
+Cloud capability check update (2026-10-12): user sign-in completed. The authenticated Settings > Codex Cloud > Environments tab reports “No saved environments.” Required KVM/QEMU/disk/permission capabilities remain unknown, with no remote runtime probe. No VM transfer, new environment, paid provisioning or infrastructure is authorized by this result. [Capability record](../programs/free-cloud-ai/evidence/2026-10-12-codex-cloud-capability-check.json) records the check. Next action: continue independent local preview work; probe Cloud only if an existing published environment becomes available.
+
 The verified installable preview is incomplete. Work remains in isolated FreeAI runtime, Hub, Connect and package worktrees. No product merge, host installation, production signing or publication has occurred. The [program ledger](../programs/free-cloud-ai/tasks.json) owns current tasks; the [candidate manifest](../programs/free-cloud-ai/candidate.json) remains not-ready with no accepted capabilities or full preview gates.
 
 ## Current source and evidence
