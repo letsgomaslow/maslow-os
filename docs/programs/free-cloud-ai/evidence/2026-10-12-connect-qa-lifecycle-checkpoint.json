@@ -1,0 +1,84 @@
+{
+  "schema": 1,
+  "status": "preview-incomplete-concrete-QA-and-lifecycle-blockers",
+  "date": "2026-10-12",
+  "evidence": [
+    {
+      "path": "/home/maslow/Maslow-ai-os/free-ai-build/native-2-39/connect-remediation-source-qa-3/status.json",
+      "sha256": "523df74a3f841cbd82e439dbf3f329e5e4a25ffd117bffcf5d80fe83249adf80"
+    },
+    {
+      "path": "/home/maslow/Maslow-ai-os/free-ai-build/native-2-39/connect-remediation-source-qa-3/owning-check.log",
+      "sha256": "79ff213abe5b4f6e487c7a5176511f0144cb969ae6895c0f22f857a2f1233fb0"
+    },
+    {
+      "path": "/home/maslow/Maslow-ai-os/free-ai-build/native-2-39/connect-remediation-source-qa-4/status.json",
+      "sha256": "4452f7c3806718c416cebab749957cb0f1a889a620821c8a5de49e4d3635c3f6"
+    },
+    {
+      "path": "/home/maslow/Maslow-ai-os/free-ai-build/native-2-39/connect-remediation-source-qa-4/owning-check.log",
+      "sha256": "736a5759d9246d23d1bdc5563c7191f8174d2b1e9ee5c79d58f9b606fcd4a7bd"
+    },
+    {
+      "path": "/home/maslow/Projects/Maslow/free-ai-hub-current/docs/evidence/2026-10-12-managed-state-review.json",
+      "sha256": "79ae53245682751b12e7b021252c573f41fe622dba6e4e17251dbd8116954fd9"
+    },
+    {
+      "path": "/home/maslow/Projects/Maslow/free-ai-hub-current/docs/evidence/2026-10-12-voice-provenance-review.json",
+      "sha256": "6dd81b1a2de385254a5a848741aad5fa0900722e3e01c793f41051207b3518e0"
+    }
+  ],
+  "baseline": {
+    "path": "/home/maslow/Maslow-ai-os/free-ai-build/guest-baseline-prep/snapshots/iso/release/hub-build.m4G5KIGT/maslow-os-2026.10.12-x86_64-local.iso",
+    "sha256": "c6674db434e0a5992399091c5af16bd8e79f7a60fefc298784d311de0b247d8d",
+    "bytes": 6638323712,
+    "wrapperCompleted": true,
+    "ownedLaunchGroupRetired": true,
+    "mediaVerified": false,
+    "guestExecuted": false,
+    "scope": "Only the already admitted single healthy baseline attempt finished. No new ISO cycle or automatic prerequisite."
+  },
+  "connectQA3": {
+    "namespaceSmoke": "pass",
+    "unchangedLatePipe": "pass",
+    "typecheck": "pass",
+    "owningTests": {
+      "passed": 371,
+      "failed": 6,
+      "skipped": 11
+    },
+    "build": "notreached",
+    "diagnosis": "Missing fixture destination /usr/lib/NetworkManager and >256 visible sameUID thread prerequisite. One generic connection-close cause inferred until QA4."
+  },
+  "connectQA4": {
+    "publicationControls": {
+      "passed": 6,
+      "skipped": 1
+    },
+    "idleFixtureKernelTasks": 301,
+    "owningTests": {
+      "passed": 376,
+      "failed": 1,
+      "skipped": 11
+    },
+    "build": "notreached",
+    "diagnosis": "Fixture umask077 leaked into test preparation; servers.test.ts expected ordinary existing config mode0644 but its initial file was0600. Product code/tests unchanged; mktemp readiness already enforces0600."
+  },
+  "managedState": {
+    "hubCommit": "3ad7af8817f2d33eb3435f94c6692855872080e7",
+    "focusedChecks": 29,
+    "independentReview": "pass after three consistency/resource fixes",
+    "rootPublicWiring": false
+  },
+  "voiceProvenance": {
+    "implementation": "uncommitted source primitive;18 independent focused checks pass",
+    "loadedCodeAuthority": false,
+    "blockers": [
+      "Canonical service Python -m startup permits cwd module shadowing; fixed isolated bootstrap being prepared",
+      "pre/post normalALPM hook integration/currentref terminal ordering/socketpeer correlation/rollback invalidation/crossboot proof remainopen"
+    ]
+  },
+  "nextAction": "Review/admit QA5 fixture-only umask correction, run failed permission control then full owning pnpm check under sole heavy slot. Only after success freeze source and build Connect replacement. Continue safe Voice startup and managed root flow in disjoint worktrees.",
+  "preservation": "Craft paused; no product merges/publication or original Craft modifications. Backend2/Voice39 checked artifact bytes unchanged. Native6 remains blocked, no new identity admitted to Hub.",
+  "previewAccepted": false
+}

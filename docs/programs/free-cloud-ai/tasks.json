@@ -60,13 +60,14 @@
         " M docs/programs/craft-optional-apps/tasks/CRAFT-CORE-SANDBOX.md",
         "?? docs/handoffs/2026-10-11-freellmapi-review.md"
       ],
-      "implementation_revision": "c2b03842a81645998a79cbca525c03ddf67813b4"
+      "implementation_revision": "0ad62e58b889bfa0fdedc8015e2e24f6a006b358",
+      "unchanged_backend_artifact_source": "c2b03842a81645998a79cbca525c03ddf67813b4"
     },
     "hub": {
       "path": "/home/maslow/Projects/Maslow/free-ai-hub-current",
       "base_revision": "33940d2e8740b172b953cc3e091cbae1ba1cd303",
       "branch": "codex/free-cloud-ai-hub-current",
-      "implementation_revision": "9562f8e3d764954ff2fe4ce5aa20a40aa2b7a421",
+      "implementation_revision": "27de96e7045f71d1323e0ff61ec59f7c265e59da",
       "previous_free_ai_worktree": "/home/maslow/Projects/Maslow/free-ai-hub",
       "accepted_craft_source_reference": "2666609002dce8bb6cc16511ef2125bccb18dbe9"
     },
@@ -74,7 +75,7 @@
       "path": "/home/maslow/Projects/Maslow/free-ai-packages",
       "base_revision": "448856485e710caedfc24f544a027aea8652dd33",
       "branch": "codex/free-cloud-ai",
-      "implementation_revision": "333f4f83ddcba6651687a7723c6778f68023cc5b"
+      "implementation_revision": "d792676ca82d1c38441bde638631cdf6e54ffbe6"
     },
     "connect": {
       "path": "/home/maslow/Projects/Maslow/free-ai-connect-current",
@@ -88,7 +89,7 @@
         "scope": "Craft source + native synthetic/container checks only; not FreeAI managed account/live acceptance"
       },
       "preserved_source_checkout": "/home/maslow/Projects/Maslow/craft-connect",
-      "implementation_revision": "97ac20eed146a8c6b37e33c2c29901a00f3045ff",
+      "implementation_revision": "fd33682f3bcfdbce849a06304da0d74137b592f0",
       "previous_managed_worktree": "/home/maslow/Projects/Maslow/free-ai-connect",
       "previous_managed_revision": "646aa1149f36050a470ded7e3658ad0b0a38bcbb",
       "accepted_craft_native_reference": {
@@ -570,8 +571,8 @@
         "docs/programs/free-cloud-ai/evidence/2026-10-11-connect-current-integration.json"
       ],
       "artifact_hashes": {},
-      "blocker": "Five current advisories in native6; minimum pinned source fixes/9 upstream controls/typecheck pass, full owning sandbox QA failed in container and new native package remains unbuilt.",
-      "next_action": "Finish exact repaired owning QA in namespace-capable admitted environment, independent source review, then replacement native package/deployed/advisory/identity proof before live account acceptance."
+      "blocker": "Native6 remains advisory-blocked. Repaired source fd33682f passed full377/11skip owning checks and independent review; replacement native7 built, but exact production artifact/advisory/deployed/Hub identity and live account gates remain open.",
+      "next_action": "Audit exact native7 archive/source/production closure/notices and four approved dependency substitutions against upstream SRI; query fresh actual production advisories, check deployed entrypoints and matching Hub identity before live selected-account/revocation acceptance."
     },
     {
       "id": "FCAI-P4-RECOVERY",
@@ -671,7 +672,7 @@
         "docs/programs/free-cloud-ai/evidence/2026-10-12-baseline-admission.json"
       ],
       "artifact_hashes": {},
-      "blocker": "Independent baseline ISO currently building; actual fresh installed guest/glibc/Qt/pre-update optional installation remain unverified.",
+      "blocker": "Single admitted baseline completed with exact ISO c6674db4 hash; media/guest/actual pre-update optional installation remain unverified. No new ISO cycle is admitted.",
       "next_action": "Let the current healthy baseline finish its one bounded attempt with minimal monitoring. Prefer suitable existing verified media or a clean installed guest; an ISO is not a FreeAI deliverable or automatic prerequisite. Verify actual clean-install and pre-update optional-package behavior. No further ISO repair/rebuild without documenting why existing verified media cannot satisfy those tests; broader OS/hardware work remains excluded."
     },
     {

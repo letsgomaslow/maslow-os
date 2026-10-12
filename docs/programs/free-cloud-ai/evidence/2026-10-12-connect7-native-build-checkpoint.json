@@ -1,0 +1,47 @@
+{
+  "schema": 1,
+  "date": "2026-10-12",
+  "status": "native7-built-artifact-advisory-installed-gates-open",
+  "sourceCommit": "fd33682f3bcfdbce849a06304da0d74137b592f0",
+  "recipeCommit": "d792676ca82d1c38441bde638631cdf6e54ffbe6",
+  "manifestSha256": "7066f081e7f0e62586038f56caa688fbc15a99a57dddf9a64844fb7469cc5a39",
+  "buildSession": "ecdc534fa885406aa62fe575f7c2b5e5",
+  "artifact": {
+    "path": "/home/maslow/Maslow-ai-os/free-ai-build/connect-package-7-prep/recipe/maslow-connect-0.1.0-7-x86_64.pkg.tar.zst",
+    "name": "maslow-connect",
+    "version": "0.1.0-7",
+    "sha256": "95218c3e5eb74f440ac8b4d8f2c5e45e661f7f42fc469732652407ccb2c26668",
+    "bytes": 7692682,
+    "signed": false,
+    "installedAccepted": false
+  },
+  "evidence": [
+    {
+      "path": "/home/maslow/Maslow-ai-os/free-ai-build/connect-package-7-prep/build-evidence/ecdc534fa885406aa62fe575f7c2b5e5/state.json",
+      "sha256": "d1be960d7ac1d9f16b0f1340a8ba8cfed5211d83dde6c105a5c0667c08bc8618"
+    },
+    {
+      "path": "/home/maslow/Maslow-ai-os/free-ai-build/connect-package-7-prep/build-evidence/ecdc534fa885406aa62fe575f7c2b5e5/build.log",
+      "sha256": "a59d1ad942120ba9a8b41028f237d837689d804178560ede8a2913bc15eb5e58"
+    },
+    {
+      "path": "/home/maslow/Maslow-ai-os/free-ai-build/connect-package-7-prep/build-evidence/ecdc534fa885406aa62fe575f7c2b5e5/argv.json",
+      "sha256": "63cb7e6a810c23f881c9e70224c5697b5f149667fea20e99e753561e9d2297df"
+    },
+    {
+      "path": "/home/maslow/Maslow-ai-os/free-ai-build/connect-package-7-prep/build-admission.json",
+      "sha256": "15bcd7faccef250d88decbc340c1f85b00b7feb6b1c21f94e5b2e17a6a8270ac"
+    }
+  ],
+  "buildChecks": "Normal makepkg dependency checks, frozen ignoreScripts install, bridge/contracts build, deployed frozen lock/compiledcontracts/capabilities/catalog/license/links checks, fakeroot packaging completed. No nodeps/overwrite/signature/dependency bypass.",
+  "limits": "CPU2/RAM4GiB/total6GiB/MAKE-j2/sharedexclusiveheavylock; exactcfd builder; group retirement verified; no Docker containers remained.",
+  "sourceQA": "Independent final source377pass0fail11accounted skips, all workspace typechecks/builds. No source suite repeated in package check.",
+  "remaining": [
+    "Full exact newarchive identity/ownership/compiledsource/dependency closure/notices/known4dependency substitutions and tarball-SRI verification",
+    "Fresh actual production advisory query with exact newarchive inventory",
+    "Actual deployed entry/rootpath/helper/capability checks and overlap",
+    "Exact matched Hub identity then installed/live/account/revocation/recovery/Voice/Lenovo acceptance"
+  ],
+  "preserved": "Native5/6 and FreeAI2/Voice39 bytes preserved; native6blocked, neither relabeled; Craftpaused; no productmerge/productionpublication.",
+  "previewAccepted": false
+}

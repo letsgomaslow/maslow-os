@@ -35,10 +35,10 @@
     "runtime_implementation": "e7b8831a4fc81f6fdf0a1b8369dcc748274d9112",
     "connect_native3_baseline_not_managed_account_acceptance": "7545ba68c0b6759a7f65c88ccb1390777df5b812",
     "runtime_current_source": "c2b03842a81645998a79cbca525c03ddf67813b4",
-    "voice_managed_lifecycle_source": "89a7478dad7617faccc78b16e8880d3092cca7ba",
-    "hub_current_source": "b6fffd1ac3fb7af0e26a18eaf37b21fddef7881a",
-    "packages_current_source": "333f4f83ddcba6651687a7723c6778f68023cc5b",
-    "connect_managed_source": "97ac20eed146a8c6b37e33c2c29901a00f3045ff",
+    "voice_managed_lifecycle_source": "0ad62e58b889bfa0fdedc8015e2e24f6a006b358",
+    "hub_current_source": "27de96e7045f71d1323e0ff61ec59f7c265e59da",
+    "packages_current_source": "d792676ca82d1c38441bde638631cdf6e54ffbe6",
+    "connect_managed_source": "fd33682f3bcfdbce849a06304da0d74137b592f0",
     "hub_recovery_design": "0aafacbc8915d5db64e92bdb5a97bd604c76e6e1",
     "connect_previous_managed_source": "646aa1149f36050a470ded7e3658ad0b0a38bcbb",
     "connect_accepted_craft_baseline": "2e872f50a28706e70c159380e2b7186869415b7f",
@@ -99,6 +99,17 @@
       "signed": false,
       "installed_acceptance": false,
       "status": "BLOCKED for delivery:5 current production advisory matches; retained historical artifact; repaired source/native replacement required"
+    },
+    {
+      "path": "/home/maslow/Maslow-ai-os/free-ai-build/connect-package-7-prep/recipe/maslow-connect-0.1.0-7-x86_64.pkg.tar.zst",
+      "name": "maslow-connect",
+      "version": "0.1.0-7",
+      "sha256": "95218c3e5eb74f440ac8b4d8f2c5e45e661f7f42fc469732652407ccb2c26668",
+      "bytes": 7692682,
+      "source_commit": "fd33682f3bcfdbce849a06304da0d74137b592f0",
+      "signed": false,
+      "installed_acceptance": false,
+      "status": "replacement built with owning package checks; exact artifact/dependency/advisory/deployed/Hub identity acceptance open"
     }
   ],
   "accepted_capabilities": [],
@@ -150,7 +161,9 @@
     "docs/programs/free-cloud-ai/evidence/2026-10-12-native-validation-checkpoint.json",
     "docs/programs/free-cloud-ai/evidence/2026-10-12-baseline-admission.json",
     "docs/programs/free-cloud-ai/evidence/2026-10-12-guest-vm-control-review.json",
-    "docs/programs/free-cloud-ai/evidence/2026-10-12-managed-lifecycle-source-checkpoint.json"
+    "docs/programs/free-cloud-ai/evidence/2026-10-12-managed-lifecycle-source-checkpoint.json",
+    "docs/programs/free-cloud-ai/evidence/2026-10-12-connect-qa-lifecycle-checkpoint.json",
+    "docs/programs/free-cloud-ai/evidence/2026-10-12-connect7-native-build-checkpoint.json"
   ],
   "passed_source_gates": [
     "every-dispatch-provider-and-model-policy",
