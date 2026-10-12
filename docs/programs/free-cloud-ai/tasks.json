@@ -568,11 +568,12 @@
         "docs/programs/free-cloud-ai/evidence/2026-10-11-account-ui-source-checkpoint.json",
         "docs/programs/free-cloud-ai/evidence/2026-10-11-account-recovery-review.json",
         "/home/maslow/Projects/Maslow/free-ai-connect/docs/evidence/2026-10-11-managed-accounts.json",
-        "docs/programs/free-cloud-ai/evidence/2026-10-11-connect-current-integration.json"
+        "docs/programs/free-cloud-ai/evidence/2026-10-11-connect-current-integration.json",
+        "docs/programs/free-cloud-ai/evidence/2026-10-12-connect7-artifact-review-checkpoint.json"
       ],
       "artifact_hashes": {},
-      "blocker": "Native6 remains advisory-blocked. Repaired source fd33682f passed full377/11skip owning checks and independent review; replacement native7 built, but exact production artifact/advisory/deployed/Hub identity and live account gates remain open.",
-      "next_action": "Audit exact native7 archive/source/production closure/notices and four approved dependency substitutions against upstream SRI; query fresh actual production advisories, check deployed entrypoints and matching Hub identity before live selected-account/revocation acceptance."
+      "blocker": "Native7 notice audit found two missing license texts; supplemental recipe8 is prepared for independent review. Exact production105-tuple fresh npm advisory response reports0. Deployed/account/installed gates remain open.",
+      "next_action": "Review supplemental-notice recipe8 and build replacement; retain source377-pass/11-skip evidence and unchanged FreeAI2 rather than repeating them."
     },
     {
       "id": "FCAI-P4-RECOVERY",
@@ -768,11 +769,12 @@
         }
       ],
       "evidence": [
-        "docs/programs/free-cloud-ai/evidence/2026-10-11-connect-package-preparation-review.json"
+        "docs/programs/free-cloud-ai/evidence/2026-10-11-connect-package-preparation-review.json",
+        "docs/programs/free-cloud-ai/evidence/2026-10-12-connect7-artifact-review-checkpoint.json"
       ],
       "artifact_hashes": {},
-      "blocker": "Preparation only; native build slot and installed/live account gates remain unavailable.",
-      "next_action": "Serialize native candidate build and actual deployed marker/closure/ownership/overlap checks; no native/live acceptance inferred."
+      "blocker": "Native7 notice audit found two missing license texts; supplemental recipe8 is prepared for independent review. Exact production105-tuple fresh npm advisory response reports0. Deployed/account/installed gates remain open.",
+      "next_action": "Review supplemental-notice recipe8 and build replacement; retain source377-pass/11-skip evidence and unchanged FreeAI2 rather than repeating them."
     }
   ],
   "coordination": {

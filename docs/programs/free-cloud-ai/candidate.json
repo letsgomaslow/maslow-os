@@ -109,7 +109,7 @@
       "source_commit": "fd33682f3bcfdbce849a06304da0d74137b592f0",
       "signed": false,
       "installed_acceptance": false,
-      "status": "replacement built with owning package checks; exact artifact/dependency/advisory/deployed/Hub identity acceptance open"
+      "status": "built; full static audit blocked on two missing license texts; fresh exact105-tuple npm advisory response reports0; not admitted or installed"
     }
   ],
   "accepted_capabilities": [],

@@ -1,0 +1,36 @@
+{
+  "schema": 1,
+  "status": "incomplete-notice-gate-blocks-native7",
+  "archiveSha256": "95218c3e5eb74f440ac8b4d8f2c5e45e661f7f42fc469732652407ccb2c26668",
+  "sourceCommit": "fd33682f3bcfdbce849a06304da0d74137b592f0",
+  "recipeCommit": "d792676ca82d1c38441bde638631cdf6e54ffbe6",
+  "verificationDirectory": "/home/maslow/Maslow-ai-os/free-ai-build/connect-package-7-prep/verification",
+  "verificationManifestSha256": "e6f31996a4e6980e28360de29ddb0337f9c85dd2bb86f905cd8a3665fe75c45c",
+  "coordinatorSyntheticControls": {"passed": 11, "failed": 0},
+  "inventorySha256": "90d4831dce6b73152001a50c3ad606cbcb80ca359f19cd2f00ce61d13bfa7791",
+  "inventoryApprovalSha256": "3214cbcecad71d010b12cfa5d653b1e5dec2a26f47bb8e3e6caf4078ecc64ef4",
+  "observedCounts": {"physicalPackageRoots": 106, "externalNameVersionTuples": 105, "regularFiles": 8786, "compiledFiles": 99},
+  "staticAudit": {
+    "exit": 1,
+    "failure": "Missing packaged dependency notice: @cfworker/json-schema",
+    "checksReachedBeforeFailure": ["four patched package complete files and modes match exact lock SRI tarballs", "full source-derived deployment lock matches", "retained payload, paths, links, compiled code and contracts match native6", "package dependencies and ownership metadata match"],
+    "allNoticeGaps": ["@cfworker/json-schema@4.1.1", "@composio/client@2.0.0-rc.8"],
+    "fullStaticPass": false
+  },
+  "freshProductionAdvisory": {
+    "path": "evidence/connect7-production-advisories.jsonl",
+    "sha256": "b26c0ded377667e281c97ee6acb37bc829d044019f439718cabc317e8b0c2cec",
+    "capturedAtUtc": "2026-10-12T04:26:22.172539+00:00",
+    "httpStatus": 200,
+    "externalNameVersionTuples": 105,
+    "reportedAdvisoryCount": 0,
+    "scope": "Exact archive-derived production npm tuple request; no full-workspace pnpm audit, OS/Python/Node CVE assessment or universal vulnerability clearance inferred."
+  },
+  "preserved": ["native7 archive and failed audit", "native6 blocked archive and original five advisory reports", "unchanged verified FreeAI2 and Voice39 artifacts", "Craft compatibility source and paused work"],
+  "nextAction": "Independently review the narrow supplemental-notice recipe8 and Voice40 context, then build sequentially under the shared heavy-work lock. Reconcile exact replacement payloads before matched Hub admission.",
+  "artifactAccepted": false,
+  "hubAdmitted": false,
+  "installedVerified": false,
+  "liveVerified": false,
+  "previewComplete": false
+}
