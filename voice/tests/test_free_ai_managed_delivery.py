@@ -7,6 +7,7 @@ import os
 from pathlib import Path
 from types import SimpleNamespace
 import subprocess
+import sqlite3
 import tempfile
 import time
 import unittest
@@ -14,6 +15,7 @@ from unittest.mock import AsyncMock, Mock, patch
 
 from maslow_voice import free_ai_delivery as delivery
 from maslow_voice.errors import VoiceError
+from maslow_voice.ipc import ControlServer
 
 TX, NONCE = 'a'*32,'b'*64
 
@@ -92,12 +94,21 @@ def service():
 class ManagedQuiescenceTests(unittest.IsolatedAsyncioTestCase):
     def setUp(self):
         self.service=service();self.coordinator=delivery.DeliveryCoordinator(self.service);self.ticket=ticket(False)
-        for p in (patch.object(delivery,'read_managed_ticket',side_effect=lambda *args:copy.deepcopy(self.ticket)),
+        for p in (patch.object(delivery,'_protected_ticket',side_effect=lambda *args:copy.deepcopy(self.ticket)),
                   patch.object(delivery,'managed_capability'),patch.object(delivery,'canonical_service'),patch.object(delivery,'no_agent_sessions')):
             p.start();self.addCleanup(p.stop)
 
     def request(self,operation='quiesce'):
         return {'action':'free_ai_delivery','schema':2,'operation':operation,'transactionId':TX,'nonce':NONCE}
+
+    def assertRejected(self, response, reason='active-work'):
+        value=response['result']['rejection']
+        self.assertEqual(value['reason'],reason);self.assertEqual(value['ticketSchema'],2)
+        self.assertEqual(value['action'],self.ticket['action']);self.assertEqual(value['nonce'],self.ticket['nonce'])
+        self.assertEqual(value['originalTicketSha256'],hashlib.sha256(delivery.canonical_ticket(self.ticket)).hexdigest())
+        self.assertIs(value['continuationPending'],False);self.assertIs(value['preparationStarted'],False)
+        self.assertFalse(self.coordinator.closed);self.service._free_ai.assert_not_called()
+        self.assertIsNone(self.coordinator.managed_prepared)
 
     async def test_absent_backend_quiesces_without_import_snapshot_key_or_initialization(self):
         result=(await self.coordinator.handle(self.request()))['result']
@@ -111,20 +122,24 @@ class ManagedQuiescenceTests(unittest.IsolatedAsyncioTestCase):
     async def test_active_conversation_jobs_tasks_configuration_and_reservations_do_not_close(self):
         changes=(('provider',object()),('conversation_requests',{'active'}),('agent_jobs',{'active'}),('jobs',{'j':{'state':'running'}}),('action_work',{'active':True}))
         for field,bad in changes:
+            self.coordinator=delivery.DeliveryCoordinator(self.service)
             previous=getattr(self.service,field);setattr(self.service,field,bad)
-            with self.subTest(field=field),self.assertRaises(VoiceError):await self.coordinator.handle(self.request())
+            with self.subTest(field=field):self.assertRejected(await self.coordinator.handle(self.request()))
             self.assertFalse(self.coordinator.closed);setattr(self.service,field,previous)
+        self.coordinator=delivery.DeliveryCoordinator(self.service)
         self.service.tasks.assistant_reservations.add('active')
-        with self.assertRaises(VoiceError):await self.coordinator.handle(self.request())
+        self.assertRejected(await self.coordinator.handle(self.request()))
         self.assertFalse(self.coordinator.closed);self.service.tasks.assistant_reservations.clear()
+        self.coordinator=delivery.DeliveryCoordinator(self.service)
         await self.service.configuration_lock.acquire()
-        with self.assertRaises(VoiceError):await self.coordinator.handle(self.request())
+        self.assertRejected(await self.coordinator.handle(self.request()))
         self.assertFalse(self.coordinator.closed)
 
     async def test_inherited_coordinator_or_router_when_backend_absent_refuse(self):
         self.service.hermes.clients['inherited']=object()
-        with self.assertRaises(VoiceError):await self.coordinator.handle(self.request())
+        self.assertRejected(await self.coordinator.handle(self.request()),'inherited-coordinator')
         self.assertFalse(self.coordinator.closed);self.service.hermes.clients.clear()
+        self.coordinator=delivery.DeliveryCoordinator(self.service)
         self.service.free_ai_router=object()
         with self.assertRaises(VoiceError):await self.coordinator.handle(self.request())
         self.assertFalse(self.coordinator.closed)
@@ -157,6 +172,83 @@ class ManagedQuiescenceTests(unittest.IsolatedAsyncioTestCase):
         await self.coordinator.handle(self.request())
         self.ticket['nonce']='0'*64
         with self.assertRaises(VoiceError):await self.coordinator.handle(self.request('check'))
+
+    async def test_router_preclosure_busy_latches_without_stopping_or_disabling(self):
+        self.ticket=ticket(True)
+        router=SimpleNamespace(lock=asyncio.Lock(),owners={'synthetic'},admission=True,process=None,_stop=AsyncMock())
+        self.service.free_ai_router=router
+        response=await self.coordinator.handle(self.request());self.assertRejected(response,'router-work')
+        router.owners.clear()
+        self.assertEqual(response,await self.coordinator.handle(self.request()))
+        router._stop.assert_not_called();self.assertTrue(router.admission)
+        with self.assertRaises(VoiceError):await self.coordinator.handle(self.request('check'))
+
+    async def test_postclosure_router_busy_keeps_pending_without_rejection(self):
+        self.ticket=ticket(True)
+        router=SimpleNamespace(lock=asyncio.Lock(),owners=set(),admission=True,process=None,_stop=AsyncMock())
+        self.service.free_ai_router=router
+        async def change():router.owners.add('synthetic acquired during stop')
+        self.service.offline=SimpleNamespace(stop=AsyncMock(side_effect=change))
+        with self.assertRaises(VoiceError) as error:await self.coordinator.handle(self.request())
+        self.assertEqual(error.exception.code,'FREE_AI_PREPARATION_BUSY')
+        self.assertTrue(self.coordinator.closed);self.assertIsNone(self.coordinator.rejected)
+        router._stop.assert_not_called()
+
+    async def test_uninspectable_tasks_and_absent_backend_inconsistency_never_positive(self):
+        self.service.provider=object()
+        self.service.store.active=Mock(side_effect=sqlite3.DatabaseError('synthetic corrupt'))
+        with self.assertRaises(sqlite3.DatabaseError):await self.coordinator.handle(self.request())
+        self.assertIsNone(self.coordinator.rejected)
+        self.service.store.active=lambda:[];self.service.free_ai_router=object()
+        with self.assertRaises(VoiceError):await self.coordinator.handle(self.request())
+        self.assertIsNone(self.coordinator.rejected);self.assertFalse(self.coordinator.closed)
+
+    async def test_agent_sessions_reject_without_coordinator_or_router_shutdown(self):
+        with patch.object(delivery,'no_agent_sessions',side_effect=VoiceError('FREE_AI_PREPARATION_BUSY','synthetic')):
+            self.assertRejected(await self.coordinator.handle(self.request()),'agent-sessions')
+        self.assertIsNone(self.service.offline);self.assertFalse(self.service.hermes.processes)
+
+    async def test_same_ticket_rejects_when_idle_and_changed_public_or_expiry_refuses(self):
+        self.service.provider=object();response=await self.coordinator.handle(self.request())
+        self.service.provider=None
+        self.assertEqual(response,await self.coordinator.handle(self.request()))
+        self.ticket['expiresAt']-=1
+        with self.assertRaises(VoiceError):await self.coordinator.handle(self.request())
+        self.ticket['expiresAt']=int(time.time())-1
+        with self.assertRaises(VoiceError):await self.coordinator.handle(self.request())
+        self.service._free_ai.assert_not_called()
+
+    async def test_actual_two_ipc_connections_reject_after_first_disconnect_without_continuation(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            control=ControlServer(Path(temporary)/'control.sock',self.coordinator.handle,lambda:{})
+            original_send=control.send
+            sending,release=asyncio.Event(),asyncio.Event()
+            async def gated_send(writer,value):
+                if not sending.is_set():
+                    sending.set();await release.wait()
+                await original_send(writer,value)
+            control.send=gated_send
+            await control.start();clients=[]
+            try:
+                _,first=await asyncio.open_unix_connection(str(control.path));clients.append(first)
+                self.service.provider=object()
+                first.write(json.dumps(self.request()).encode()+b'\n');await first.drain()
+                await asyncio.wait_for(sending.wait(),2)
+                first.close();await first.wait_closed()
+                self.service.provider=None
+                reader,second=await asyncio.open_unix_connection(str(control.path));clients.append(second)
+                second.write(json.dumps(self.request()).encode()+b'\n');await second.drain()
+                response=json.loads(await asyncio.wait_for(reader.readline(),2))
+                self.assertIs(response['ok'],True);self.assertRejected(response)
+                self.assertEqual(response['result']['rejection'],self.coordinator.rejected['receipt'])
+                release.set();await asyncio.wait_for(asyncio.gather(*tuple(control.requests)),2)
+                self.assertFalse(control.requests)
+                self.coordinator.admit_tasks();self.coordinator.admit_control({'action':'submit_text'})
+                self.assertIsNone(self.coordinator.prepared);self.assertIsNone(self.coordinator.managed_prepared)
+            finally:
+                release.set()
+                for writer in clients:writer.close();await writer.wait_closed()
+                await control.close()
 
 
 if __name__=='__main__':unittest.main()

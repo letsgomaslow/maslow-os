@@ -146,6 +146,11 @@ def process_start():
     return Path('/proc/self/stat').read_text().rsplit(')',1)[1].split()[19]
 
 
+def canonical_ticket(ticket):
+    """Exact original literal: ASCII sorted compact JSON, without a newline."""
+    return json.dumps(ticket,sort_keys=True,separators=(',',':'),ensure_ascii=True,allow_nan=False).encode('ascii')
+
+
 def _managed_hex(value, size):
     return isinstance(value,str) and re.fullmatch(r'[a-f0-9]{' + str(size) + '}',value) is not None
 
@@ -261,6 +266,8 @@ class DeliveryCoordinator:
         self.closed = False
         self.prepared = None
         self.managed_prepared = None
+        self.rejected = None
+        self.attempted_ticket = None
 
     def admit_tasks(self):
         if self.closed:
@@ -273,16 +280,70 @@ class DeliveryCoordinator:
             return
         raise VoiceError('FREE_AI_DELIVERY_PENDING','Voice work and configuration are paused for the pending package operation.')
 
-    def idle(self, *, initial=False):
+    def _work_active(self):
         service = self.service
-        if (service.provider is not None or service.preview_task is not None or service.startup_task is not None
+        # A corrupt/unreadable task store is not a positive busy rejection.
+        active = service.store.active()
+        return (service.provider is not None or service.preview_task is not None or service.startup_task is not None
                 or service.conversation_requests or service.control_requests or service.configuration_lock.locked()
                 or service.lifecycle_lock.locked() or service.action_lock.locked() or service.action_work
                 or (service.reconnect_task and not service.reconnect_task.done())
-                or (service.provider_cleanup and not service.provider_cleanup.done()) or service.store.active() or service.tasks.assistant_reservations
+                or (service.provider_cleanup and not service.provider_cleanup.done()) or active or service.tasks.assistant_reservations
                 or any(not worker.done() for worker in service.tasks.monitors.values()) or service.agent_jobs
-                or any(job.get('state') not in {'finished','closed'} for job in service.jobs.values())):
+                or any(job.get('state') not in {'finished','closed'} for job in service.jobs.values()))
+
+    def idle(self, *, initial=False):
+        if self._work_active():
             raise VoiceError('FREE_AI_PREPARATION_BUSY' if initial else 'FREE_AI_WORK_ACTIVE','Finish active Voice conversations, tasks and agent jobs before installing components. No work was cancelled.')
+
+    def initial_rejection(self, ticket):
+        """Synchronous, before closure/await/import; never authority for Root."""
+        if self.closed or self.prepared is not None or self.managed_prepared is not None:
+            raise VoiceError('FREE_AI_DELIVERY_PENDING','Preparation has started. Verify or recover the current operation.')
+        literal = canonical_ticket(ticket)
+        if self.attempted_ticket is not None and self.attempted_ticket['transactionId'] == ticket['transactionId']:
+            if canonical_ticket(self.attempted_ticket) != literal:
+                raise VoiceError('FREE_AI_TICKET_INVALID','The attempted operation ticket changed.')
+            raise VoiceError('FREE_AI_DELIVERY_PENDING','Preparation may have started for this operation. Review or recover it before retrying.')
+        router = self.service.free_ai_router
+        if ticket['action'] == 'free-ai-reinstall' and router is not None:
+            raise VoiceError('FREE_AI_PREPARATION_BUSY','An absent backend still has router state in Voice.')
+        if self.rejected is not None and self.rejected['ticket']['transactionId'] == ticket['transactionId']:
+            if canonical_ticket(self.rejected['ticket']) != literal:
+                raise VoiceError('FREE_AI_TICKET_INVALID','The rejected operation ticket changed.')
+            self._rejection_current(ticket,literal)
+            return {'rejection':copy.deepcopy(self.rejected['receipt'])}
+        if self._work_active():
+            reason = 'active-work'
+        elif set(self.service.hermes.clients) - set(self.service.hermes.processes):
+            reason = 'inherited-coordinator'
+        elif router is not None and (router.owners or (ticket['schema'] == 2 and router.lock.locked())):
+            reason = 'router-work'
+        else:
+            try:
+                no_agent_sessions()
+            except VoiceError as error:
+                if error.code != 'FREE_AI_PREPARATION_BUSY':
+                    raise
+                reason = 'agent-sessions'
+            else:
+                return None
+        # No await or background preparation has occurred. Recheck the actual
+        # public literal before latching a terminal rejection for this ticket.
+        self._rejection_current(ticket,literal)
+        receipt = {'schema':1,'purpose':'free-ai-preparation-rejection','ticketSchema':ticket['schema'],
+            'action':ticket['action'],'transactionId':ticket['transactionId'],'nonce':ticket['nonce'],'uid':os.getuid(),
+            'originalTicketSha256':hashlib.sha256(literal).hexdigest(),'daemonPid':os.getpid(),'daemonStart':process_start(),
+            'outcome':'rejected-before-admission','reason':reason,'admissionClosed':False,
+            'preparationStarted':False,'continuationPending':False}
+        self.rejected = {'ticket':copy.deepcopy(ticket),'receipt':copy.deepcopy(receipt)}
+        return {'rejection':receipt}
+
+    def _rejection_current(self, ticket, literal):
+        canonical_service(self.service)
+        reader = read_ticket if ticket['schema'] == 1 else read_managed_ticket
+        if canonical_ticket(reader(ticket['transactionId'],ticket['nonce'])) != literal:
+            raise VoiceError('FREE_AI_TICKET_INVALID','The current operation ticket changed before rejection.')
 
     async def handle(self, request):
         if type(request.get('schema')) is int and request.get('schema') == 2:
@@ -301,14 +362,12 @@ class DeliveryCoordinator:
                 if isinstance(error,FreeAIError):
                     raise VoiceError(error.code,error.message) from None
                 raise VoiceError('FREE_AI_VERIFICATION_FAILED','The stopped recovery record could not be verified. Admission remains closed.') from None
-        if self.closed or self.prepared is not None:
-            raise VoiceError('FREE_AI_DELIVERY_PENDING','Preparation has started for this operation. Verify or recover it rather than creating another snapshot.')
-        self.idle(initial=True)
-        if set(self.service.hermes.clients) - set(self.service.hermes.processes):
-            raise VoiceError('FREE_AI_PREPARATION_BUSY','An inherited coordinator cannot be shut down safely. Review it before package changes. No preparation started.')
-        if self.service.free_ai_router and self.service.free_ai_router.owners:
-            raise VoiceError('FREE_AI_PREPARATION_BUSY','An assistant request still owns the router. No preparation started.')
-        no_agent_sessions()
+        rejection = self.initial_rejection(ticket)
+        if rejection is not None:
+            return {'result':rejection}
+        # Lazy construction can change state before closure or fail halfway.
+        # Never later certify that this exact operation did not start.
+        self.attempted_ticket = copy.deepcopy(ticket)
         router = self.service._free_ai()
         if not hasattr(router,'prepare_recovery'):
             raise VoiceError('FREE_AI_RECOVERY_UNAVAILABLE','The installed private runtime does not support paired recovery. No package operation was authorized.')
@@ -373,17 +432,10 @@ class DeliveryCoordinator:
         canonical_service(self.service)
         if request['operation'] == 'check':
             return {'result':self.managed_check(ticket)}
-        if self.closed or self.prepared is not None or self.managed_prepared is not None:
-            raise VoiceError('FREE_AI_DELIVERY_PENDING','An operation has already closed admission. Verify or recover it.')
-        self.idle(initial=True)
-        if set(self.service.hermes.clients) - set(self.service.hermes.processes):
-            raise VoiceError('FREE_AI_PREPARATION_BUSY','An inherited coordinator cannot be shut down safely.')
+        rejection = self.initial_rejection(ticket)
+        if rejection is not None:
+            return {'result':rejection}
         router = self.service.free_ai_router  # never lazily import/create an absent backend
-        if ticket['action'] == 'free-ai-reinstall' and router is not None:
-            raise VoiceError('FREE_AI_PREPARATION_BUSY','An absent backend still has router state in Voice.')
-        if router is not None and (router.owners or router.lock.locked()):
-            raise VoiceError('FREE_AI_PREPARATION_BUSY','The owned router still has active work.')
-        no_agent_sessions()
         self.closed = True  # no await between idle proof and admission closure
         try:
             if self.service.hermes.processes:
