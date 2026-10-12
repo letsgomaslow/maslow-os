@@ -36,8 +36,8 @@
     "connect_native3_baseline_not_managed_account_acceptance": "7545ba68c0b6759a7f65c88ccb1390777df5b812",
     "runtime_current_source": "c2b03842a81645998a79cbca525c03ddf67813b4",
     "voice_managed_lifecycle_source": "0ad62e58b889bfa0fdedc8015e2e24f6a006b358",
-    "hub_current_source": "27de96e7045f71d1323e0ff61ec59f7c265e59da",
-    "packages_current_source": "d792676ca82d1c38441bde638631cdf6e54ffbe6",
+    "hub_current_source": "f3873e78b5b707c84eba919ead91360a93db71e1",
+    "packages_current_source": "42adaeca720dd8aced00d17bd4238225c15464cd",
     "connect_managed_source": "fd33682f3bcfdbce849a06304da0d74137b592f0",
     "hub_recovery_design": "0aafacbc8915d5db64e92bdb5a97bd604c76e6e1",
     "connect_previous_managed_source": "646aa1149f36050a470ded7e3658ad0b0a38bcbb",
@@ -110,6 +110,30 @@
       "signed": false,
       "installed_acceptance": false,
       "status": "built; full static audit blocked on two missing license texts; fresh exact105-tuple npm advisory response reports0; not admitted or installed"
+    },
+    {
+      "path": "/home/maslow/Maslow-ai-os/free-ai-build/voice40-prep/recipe/maslow-voice-0.1.5-40-x86_64.pkg.tar.zst",
+      "name": "maslow-voice",
+      "version": "0.1.5-40",
+      "sha256": "407b4372e0d8a3de0652a59d28b0ddd38068447450abfa5309c91e431239db44",
+      "bytes": 286217478,
+      "source_commit": "0ad62e58b889bfa0fdedc8015e2e24f6a006b358",
+      "recipe_commit": "488d7cede41c309be7202f2ef0bc2f8d57ff5fc2",
+      "signed": false,
+      "installed_acceptance": false,
+      "status": "normal resource-limited build complete; archive/runtime/installed/live checks pending"
+    },
+    {
+      "path": "/home/maslow/Maslow-ai-os/free-ai-build/connect-package-8-prep/recipe/maslow-connect-0.1.0-8-x86_64.pkg.tar.zst",
+      "name": "maslow-connect",
+      "version": "0.1.0-8",
+      "sha256": "3bbd8f3218af5556dbb5d989c7375b66292d62790a841c905dde72a1f6f34dca",
+      "bytes": 7698219,
+      "source_commit": "fd33682f3bcfdbce849a06304da0d74137b592f0",
+      "recipe_commit": "42adaeca720dd8aced00d17bd4238225c15464cd",
+      "signed": false,
+      "installed_acceptance": false,
+      "status": "normal resource-limited build complete; archive/runtime/installed/live checks pending"
     }
   ],
   "accepted_capabilities": [],

@@ -67,7 +67,7 @@
       "path": "/home/maslow/Projects/Maslow/free-ai-hub-current",
       "base_revision": "33940d2e8740b172b953cc3e091cbae1ba1cd303",
       "branch": "codex/free-cloud-ai-hub-current",
-      "implementation_revision": "27de96e7045f71d1323e0ff61ec59f7c265e59da",
+      "implementation_revision": "f3873e78b5b707c84eba919ead91360a93db71e1",
       "previous_free_ai_worktree": "/home/maslow/Projects/Maslow/free-ai-hub",
       "accepted_craft_source_reference": "2666609002dce8bb6cc16511ef2125bccb18dbe9"
     },
@@ -75,7 +75,7 @@
       "path": "/home/maslow/Projects/Maslow/free-ai-packages",
       "base_revision": "448856485e710caedfc24f544a027aea8652dd33",
       "branch": "codex/free-cloud-ai",
-      "implementation_revision": "d792676ca82d1c38441bde638631cdf6e54ffbe6"
+      "implementation_revision": "42adaeca720dd8aced00d17bd4238225c15464cd"
     },
     "connect": {
       "path": "/home/maslow/Projects/Maslow/free-ai-connect-current",
@@ -365,7 +365,8 @@
         "docs/programs/free-cloud-ai/evidence/2026-10-11-c2-final-context-inventory.json",
         "docs/programs/free-cloud-ai/evidence/2026-10-11-native-sequence-admission.json",
         "docs/programs/free-cloud-ai/evidence/2026-10-12-native-build-checkpoint.json",
-        "docs/programs/free-cloud-ai/evidence/2026-10-12-native-validation-checkpoint.json"
+        "docs/programs/free-cloud-ai/evidence/2026-10-12-native-validation-checkpoint.json",
+        "docs/programs/free-cloud-ai/evidence/2026-10-12-voice40-connect8-native-build-checkpoint.json"
       ],
       "artifact_hashes": {
         "/home/maslow/Maslow-ai-os/free-ai-build/native/maslow-free-ai-0.1.0-1-x86_64.pkg.tar.zst": "5b2d989d58451ac9744f9c0e8c2c3dcde5f99657d1fef931d2c4a348fb5e4143",
@@ -465,7 +466,8 @@
         "docs/programs/free-cloud-ai/evidence/2026-10-11-hub-stage1-checkpoint.json",
         "docs/programs/free-cloud-ai/evidence/2026-10-11-hub-recovery-source-checkpoint.json",
         "docs/programs/free-cloud-ai/evidence/2026-10-11-hub-current-integration-checkpoint.json",
-        "docs/programs/free-cloud-ai/evidence/2026-10-11-guided-hub-source-checkpoint.json"
+        "docs/programs/free-cloud-ai/evidence/2026-10-11-guided-hub-source-checkpoint.json",
+        "docs/programs/free-cloud-ai/evidence/2026-10-12-voice40-connect8-native-build-checkpoint.json"
       ],
       "artifact_hashes": {},
       "blocker": "Managed removal/reinstall lifecycle and installed signed delivery/recovery remain incomplete; Connect6 blocked, no new native identity admitted.",
@@ -637,7 +639,8 @@
         "docs/programs/free-cloud-ai/evidence/2026-10-11-runtime-delivery-review.json",
         "docs/programs/free-cloud-ai/evidence/2026-10-11-delivery-recovery-checkpoint.json",
         "docs/programs/free-cloud-ai/evidence/2026-10-11-hub-stage1-checkpoint.json",
-        "docs/programs/free-cloud-ai/evidence/2026-10-11-reinstall-design-checkpoint.json"
+        "docs/programs/free-cloud-ai/evidence/2026-10-11-reinstall-design-checkpoint.json",
+        "docs/programs/free-cloud-ai/evidence/2026-10-12-voice40-connect8-native-build-checkpoint.json"
       ],
       "artifact_hashes": {},
       "blocker": "Native interrupted package/database/key restoration and fresh undo remain unverified. Preserved-state reinstall is design-only; manual/unrecorded removal remains unsupported. Both delivery gates stay false.",
@@ -770,11 +773,12 @@
       ],
       "evidence": [
         "docs/programs/free-cloud-ai/evidence/2026-10-11-connect-package-preparation-review.json",
-        "docs/programs/free-cloud-ai/evidence/2026-10-12-connect7-artifact-review-checkpoint.json"
+        "docs/programs/free-cloud-ai/evidence/2026-10-12-connect7-artifact-review-checkpoint.json",
+        "docs/programs/free-cloud-ai/evidence/2026-10-12-voice40-connect8-native-build-checkpoint.json"
       ],
       "artifact_hashes": {},
-      "blocker": "Native7 notice audit found two missing license texts; supplemental recipe8 is prepared for independent review. Exact production105-tuple fresh npm advisory response reports0. Deployed/account/installed gates remain open.",
-      "next_action": "Review supplemental-notice recipe8 and build replacement; retain source377-pass/11-skip evidence and unchanged FreeAI2 rather than repeating them."
+      "blocker": "Native8 now built with reviewed supplemental notices; exact artifact/advisory/deployed/Hub identity checks and live/installed gates are pending.",
+      "next_action": "Verify new native8 archive and deployed fixed launcher before admitting its exact Hub identity; preserve source377-pass evidence."
     }
   ],
   "coordination": {

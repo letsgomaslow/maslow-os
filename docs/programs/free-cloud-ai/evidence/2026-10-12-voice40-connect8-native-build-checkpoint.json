@@ -1,0 +1,63 @@
+{
+  "schema": 1,
+  "status": "native-builds-complete-acceptance-pending",
+  "craft": "paused; no source, package or ledger changes by this workstream",
+  "limits": {
+    "cpus": 2,
+    "memoryGiB": 4,
+    "totalMemoryGiB": 6,
+    "makeFlags": "-j2",
+    "heavyJobsAtOnce": 1
+  },
+  "voice": {
+    "version": "0.1.5-40",
+    "source": "0ad62e58b889bfa0fdedc8015e2e24f6a006b358",
+    "sourceArchiveSha256": "be9a936c389131ebc667baede280bca7f18c38730dc8c561fa87b02b1d9010a9",
+    "recipe": "488d7cede41c309be7202f2ef0bc2f8d57ff5fc2",
+    "reviewSha256": "3cef12b97045b511b16f6d0e344dfe34e52f061a9604e9fd303905fd62db0fb8",
+    "manifestSha256": "55682b19921d0aed30da05030fd49cbaff1ce0274c402ee31c6538918324faa3",
+    "session": "db1485685bda402b962a24b67a646745",
+    "image": "sha256:adc435b28948e6bac4f744cda2018fb5ce0121d7a50aed58a08477e1fc861afb",
+    "archive": "/home/maslow/Maslow-ai-os/free-ai-build/voice40-prep/recipe/maslow-voice-0.1.5-40-x86_64.pkg.tar.zst",
+    "archiveSha256": "407b4372e0d8a3de0652a59d28b0ddd38068447450abfa5309c91e431239db44",
+    "bytes": 286217478,
+    "buildExit": 0,
+    "normalDependenciesChecked": true,
+    "launchGroupRetired": true,
+    "knownReviewFinding": "Valid stale source-tools bytecode could bypass the first controller's helper import. Corrected single-read/hash/compile path independently retested; original controller and manifest preserved.",
+    "artifactAccepted": false
+  },
+  "connect": {
+    "version": "0.1.0-8",
+    "source": "fd33682f3bcfdbce849a06304da0d74137b592f0",
+    "sourceArchiveSha256": "e8074082b5178f0b1f28843bca1ac96eec2436a374ae7f0de7732cb15eebba83",
+    "sourceLockSha256": "e6d717577fc92a37a03e630eb2c4acfcf2225900d155e6e2c832655bedbe10e1",
+    "recipe": "42adaeca720dd8aced00d17bd4238225c15464cd",
+    "reviewSha256": "c42c864a91bdebf658aa0d5c8bbee6076e6344d8ebd2abef63801ae589e83fa3",
+    "manifestSha256": "4742bafe93b5f1ac26e7865a2ad8b23bd0ed33da0473a90682526b55e6d819a3",
+    "session": "c3a6aed48e2245b1871773ba17a56123",
+    "image": "sha256:cfd891bf262d24bac53aa489af912484a08545e38001624a94640de4e43b840f",
+    "archive": "/home/maslow/Maslow-ai-os/free-ai-build/connect-package-8-prep/recipe/maslow-connect-0.1.0-8-x86_64.pkg.tar.zst",
+    "archiveSha256": "3bbd8f3218af5556dbb5d989c7375b66292d62790a841c905dde72a1f6f34dca",
+    "bytes": 7698219,
+    "buildExit": 0,
+    "normalDependenciesChecked": true,
+    "launchGroupRetired": true,
+    "change": "Separate supplemental license texts and exact provenance; source and deployed dependencies unchanged from repaired native7 inputs.",
+    "artifactAccepted": false
+  },
+  "hub": {
+    "source": "f3873e78b5b707c84eba919ead91360a93db71e1",
+    "owningTests": 387,
+    "owningResult": "OK",
+    "uiResult": "pass",
+    "epochReviewSha256": "09491be541dd8e51fd104d078a62969691904f61069ff44e84727fc8b6331be5",
+    "v2RemovalReinstall": "separate unreviewed source milestone in progress"
+  },
+  "backend2": "Preserved unchanged; no rebuild or repeated passing native checks",
+  "nextAction": "Verify exact new archives and fresh extracted packaged execution; finish reviewed V2 lifecycle and matched Hub before installed/private/physical acceptance.",
+  "signed": false,
+  "installedVerified": false,
+  "liveVerified": false,
+  "previewComplete": false
+}
