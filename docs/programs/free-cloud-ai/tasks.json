@@ -67,7 +67,7 @@
       "path": "/home/maslow/Projects/Maslow/free-ai-hub-current",
       "base_revision": "33940d2e8740b172b953cc3e091cbae1ba1cd303",
       "branch": "codex/free-cloud-ai-hub-current",
-      "implementation_revision": "e372d7c9ac05a359d267912862ae7fdd932f3eb4",
+      "implementation_revision": "5d74104d86121f4f9c850ad4bbaaf40942322de4",
       "previous_free_ai_worktree": "/home/maslow/Projects/Maslow/free-ai-hub",
       "accepted_craft_source_reference": "2666609002dce8bb6cc16511ef2125bccb18dbe9"
     },
@@ -610,7 +610,7 @@
       "worker": "current_recovery managed lifecycle contract/code; root installed recovery integration",
       "actual_model": "gpt-6.1-sol/high implementation; root coordinator",
       "attempt": 1,
-      "last_checkpoint": "2026-10-11T19:11:20.265138+00:00",
+      "last_checkpoint": "2026-10-12T08:21:56.993521+00:00",
       "base_revision": "09721dff",
       "branch": "codex/free-cloud-ai",
       "worktree": "/home/maslow/Maslow-ai-os/free-ai-runtime",
@@ -648,11 +648,12 @@
         "docs/programs/free-cloud-ai/evidence/2026-10-12-managed-source-and-owning-checkpoint.json",
         "docs/programs/free-cloud-ai/evidence/2026-10-12-issuer-map-native-checkpoint.json",
         "docs/programs/free-cloud-ai/evidence/2026-10-12-offline-lease-review-checkpoint.json",
-        "docs/programs/free-cloud-ai/evidence/2026-10-12-guarded-lease-source-checkpoint.json"
+        "docs/programs/free-cloud-ai/evidence/2026-10-12-guarded-lease-source-checkpoint.json",
+        "docs/programs/free-cloud-ai/evidence/2026-10-12-executor-admission-source-checkpoint.json"
       ],
       "artifact_hashes": {},
-      "blocker": "Guarded offline lease accepted; first private executor freeze has three independently reproduced retry/socket defects despite27focused/143affected passes. Targeted fixes active. Public/initial-rejection/crossboot, WAL/staging/corrupt-state and actualinstalled recovery remain required.",
-      "next_action": "Fix/review the exact executor retry and socket findings, then one final Hub owning/UI validation. Keep public gates closed and required native/live/recovery gates open.",
+      "blocker": "Private recovery executor and Installer pending admission accepted with509owning/UI checks. Typed Voice41 initial rejection, witnessed cleanup, reboot authority, WAL/staging/damagedDB and actualinstalled recovery remain required.",
+      "next_action": "Implement/review typed Voice41 initial rejection/latch and focused Hub receipt codec; then separately reviewed helper/witness/abort cleanup. No public gate opening or backend2/c2 change.",
       "coordinator_only": true
     },
     {
@@ -673,7 +674,7 @@
       "worker": "root existing-image validation; independent bounded preparation/result review",
       "actual_model": "coordinator; gpt-6.1-sol/medium preparation, gpt-6.1-sol/high launch cleanup, gpt-6-astra/high review",
       "attempt": 1,
-      "last_checkpoint": "2026-10-12T07:37:14.650580+00:00",
+      "last_checkpoint": "2026-10-12T08:21:56.993565+00:00",
       "base_revision": "c2b03842",
       "branch": "codex/free-cloud-ai",
       "worktree": "/home/maslow/Maslow-ai-os/free-ai-runtime",
@@ -683,11 +684,12 @@
       "evidence": [
         "docs/programs/free-cloud-ai/evidence/2026-10-12-baseline-admission.json",
         "docs/programs/free-cloud-ai/evidence/2026-10-12-existing-media-targeted-checkpoint.json",
-        "docs/programs/free-cloud-ai/evidence/2026-10-12-existing-media-artifact-collection.json"
+        "docs/programs/free-cloud-ai/evidence/2026-10-12-existing-media-artifact-collection.json",
+        "docs/programs/free-cloud-ai/evidence/2026-10-12-existing-media-static-checkpoint.json"
       ],
       "artifact_hashes": {},
-      "blocker": "Existing c667 image and nine actual local archives/target DB collected; exact payload/source, optional/test-trust absence and complete media receipt remain required. No VM or installed acceptance; no new ISO cycle admitted.",
-      "next_action": "Reconcile collected existing-media package payload/source and metadata, verify optional/test-trust absence and obtain the complete independent media receipt; then use the prepared clean guest. Keep installed-system gates and no-new-ISO constraint."
+      "blocker": "Existing image completed34static read stages and12critical source byte matches. Full MTREE/optional/testrepo/publictrust reconciliation and complete independent media receipt remain required; no VM or installed acceptance and no new ISO cycle.",
+      "next_action": "Finish existing-media manifest, absence and public-only trust reconciliation; then run the prepared real clean guest before OS update. Preserve all installed/live/Lenovo gates."
     },
     {
       "id": "FCAI-P6-REVIEW",

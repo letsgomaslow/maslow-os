@@ -1,0 +1,22 @@
+{
+  "schema": 1,
+  "status": "private-executor-and-installer-admission-source-verified-preview-incomplete",
+  "executorCommit": "19d3d21b130c787dcbb2c6b486c0f1c58f3ac625",
+  "hubCurrentSource": "5d74104d86121f4f9c850ad4bbaaf40942322de4",
+  "executorRetakeSha256": "7f4630408baf3c21a2a60c2b813471fce956c4c28144e00dd027f7310eb602aa",
+  "admissionReviewSha256": "dbbaa54a6c6f6e5f29c88aeeea495a430d32d8be9faf354d673aa26582abf906",
+  "checks": [
+    {"source": "executor79a7", "owningPassed": 504, "seconds": 81.884, "logSha256": "e84c7a129035803c77a831aae1d97bd7351ef9317195996dccfb69ccd102fdd9", "uiPassed": true},
+    {"source": "admission5663", "owningPassed": 509, "seconds": 84.341, "logSha256": "bd55e9026566b4c3e565bfe8ea02a43d550e68bc28351ed50e52a4d9c695e454", "uiPassed": true}
+  ],
+  "implemented": ["Authenticated private current-operation recovery controller/server", "Separate finish-only decisions and marker cleanup", "Reviewed crash retry and socket ownership corrections", "Global Installer pending exclusion for Hub/Voice/FreeAI package actions"],
+  "originalFailures": "Three independent executor findings and original failed/focused source logs remain preserved externally and in committed review history. Passing source tests never overrode the negative reproductions.",
+  "nextUnit": "Typed Voice41 rejection/latch and focused Hub receipt codec; Root accepted proposal0653896c6c5be5948b536660010ef650b2e196078a3186d5d810a469e69a4587. Helper forwarding and witnessed Root abort cleanup remain a later reviewed unit.",
+  "preserved": "Backend2/c2 and its six recovery members, current Connect8/Voice40 artifacts, Craft identities and original worktrees remain unchanged. Voice41 will require a new exact artifact after accepted source changes.",
+  "remaining": ["Initial refusal forwarding/witness/cleanup and loaded Voice41 proof", "Reboot authority", "WAL settlement", "Uncertain staging cleanup/retry", "Missing/corrupt current DB recovery", "Actual package/database/key recovery", "Final matched Hub package, signatures and full ownership checks", "Clean guest installation", "Live Groq and selected-account reads/revocation", "Audible existing Voice and Lenovo behavior/resources"],
+  "craftPaused": true,
+  "newIsoBuildOrRepair": false,
+  "publicGatesOpened": false,
+  "nativeRecoveryAccepted": false,
+  "previewComplete": false
+}

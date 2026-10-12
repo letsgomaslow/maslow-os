@@ -1,0 +1,22 @@
+{
+  "schema": 1,
+  "status": "actual-static-evidence-collected-not-complete-media-acceptance",
+  "run": "/home/maslow/Maslow-ai-os/free-ai-build/guest-baseline-prep/media-inspection/static-evidence/97af10fd95514c2aa6b1c601849e9fa3",
+  "stateSha256": "929b1e6f16391985211618ad48cc4095195529bef47146bad9d502253b748744",
+  "collectorSha256": "85d48ab0ec5a9dd992b6edf964d9cefb257c766f4e0cc7488cca7ce35603ad13",
+  "inventorySha256": "b9115f323ffebb57b6cd01b7dd0c42a836ccfc96c47b5403e370dcda2a1df132",
+  "manifestSha256": "8146a442dc424df8d4ce3499b5b1c76128fec8e76d29fd1ec32d3a6e34712912",
+  "controlReviewSha256": "c492d30b38997b1fe68a27badff637cf6733af6baa5b1e6fb2bdf0a94c593513",
+  "actualExitCode": 0,
+  "completedOwnedStages": 34,
+  "nonemptyStageErrorFiles": 0,
+  "criticalFrozenSourceFilesMatched": 12,
+  "facts": "All nine archive inventories include regular payload hashes, types, modes, owners and link records, with archive hashes checked before and after. Literal MTREE bytes and checked libarchive listings plus fixed rootfs listings/configuration were collected under the shared lock and existing two-CPU/4GiB bounds. No package was executed or extracted onto the filesystem.",
+  "remaining": ["Independent full MTREE-to-archive reconciliation", "Optional payload/package and test repository absence evaluation", "Complete public-only trust input and denylist comparison", "Independent six-fact media receipt", "Real clean installed guest before OS update"],
+  "limits": "Twelve critical byte matches and accepted metadata/build receipts are a narrow provenance basis. Original final-nine precomputed hashes remain absent/null. Two known public test fingerprints do not constitute a complete trust check.",
+  "newIsoBuildOrRepair": false,
+  "mediaVerified": false,
+  "guestVerified": false,
+  "testTrustAbsent": false,
+  "previewComplete": false
+}
