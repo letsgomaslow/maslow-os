@@ -385,7 +385,9 @@
         "docs/programs/free-cloud-ai/evidence/2026-10-12-native-validation-checkpoint.json",
         "docs/programs/free-cloud-ai/evidence/2026-10-12-voice40-connect8-native-build-checkpoint.json",
         "docs/programs/free-cloud-ai/evidence/2026-10-12-voice41-scoped-artifact-checkpoint.json",
-        "docs/programs/free-cloud-ai/evidence/2026-10-12-resource-efficient-completion.json"
+        "docs/programs/free-cloud-ai/evidence/2026-10-12-resource-efficient-completion.json",
+        "docs/programs/free-cloud-ai/evidence/2026-10-12-retained-hub-artifact-audit.json",
+        "docs/programs/free-cloud-ai/evidence/2026-10-12-lenovo-pivot-diligence.json"
       ],
       "artifact_hashes": {
         "/home/maslow/Maslow-ai-os/free-ai-build/native/maslow-free-ai-0.1.0-1-x86_64.pkg.tar.zst": "5b2d989d58451ac9744f9c0e8c2c3dcde5f99657d1fef931d2c4a348fb5e4143",
@@ -515,11 +517,13 @@
         "docs/programs/free-cloud-ai/evidence/2026-10-12-overlay-controls-and-cid-checkpoint.json",
         "docs/programs/free-cloud-ai/evidence/2026-10-12-qa-source-build-and-postboot-checkpoint.json",
         "docs/programs/free-cloud-ai/evidence/2026-10-12-guest-login-and-postboot-owning-checkpoint.json",
-        "docs/programs/free-cloud-ai/evidence/2026-10-12-resource-efficient-completion.json"
+        "docs/programs/free-cloud-ai/evidence/2026-10-12-resource-efficient-completion.json",
+        "docs/programs/free-cloud-ai/evidence/2026-10-12-retained-hub-artifact-audit.json",
+        "docs/programs/free-cloud-ai/evidence/2026-10-12-lenovo-pivot-diligence.json"
       ],
       "artifact_hashes": {},
-      "blocker": "Hub677 owning/UI/shell passed. QA2 Hub built but original controller failed deterministic pkgver postcheck; fix independently accepted. Actual archive audit, normal Voice bootstrap and installed/live gates open.",
-      "next_action": "Review separate retained-artifact admission and audit exact existing QA2 Hub; preserve original failed build state and unchanged2/41/8."
+      "blocker": "Actual retained QA Hub audit passed, no rebuild. Lenovo requires exact signed Hub0.3.6 rollback seed and pair signatures matching enrolled staging key; current channel and scoped Mac search have no old archive. Host install not admitted.",
+      "next_action": "Establish old-source rollback feasibility and operator preview signing handoff; integrate reviewed recovery source and build only affected matched Hub."
     },
     {
       "id": "FCAI-P2-WORK",
@@ -725,11 +729,13 @@
         "docs/programs/free-cloud-ai/evidence/2026-10-12-overlay-controls-and-cid-checkpoint.json",
         "docs/programs/free-cloud-ai/evidence/2026-10-12-qa-source-build-and-postboot-checkpoint.json",
         "docs/programs/free-cloud-ai/evidence/2026-10-12-guest-login-and-postboot-owning-checkpoint.json",
-        "docs/programs/free-cloud-ai/evidence/2026-10-12-resource-efficient-completion.json"
+        "docs/programs/free-cloud-ai/evidence/2026-10-12-resource-efficient-completion.json",
+        "docs/programs/free-cloud-ai/evidence/2026-10-12-retained-hub-artifact-audit.json",
+        "docs/programs/free-cloud-ai/evidence/2026-10-12-lenovo-pivot-diligence.json"
       ],
       "artifact_hashes": {},
-      "blocker": "Private postboot source677/UI/shell accepted. Actual package/key recovery open; current V2 keep-only route cannot yet prove physical missing-database restoration success. Read-only reconciliation retained.",
-      "next_action": "Prepare narrow current-operation physical-restoration charter and focused source implementation/review, retaining backend2/Voice41 contract. Actual recovery gates remain mandatory.",
+      "blocker": "Narrow missing-standalone private V2 source implementation active; no freeze/review/full-suite or native restoration success. Corrupt-present and unrecorded-stage interruption gates remain explicitly open.",
+      "next_action": "Review bounded author freeze and focused tests, run appropriate owning checks once after accepted changes, then exact synthetic installed recovery gates.",
       "coordinator_only": true
     },
     {
@@ -776,11 +782,13 @@
         "docs/programs/free-cloud-ai/evidence/2026-10-12-overlay-controls-and-cid-checkpoint.json",
         "docs/programs/free-cloud-ai/evidence/2026-10-12-guest-login-and-postboot-owning-checkpoint.json",
         "docs/programs/free-cloud-ai/evidence/2026-10-12-resource-efficient-completion.json",
-        "docs/programs/free-cloud-ai/evidence/2026-10-12-bounded-guest-delivery-blockers.json"
+        "docs/programs/free-cloud-ai/evidence/2026-10-12-bounded-guest-delivery-blockers.json",
+        "docs/programs/free-cloud-ai/evidence/2026-10-12-retained-hub-artifact-audit.json",
+        "docs/programs/free-cloud-ai/evidence/2026-10-12-lenovo-pivot-diligence.json"
       ],
       "artifact_hashes": {},
-      "blocker": "Guest6bcc1f57 completed read-only checks. Normal Voice setup command exists but no Voice package metadata/cache/standalone Hub payload. Mapped bar still absent from real frame. Installation/live/visual gates remain open.",
-      "next_action": "Establish reviewed normal Voice delivery inputs and matched Hub artifact audit before another installation guest. Reuse guest facts; no unchanged repeat or ISO rebuild."
+      "blocker": "Native-first pivot authorized after diligence; audio/deps/oldVoice bytes available but trusted Hub rollback seed and matching signatures unavailable. Guest fresh/destructive and real native/audio gates remain required.",
+      "next_action": "Prepare concrete reversible trusted Lenovo installation; perform everyday/live/audio there after admission, reserving existing guest for mandatory fresh/destructive gates."
     },
     {
       "id": "FCAI-P6-REVIEW",
@@ -888,12 +896,12 @@
   ],
   "coordination": {
     "shared_owners": "Craft remains paused per owner handoff; preserve Craft Hub2666609 and Connect native5/source2e872f50 compatibility. Free AI edits only isolated worktrees; coordinate shared Hub/install/helper, Connect and Voice changes before installation.",
-    "build_serialization": "Craft paused; unchanged backend2/Voice41/Connect8 retained. Diagnostic guest6bcc1f57 completed, owned group/container retired. No heavy job running. Next heavy work is retained Hub artifact audit after reviewed admission; use existing shared lock/resource limits.",
+    "build_serialization": "No heavy job running. Actual Hub archive audit and Voice37 installed-byte check completed under shared lock, one CPU/1GiB/240s. Lenovo-first ordinary/live/audio acceptance after trusted rollback/signature/state checks; clean guest only for required fresh/destructive tests. No host changes or new ISO.",
     "worker_limit": 2,
     "integration": "No product/shared merge, host installation, production signing or publication. Program completed source commits only.",
     "active_workers": [
-      "rejection_forwarding: gpt-6-sol/high; external retained-Hub audit admission, no heavy job.",
-      "boundary_review: gpt-6-astra/high; bounded missing-database charter only, no heavy job."
+      "rejection_forwarding: gpt-6-sol/high; narrow missing-database lease/progress/executor source + focused tests.",
+      "boundary_review: gpt-6-astra/high; read-only Hub0.3.6 rollback-source feasibility."
     ]
   },
   "user_priority": "Free AI through completion of approved scope. Craft development paused; do not resume it, merge product branches or publish production artifacts."

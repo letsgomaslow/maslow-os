@@ -1,0 +1,38 @@
+{
+  "schema": 1,
+  "status": "native-first-pivot-prepared-installation-not-yet-admitted",
+  "userDecision": "Move ordinary/live/audio acceptance to Lenovo after due diligence; retain mandatory clean-install and destructive fault checks on the existing disposable guest. Craft stays paused, no production publication or product merges.",
+  "hostInventorySha256": "091a991eeb7c257033610d2e2d2d0551b15be2dd8cf8973712ac36550276755c",
+  "deliveryInventorySha256": "3a22291c5442f1032f36834001ecbe0b5126147a205a3dc5e751d64504cd9780",
+  "verified": {
+    "hubCandidate": "QA Hub0.3.9-1 archive fe60da60266623c535d7f82c6018b70c6ae567864153d0504d4c228d2383df9c passed actual source/metadata/opaque-pair/four-package audit; installed behavior still open.",
+    "hostDependencies": "Declared backend2/Voice41/Connect8 dependency constraints satisfied; no package/dependency changes. Actual ABI/loading remains a native gate.",
+    "audio": "Two non-monitor PipeWire microphone endpoints and Speaker present. No recording/playback or heard-audio claim.",
+    "voicePrevious": "Historical Voice37 archive9d7847e731003c3797204e16c66ed66c61e83bd013b823186eb07b31eec369a9,286210312bytes matches all actual installed package-owned entries under current checker. Comparison37.293s, one CPU/1GiB/240s/shared lock; no mutation. Result SHA e4213ea09a7e96fc19e18dd6be35200c778c2bd9ccd248e1253388bf45329e8b.",
+    "signaturePolicy": "Actual LocalFileSigLevel PackageOptional+PackageTrustedOnly; repository policy remains PackageRequired+PackageTrustedOnly. No policy relaxation. Old Voice archive has no detached signature; protected copy and fixed installer final revalidation remain required.",
+    "publicTrust": "SPKI DER fingerprint daacaa5aac138710a3950097b29a05abd3f69c9a8efad512321c45f3103d1ee4. Actual QA manifest verification with installed release.pem returns1. Result SHA fd1784e592c53d7f72e06397f6ba3566bdf17a089ad68ad109e35cb7576c5fa1; no key/trust mutation."
+  },
+  "userReported": {
+    "rootMetadata": "User ran the prepared read-only sudo check and reports free-ai-security.json, free-ai-managed-security.json and /var/cache/maslow-hub/free-ai absent. This is user-reported presence evidence, not independent installer authority; final Root preflight must recheck.",
+    "releaseWorkstation": "Available. Scoped Mac find search returned no matching original Hub0.3.6-1 package/signature. Errors were redirected; this establishes no returned match within those search paths, not universal archive absence."
+  },
+  "stagingDiscovery": {
+    "reportSha256": "53e603010d69df4bfeb70dbe987dcff95b7e5bacc5129e7d8357d81c1afe54c2",
+    "observed": "Configured staging manifest signature verified with unchanged enrolled public key; sequence9, releases through0.3.5, no0.3.6 record. No guessed archive URL or large download.",
+    "blocker": "Installed Hub0.3.6 needs a correctly trusted same-version rollback seed before normal apply. Not available in host cache, scoped build inventory or current signed channel."
+  },
+  "remainingBeforeHostInstall": [
+    "Recover original Hub0.3.6 rollback package or independently prove a rebuilt recorded-source payload exactly matches installed Hub under unchanged installer contract; never label reconstructed bytes original.",
+    "Operator-managed preview signatures and signed manifest using existing enrolled staging trust for rollback/target Hub and unchanged backend2/Voice41 pair. Keep private key/passphrase on release workstation; no production publication or trust substitution.",
+    "Protected verified Voice37 cache copy and supported idle/stopped service preflight; preserve Voice settings/work and separate active Hermes gateway.",
+    "Consistent private state/key preservation and reviewed restoration path. Existing Connect state despite package absence must be preserved and validated; no fresh-state assumption or stale-grant restoration.",
+    "Freeze/review narrow missing-database recovery source and affected Hub candidate; full actual recovery success remains mandatory."
+  ],
+  "activeIndependentWork": [
+    "rejection_forwarding: gpt-6-sol/high; bounded current-operation missing-standalone reconstruction in existing private V2 lease/progress/executor, tests only; no host/build/VM actions.",
+    "boundary_review: gpt-6-astra/high; read-only recorded Hub0.3.6 source versus installed payload feasibility; no build or host changes."
+  ],
+  "nextAction": "Finish rollback-seed feasibility and recovery source while preparing the exact existing-staging-workstation handoff. Admit installation only after concrete trusted inputs and restoration checks; no VM or build is currently running.",
+  "hostChanges": false,
+  "previewComplete": false
+}

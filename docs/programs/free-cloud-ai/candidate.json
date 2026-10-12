@@ -146,6 +146,19 @@
       "signed": false,
       "installed_acceptance": false,
       "status": "Independent scoped static, packaged owning (517 passed/5 skipped), UI/controller/composer and three-package overlap checks accepted; loaded-code/installed/live/recovery open"
+    },
+    {
+      "path": "/home/maslow/Maslow-ai-os/free-ai-build/hub-bundle-prep/qa-hub-build-1/evidence/99f88f71815b4a76b5954abacda89a6f/work/maslow-hub-0.3.9-1-any.pkg.tar.zst",
+      "name": "maslow-hub",
+      "version": "0.3.9-1",
+      "sha256": "fe60da60266623c535d7f82c6018b70c6ae567864153d0504d4c228d2383df9c",
+      "bytes": 332772871,
+      "source_commit": "c00b88da49a0bf8a350ca5ac7a5c5a6cd44a60a5",
+      "product_source_parent": "52966604271db965147b25c9997121b584bf15fc",
+      "recipe_commit": "8709933da1c2d89cd3c185902084b5dc3e45ad0d",
+      "signed": false,
+      "installed_acceptance": false,
+      "status": "QA-only: actual source/metadata/opaque/four-package audit passed; preserved original controller postcheck failure; no native/trusted-host delivery acceptance. Recovery source changes require affected Hub rebuild."
     }
   ],
   "accepted_capabilities": [],
@@ -228,7 +241,9 @@
     "docs/programs/free-cloud-ai/evidence/2026-10-12-qa-source-build-and-postboot-checkpoint.json",
     "docs/programs/free-cloud-ai/evidence/2026-10-12-guest-login-and-postboot-owning-checkpoint.json",
     "docs/programs/free-cloud-ai/evidence/2026-10-12-resource-efficient-completion.json",
-    "docs/programs/free-cloud-ai/evidence/2026-10-12-bounded-guest-delivery-blockers.json"
+    "docs/programs/free-cloud-ai/evidence/2026-10-12-bounded-guest-delivery-blockers.json",
+    "docs/programs/free-cloud-ai/evidence/2026-10-12-retained-hub-artifact-audit.json",
+    "docs/programs/free-cloud-ai/evidence/2026-10-12-lenovo-pivot-diligence.json"
   ],
   "passed_source_gates": [
     "every-dispatch-provider-and-model-policy",
