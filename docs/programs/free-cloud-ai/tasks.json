@@ -527,11 +527,12 @@
         "docs/programs/free-cloud-ai/evidence/2026-10-12-hub036-reconstructed-build.json",
         "docs/programs/free-cloud-ai/evidence/2026-10-12-qa3-source-admission.json",
         "docs/programs/free-cloud-ai/evidence/2026-10-12-local-signing-prompt-checkpoint.json",
-        "docs/programs/free-cloud-ai/evidence/2026-10-12-local-signing-workstation-correction.json"
+        "docs/programs/free-cloud-ai/evidence/2026-10-12-local-signing-workstation-correction.json",
+        "docs/programs/free-cloud-ai/evidence/2026-10-12-local-preview-signatures-verified.json"
       ],
       "artifact_hashes": {},
-      "blocker": "Existing local encrypted stagingkey requiresoperatorunlock. Firstattempt failed with0-byte sig; diagnosedretry awaitinglocalpassphrase. Noaccepted signatures/finalmatchedHub/nativeinstallation.",
-      "next_action": "Inspect localretry status;verify4signatures againstenrolledkey ordiagnoseerrorcategory. NoMac transfer,nopublication/trust substitution. Then finalQA3Hub preparation."
+      "blocker": "Four local preview signatures verified and public pair accepted. Final QA3 matchedHub context/build/audit and normal state/key preservation, protected priorVoice37, servicequiescence, replay/installation and live gates remain required.",
+      "next_action": "Review exact final build context and run one bounded Hub build; preserve verified backend2/Voice41/Connect8. No Mac transfer, trust change or publication."
     },
     {
       "id": "FCAI-P2-WORK",
@@ -908,10 +909,13 @@
   ],
   "coordination": {
     "shared_owners": "Craft remains paused per owner handoff; preserve Craft Hub2666609 and Connect native5/source2e872f50 compatibility. Free AI edits only isolated worktrees; coordinate shared Hub/install/helper, Connect and Voice changes before installation.",
-    "build_serialization": "No heavybuild/VM. Existing Lenovo releaseworkstation verified; diagnostic native-terminal signingbatch awaitsoperatorpassphrase. Mac transfer cancelled. Only correctly verified local signatures admit final QA3Hub build under sharedlock.",
+    "build_serialization": "No heavy build/VM. Four local preview signatures independently verified, unchanged backend2/Voice41 staged with enrolled trust; public-input scope accepted. Prepare/review final QA3 Hub context, then one bounded affected Hub build under shared lock. Native prerequisites and actual recovery/live/audio remain open.",
     "worker_limit": 2,
     "integration": "No product/shared merge, host installation, production signing or publication. Program completed source commits only.",
-    "active_workers": []
+    "active_workers": [
+      "rejection_forwarding: gpt-6-sol/high; final QA3 matched Hub build context, small pinned-input delta only.",
+      "boundary_review: gpt-6-astra/high; public pair review accepted; native state-preserving installation plan."
+    ]
   },
   "user_priority": "Free AI through completion of approved scope. Craft development paused; do not resume it, merge product branches or publish production artifacts."
 }
