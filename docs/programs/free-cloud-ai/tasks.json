@@ -366,7 +366,8 @@
         "docs/programs/free-cloud-ai/evidence/2026-10-11-native-sequence-admission.json",
         "docs/programs/free-cloud-ai/evidence/2026-10-12-native-build-checkpoint.json",
         "docs/programs/free-cloud-ai/evidence/2026-10-12-native-validation-checkpoint.json",
-        "docs/programs/free-cloud-ai/evidence/2026-10-12-voice40-connect8-native-build-checkpoint.json"
+        "docs/programs/free-cloud-ai/evidence/2026-10-12-voice40-connect8-native-build-checkpoint.json",
+        "docs/programs/free-cloud-ai/evidence/2026-10-12-voice41-scoped-artifact-checkpoint.json"
       ],
       "artifact_hashes": {
         "/home/maslow/Maslow-ai-os/free-ai-build/native/maslow-free-ai-0.1.0-1-x86_64.pkg.tar.zst": "5b2d989d58451ac9744f9c0e8c2c3dcde5f99657d1fef931d2c4a348fb5e4143",
@@ -375,8 +376,8 @@
         "/home/maslow/Maslow-ai-os/free-ai-build/native-2-39/maslow-voice/maslow-voice-0.1.5-39-x86_64.pkg.tar.zst": "a8933c4b783a63786ec58fa3d22df53ef054355ecc3908ae785572f61593118f",
         "/home/maslow/Maslow-ai-os/free-ai-build/connect-package-prep/native/recipe/maslow-connect-0.1.0-6-x86_64.pkg.tar.zst": "32890f539c5c06649cbee62e3872b99a1fa77f4bb0694f9ee7e08740fb87633c"
       },
-      "blocker": "Connect6 current dependency advisories block coordinated delivery; FreeAI2/Voice39 scoped native checks pass, installed/recovery/live acceptance open.",
-      "next_action": "Preserve exact2/39 artifacts; finish Connect patch source/owning checks and build reviewed replacement, then matched Hub and installed recovery.",
+      "blocker": "Current backend2, Voice41 and Connect8 scoped native artifact checks accepted; matched Hub, signatures and installed/recovery/live acceptance remain open.",
+      "next_action": "Preserve verified artifacts; finish remaining Hub delivery/recovery wiring, then build only affected matched Hub inputs.",
       "coordinator_only": false
     },
     {
@@ -470,11 +471,12 @@
         "docs/programs/free-cloud-ai/evidence/2026-10-12-voice40-connect8-native-build-checkpoint.json",
         "docs/programs/free-cloud-ai/evidence/2026-10-12-managed-source-and-owning-checkpoint.json",
         "docs/programs/free-cloud-ai/evidence/2026-10-12-connect8-native-result-review.json",
-        "docs/programs/free-cloud-ai/evidence/2026-10-12-issuer-map-native-checkpoint.json"
+        "docs/programs/free-cloud-ai/evidence/2026-10-12-issuer-map-native-checkpoint.json",
+        "docs/programs/free-cloud-ai/evidence/2026-10-12-voice41-scoped-artifact-checkpoint.json"
       ],
       "artifact_hashes": {},
-      "blocker": "Managed removal/reinstall lifecycle and installed signed delivery/recovery remain incomplete; Connect6 blocked, no new native identity admitted.",
-      "next_action": "Keep Connect6 blocked. After the security replacement passes owning, native, deployed and advisory checks, add only its exact matched identity while preserving accepted native5. Complete managed lifecycle wiring and the matched Hub build before installed setup acceptance."
+      "blocker": "Matched source preserves Craft native5 and admits verified Connect8; final Hub package, managed removal/reinstall and installed signed delivery/recovery remain incomplete.",
+      "next_action": "Finish authenticated rejection cleanup and remaining recovery cases, then build matched Hub and verify complete ownership/signature/installed flows."
     },
     {
       "id": "FCAI-P2-WORK",
@@ -575,11 +577,12 @@
         "/home/maslow/Projects/Maslow/free-ai-connect/docs/evidence/2026-10-11-managed-accounts.json",
         "docs/programs/free-cloud-ai/evidence/2026-10-11-connect-current-integration.json",
         "docs/programs/free-cloud-ai/evidence/2026-10-12-connect7-artifact-review-checkpoint.json",
-        "docs/programs/free-cloud-ai/evidence/2026-10-12-connect8-native-result-review.json"
+        "docs/programs/free-cloud-ai/evidence/2026-10-12-connect8-native-result-review.json",
+        "docs/programs/free-cloud-ai/evidence/2026-10-12-voice41-scoped-artifact-checkpoint.json"
       ],
       "artifact_hashes": {},
-      "blocker": "Native7 notice audit found two missing license texts; supplemental recipe8 is prepared for independent review. Exact production105-tuple fresh npm advisory response reports0. Deployed/account/installed gates remain open.",
-      "next_action": "Review supplemental-notice recipe8 and build replacement; retain source377-pass/11-skip evidence and unchanged FreeAI2 rather than repeating them."
+      "blocker": "Security replacement native8 passed independent scoped source/artifact/advisory/deployed checks; installed selected-account/revocation/confinement remain open.",
+      "next_action": "Preserve verified source and native8; complete exact selected-account reads and revocation after matched delivery is ready."
     },
     {
       "id": "FCAI-P4-RECOVERY",
@@ -651,11 +654,12 @@
         "docs/programs/free-cloud-ai/evidence/2026-10-12-guarded-lease-source-checkpoint.json",
         "docs/programs/free-cloud-ai/evidence/2026-10-12-executor-admission-source-checkpoint.json",
         "docs/programs/free-cloud-ai/evidence/2026-10-12-typed-rejection-source-checkpoint.json",
-        "docs/programs/free-cloud-ai/evidence/2026-10-12-voice41-build-and-error-safety-checkpoint.json"
+        "docs/programs/free-cloud-ai/evidence/2026-10-12-voice41-build-and-error-safety-checkpoint.json",
+        "docs/programs/free-cloud-ai/evidence/2026-10-12-voice41-scoped-artifact-checkpoint.json"
       ],
       "artifact_hashes": {},
-      "blocker": "Typed rejection/latch and V1 uncertain-error cleanup removal accepted. Hub520owning/UI pass; Voice41 built but static/packaged owning/loaded proof pending. Positive Root witness/masked proof, reboot/WAL/staging/damagedDB and actualinstalled recovery remain required.",
-      "next_action": "Verify actual Voice41 artifact and packaged checks; implement separately reviewed authenticated rejection witness and fixed masked provenance. Keep all required native/live gates and backend2 unchanged.",
+      "blocker": "Typed rejection/latch, uncertain-error retention and Voice41 scoped artifact checks accepted. Positive Root witness/masked loaded-code proof, reboot/WAL/staging/damagedDB and actual installed recovery remain required.",
+      "next_action": "Correct shared-lock path and independently review harmless masked-service measurement; then implement authenticated helper forwarding/protected rejection witness and decision-only cleanup.",
       "coordinator_only": true
     },
     {

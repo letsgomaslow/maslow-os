@@ -145,7 +145,7 @@
       "recipe_commit": "6cc15c3b297a375897f078fee7ef27afcbcfcf72",
       "signed": false,
       "installed_acceptance": false,
-      "status": "normal build completed/group retired; actual static/packaged owning/overlap/loaded41/native gates pending"
+      "status": "Independent scoped static, packaged owning (517 passed/5 skipped), UI/controller/composer and three-package overlap checks accepted; loaded-code/installed/live/recovery open"
     }
   ],
   "accepted_capabilities": [],
@@ -205,7 +205,8 @@
     "docs/programs/free-cloud-ai/evidence/2026-10-12-existing-media-static-checkpoint.json",
     "docs/programs/free-cloud-ai/evidence/2026-10-12-typed-rejection-source-checkpoint.json",
     "docs/programs/free-cloud-ai/evidence/2026-10-12-existing-media-public-input-checkpoint.json",
-    "docs/programs/free-cloud-ai/evidence/2026-10-12-voice41-build-and-error-safety-checkpoint.json"
+    "docs/programs/free-cloud-ai/evidence/2026-10-12-voice41-build-and-error-safety-checkpoint.json",
+    "docs/programs/free-cloud-ai/evidence/2026-10-12-voice41-scoped-artifact-checkpoint.json"
   ],
   "passed_source_gates": [
     "every-dispatch-provider-and-model-policy",
@@ -226,7 +227,7 @@
     "native_admission_blocker": null,
     "build_context_sha256": "08bca127d23a3cdd7e193d0a05dbc5a4a09d4d6213faa2e227155b600a3aea65",
     "sequence_session": "200e3daafe734d22a6aa2b2f5881f1c2",
-    "current_status": "Historical2/39/6 build evidence preserved: native6 blocked. Current unchanged backend2, replacement Voice40 and Connect8 pass scoped native checks; final Hub and installed/live gates remain open. Existing baseline image completed and is being validated without another ISO cycle."
+    "current_status": "Historical2/39/6 evidence retained; native6 blocked. Unchanged backend2, Voice41 and Connect8 pass scoped native checks; final Hub and installed/live/recovery gates remain open. Existing image is acceptance infrastructure only; no further ISO cycle."
   },
   "prepared_connect_build": {
     "package_revision": "f4df4dad2da480ce95c7e53a3fc263b79a87c5c0",
