@@ -36,7 +36,7 @@
     "connect_native3_baseline_not_managed_account_acceptance": "7545ba68c0b6759a7f65c88ccb1390777df5b812",
     "runtime_current_source": "c2b03842a81645998a79cbca525c03ddf67813b4",
     "voice_managed_lifecycle_source": "0ad62e58b889bfa0fdedc8015e2e24f6a006b358",
-    "hub_current_source": "715ab5d4d426508271b7458354252d1cfb94fecf",
+    "hub_current_source": "b60120b1e55e9c8e863642fd2782c9ca3f87da51",
     "packages_current_source": "42adaeca720dd8aced00d17bd4238225c15464cd",
     "connect_managed_source": "fd33682f3bcfdbce849a06304da0d74137b592f0",
     "hub_recovery_design": "0aafacbc8915d5db64e92bdb5a97bd604c76e6e1",
@@ -133,7 +133,7 @@
       "recipe_commit": "42adaeca720dd8aced00d17bd4238225c15464cd",
       "signed": false,
       "installed_acceptance": false,
-      "status": "actual static/notice/SRI/closure/compiled checks pass; fresh105-tuple npm scan reports0; deployed/installed/live open"
+      "status": "independent scoped static/notice/SRI/closure/advisory/deployed/three-package overlap checks passed; exact Hub8/source map added; installed/account/confinement/live/recovery open"
     }
   ],
   "accepted_capabilities": [],

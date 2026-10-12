@@ -1,0 +1,45 @@
+{
+  "schema": 1,
+  "status": "scoped-delivery-progress-preview-incomplete",
+  "hubSource": "b60120b1e55e9c8e863642fd2782c9ca3f87da51",
+  "hubMapCommit": "4d67d44",
+  "issuerSourceSha256": "96010ab96198db30453dfc08a70e718535db91cfac0e315f17a7a5d56557714d",
+  "issuerTestsSha256": "ebfe5b621aabd0e3b2f02acec49ddf9fa61178e2db8e941378ddbd1c06a788b8",
+  "issuerReviewSha256": "ba9b65a522781b3f17bdddd9ecb7e043b8ddc85dde27222b5d7ff426c08d22d6",
+  "mapReviewSha256": "d38dcea592a8688b193f16bb5bfeac346641187dca6938181c8dfec37347c3d7",
+  "hubOwning": {
+    "tests": 434,
+    "result": "OK",
+    "seconds": 50.879,
+    "skips": 0,
+    "logSha256": "3ed13f9f71ac0b22dc26a646ef6df05942806ae0d322662d287d807c72b7896d",
+    "logDirectory": "/home/maslow/Maslow-ai-os/free-ai-build/hub-managed-recovery-issuer",
+    "uiResult": "pass"
+  },
+  "connect8ActualDeployedAndOverlap": {
+    "session": "e83f248075034477bb3923669b89c98e",
+    "manifestSha256": "a539217df72587ff86f3ac4e0f3858576cb2e9cc74dfc3427db030860181550f",
+    "deployedLogSha256": "2e13915a3df5ead716412ba948bcca9e3b964c6c1426e8ee5dc7aa891d7e3234",
+    "overlapLogSha256": "1f23a49411cb5d2bdc31470bbfaddd5b8c1b13a27675518d58d2bf9c1d1217c1",
+    "stateSha256": "67ab6fb1d44ffa4a135d3af9a95eaa089ad3b43be09ca5d013dc3a0f506c9159",
+    "bothLaunchGroupsRetired": true,
+    "exactContainerAbsent": "Coordinator docker inspect returned exact No such container; no unrelated process altered.",
+    "independentReviewSha256": "3314b8975cecad9fde2c66bde9bb78214c6efe4b3d2ed4be20e8b47a75c44989",
+    "scope": "Fixed installed-path CLI/capabilities/catalog/patched dependencies/profile/root checks plus backend2/Voice40/Connect8 overlap. Probe retained false legacy hubNative7AdmissionAccepted field; header/assertions bind actual8, no admission inferred.",
+    "fullHubOverlapVerified": false
+  },
+  "remaining": [
+    "offline fresh-ticket recovery lease/current NEW-checkpoint verification and executor",
+    "fixed public install/removal/reinstall/recovery admission and pending integration",
+    "safe explicit pre-admission rejection",
+    "crossboot loaded authority",
+    "matched Hub package and full overlap",
+    "actual clean installed guest and Lenovo",
+    "live Groq/model tools, selected accounts/revocation, audible existing Voice",
+    "installed recovery and independent final preview review"
+  ],
+  "productionSigningOrPublication": false,
+  "installedVerified": false,
+  "liveVerified": false,
+  "previewComplete": false
+}

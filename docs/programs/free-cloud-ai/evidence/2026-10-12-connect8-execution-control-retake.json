@@ -1,0 +1,89 @@
+{
+  "schema": 1,
+  "date": "2026-10-12",
+  "scope": "Independent bounded retake of Connect8 execution-control findings only. No actual candidate archive scan, deployed execution, Docker/VM, network, account or package operation.",
+  "priorReview": {
+    "path": "docs/programs/free-cloud-ai/evidence/2026-10-12-native40-8-scoped-artifact-review.json",
+    "sha256": "8c8ddb791ee90b7dbc303e696a73c6ade4f9c600f7486ef0052c187258381cb6",
+    "unchanged": true
+  },
+  "reviewedSha256": {
+    "run-deployed.py": "b8b20560bdbf1b4724d58a1fcb94e9dc26ec4225f204401a38fe3c54278a934d",
+    "check-package-file-overlap-checked.sh": "363b39ba2c82cc8931046a916c38d7c1c0a61556c47372a0c4287f443da4282f",
+    "deployed-manifest.json": "a539217df72587ff86f3ac4e0f3858576cb2e9cc74dfc3427db030860181550f",
+    "unchangedSharedCraftChecker": "e88e8c48b31308be192be2acc2803e9a5e684902105544c0c0a0c4514e69a8f0"
+  },
+  "fixes": [
+    {
+      "id": "overlap-unowned-process-stage",
+      "status": "fixed-independent-retake",
+      "change": "Restore effective termination handlers after Docker retirement/cleanup; rehash three artifacts and original checker; launch overlap with the same reviewed LaunchGroup, deferred signals, persisted identity, wait/retire and error cleanup. Shared lock spans both stages and descendant retirement.",
+      "test": "Actual revised main with mocked Docker/preflight/artifact digest operations, scratch lock/evidence, and real inert second-stage leader+forked grandchild ignoring SIGTERM. Send SIGTERM to supervisor while overlap waits. Both owned PIDs absent after main exits; no Docker invoked.",
+      "trace": [
+        "docker-retired",
+        "cleanup",
+        "overlap handlers active for TERM and INT",
+        "overlap-retired",
+        "cleanup"
+      ],
+      "testHarnessCorrection": "Initial independent harness redundantly called retire in its finally after successful main retirement, producing FileNotFound for already-reaped leader. Corrected harness only calls emergency retirement if leader still exists. Exact rerun passed; this was not a wrapper failure."
+    },
+    {
+      "id": "overlap-listing-failure-false-pass",
+      "status": "fixed-independent-retake",
+      "change": "Separate external checked copy retains original source hash and conflict/path-filter logic. Each exclusive temporary listing is populated by an explicitly checked command with60-second timeout and8MiB file limit, then must be nonempty and bounded before processing. Shared Craft source unchanged.",
+      "tests": [
+        {
+          "case": "Partial listing then exit19",
+          "expectedExit": 19,
+          "actualExit": 19
+        },
+        {
+          "case": "Empty successful listing",
+          "expectedExit": 2,
+          "actualExit": 2
+        },
+        {
+          "case": "Injected listing write failure exit28",
+          "expectedExit": 28,
+          "actualExit": 28
+        },
+        {
+          "case": "Duplicate file ownership",
+          "expectedExit": 1,
+          "actualExit": 1
+        },
+        {
+          "case": "Distinct file ownership",
+          "expectedExit": 0,
+          "actualExit": 0
+        }
+      ],
+      "method": "Actual checked Bash script, inert scratch package placeholders and controlled scratch bsdtar shim; no candidate package listing or extraction."
+    }
+  ],
+  "invariants": [
+    "All8 current deployed-manifest input hashes match independently.",
+    "Original75fe controller and b25b manifest preserved under control-history; original scoped review remains unchanged.",
+    "Archive/static/identity/probe/source/recipe/build image/resource/network/read-only mount/CLI bindings remain unchanged.",
+    "Existing exact extracted usr-tree safety seal and shared02cb controls remain in force. No broad control weakening or skips introduced.",
+    "Three known archive identities are rechecked before overlap; report continues to distinguish three-package overlap from full Hub overlap.",
+    "No installed/live/Hub admission flags enabled."
+  ],
+  "result": "Both confirmed execution-preparation findings are resolved within this bounded review. Suitable for coordinator-owned admitted execution of the exact prepared deployed and three-package overlap checks.",
+  "limits": [
+    "No actual Connect8 deployed or overlap result follows from these inert controls; coordinator must capture and reconcile real outputs.",
+    "No independent repeat of full shared signal suite or candidate archive scans was needed for this delta.",
+    "Injected exit28 verifies failure propagation; it is not a real filesystem-full experiment.",
+    "Previously reconciled Voice40 owning/static and Connect8 static/advisory evidence remain separate; no installed/physical/live/preview acceptance.",
+    "Public lifecycle/current-operation recovery, matched Hub identity/full package overlap and final preview review remain open."
+  ],
+  "claims": {
+    "workerCandidateScan": false,
+    "workerDockerRun": false,
+    "workerNetwork": false,
+    "actualDeployedAccepted": false,
+    "installedAccepted": false,
+    "previewAccepted": false
+  }
+}
