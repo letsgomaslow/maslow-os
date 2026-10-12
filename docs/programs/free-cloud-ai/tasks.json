@@ -84,7 +84,7 @@
       "path": "/home/maslow/Projects/Maslow/free-ai-hub-current",
       "base_revision": "33940d2e8740b172b953cc3e091cbae1ba1cd303",
       "branch": "codex/free-cloud-ai-hub-current",
-      "implementation_revision": "4def9b7cc916c5a71ccce20059c50fcd5d754fdd",
+      "implementation_revision": "ceba096b7ea8d36e6124ffbf121b1eef192ecc75",
       "previous_free_ai_worktree": "/home/maslow/Projects/Maslow/free-ai-hub",
       "accepted_craft_source_reference": "2666609002dce8bb6cc16511ef2125bccb18dbe9"
     },
@@ -434,7 +434,7 @@
       "worker": "current_recovery managed lifecycle contract/code; root integration",
       "actual_model": "gpt-6.1-sol/high implementation; gpt-6-astra/high independent review",
       "attempt": 2,
-      "last_checkpoint": "2026-10-12T14:44:55.241966+00:00",
+      "last_checkpoint": "2026-10-12T15:18:08.790646+00:00",
       "base_revision": "2a8c6eda15d92078fdd8656a879b1e93dd786a1d",
       "branch": "codex/free-cloud-ai-hub-current",
       "worktree": "/home/maslow/Projects/Maslow/free-ai-hub-current",
@@ -455,7 +455,10 @@
         "67fc348234aa65b66af3379d7e6f9faa744c89dd",
         "bb66f9e053b5701d43ee98294498f089ff8a20eb",
         "c65c646722d6cf437f1b2159ff2d50400e8bfb18",
-        "4def9b7cc916c5a71ccce20059c50fcd5d754fdd"
+        "4def9b7cc916c5a71ccce20059c50fcd5d754fdd",
+        "2e6e55437bb410df1a4969f7cc628713656bfe67",
+        "015e9f426931b200c7945739f3b5adb913b3bef3",
+        "ceba096b7ea8d36e6124ffbf121b1eef192ecc75"
       ],
       "integration_commits": [
         "c856c683de8e66a43d326b435bbf73504f5ca6a2",
@@ -504,11 +507,12 @@
         "docs/programs/free-cloud-ai/evidence/2026-10-12-rejection-wal-source-checkpoint.json",
         "docs/programs/free-cloud-ai/evidence/2026-10-12-combined-recovery-source-checkpoint.json",
         "docs/programs/free-cloud-ai/evidence/2026-10-12-qa-pair-preparation-checkpoint.json",
-        "docs/programs/free-cloud-ai/evidence/2026-10-12-rejection-authority-source-checkpoint.json"
+        "docs/programs/free-cloud-ai/evidence/2026-10-12-rejection-authority-source-checkpoint.json",
+        "docs/programs/free-cloud-ai/evidence/2026-10-12-keep-expiry-source-checkpoint.json"
       ],
       "artifact_hashes": {},
-      "blocker": "631owning/no skips/UI/shell accepted. Standalone preservation and V2 expired review remain unfinished; damaged/staging/reboot and native/live recovery gates open.",
-      "next_action": "Implement reviewed standalone current-data preservation and independently review it. Design the small V2 expired-negative review in disjoint ownership. Preserve signed QA pair, accepted archives and pristine guest."
+      "blocker": "657owning/no skips/UI/shell accepted. Overlay-only admission, guest dependencies/policy, offline crossboot recovery and actual installed paired recovery remain unresolved; public gates false.",
+      "next_action": "Prepare and independently review overlay-only guest admission for read-only dependency/policy/desktop facts. In parallel scope offline crossboot recovery and a concrete gated native-acceptance path; no VM GO, ISO build or gate bypass."
     },
     {
       "id": "FCAI-P2-WORK",
@@ -645,7 +649,7 @@
       "worker": "current_recovery managed lifecycle contract/code; root installed recovery integration",
       "actual_model": "gpt-6.1-sol/high implementation; root coordinator",
       "attempt": 1,
-      "last_checkpoint": "2026-10-12T14:44:55.242011+00:00",
+      "last_checkpoint": "2026-10-12T15:18:08.790692+00:00",
       "base_revision": "09721dff",
       "branch": "codex/free-cloud-ai",
       "worktree": "/home/maslow/Maslow-ai-os/free-ai-runtime",
@@ -664,7 +668,10 @@
         "67fc348234aa65b66af3379d7e6f9faa744c89dd",
         "bb66f9e053b5701d43ee98294498f089ff8a20eb",
         "c65c646722d6cf437f1b2159ff2d50400e8bfb18",
-        "4def9b7cc916c5a71ccce20059c50fcd5d754fdd"
+        "4def9b7cc916c5a71ccce20059c50fcd5d754fdd",
+        "2e6e55437bb410df1a4969f7cc628713656bfe67",
+        "015e9f426931b200c7945739f3b5adb913b3bef3",
+        "ceba096b7ea8d36e6124ffbf121b1eef192ecc75"
       ],
       "integration_commits": [],
       "tests": [
@@ -704,11 +711,12 @@
         "docs/programs/free-cloud-ai/evidence/2026-10-12-recovery-units-active-checkpoint.json",
         "docs/programs/free-cloud-ai/evidence/2026-10-12-combined-recovery-source-checkpoint.json",
         "docs/programs/free-cloud-ai/evidence/2026-10-12-rejection-authority-units-checkpoint.json",
-        "docs/programs/free-cloud-ai/evidence/2026-10-12-rejection-authority-source-checkpoint.json"
+        "docs/programs/free-cloud-ai/evidence/2026-10-12-rejection-authority-source-checkpoint.json",
+        "docs/programs/free-cloud-ai/evidence/2026-10-12-keep-expiry-source-checkpoint.json"
       ],
       "artifact_hashes": {},
-      "blocker": "631owning/no skips/UI/shell accepted. Standalone preservation and V2 expired review remain unfinished; damaged/staging/reboot and native/live recovery gates open.",
-      "next_action": "Implement reviewed standalone current-data preservation and independently review it. Design the small V2 expired-negative review in disjoint ownership. Preserve signed QA pair, accepted archives and pristine guest.",
+      "blocker": "657owning/no skips/UI/shell accepted. Overlay-only admission, guest dependencies/policy, offline crossboot recovery and actual installed paired recovery remain unresolved; public gates false.",
+      "next_action": "Prepare and independently review overlay-only guest admission for read-only dependency/policy/desktop facts. In parallel scope offline crossboot recovery and a concrete gated native-acceptance path; no VM GO, ISO build or gate bypass.",
       "coordinator_only": true
     },
     {
@@ -729,7 +737,7 @@
       "worker": "root existing-image validation; independent bounded preparation/result review",
       "actual_model": "coordinator; gpt-6.1-sol/medium preparation, gpt-6.1-sol/high launch cleanup, gpt-6-astra/high review",
       "attempt": 1,
-      "last_checkpoint": "2026-10-12T08:21:56.993565+00:00",
+      "last_checkpoint": "2026-10-12T15:18:08.790708+00:00",
       "base_revision": "c2b03842",
       "branch": "codex/free-cloud-ai",
       "worktree": "/home/maslow/Maslow-ai-os/free-ai-runtime",
@@ -748,11 +756,12 @@
         "docs/programs/free-cloud-ai/evidence/2026-10-12-parent-result-and-crypto-checkpoint.json",
         "docs/programs/free-cloud-ai/evidence/2026-10-12-public-crypto-result-checkpoint.json",
         "docs/programs/free-cloud-ai/evidence/2026-10-12-no-cache-source-and-guest-admission-checkpoint.json",
-        "docs/programs/free-cloud-ai/evidence/2026-10-12-clean-installed-baseline-checkpoint.json"
+        "docs/programs/free-cloud-ai/evidence/2026-10-12-clean-installed-baseline-checkpoint.json",
+        "docs/programs/free-cloud-ai/evidence/2026-10-12-keep-expiry-source-checkpoint.json"
       ],
       "artifact_hashes": {},
-      "blocker": "Clean installed pre-update baseline exists and is preserved; matched Hub/payload/recovery remain unfinished. Optional installation, typed use, live accounts, audio and Lenovo gates remain open.",
-      "next_action": "Preserve pristine base f46ced1a; boot an owned overlay for matched Hub installation after recovery source and signed QA payloads are ready. No OS update or ISO rebuild."
+      "blocker": "657owning/no skips/UI/shell accepted. Overlay-only admission, guest dependencies/policy, offline crossboot recovery and actual installed paired recovery remain unresolved; public gates false.",
+      "next_action": "Prepare and independently review overlay-only guest admission for read-only dependency/policy/desktop facts. In parallel scope offline crossboot recovery and a concrete gated native-acceptance path; no VM GO, ISO build or gate bypass."
     },
     {
       "id": "FCAI-P6-REVIEW",
@@ -864,8 +873,8 @@
     "worker_limit": 2,
     "integration": "No product/shared merge, host installation, production signing or publication. Program completed source commits only.",
     "active_workers": [
-      "rejection_forwarding: gpt-6-sol/high, standalone verified current-data preservation in lease/progress/executor + scoped tests.",
-      "boundary_review: gpt-6-astra/high, read-only V2 expired-negative review design, no edits."
+      "rejection_forwarding: gpt-6-sol/high, external overlay-only guest admission/driver preparation; no VM GO or product-source changes.",
+      "boundary_review: gpt-6-astra/high, read-only offline crossboot/native-admission design; no code/gates."
     ]
   },
   "user_priority": "Free AI through completion of approved scope. Craft development paused; do not resume it, merge product branches or publish production artifacts."
