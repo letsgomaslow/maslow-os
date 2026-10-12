@@ -1,0 +1,29 @@
+{
+  "schema": 1,
+  "run": "/home/maslow/Maslow-ai-os/free-ai-build/guest-baseline-prep/media-inspection/parent-reader-prep/build-evidence/2e7305fef22c4b40a086fe1e429df187",
+  "stateSha256": "484805c6b48e19f8ad2310b08e9936d1d87c773a89fdec29bae77bbe2989604a",
+  "logSha256": "5b86552f2751635265c2ae17cde8caec23064b3368e137d28ef30f5c09118f74",
+  "fixtureResultSha256": "2189adf3e9ddacbe834d628c255782cddd742da56aa518303595b0bb341ff8ab",
+  "commands": 20,
+  "binarySha256": {
+    "original": "4135605ad67c6d00ae42feb45c7674745c3a4a075b801cfec1fef522f544405f",
+    "patched": "d085c7b854868c7d96dc278978358a63cd138eb6803ae7ffd32d61c627c9590c",
+    "qa-original": "8aa9769f8e3c509a7173033a46e088481a3db618cd0a9dd18b8599eeaaa038b7",
+    "qa-patched": "565a07c35211816de041584dc8b5188a3a21c870d365387f50f56db344759e10"
+  },
+  "containerId": "82f92d4d7466074cad3a4ee1889153083ea3f0b03fcf79f6f073275dd1fd570f",
+  "exactContainerGone": true,
+  "currentToolchain": [
+    "gcc 16.2.1+r23+gd564253eb6c8-1",
+    "make 4.4.1-3",
+    "zstd 1.5.7-3"
+  ],
+  "toolchainBytesSha256": "e4de57c2b067e6b9f2e4645bfa6d0508a739554f14a5e1a648716108108ce956",
+  "independentBinaryAcceptancePending": false,
+  "realMediaGo": false,
+  "earlierRootInspection": "First reconciliation expected capitalized Docker error; exact current lowercase diagnostic was checked, no build/test failure.",
+  "independentResultReviewPath": "/home/maslow/Maslow-ai-os/free-ai-build/guest-baseline-prep/media-inspection/parent-reader-prep/independent-result-review.json",
+  "independentResultReviewSha256": "07667290b1c6dd2ea90aaa8943a507ee9a3b766df6088b3c1efa7b1977d8b68a",
+  "status": "Private inspector synthetic build/result accepted; fixed real-parent invocation review pending",
+  "previewComplete": false
+}

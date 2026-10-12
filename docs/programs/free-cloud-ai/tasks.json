@@ -695,11 +695,12 @@
         "docs/programs/free-cloud-ai/evidence/2026-10-12-existing-media-static-checkpoint.json",
         "docs/programs/free-cloud-ai/evidence/2026-10-12-existing-media-mtree-checkpoint.json",
         "docs/programs/free-cloud-ai/evidence/2026-10-12-existing-media-public-input-checkpoint.json",
-        "docs/programs/free-cloud-ai/evidence/2026-10-12-existing-media-keyring-provenance-checkpoint.json"
+        "docs/programs/free-cloud-ai/evidence/2026-10-12-existing-media-keyring-provenance-checkpoint.json",
+        "docs/programs/free-cloud-ai/evidence/2026-10-12-parent-inspector-build-checkpoint.json"
       ],
       "artifact_hashes": {},
       "blocker": "All nine MTREE inventories and six public ring members reconcile to collected keyring packages; official Arch master set matches captured trusted file. Detached signatures/certifications and safe parent metadata remain open; media/guest/live/Lenovo not accepted.",
-      "next_action": "Finish private parent-reader fixture and public-only cryptographic verification, then independently reconcile complete media receipt and run clean installed guest; no further ISO cycle."
+      "next_action": "Independently review/admit one fixed parent-only read using the accepted private inspector. Finish isolated public-signature crypto prep/review and verification, then complete media receipt and run clean installed guest; no ISO cycle."
     },
     {
       "id": "FCAI-P6-REVIEW",
