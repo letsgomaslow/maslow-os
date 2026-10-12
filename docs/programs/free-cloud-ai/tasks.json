@@ -696,11 +696,12 @@
         "docs/programs/free-cloud-ai/evidence/2026-10-12-existing-media-mtree-checkpoint.json",
         "docs/programs/free-cloud-ai/evidence/2026-10-12-existing-media-public-input-checkpoint.json",
         "docs/programs/free-cloud-ai/evidence/2026-10-12-existing-media-keyring-provenance-checkpoint.json",
-        "docs/programs/free-cloud-ai/evidence/2026-10-12-parent-inspector-build-checkpoint.json"
+        "docs/programs/free-cloud-ai/evidence/2026-10-12-parent-inspector-build-checkpoint.json",
+        "docs/programs/free-cloud-ai/evidence/2026-10-12-parent-result-and-crypto-checkpoint.json"
       ],
       "artifact_hashes": {},
-      "blocker": "All nine MTREE inventories and six public ring members reconcile to collected keyring packages; official Arch master set matches captured trusted file. Detached signatures/certifications and safe parent metadata remain open; media/guest/live/Lenovo not accepted.",
-      "next_action": "Independently review/admit one fixed parent-only read using the accepted private inspector. Finish isolated public-signature crypto prep/review and verification, then complete media receipt and run clean installed guest; no ISO cycle."
+      "blocker": "Actual exact parent listing independently reconciled: no gnupg entry. Crypto stopped after successful public import because freeform GPG diagnostics were decoded as UTF8; targeted byte handling correction active. Signatures/complete media receipt and actual guest/live/Lenovo gates remain open.",
+      "next_action": "Review byte-safe diagnostic retake, run one fresh isolated public crypto verification, reconcile complete media receipt, then clean installed guest. Preserve accepted parent result and all failed evidence; no ISO cycle."
     },
     {
       "id": "FCAI-P6-REVIEW",

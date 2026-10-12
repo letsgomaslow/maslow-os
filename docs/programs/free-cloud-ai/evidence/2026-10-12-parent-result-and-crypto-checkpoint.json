@@ -1,0 +1,36 @@
+{
+  "schema": 1,
+  "status": "actual-parent-absence-reconciled-crypto-failed-on-diagnostic-decoding",
+  "parent": {
+    "session": "7ddebe4327b74e60a491abbdb79dc74e",
+    "stateSha256": "8efcc5a7dfa3d95fc2dd14b6000616bd0e743c756956acd3d28a1272f5f485c0",
+    "stdoutSha256": "7e9acef4676ee96561f5cf453d349ca5e0ee19e52fcf8d08aef8bdd8c1b5bcfa",
+    "stderrBytes": 0,
+    "children": [
+      "hooks",
+      "mirrorlist"
+    ],
+    "gnupgParentPresent": false,
+    "noChildDirectoryEntriesRead": true,
+    "independentReviewPath": "/home/maslow/Maslow-ai-os/free-ai-build/guest-baseline-prep/media-inspection/parent-result-review.json",
+    "independentReviewSha256": "348e3ed50be2b97ddabc10e2db7c73dde5a774a8efe7241cda25b67f60765ca5",
+    "manifestSha256": "815b2286456b847e7eb19df3f55b7566f8b0aad8c82217b08c288a3ac7475cb0"
+  },
+  "crypto": {
+    "session": "76db54b6926b4bf49ca10dda9086a340",
+    "stateSha256": "56b51a7bee05c7e9109488c18280bc00dbea15399712f9035c0d288a4a9bd1b3",
+    "actualGpgShowAndPublicImportExecuted": true,
+    "completedStages": 2,
+    "publicImported": 182,
+    "secretImportCounters": 0,
+    "failure": "Python UTF8 decode of LC_ALL=C GPG freeform diagnostic bytes; package verification not reached. Raw diagnostics and failed store retained.",
+    "correction": "Preserve raw diagnostic bytes; decode only strict ASCII machine status lines. Review focused regression before fresh-store retry.",
+    "packageSignaturesVerified": false
+  },
+  "noHostKeyringOrPrivateAccountMutation": true,
+  "testTrustAbsent": false,
+  "mediaVerified": false,
+  "guestVerified": false,
+  "previewComplete": false,
+  "nextAction": "Review diagnostic byte handling retake, finish fixed public crypto run and independent media receipt. Continue Hub managed update ordering source/recovery verification in parallel."
+}
