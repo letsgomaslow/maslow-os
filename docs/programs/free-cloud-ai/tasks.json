@@ -525,11 +525,13 @@
         "docs/programs/free-cloud-ai/evidence/2026-10-12-lenovo-pivot-diligence.json",
         "docs/programs/free-cloud-ai/evidence/2026-10-12-native-signing-ready-checkpoint.json",
         "docs/programs/free-cloud-ai/evidence/2026-10-12-hub036-reconstructed-build.json",
-        "docs/programs/free-cloud-ai/evidence/2026-10-12-qa3-source-admission.json"
+        "docs/programs/free-cloud-ai/evidence/2026-10-12-qa3-source-admission.json",
+        "docs/programs/free-cloud-ai/evidence/2026-10-12-local-signing-prompt-checkpoint.json",
+        "docs/programs/free-cloud-ai/evidence/2026-10-12-local-signing-workstation-correction.json"
       ],
       "artifact_hashes": {},
-      "blocker": "QA3 derivativee0ebb independently admitted; operator public-input transfer/staging signatures pending. No final matchedHub build/native installation. Protected previousVoice37,state/key preservation,servicequiescence and actualrecovery/live gates remain required.",
-      "next_action": "Validate Mac signatures with enrolled key,then review exact finalQA3 matchedHub build context. No trust substitution/publication or unchanged artifact rebuilds."
+      "blocker": "Existing local encrypted stagingkey requiresoperatorunlock. Firstattempt failed with0-byte sig; diagnosedretry awaitinglocalpassphrase. Noaccepted signatures/finalmatchedHub/nativeinstallation.",
+      "next_action": "Inspect localretry status;verify4signatures againstenrolledkey ordiagnoseerrorcategory. NoMac transfer,nopublication/trust substitution. Then finalQA3Hub preparation."
     },
     {
       "id": "FCAI-P2-WORK",
@@ -906,7 +908,7 @@
   ],
   "coordination": {
     "shared_owners": "Craft remains paused per owner handoff; preserve Craft Hub2666609 and Connect native5/source2e872f50 compatibility. Free AI edits only isolated worktrees; coordinate shared Hub/install/helper, Connect and Voice changes before installation.",
-    "build_serialization": "No heavyjob or activeworkers. QA3 source accepted;684owning/UI/diff and reconstructedHub036 actualpayload audit passed. Waitoperatorpreview signatures before finalmatchedHub build; native-first ordinary/live/audio afteradmission,existingguest onlyrequiredclean/faultgates.",
+    "build_serialization": "No heavybuild/VM. Existing Lenovo releaseworkstation verified; diagnostic native-terminal signingbatch awaitsoperatorpassphrase. Mac transfer cancelled. Only correctly verified local signatures admit final QA3Hub build under sharedlock.",
     "worker_limit": 2,
     "integration": "No product/shared merge, host installation, production signing or publication. Program completed source commits only.",
     "active_workers": []

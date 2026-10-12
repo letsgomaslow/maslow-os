@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "status": "existing-local-workstation-found-terminal-signing-preparation",
+  "correction": "Root missed the October9 local-release-workstation handoff and unnecessarily requested Mac transfer. User asks agent to handle it. Cancel that transfer; Lenovo already has the existing encrypted staging-key/tool setup.",
+  "basis": "docs/handoffs/2026-10-09-local-release-workstation.md",
+  "checked": {
+    "toolCommit": "140e023baf4fccb651ca944a866af36b81b651b2",
+    "toolCheckoutClean": true,
+    "localTool": "/home/maslow/.local/bin/maslow-release",
+    "keyCustody": "Existing encrypted key in owner-only700 signing directory,regular owner-only600 key file. No private-key contents or passphrase retrieved into tool output.",
+    "publicKey": "Workstation/bootstrap/enrolled PEM hash1c0134a2171832127b6f6f607f8e5b18fc8d4bec51b4afe0e995d4859e74bb3f; SPKI DER fingerprint daacaa5aac138710a3950097b29a05abd3f69c9a8efad512321c45f3103d1ee4.",
+    "maslowReleaseVerify": "Pass; signed-staging basec559feaf9c02a90dc46573bcae045ff414cd098a,manifestsequence9,catalog5,Pages serves exact tip. No signing/publication performed."
+  },
+  "prepared": "Fixed four-input procedural batch using existing release op_verify/signing APIs. Opens only a visible local terminal for operator passphrase; strips unattended passphrase environment,never publishes or changes trust/configuration. Independent review found cached-bytecode/Git-hook gaps; exact source/flags/raw-blob checks corrected and retake pending.",
+  "wrapperSha256": "6a4941d8767173b25f206ce441e0a8d5c9516edacb9c02684a06498a1cf0b480",
+  "nextAction": "Accept independent wrapper retake,open existing native terminal with isolated no-site/no-cache Python. User enters release signing passphrase only into local OpenSSL prompts; Root verifies resulting signatures and continues final matchedHub preparation. No file transfer or command copying required.",
+  "constraints": "No private key/passphrase in chat,diagnostics,Git or new infrastructure. No production publication/product merges/Craft resume. No native installation until remaining state/recovery/quiescence prerequisites pass.",
+  "previewComplete": false
+}
