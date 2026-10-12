@@ -84,7 +84,7 @@
       "path": "/home/maslow/Projects/Maslow/free-ai-hub-current",
       "base_revision": "33940d2e8740b172b953cc3e091cbae1ba1cd303",
       "branch": "codex/free-cloud-ai-hub-current",
-      "implementation_revision": "c53d4e5db8de7b8d2957e5cccffba0b0f3020da7",
+      "implementation_revision": "bb66f9e053b5701d43ee98294498f089ff8a20eb",
       "previous_free_ai_worktree": "/home/maslow/Projects/Maslow/free-ai-hub",
       "accepted_craft_source_reference": "2666609002dce8bb6cc16511ef2125bccb18dbe9"
     },
@@ -434,7 +434,7 @@
       "worker": "current_recovery managed lifecycle contract/code; root integration",
       "actual_model": "gpt-6.1-sol/high implementation; gpt-6-astra/high independent review",
       "attempt": 2,
-      "last_checkpoint": "2026-10-12T12:58:06.429284+00:00",
+      "last_checkpoint": "2026-10-12T14:05:38.422637+00:00",
       "base_revision": "2a8c6eda15d92078fdd8656a879b1e93dd786a1d",
       "branch": "codex/free-cloud-ai-hub-current",
       "worktree": "/home/maslow/Projects/Maslow/free-ai-hub-current",
@@ -450,7 +450,10 @@
         "690285be868fef835ec424905a03b94df44302cb",
         "545036affacb5f880d323083035cdd6fc894a1eb",
         "ccf2ea4981f76270407295f14f012c217c2c489a",
-        "c53d4e5db8de7b8d2957e5cccffba0b0f3020da7"
+        "c53d4e5db8de7b8d2957e5cccffba0b0f3020da7",
+        "8f61dd2f9bd7cf9e8ebe9b6d3d34789b014c2061",
+        "67fc348234aa65b66af3379d7e6f9faa744c89dd",
+        "bb66f9e053b5701d43ee98294498f089ff8a20eb"
       ],
       "integration_commits": [
         "c856c683de8e66a43d326b435bbf73504f5ca6a2",
@@ -496,11 +499,12 @@
         "docs/programs/free-cloud-ai/evidence/2026-10-12-voice41-scoped-artifact-checkpoint.json",
         "docs/programs/free-cloud-ai/evidence/2026-10-12-deferred-managed-mask-source-checkpoint.json",
         "docs/programs/free-cloud-ai/evidence/2026-10-12-no-cache-source-and-guest-admission-checkpoint.json",
-        "docs/programs/free-cloud-ai/evidence/2026-10-12-rejection-wal-source-checkpoint.json"
+        "docs/programs/free-cloud-ai/evidence/2026-10-12-rejection-wal-source-checkpoint.json",
+        "docs/programs/free-cloud-ai/evidence/2026-10-12-combined-recovery-source-checkpoint.json"
       ],
       "artifact_hashes": {},
-      "blocker": "Two source units accepted with 560 owning tests/no skips and UI. V1 decision cleanup is active; durable progress, V2 dispatcher, staging/damaged DB/reboot and actual installed recovery remain required.",
-      "next_action": "Complete V1 decision-only cleanup with independent review; implement the reviewed WAL no-copy reply-loss progress slice in disjoint ownership. Preserve the installed baseline and unchanged backend2/Voice41/Connect8 artifacts."
+      "blocker": "Combined600owning/no skips/UI/shell/diff accepted. Expired preparing review authority, V2 negative handling, staged/damaged DB/reboot and installed/live recovery remain open.",
+      "next_action": "Implement the independently reduced expired V1 review authority in disjoint ownership; design V2 initial negative forwarding/cleanup read-only. Preserve clean installed baseline and unchanged artifacts."
     },
     {
       "id": "FCAI-P2-WORK",
@@ -637,7 +641,7 @@
       "worker": "current_recovery managed lifecycle contract/code; root installed recovery integration",
       "actual_model": "gpt-6.1-sol/high implementation; root coordinator",
       "attempt": 1,
-      "last_checkpoint": "2026-10-12T12:58:06.429284+00:00",
+      "last_checkpoint": "2026-10-12T14:05:38.422705+00:00",
       "base_revision": "09721dff",
       "branch": "codex/free-cloud-ai",
       "worktree": "/home/maslow/Maslow-ai-os/free-ai-runtime",
@@ -651,7 +655,10 @@
         "690285be868fef835ec424905a03b94df44302cb",
         "545036affacb5f880d323083035cdd6fc894a1eb",
         "ccf2ea4981f76270407295f14f012c217c2c489a",
-        "c53d4e5db8de7b8d2957e5cccffba0b0f3020da7"
+        "c53d4e5db8de7b8d2957e5cccffba0b0f3020da7",
+        "8f61dd2f9bd7cf9e8ebe9b6d3d34789b014c2061",
+        "67fc348234aa65b66af3379d7e6f9faa744c89dd",
+        "bb66f9e053b5701d43ee98294498f089ff8a20eb"
       ],
       "integration_commits": [],
       "tests": [
@@ -688,11 +695,12 @@
         "docs/programs/free-cloud-ai/evidence/2026-10-12-deferred-managed-mask-source-checkpoint.json",
         "docs/programs/free-cloud-ai/evidence/2026-10-12-no-cache-source-and-guest-admission-checkpoint.json",
         "docs/programs/free-cloud-ai/evidence/2026-10-12-rejection-wal-source-checkpoint.json",
-        "docs/programs/free-cloud-ai/evidence/2026-10-12-recovery-units-active-checkpoint.json"
+        "docs/programs/free-cloud-ai/evidence/2026-10-12-recovery-units-active-checkpoint.json",
+        "docs/programs/free-cloud-ai/evidence/2026-10-12-combined-recovery-source-checkpoint.json"
       ],
       "artifact_hashes": {},
-      "blocker": "Unit B focused source independently accepted after internal fsync fixes; combined owning pending WAL progress freeze/review. V2 dispatcher, expiry-review, staged/damaged DB/reboot and installed recovery remain open.",
-      "next_action": "boundary_review: gpt-6-astra/high, WAL progress source implementation and focused checks; independent final source review required. Obtain exact freeze for independent source review, then combined owning/UI.",
+      "blocker": "Combined600owning/no skips/UI/shell/diff accepted. Expired preparing review authority, V2 negative handling, staged/damaged DB/reboot and installed/live recovery remain open.",
+      "next_action": "Implement the independently reduced expired V1 review authority in disjoint ownership; design V2 initial negative forwarding/cleanup read-only. Preserve clean installed baseline and unchanged artifacts.",
       "coordinator_only": true
     },
     {
@@ -848,8 +856,8 @@
     "worker_limit": 2,
     "integration": "No product/shared merge, host installation, production signing or publication. Program completed source commits only.",
     "active_workers": [
-      "boundary_review: gpt-6-astra/high, WAL progress source implementation and focused checks; independent final source review required.",
-      "rejection_forwarding: gpt-6-sol/high, gated V2 dispatcher/parent/structural-ticket prerequisite implementation; four disjoint source/four test files."
+      "rejection_forwarding: gpt-6-sol/high, expired V1 review authority source, V1 rejection/recovery helpers plus new focused tests.",
+      "rejection_cleanup_review: gpt-6-astra/high, read-only V2 initial negative/cleanup design; no edits."
     ]
   },
   "user_priority": "Free AI through completion of approved scope. Craft development paused; do not resume it, merge product branches or publish production artifacts."

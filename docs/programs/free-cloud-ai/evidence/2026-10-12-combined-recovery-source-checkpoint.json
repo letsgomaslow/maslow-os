@@ -1,0 +1,46 @@
+{
+  "schema": 1,
+  "status": "three-source-units-accepted-preview-incomplete",
+  "hubSource": "bb66f9e053b5701d43ee98294498f089ff8a20eb",
+  "commits": {
+    "v1RejectionCleanup": "8f61dd2f9bd7cf9e8ebe9b6d3d34789b014c2061",
+    "walProgress": "67fc348234aa65b66af3379d7e6f9faa744c89dd",
+    "v2DispatcherPrerequisite": "bb66f9e053b5701d43ee98294498f089ff8a20eb"
+  },
+  "evidence": {
+    "/home/maslow/Projects/Maslow/free-ai-hub-current/docs/evidence/2026-10-12-combined-recovery-owning.json": "78880272660e21c11ccbca98ec5600fa216fe8b5e615aa79e0ed52d41765808f",
+    "/home/maslow/Projects/Maslow/free-ai-hub-current/docs/evidence/2026-10-12-v1-rejection-cleanup-retake.json": "97f6382615378289a9f7d8a363e51fe73aaaa83cc7864e0c365c27dc48c5dca9",
+    "/home/maslow/Projects/Maslow/free-ai-hub-current/docs/evidence/2026-10-12-wal-progress-review.json": "20e4edff158ec33041ad052410a93e538118d7d8486ad03988fba7acaf1c2b3d",
+    "/home/maslow/Projects/Maslow/free-ai-hub-current/docs/evidence/2026-10-12-v2-dispatch-prerequisite-review.json": "03bb62fce28a5847f2db51dbbe51a659520a41ffd23be03afa0a1a1f089c4adf",
+    "/home/maslow/Projects/Maslow/free-ai-hub-current/docs/evidence/2026-10-12-combined-recovery-fixture-retake.json": "412cdd666bc28968afe4ea64658be2aa5b44ed83c2d190234599d1403113faaa"
+  },
+  "checks": {
+    "owningTests": 600,
+    "skips": 0,
+    "seconds": 144.249,
+    "uiContract": "pass",
+    "shellSyntax": "pass",
+    "diff": "pass",
+    "oneCpu": true,
+    "sharedHeavyLock": true
+  },
+  "failureHistory": "Initial combined run failed five publication cases because an old fixture declared all protected paths present. Independent retake confirms all77 assertions unchanged; only new evidence names use actual fixture namespace. Original result/log preserved.",
+  "implemented": [
+    "V1 witnessed no-preparation decision/cleanup with structural expired-decided retries and durable publication/unlink ordering.",
+    "WAL no-copy ready/observed progress survives reply loss and nonce renewal without duplicate data/key/settings replay.",
+    "Gated fixed V2 remove/reinstall dispatch, exact initial parent/action binding and explicit structural ticket evidence."
+  ],
+  "limits": [
+    "Stable complete WAL/SHM only; changed/disappeared journals remain denied.",
+    "Expired preparing V1 review authority is next and unimplemented at this checkpoint.",
+    "V2 initial typed rejection/witness/cleanup remains unimplemented; managed gate false.",
+    "Staged replacement/damaged DB/reboot, matched Hub package and actual installed/live/Voice/Lenovo recovery acceptance remain required."
+  ],
+  "unchangedArtifacts": [
+    "backend2",
+    "Voice41",
+    "Connect8"
+  ],
+  "previewComplete": false,
+  "nextAction": "Implement the independently reduced expired V1 review authority in disjoint ownership; design V2 initial negative forwarding/cleanup read-only. Preserve clean installed baseline and unchanged artifacts."
+}
