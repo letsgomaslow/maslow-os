@@ -1,0 +1,28 @@
+{
+  "schema": 1,
+  "status": "active-preparation-no-VM-GO",
+  "acceptedHubSource": "ceba096b7ea8d36e6124ffbf121b1eef192ecc75",
+  "overlayFreeze": {
+    "path": "/home/maslow/Maslow-ai-os/free-ai-build/hub-bundle-prep/overlay-acceptance-prep/source-freeze.json",
+    "sha256": "1096b0c0b53b5db12654bb3a54a91f51cdcb0ce1c2cddf5b345f61c132bd378a"
+  },
+  "overlayReview": {
+    "path": "/home/maslow/Maslow-ai-os/free-ai-build/hub-bundle-prep/overlay-acceptance-prep/independent-admission-review.json",
+    "sha256": "beca8707582c2355b8fc8165c6ccbd99b7f920dc3dd97acb5413a4d77b0c7ef6",
+    "verdict": "changes-required-no-GO",
+    "findings": [
+      "OVERLAY-A1 actual approved source/harness inputs must be rechecked after slow baseline work before launch.",
+      "OVERLAY-A2 output parent aliases/foreign symlinks must refuse before creating run data."
+    ],
+    "nativeLaunched": false
+  },
+  "crossbootCharter": {
+    "path": "/home/maslow/Maslow-ai-os/free-ai-build/hub-bundle-prep/offline-crossboot-and-native-admission-design.json",
+    "sha256": "9de49ca4390f1835c4a84ac5807062b938849546d9791874592cc6de1fcea5ec",
+    "rootCodeApproved": true,
+    "scope": "Two executor/test files only; immutable historical compatibility for same already-quiesced current operation; stopped current Voice and exact current facts; no launch authority mint or process check bypass.",
+    "qaGateCandidatePolicy": "Separate unpublished candidate with only four reviewed literal gate deltas after internal/source checks; exact artifact review required before native GO; product source gates remain false."
+  },
+  "nextAction": "Fix/retake the two external overlay-controller admission findings. Review the exact two-file offline crossboot source freeze when available. Only then admit a read-only owned-overlay guest run with limits and shared lock.",
+  "previewComplete": false
+}

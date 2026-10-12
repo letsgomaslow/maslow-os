@@ -712,11 +712,12 @@
         "docs/programs/free-cloud-ai/evidence/2026-10-12-combined-recovery-source-checkpoint.json",
         "docs/programs/free-cloud-ai/evidence/2026-10-12-rejection-authority-units-checkpoint.json",
         "docs/programs/free-cloud-ai/evidence/2026-10-12-rejection-authority-source-checkpoint.json",
-        "docs/programs/free-cloud-ai/evidence/2026-10-12-keep-expiry-source-checkpoint.json"
+        "docs/programs/free-cloud-ai/evidence/2026-10-12-keep-expiry-source-checkpoint.json",
+        "docs/programs/free-cloud-ai/evidence/2026-10-12-overlay-crossboot-active-checkpoint.json"
       ],
       "artifact_hashes": {},
-      "blocker": "657owning/no skips/UI/shell accepted. Overlay-only admission, guest dependencies/policy, offline crossboot recovery and actual installed paired recovery remain unresolved; public gates false.",
-      "next_action": "Prepare and independently review overlay-only guest admission for read-only dependency/policy/desktop facts. In parallel scope offline crossboot recovery and a concrete gated native-acceptance path; no VM GO, ISO build or gate bypass.",
+      "blocker": "Overlay admission no-GO until post-baseline source recheck and safe output-parent fixes pass independent retake. Offline crossboot source is coding; actual installed/private/audio/Lenovo gates open.",
+      "next_action": "Fix/retake the two external overlay-controller admission findings. Review the exact two-file offline crossboot source freeze when available. Only then admit a read-only owned-overlay guest run with limits and shared lock.",
       "coordinator_only": true
     },
     {
@@ -757,11 +758,12 @@
         "docs/programs/free-cloud-ai/evidence/2026-10-12-public-crypto-result-checkpoint.json",
         "docs/programs/free-cloud-ai/evidence/2026-10-12-no-cache-source-and-guest-admission-checkpoint.json",
         "docs/programs/free-cloud-ai/evidence/2026-10-12-clean-installed-baseline-checkpoint.json",
-        "docs/programs/free-cloud-ai/evidence/2026-10-12-keep-expiry-source-checkpoint.json"
+        "docs/programs/free-cloud-ai/evidence/2026-10-12-keep-expiry-source-checkpoint.json",
+        "docs/programs/free-cloud-ai/evidence/2026-10-12-overlay-crossboot-active-checkpoint.json"
       ],
       "artifact_hashes": {},
-      "blocker": "657owning/no skips/UI/shell accepted. Overlay-only admission, guest dependencies/policy, offline crossboot recovery and actual installed paired recovery remain unresolved; public gates false.",
-      "next_action": "Prepare and independently review overlay-only guest admission for read-only dependency/policy/desktop facts. In parallel scope offline crossboot recovery and a concrete gated native-acceptance path; no VM GO, ISO build or gate bypass."
+      "blocker": "Overlay admission no-GO until post-baseline source recheck and safe output-parent fixes pass independent retake. Offline crossboot source is coding; actual installed/private/audio/Lenovo gates open.",
+      "next_action": "Fix/retake the two external overlay-controller admission findings. Review the exact two-file offline crossboot source freeze when available. Only then admit a read-only owned-overlay guest run with limits and shared lock."
     },
     {
       "id": "FCAI-P6-REVIEW",
@@ -873,8 +875,8 @@
     "worker_limit": 2,
     "integration": "No product/shared merge, host installation, production signing or publication. Program completed source commits only.",
     "active_workers": [
-      "rejection_forwarding: gpt-6-sol/high, external overlay-only guest admission/driver preparation; no VM GO or product-source changes.",
-      "boundary_review: gpt-6-astra/high, read-only offline crossboot/native-admission design; no code/gates."
+      "rejection_forwarding: gpt-6-sol/high, external overlay-controller A1/A2 fixes, no GO/VM/product-source edits.",
+      "boundary_review: gpt-6-astra/high, two-file offline crossboot executor/test implementation; public gates unchanged."
     ]
   },
   "user_priority": "Free AI through completion of approved scope. Craft development paused; do not resume it, merge product branches or publish production artifacts."
