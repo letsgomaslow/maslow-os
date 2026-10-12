@@ -12,6 +12,7 @@ import subprocess
 import time
 
 from .errors import VoiceError
+from .startup import canonical_startup
 
 TICKET_ROOT = Path('/run/maslow-hub-free-ai')
 NAMES = {'maslow-free-ai', 'maslow-voice'}
@@ -113,6 +114,7 @@ def canonical_service(service):
     if (service.directory != directory or service.runtime != runtime
             or any(item.is_symlink() for path in (directory,runtime) for item in (path,*path.parents))):
         raise VoiceError('FREE_AI_CANONICAL_STATE_REQUIRED','This installation needs the standard Maslow state and session locations. Custom or developer configurations were left unchanged.')
+    canonical_startup()
 
 
 def no_agent_sessions():

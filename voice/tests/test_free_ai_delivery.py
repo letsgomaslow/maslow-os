@@ -73,6 +73,8 @@ class DeliveryTests(unittest.IsolatedAsyncioTestCase):
         self.addCleanup(self.read.stop)
         self.canonical=patch('maslow_voice.free_ai_delivery.canonical_paths',return_value=(self.service.directory,self.service.runtime))
         self.canonical.start();self.addCleanup(self.canonical.stop)
+        self.startup=patch('maslow_voice.free_ai_delivery.canonical_startup')
+        self.startup.start();self.addCleanup(self.startup.stop)
         self.sessions=patch('maslow_voice.free_ai_delivery.no_agent_sessions')
         self.sessions.start();self.addCleanup(self.sessions.stop)
 

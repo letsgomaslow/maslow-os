@@ -1,5 +1,4 @@
-#!/bin/bash
+#!/bin/bash -p
 # omarchy:hidden=true
 # omarchy:summary=Send a private JSON request to Maslow Voice
-export PYTHONPATH=/usr/lib/maslow-voice
-exec /usr/lib/maslow-voice/venv/bin/python -m maslow_voice.control "$@"
+exec /usr/lib/maslow-voice/venv/bin/python -I -S -B -X pycache_prefix=/dev/null /usr/lib/maslow-voice/bootstrap.py control "$@"
