@@ -775,11 +775,12 @@
         "docs/programs/free-cloud-ai/evidence/2026-10-12-crossboot667-overlay-reader-checkpoint.json",
         "docs/programs/free-cloud-ai/evidence/2026-10-12-overlay-controls-and-cid-checkpoint.json",
         "docs/programs/free-cloud-ai/evidence/2026-10-12-guest-login-and-postboot-owning-checkpoint.json",
-        "docs/programs/free-cloud-ai/evidence/2026-10-12-resource-efficient-completion.json"
+        "docs/programs/free-cloud-ai/evidence/2026-10-12-resource-efficient-completion.json",
+        "docs/programs/free-cloud-ai/evidence/2026-10-12-bounded-guest-delivery-blockers.json"
       ],
       "artifact_hashes": {},
-      "blocker": "Signed-in guest0741 confirms Quickshell/Secret Service/dependencies but Voice and standalone Hub Voice bundle absent; frame black. Read-only diagnostic retake accepted and one bounded guest admitted. No installed/live acceptance.",
-      "next_action": "Review real Voice setup/repository/cache and compositor facts plus late frame from the single owned diagnostic guest; establish normal prerequisite path before installation."
+      "blocker": "Guest6bcc1f57 completed read-only checks. Normal Voice setup command exists but no Voice package metadata/cache/standalone Hub payload. Mapped bar still absent from real frame. Installation/live/visual gates remain open.",
+      "next_action": "Establish reviewed normal Voice delivery inputs and matched Hub artifact audit before another installation guest. Reuse guest facts; no unchanged repeat or ISO rebuild."
     },
     {
       "id": "FCAI-P6-REVIEW",
@@ -887,12 +888,12 @@
   ],
   "coordination": {
     "shared_owners": "Craft remains paused per owner handoff; preserve Craft Hub2666609 and Connect native5/source2e872f50 compatibility. Free AI edits only isolated worktrees; coordinate shared Hub/install/helper, Connect and Voice changes before installation.",
-    "build_serialization": "Craft paused. Retain unchanged backend2/Voice41/Connect8. One read-only diagnostic overlay guest admitted under existing shared lock/resource controls; no other heavy job. Audit retained Hub instead of rebuilding for corrected postcheck.",
+    "build_serialization": "Craft paused; unchanged backend2/Voice41/Connect8 retained. Diagnostic guest6bcc1f57 completed, owned group/container retired. No heavy job running. Next heavy work is retained Hub artifact audit after reviewed admission; use existing shared lock/resource limits.",
     "worker_limit": 2,
     "integration": "No product/shared merge, host installation, production signing or publication. Program completed source commits only.",
     "active_workers": [
-      "rejection_cleanup_review: gpt-6-astra/high; diagnostic retake accepted, stopped.",
-      "rejection_forwarding: gpt-6-sol/high; retained Hub artifact audit admission, no heavy job."
+      "rejection_forwarding: gpt-6-sol/high; external retained-Hub audit admission, no heavy job.",
+      "boundary_review: gpt-6-astra/high; bounded missing-database charter only, no heavy job."
     ]
   },
   "user_priority": "Free AI through completion of approved scope. Craft development paused; do not resume it, merge product branches or publish production artifacts."

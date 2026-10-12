@@ -227,7 +227,8 @@
     "docs/programs/free-cloud-ai/evidence/2026-10-12-overlay-controls-and-cid-checkpoint.json",
     "docs/programs/free-cloud-ai/evidence/2026-10-12-qa-source-build-and-postboot-checkpoint.json",
     "docs/programs/free-cloud-ai/evidence/2026-10-12-guest-login-and-postboot-owning-checkpoint.json",
-    "docs/programs/free-cloud-ai/evidence/2026-10-12-resource-efficient-completion.json"
+    "docs/programs/free-cloud-ai/evidence/2026-10-12-resource-efficient-completion.json",
+    "docs/programs/free-cloud-ai/evidence/2026-10-12-bounded-guest-delivery-blockers.json"
   ],
   "passed_source_gates": [
     "every-dispatch-provider-and-model-policy",
