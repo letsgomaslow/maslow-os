@@ -2,8 +2,8 @@
   "schema": 1,
   "status": "source-milestones-accepted-preview-incomplete",
   "hubCommits": {
-    "initialRejection": "ccf2ea4",
-    "walNoCopy": "c53d4e5"
+    "initialRejection": "ccf2ea4981f76270407295f14f012c217c2c489a",
+    "walNoCopy": "c53d4e5db8de7b8d2957e5cccffba0b0f3020da7"
   },
   "evidence": {
     "/home/maslow/Projects/Maslow/free-ai-hub-current/docs/evidence/2026-10-12-rejection-wal-combined-owning.json": "e6e19e953f6fcd0e30c2cbcf0e5d1d8783b7b4f17b1af53ad18817ce113b9497",

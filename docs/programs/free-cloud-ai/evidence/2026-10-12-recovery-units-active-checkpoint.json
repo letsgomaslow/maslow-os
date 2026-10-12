@@ -1,0 +1,36 @@
+{
+  "schema": 1,
+  "status": "active-source-units-not-accepted",
+  "acceptedHubSource": "c53d4e5db8de7b8d2957e5cccffba0b0f3020da7",
+  "unitBFreeze": {
+    "path": "/home/maslow/Maslow-ai-os/free-ai-build/initial-rejection-prep/unit-b/source-checkpoint.json",
+    "sha256": "c01cd1118398cb9c17894c789bcb10c690e64cdb38416a7743d29c4f5e305977",
+    "authorAffectedTests": 92,
+    "authorNewTests": 16,
+    "independentAffectedTests": 92,
+    "remainingFinding": "Internal publication/unlink to directory-fsync retry gaps; reviewer preparing inert evidence. Do not accept current freeze."
+  },
+  "walProgressCharter": {
+    "path": "/home/maslow/Maslow-ai-os/free-ai-build/managed-recovery-wal-no-copy/progress-design-review.json",
+    "sha256": "6d4860b8bb9b0ac73032b5b5b1e69a6bee30f89446c27ce6903e23538045c6e2",
+    "rootApproved": true,
+    "scope": "Read-only WAL plan; protected ready then observed; exact settings serialization, physical/logical data, matching keys and fresh current authority. No copy/staging/damage/reboot authority."
+  },
+  "nextAction": "Sol is fixing Unit B internal fsync retry gaps; request independent retake on its exact new freeze. Astra continues disjoint WAL progress coding. Combine owning/UI only after both source freezes are accepted.",
+  "unchangedArtifacts": [
+    "backend2",
+    "Voice41",
+    "Connect8"
+  ],
+  "previewComplete": false,
+  "unitBIndependentReview": {
+    "path": "/home/maslow/Projects/Maslow/free-ai-hub-current/docs/evidence/2026-10-12-v1-rejection-cleanup-review.json",
+    "sha256": "803efcf769a3084789af74810b6722145778743441459368d2a7992d896877cd",
+    "verdict": "changes-required",
+    "findings": [
+      "B-R1 terminal Root/receipt publication must be durably confirmed on retry.",
+      "B-R2 missing reservation/public ticket still require parent fsync before later barrier deletion."
+    ],
+    "actualInternalFsyncProbes": 4
+  }
+}

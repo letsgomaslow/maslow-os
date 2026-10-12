@@ -52,6 +52,17 @@
         "model": "gpt-6-sol",
         "reasoning": "high",
         "reason": "Fallback after gpt-6.1-sol capacity error; actual Unit A EOF fix and focused verification."
+      },
+      {
+        "task": "boundary_review / WAL progress implementation",
+        "model": "gpt-6-astra",
+        "reasoning": "high",
+        "reason": "Credential/recovery boundary; author of this unit, not its independent final source reviewer."
+      },
+      {
+        "task": "rejection_cleanup_review",
+        "model": "gpt-6-astra",
+        "reasoning": "high"
       }
     ]
   },
@@ -73,7 +84,7 @@
       "path": "/home/maslow/Projects/Maslow/free-ai-hub-current",
       "base_revision": "33940d2e8740b172b953cc3e091cbae1ba1cd303",
       "branch": "codex/free-cloud-ai-hub-current",
-      "implementation_revision": "c53d4e5",
+      "implementation_revision": "c53d4e5db8de7b8d2957e5cccffba0b0f3020da7",
       "previous_free_ai_worktree": "/home/maslow/Projects/Maslow/free-ai-hub",
       "accepted_craft_source_reference": "2666609002dce8bb6cc16511ef2125bccb18dbe9"
     },
@@ -438,8 +449,8 @@
         "9562f8e3d764954ff2fe4ce5aa20a40aa2b7a421",
         "690285be868fef835ec424905a03b94df44302cb",
         "545036affacb5f880d323083035cdd6fc894a1eb",
-        "ccf2ea4",
-        "c53d4e5"
+        "ccf2ea4981f76270407295f14f012c217c2c489a",
+        "c53d4e5db8de7b8d2957e5cccffba0b0f3020da7"
       ],
       "integration_commits": [
         "c856c683de8e66a43d326b435bbf73504f5ca6a2",
@@ -639,8 +650,8 @@
         "76fb5d08ca65662be1b16da1cce1eb0eee13f37b",
         "690285be868fef835ec424905a03b94df44302cb",
         "545036affacb5f880d323083035cdd6fc894a1eb",
-        "ccf2ea4",
-        "c53d4e5"
+        "ccf2ea4981f76270407295f14f012c217c2c489a",
+        "c53d4e5db8de7b8d2957e5cccffba0b0f3020da7"
       ],
       "integration_commits": [],
       "tests": [
@@ -676,11 +687,12 @@
         "docs/programs/free-cloud-ai/evidence/2026-10-12-deferred-managed-mask-design-checkpoint.json",
         "docs/programs/free-cloud-ai/evidence/2026-10-12-deferred-managed-mask-source-checkpoint.json",
         "docs/programs/free-cloud-ai/evidence/2026-10-12-no-cache-source-and-guest-admission-checkpoint.json",
-        "docs/programs/free-cloud-ai/evidence/2026-10-12-rejection-wal-source-checkpoint.json"
+        "docs/programs/free-cloud-ai/evidence/2026-10-12-rejection-wal-source-checkpoint.json",
+        "docs/programs/free-cloud-ai/evidence/2026-10-12-recovery-units-active-checkpoint.json"
       ],
       "artifact_hashes": {},
       "blocker": "Two source units accepted with 560 owning tests/no skips and UI. V1 decision cleanup is active; durable progress, V2 dispatcher, staging/damaged DB/reboot and actual installed recovery remain required.",
-      "next_action": "Complete V1 decision-only cleanup with independent review; implement the reviewed WAL no-copy reply-loss progress slice in disjoint ownership. Preserve the installed baseline and unchanged backend2/Voice41/Connect8 artifacts.",
+      "next_action": "Fix independently found Unit B internal fsync retry gaps and retake; continue disjoint WAL progress implementation. Both source units remain unaccepted until review and owning checks.",
       "coordinator_only": true
     },
     {
@@ -831,12 +843,13 @@
     }
   ],
   "coordination": {
-    "shared_owners": "Craft owns productivity/creative apps and its current Connect native lifecycle review (observed source2e872f50). FreeAI edits only isolated runtime/Hub/Connect/package worktrees. Shared helper/install.py, Hub Panel, package recipes and Connect CLI/accounts require serialized reconciliation before integration. The newer Craft source/package has not been accepted by this program.",
-    "build_serialization": "No native build admitted. Craft-PILOT-ISO active at observed runtime0b3e7bce; current Docker/process inventory empty does not prove a released slot. FreeAI2/Voice39 exact inputs prepared and reviewed.",
+    "shared_owners": "Craft remains paused per owner handoff; preserve Craft Hub2666609 and Connect native5/source2e872f50 compatibility. Free AI edits only isolated worktrees; coordinate shared Hub/install/helper, Connect and Voice changes before installation.",
+    "build_serialization": "Craft owner released the shared slot. Accepted backend2, Voice41 and Connect8 artifacts remain unchanged. Clean guest baseline installed/rebooted and launch retired. No build/VM currently runs; one heavy job at a time under /home/maslow/Maslow-ai-os/heavy-work.lock with recorded resource limits.",
     "worker_limit": 2,
     "integration": "No product/shared merge, host installation, production signing or publication. Program completed source commits only.",
     "active_workers": [
-      "current_recovery: isolated Hub recovery atomic publication and cleanup-preservation fixes, actual gpt-6.1-sol/high"
+      "rejection_forwarding: gpt-6-sol/high, Unit B P1 internal fsync retry fixes; 3 owned helper/test files only.",
+      "boundary_review: gpt-6-astra/high, WAL progress lease/executor/issuer/private progress module + owning tests only."
     ]
   },
   "user_priority": "Free AI through completion of approved scope. Craft development paused; do not resume it, merge product branches or publish production artifacts."
