@@ -716,8 +716,8 @@
         "docs/programs/free-cloud-ai/evidence/2026-10-12-overlay-crossboot-active-checkpoint.json"
       ],
       "artifact_hashes": {},
-      "blocker": "Overlay admission no-GO until post-baseline source recheck and safe output-parent fixes pass independent retake. Offline crossboot source is coding; actual installed/private/audio/Lenovo gates open.",
-      "next_action": "Fix/retake the two external overlay-controller admission findings. Review the exact two-file offline crossboot source freeze when available. Only then admit a read-only owned-overlay guest run with limits and shared lock.",
+      "blocker": "Independent reviews found missing crossboot boundary reread and overlay held-path evidence-write gap. Fix/retake required before any VM launch.",
+      "next_action": "Fix and independently retake the two specific review findings; keep no-GO and baseline preserved.",
       "coordinator_only": true
     },
     {
@@ -762,8 +762,8 @@
         "docs/programs/free-cloud-ai/evidence/2026-10-12-overlay-crossboot-active-checkpoint.json"
       ],
       "artifact_hashes": {},
-      "blocker": "Overlay admission no-GO until post-baseline source recheck and safe output-parent fixes pass independent retake. Offline crossboot source is coding; actual installed/private/audio/Lenovo gates open.",
-      "next_action": "Fix/retake the two external overlay-controller admission findings. Review the exact two-file offline crossboot source freeze when available. Only then admit a read-only owned-overlay guest run with limits and shared lock."
+      "blocker": "Independent reviews found missing crossboot boundary reread and overlay held-path evidence-write gap. Fix/retake required before any VM launch.",
+      "next_action": "Fix and independently retake the two specific review findings; keep no-GO and baseline preserved."
     },
     {
       "id": "FCAI-P6-REVIEW",
@@ -875,8 +875,8 @@
     "worker_limit": 2,
     "integration": "No product/shared merge, host installation, production signing or publication. Program completed source commits only.",
     "active_workers": [
-      "rejection_forwarding: gpt-6-sol/high, external overlay-controller A1/A2 fixes, no GO/VM/product-source edits.",
-      "boundary_review: gpt-6-astra/high, two-file offline crossboot executor/test implementation; public gates unchanged."
+      "rejection_cleanup_review: gpt-6-astra/high, finishing blocked crossboot source review; no edits.",
+      "boundary_review: gpt-6-astra/high, finishing blocked overlay admission retake; no edits."
     ]
   },
   "user_priority": "Free AI through completion of approved scope. Craft development paused; do not resume it, merge product branches or publish production artifacts."
