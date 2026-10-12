@@ -84,7 +84,7 @@
       "path": "/home/maslow/Projects/Maslow/free-ai-hub-current",
       "base_revision": "33940d2e8740b172b953cc3e091cbae1ba1cd303",
       "branch": "codex/free-cloud-ai-hub-current",
-      "implementation_revision": "52966604271db965147b25c9997121b584bf15fc",
+      "implementation_revision": "b222265142b585fe50743ac5a705c8da39ac2b27",
       "previous_free_ai_worktree": "/home/maslow/Projects/Maslow/free-ai-hub",
       "accepted_craft_source_reference": "2666609002dce8bb6cc16511ef2125bccb18dbe9"
     },
@@ -387,7 +387,9 @@
         "docs/programs/free-cloud-ai/evidence/2026-10-12-voice41-scoped-artifact-checkpoint.json",
         "docs/programs/free-cloud-ai/evidence/2026-10-12-resource-efficient-completion.json",
         "docs/programs/free-cloud-ai/evidence/2026-10-12-retained-hub-artifact-audit.json",
-        "docs/programs/free-cloud-ai/evidence/2026-10-12-lenovo-pivot-diligence.json"
+        "docs/programs/free-cloud-ai/evidence/2026-10-12-lenovo-pivot-diligence.json",
+        "docs/programs/free-cloud-ai/evidence/2026-10-12-native-signing-ready-checkpoint.json",
+        "docs/programs/free-cloud-ai/evidence/2026-10-12-hub036-reconstructed-build.json"
       ],
       "artifact_hashes": {
         "/home/maslow/Maslow-ai-os/free-ai-build/native/maslow-free-ai-0.1.0-1-x86_64.pkg.tar.zst": "5b2d989d58451ac9744f9c0e8c2c3dcde5f99657d1fef931d2c4a348fb5e4143",
@@ -462,7 +464,8 @@
         "2e6e55437bb410df1a4969f7cc628713656bfe67",
         "015e9f426931b200c7945739f3b5adb913b3bef3",
         "ceba096b7ea8d36e6124ffbf121b1eef192ecc75",
-        "52966604271db965147b25c9997121b584bf15fc"
+        "52966604271db965147b25c9997121b584bf15fc",
+        "b222265142b585fe50743ac5a705c8da39ac2b27"
       ],
       "integration_commits": [
         "c856c683de8e66a43d326b435bbf73504f5ca6a2",
@@ -519,11 +522,14 @@
         "docs/programs/free-cloud-ai/evidence/2026-10-12-guest-login-and-postboot-owning-checkpoint.json",
         "docs/programs/free-cloud-ai/evidence/2026-10-12-resource-efficient-completion.json",
         "docs/programs/free-cloud-ai/evidence/2026-10-12-retained-hub-artifact-audit.json",
-        "docs/programs/free-cloud-ai/evidence/2026-10-12-lenovo-pivot-diligence.json"
+        "docs/programs/free-cloud-ai/evidence/2026-10-12-lenovo-pivot-diligence.json",
+        "docs/programs/free-cloud-ai/evidence/2026-10-12-native-signing-ready-checkpoint.json",
+        "docs/programs/free-cloud-ai/evidence/2026-10-12-hub036-reconstructed-build.json",
+        "docs/programs/free-cloud-ai/evidence/2026-10-12-qa3-source-admission.json"
       ],
       "artifact_hashes": {},
-      "blocker": "Actual retained QA Hub audit passed, no rebuild. Lenovo requires exact signed Hub0.3.6 rollback seed and pair signatures matching enrolled staging key; current channel and scoped Mac search have no old archive. Host install not admitted.",
-      "next_action": "Establish old-source rollback feasibility and operator preview signing handoff; integrate reviewed recovery source and build only affected matched Hub."
+      "blocker": "QA3 derivativee0ebb independently admitted; operator public-input transfer/staging signatures pending. No final matchedHub build/native installation. Protected previousVoice37,state/key preservation,servicequiescence and actualrecovery/live gates remain required.",
+      "next_action": "Validate Mac signatures with enrolled key,then review exact finalQA3 matchedHub build context. No trust substitution/publication or unchanged artifact rebuilds."
     },
     {
       "id": "FCAI-P2-WORK",
@@ -731,11 +737,13 @@
         "docs/programs/free-cloud-ai/evidence/2026-10-12-guest-login-and-postboot-owning-checkpoint.json",
         "docs/programs/free-cloud-ai/evidence/2026-10-12-resource-efficient-completion.json",
         "docs/programs/free-cloud-ai/evidence/2026-10-12-retained-hub-artifact-audit.json",
-        "docs/programs/free-cloud-ai/evidence/2026-10-12-lenovo-pivot-diligence.json"
+        "docs/programs/free-cloud-ai/evidence/2026-10-12-lenovo-pivot-diligence.json",
+        "docs/programs/free-cloud-ai/evidence/2026-10-12-native-signing-ready-checkpoint.json",
+        "docs/programs/free-cloud-ai/evidence/2026-10-12-hub036-reconstructed-build.json"
       ],
       "artifact_hashes": {},
-      "blocker": "Narrow missing-standalone private V2 source implementation active; no freeze/review/full-suite or native restoration success. Corrupt-present and unrecorded-stage interruption gates remain explicitly open.",
-      "next_action": "Review bounded author freeze and focused tests, run appropriate owning checks once after accepted changes, then exact synthetic installed recovery gates.",
+      "blocker": "Missing-standalone slice b222 independently accepted after R1/R2 fixes; all684owning/UI/diff passed. Real installed restoration/full-disk/interruption and corrupt-present/unrecorded-stage successes remain unverified/unsupported.",
+      "next_action": "Preserve scoped source evidence; test actual package/key/database recovery with syntheticdata only after trusted native/guestadmission. Do not label safe denial as successful restore.",
       "coordinator_only": true
     },
     {
@@ -784,11 +792,13 @@
         "docs/programs/free-cloud-ai/evidence/2026-10-12-resource-efficient-completion.json",
         "docs/programs/free-cloud-ai/evidence/2026-10-12-bounded-guest-delivery-blockers.json",
         "docs/programs/free-cloud-ai/evidence/2026-10-12-retained-hub-artifact-audit.json",
-        "docs/programs/free-cloud-ai/evidence/2026-10-12-lenovo-pivot-diligence.json"
+        "docs/programs/free-cloud-ai/evidence/2026-10-12-lenovo-pivot-diligence.json",
+        "docs/programs/free-cloud-ai/evidence/2026-10-12-native-signing-ready-checkpoint.json",
+        "docs/programs/free-cloud-ai/evidence/2026-10-12-hub036-reconstructed-build.json"
       ],
       "artifact_hashes": {},
-      "blocker": "Native-first pivot authorized after diligence; audio/deps/oldVoice bytes available but trusted Hub rollback seed and matching signatures unavailable. Guest fresh/destructive and real native/audio gates remain required.",
-      "next_action": "Prepare concrete reversible trusted Lenovo installation; perform everyday/live/audio there after admission, reserving existing guest for mandatory fresh/destructive gates."
+      "blocker": "Native-first diligence completed,previousVoice37 exactbytecheck and reconstructedHub036 payload audit pass; Mac signatures/finalmatchedHub and actualprivate-state/quiescence prerequisites pending. Guest fresh/destructive and native/live/audio gates open.",
+      "next_action": "Finish trusted native installation preparation while user transfers public signingfolder toMac; reserve existingguest for remainingrequiredclean/faultproof."
     },
     {
       "id": "FCAI-P6-REVIEW",
@@ -896,13 +906,10 @@
   ],
   "coordination": {
     "shared_owners": "Craft remains paused per owner handoff; preserve Craft Hub2666609 and Connect native5/source2e872f50 compatibility. Free AI edits only isolated worktrees; coordinate shared Hub/install/helper, Connect and Voice changes before installation.",
-    "build_serialization": "No heavy job running. Actual Hub archive audit and Voice37 installed-byte check completed under shared lock, one CPU/1GiB/240s. Lenovo-first ordinary/live/audio acceptance after trusted rollback/signature/state checks; clean guest only for required fresh/destructive tests. No host changes or new ISO.",
+    "build_serialization": "No heavyjob or activeworkers. QA3 source accepted;684owning/UI/diff and reconstructedHub036 actualpayload audit passed. Waitoperatorpreview signatures before finalmatchedHub build; native-first ordinary/live/audio afteradmission,existingguest onlyrequiredclean/faultgates.",
     "worker_limit": 2,
     "integration": "No product/shared merge, host installation, production signing or publication. Program completed source commits only.",
-    "active_workers": [
-      "rejection_forwarding: gpt-6-sol/high; narrow missing-database lease/progress/executor source + focused tests.",
-      "boundary_review: gpt-6-astra/high; read-only Hub0.3.6 rollback-source feasibility."
-    ]
+    "active_workers": []
   },
   "user_priority": "Free AI through completion of approved scope. Craft development paused; do not resume it, merge product branches or publish production artifacts."
 }
