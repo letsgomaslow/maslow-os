@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "status": "private-backups-verified-reviewed-native-hub-terminal-open-outcome-pending",
+  "status": "protected-readonly-check-passed-native-hub-manual-command-ready",
   "quiescence": {
     "prior": "Voice37 disabled/not speaking, preview idle; complete SQLite task history contained cancelled1/completed2/failed1 and zero active tasks. Private Voice tmux socket absent.",
     "stopAttempt": "Ordinary systemctl user stop was canceled and the service restarted with a new PID; old PID exited. Do not claim stopped from the first command.",
@@ -30,7 +30,7 @@
   },
   "keyReferences": "Read-only Secret Service SearchItems/ReadAlias/Locked metadata:4 existingVoice references,0FreeAI items,default collection available/unlocked. Only reference hashes/counts saved privately; no credential values read/exported. Reference stability is not value stability or keyring storage-roundtrip proof.",
   "untouchedPaths": "Private identity-only baseline for Voice notes,managed project directory and existingConnect state;336 entries,relative names hashed,no contents read. Not a backup/content-proof and no destructive authority against them.",
-  "rootPreflight": "First terminal attempt exit1/no result; user reports fingerprint authentication timed out. /run/maslow-hub is absent after reboot. Narrow independently reviewed read-only delta allows only safe absent lock paths, reports no acquired lock, retains strict private transaction/floor and ALPM guards. Source SHAeeea5d0a85394584c198f48e35d99ce87a2223f78c81d6c4ac2397a9ee52f71c. Actual privileged result remains required.",
+  "rootPreflight": "User ran manual read-only command2; Root verified saved exit0/readOnlytrue, explicit Root transactionnull, private floor9/hash eefe4e25..., securitySHA63ceb5b9d5a83ef5117335701ec8a68ec4da231af59c4b6f0d56cf84344658e0 and no ALPM lock. Existing install lock absent; no lock acquired, snapshot limitation explicit. No package/replay mutation. Prior authentication timeouts retained; final installed-lock guard still rechecks at apply time.",
   "pipeline": {
     "script": "/home/maslow/Maslow-ai-os/free-ai-build/hub-bundle-prep/native-preview-prep/run-native-hub-install.py",
     "sha256": "cf74ee77e858002b0f66e9b386927345a7743eabda2c29ca980b1311eacf6395",
@@ -39,6 +39,12 @@
     "resolved": "Initial review caught preflight-to-apply race and unpinned mask record. Accepted retake pins/rechecks exact runtime mask and uses a one-off guard around installed Installer.execute/apply: strict protected transaction-null/floor check occurs inside actual owning install lock immediately before unchanged apply logic. No installed helper or package source modified.",
     "execution": "Root opened exact SHA-checked isolated pipeline through existing native terminal launcher,CPU1/nice10; owns heavy/user update locks. User normal local administrator participation requested. Actual completed-step status,Root provenance and installed files must be inspected; terminal launch is not installation success.",
     "outputs": "/home/maslow/Maslow-ai-os/free-ai-build/hub-bundle-prep/native-preview-prep/native-install-1",
+    "manualRetry": {
+      "script": "/home/maslow/Maslow-ai-os/free-ai-build/hub-bundle-prep/native-preview-prep/run-native-hub-install-2.py",
+      "sha256": "88a51bec11c245dd55fbb88c5bed015b700997ec15b1dd0d8a7bdbbcd7673f27",
+      "outputs": "/home/maslow/Maslow-ai-os/free-ai-build/hub-bundle-prep/native-preview-prep/native-install-2",
+      "verification": "Inverse byte comparison equals accepted cf74 pipeline exactly; sole delta is fresh output directory. Syntax passed, not executed. First native-install-1 stopped at preflight exit1/emptylog and never reached copy/apply; preserved. User runs manual command when present to avoid another expired auto-opened prompt."
+    },
     "scope": "Protected readonly preflight, exact previousVoice37 cache copy, then normal installed Hub package API. Hub only; no FreeAI/Voice41/Connect upgrade,publication or replay reset."
   },
   "userChoice": "Proceed with local laptop preview and temporary Hub update pause; final two signatures independently verified. No publication or replay reset.",
