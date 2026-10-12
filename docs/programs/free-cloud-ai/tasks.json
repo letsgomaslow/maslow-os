@@ -670,10 +670,10 @@
       "status": "active",
       "owner": "root",
       "session": "2026-10-11-free-cloud-ai-root",
-      "worker": "root baseline ISO/guest; reviewed source snapshots and external lifecycle controls",
+      "worker": "root existing-image validation; independent bounded preparation/result review",
       "actual_model": "coordinator; gpt-6.1-sol/medium preparation, gpt-6.1-sol/high launch cleanup, gpt-6-astra/high review",
       "attempt": 1,
-      "last_checkpoint": "2026-10-12T01:20:33.660740+00:00",
+      "last_checkpoint": "2026-10-12T07:37:14.650580+00:00",
       "base_revision": "c2b03842",
       "branch": "codex/free-cloud-ai",
       "worktree": "/home/maslow/Maslow-ai-os/free-ai-runtime",
@@ -681,11 +681,13 @@
       "integration_commits": [],
       "tests": [],
       "evidence": [
-        "docs/programs/free-cloud-ai/evidence/2026-10-12-baseline-admission.json"
+        "docs/programs/free-cloud-ai/evidence/2026-10-12-baseline-admission.json",
+        "docs/programs/free-cloud-ai/evidence/2026-10-12-existing-media-targeted-checkpoint.json",
+        "docs/programs/free-cloud-ai/evidence/2026-10-12-existing-media-artifact-collection.json"
       ],
       "artifact_hashes": {},
-      "blocker": "Single admitted baseline completed with exact ISO c6674db4 hash; media/guest/actual pre-update optional installation remain unverified. No new ISO cycle is admitted.",
-      "next_action": "Let the current healthy baseline finish its one bounded attempt with minimal monitoring. Prefer suitable existing verified media or a clean installed guest; an ISO is not a FreeAI deliverable or automatic prerequisite. Verify actual clean-install and pre-update optional-package behavior. No further ISO repair/rebuild without documenting why existing verified media cannot satisfy those tests; broader OS/hardware work remains excluded."
+      "blocker": "Existing c667 image and nine actual local archives/target DB collected; exact payload/source, optional/test-trust absence and complete media receipt remain required. No VM or installed acceptance; no new ISO cycle admitted.",
+      "next_action": "Reconcile collected existing-media package payload/source and metadata, verify optional/test-trust absence and obtain the complete independent media receipt; then use the prepared clean guest. Keep installed-system gates and no-new-ISO constraint."
     },
     {
       "id": "FCAI-P6-REVIEW",

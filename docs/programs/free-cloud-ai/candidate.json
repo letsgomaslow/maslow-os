@@ -187,7 +187,8 @@
     "docs/programs/free-cloud-ai/evidence/2026-10-12-guest-vm-control-review.json",
     "docs/programs/free-cloud-ai/evidence/2026-10-12-managed-lifecycle-source-checkpoint.json",
     "docs/programs/free-cloud-ai/evidence/2026-10-12-connect-qa-lifecycle-checkpoint.json",
-    "docs/programs/free-cloud-ai/evidence/2026-10-12-connect7-native-build-checkpoint.json"
+    "docs/programs/free-cloud-ai/evidence/2026-10-12-connect7-native-build-checkpoint.json",
+    "docs/programs/free-cloud-ai/evidence/2026-10-12-existing-media-artifact-collection.json"
   ],
   "passed_source_gates": [
     "every-dispatch-provider-and-model-policy",
@@ -208,7 +209,7 @@
     "native_admission_blocker": null,
     "build_context_sha256": "08bca127d23a3cdd7e193d0a05dbc5a4a09d4d6213faa2e227155b600a3aea65",
     "sequence_session": "200e3daafe734d22a6aa2b2f5881f1c2",
-    "current_status": "Three builds/scoped native validation passed; Connect6 installation blocked by5 current advisory matches. Repaired source uncommitted; full sandbox QA pending. Independent baseline ISO running."
+    "current_status": "Historical2/39/6 build evidence preserved: native6 blocked. Current unchanged backend2, replacement Voice40 and Connect8 pass scoped native checks; final Hub and installed/live gates remain open. Existing baseline image completed and is being validated without another ISO cycle."
   },
   "prepared_connect_build": {
     "package_revision": "f4df4dad2da480ce95c7e53a3fc263b79a87c5c0",
