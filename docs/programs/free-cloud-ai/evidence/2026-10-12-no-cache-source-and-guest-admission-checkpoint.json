@@ -1,0 +1,39 @@
+{
+  "schema": 1,
+  "status": "fixed-launch-source-accepted-clean-guest-install-running-preview-incomplete",
+  "hubCommit": "545036affacb5f880d323083035cdd6fc894a1eb",
+  "sourceCheck": {
+    "tests": 540,
+    "seconds": 97.858,
+    "skipped": 0,
+    "uiPassed": true,
+    "logSha256": "80bedfee89772f91e3ccba1b35681dd7bb1bfc792f41a95f6f6498b30093fcc9",
+    "independentRootActualInertTests": 6,
+    "workerFocusedTests": 163
+  },
+  "launchScope": "Fixed FreeAI root/helper/pacman/hooks and exactexistingparentvalidators use -I -B -X pycache_prefix=/dev/null; systemsite/legacyupdater/Voiceprofile andgates preserved.",
+  "charterSha256": "2b96d467acd4d472697bc34aee0fdfe512411b82809bbe32b362483ad4722c23",
+  "implementationActive": "V1managed initial authenticatedforwarding/context/witness only; V2productionforwarding unavailable; decisioncleanup nextseparateunit",
+  "mediaStaticReviewSha256": "41fad591fa6b33bfdc0073b4ddd1b9a4687692be3b0b4387c8ae036deeba0ec8",
+  "mediaReceiptPath": "/home/maslow/Maslow-ai-os/free-ai-build/guest-baseline-prep/media-inspection/media-receipt.json",
+  "mediaReceiptSha256": "880012216d0f07fa5e39b1145e1512dfa9b9c228dd40fbdf619f5d6a276751fc",
+  "mediaScope": "Sixstaticpre-guestfacts acceptedonly; noexecutedboot/install/feature claim",
+  "vm": {
+    "session": "2de17375e2dd42ecb99bf594bd1afb19",
+    "execSession": 50018,
+    "status": "unattendedcleaninstall-running",
+    "image": "sha256:043889b711ad30dcc148bb81588c3a596b234ec6773550c2f72fe103dd9a368d",
+    "vmManifestSha256": "fa3cd64f428bd3f6d719256f7fbe8b5ae7024d4da434cc4ecbabe8482be8c03e",
+    "cpu": 2,
+    "guestMiB": 4096,
+    "outerRamGiB": 6,
+    "totalMemoryGiB": 8,
+    "actualOVMFPinsAndKvmAccessible": true,
+    "sharedLockHeldByOwnedSupervisor": true,
+    "installedAccepted": false
+  },
+  "noNewIsoBuild": true,
+  "onFailure": "Preserveexistingimage/guest/source; diagnose before anyretry. NoISOrepair/rebuild withoutdocumentedwhyverifiedexistingmedia cannotmeetcleaninstalledtests.",
+  "publicGatesOpened": false,
+  "previewComplete": false
+}
