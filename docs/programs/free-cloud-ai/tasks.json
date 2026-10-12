@@ -685,11 +685,12 @@
         "docs/programs/free-cloud-ai/evidence/2026-10-12-baseline-admission.json",
         "docs/programs/free-cloud-ai/evidence/2026-10-12-existing-media-targeted-checkpoint.json",
         "docs/programs/free-cloud-ai/evidence/2026-10-12-existing-media-artifact-collection.json",
-        "docs/programs/free-cloud-ai/evidence/2026-10-12-existing-media-static-checkpoint.json"
+        "docs/programs/free-cloud-ai/evidence/2026-10-12-existing-media-static-checkpoint.json",
+        "docs/programs/free-cloud-ai/evidence/2026-10-12-existing-media-mtree-checkpoint.json"
       ],
       "artifact_hashes": {},
-      "blocker": "Existing image completed34static read stages and12critical source byte matches. Full MTREE/optional/testrepo/publictrust reconciliation and complete independent media receipt remain required; no VM or installed acceptance and no new ISO cycle.",
-      "next_action": "Finish existing-media manifest, absence and public-only trust reconciliation; then run the prepared real clean guest before OS update. Preserve all installed/live/Lenovo gates."
+      "blocker": "All nine recorded MTREE inventories reconcile25498entries/20100regular hashes/1516symlinks; scoped optional absence verified. Fixed public-only trust inputs, complete trust comparison and independent six-fact media receipt remain required; no VM/installed acceptance.",
+      "next_action": "Collect/review the six fixed public keyring inputs and conditionally proved public pubring leaf, complete trust comparison and media receipt, then run the prepared real clean guest. No new ISO cycle."
     },
     {
       "id": "FCAI-P6-REVIEW",
