@@ -639,7 +639,7 @@
       ],
       "artifact_hashes": {},
       "blocker": "Native interrupted package/database/key restoration and fresh undo remain unverified. Preserved-state reinstall is design-only; manual/unrecorded removal remains unsupported. Both delivery gates stay false.",
-      "next_action": "Review the strict V2 lifecycle codec and Voice quiesce-only milestone, then wire bounded root-managed removal and exact-artifact reinstall with current-state provenance and a fresh checkpoint. Build the required new Voice artifact and verify installed package/database/key recovery; never reinterpret fresh absence or replay an old snapshot.",
+      "next_action": "Finish and review retained-user current-state/key sealing and a NEW checkpoint. Then wire bounded root-managed removal/reinstall/recovery and enforce tested fresh artifact-bound Voice launch provenance (installed-file hashing alone is insufficient). Preserve V1 readers/backend2; build the new Voice artifact and verify installed package/database/key recovery. Never reinterpret fresh absence or replay an old snapshot.",
       "coordinator_only": true
     },
     {
