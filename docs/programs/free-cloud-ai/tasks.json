@@ -67,7 +67,7 @@
       "path": "/home/maslow/Projects/Maslow/free-ai-hub-current",
       "base_revision": "33940d2e8740b172b953cc3e091cbae1ba1cd303",
       "branch": "codex/free-cloud-ai-hub-current",
-      "implementation_revision": "b60120b1e55e9c8e863642fd2782c9ca3f87da51",
+      "implementation_revision": "e372d7c9ac05a359d267912862ae7fdd932f3eb4",
       "previous_free_ai_worktree": "/home/maslow/Projects/Maslow/free-ai-hub",
       "accepted_craft_source_reference": "2666609002dce8bb6cc16511ef2125bccb18dbe9"
     },
@@ -647,11 +647,12 @@
         "docs/programs/free-cloud-ai/evidence/2026-10-12-voice40-connect8-native-build-checkpoint.json",
         "docs/programs/free-cloud-ai/evidence/2026-10-12-managed-source-and-owning-checkpoint.json",
         "docs/programs/free-cloud-ai/evidence/2026-10-12-issuer-map-native-checkpoint.json",
-        "docs/programs/free-cloud-ai/evidence/2026-10-12-offline-lease-review-checkpoint.json"
+        "docs/programs/free-cloud-ai/evidence/2026-10-12-offline-lease-review-checkpoint.json",
+        "docs/programs/free-cloud-ai/evidence/2026-10-12-guarded-lease-source-checkpoint.json"
       ],
       "artifact_hashes": {},
-      "blocker": "Offline lease async verification/restore interleavings can overwrite newer quota and mutate after expiry; reviewed reproductions block acceptance. Guarded fix in progress; executor/public/crossboot/native still required.",
-      "next_action": "Retake exact guarded offlinelease/current-state mutations and WAL refusal after focused regressions; then original-current recovery executor/server and final delivery wiring.",
+      "blocker": "Guarded offline lease source defects fixed and reviewed with474owning tests; Rootexecutor/server, public/initial-rejection/crossboot, WAL/staging/corrupt-state and actualinstalled recovery remain required.",
+      "next_action": "Implement/review private Root executor+authenticatedserver and separate finish-only decision/marker flow under existing global lock; no public gate opening.",
       "coordinator_only": true
     },
     {
