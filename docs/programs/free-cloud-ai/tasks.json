@@ -500,7 +500,8 @@
         "docs/programs/free-cloud-ai/evidence/2026-10-12-deferred-managed-mask-source-checkpoint.json",
         "docs/programs/free-cloud-ai/evidence/2026-10-12-no-cache-source-and-guest-admission-checkpoint.json",
         "docs/programs/free-cloud-ai/evidence/2026-10-12-rejection-wal-source-checkpoint.json",
-        "docs/programs/free-cloud-ai/evidence/2026-10-12-combined-recovery-source-checkpoint.json"
+        "docs/programs/free-cloud-ai/evidence/2026-10-12-combined-recovery-source-checkpoint.json",
+        "docs/programs/free-cloud-ai/evidence/2026-10-12-qa-pair-preparation-checkpoint.json"
       ],
       "artifact_hashes": {},
       "blocker": "Combined600owning/no skips/UI/shell/diff accepted. Expired preparing review authority, V2 negative handling, staged/damaged DB/reboot and installed/live recovery remain open.",
@@ -856,8 +857,8 @@
     "worker_limit": 2,
     "integration": "No product/shared merge, host installation, production signing or publication. Program completed source commits only.",
     "active_workers": [
-      "rejection_forwarding: gpt-6-sol/high, expired V1 review authority source, V1 rejection/recovery helpers plus new focused tests.",
-      "rejection_cleanup_review: gpt-6-astra/high, read-only V2 initial negative/cleanup design; no edits."
+      "boundary_review: gpt-6-astra/high, independent expired V1 review source check, no edits.",
+      "rejection_cleanup_review: gpt-6-astra/high, V2 initial typed rejection/witness/cleanup source author in disjoint managed files/tests."
     ]
   },
   "user_priority": "Free AI through completion of approved scope. Craft development paused; do not resume it, merge product branches or publish production artifacts."

@@ -1,0 +1,37 @@
+{
+  "schema": 1,
+  "status": "isolated-QA-public-pair-checks-passed-not-installed",
+  "receipt": "/home/maslow/Maslow-ai-os/free-ai-build/hub-bundle-prep/qa-pair-1/receipt.json",
+  "receiptSha256": "a8a0f404723f9baf00e184e6a93bb8b4e09fb0a56d28cff93b6d1e69d457f0b5",
+  "publicBundle": "/home/maslow/Maslow-ai-os/free-ai-build/hub-bundle-prep/qa-pair-1/bundle",
+  "manifestSha256": "8c5bc4497b96be44f00ae3e9dc64f2ec2a168f0607e5270ef9490a0d1b345355",
+  "qaPublicKeySha256": "3cbf0429df9bb7d953916ee840266cd759e72c03400d6d39d7c321e5e0543fe8",
+  "checkerSourceCommit": "bb66f9e053b5701d43ee98294498f089ff8a20eb",
+  "publicScopeAndSignatureCheck": "passed",
+  "checkLogSha256": "831366c76de318092e796eb49e47180095da4efdc62dcc251c063e663cb195f3",
+  "packages": [
+    {
+      "name": "maslow-free-ai",
+      "version": "0.1.0-2",
+      "filename": "maslow-free-ai-0.1.0-2-x86_64.pkg.tar.zst",
+      "sha256": "68af1f9c764bcd3cc5b37c5318e23348ac2719ea0b829672ae40399c39341a07",
+      "size": 46638619
+    },
+    {
+      "name": "maslow-voice",
+      "version": "0.1.5-41",
+      "filename": "maslow-voice-0.1.5-41-x86_64.pkg.tar.zst",
+      "sha256": "2c5e6666c753963049adc36059dffa048c52e8fb12a3bf2aeb546ce869f93800",
+      "size": 286110235
+    }
+  ],
+  "privateKeyMode": "0600",
+  "privateKeyExcludedFromPublicScope": true,
+  "testOnly": true,
+  "productionSigning": false,
+  "publication": false,
+  "hostTrustChanged": false,
+  "hubBuilt": false,
+  "previewComplete": false,
+  "nextAction": "Independently review public pair input scope and freeze final matched Hub source/recipe/context after remaining delivery/recovery units. Use public payload and public trust only in any build context; keep QA private key external."
+}

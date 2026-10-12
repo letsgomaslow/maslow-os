@@ -217,7 +217,8 @@
     "docs/programs/free-cloud-ai/evidence/2026-10-12-clean-installed-baseline-checkpoint.json",
     "docs/programs/free-cloud-ai/evidence/2026-10-12-rejection-wal-source-checkpoint.json",
     "docs/programs/free-cloud-ai/evidence/2026-10-12-recovery-units-active-checkpoint.json",
-    "docs/programs/free-cloud-ai/evidence/2026-10-12-combined-recovery-source-checkpoint.json"
+    "docs/programs/free-cloud-ai/evidence/2026-10-12-combined-recovery-source-checkpoint.json",
+    "docs/programs/free-cloud-ai/evidence/2026-10-12-qa-pair-preparation-checkpoint.json"
   ],
   "passed_source_gates": [
     "every-dispatch-provider-and-model-policy",
