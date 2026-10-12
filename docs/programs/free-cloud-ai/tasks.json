@@ -46,6 +46,12 @@
         "task": "qt_voice",
         "model": "gpt-6.1-sol",
         "reasoning": "medium"
+      },
+      {
+        "task": "rejection_forwarding",
+        "model": "gpt-6-sol",
+        "reasoning": "high",
+        "reason": "Fallback after gpt-6.1-sol capacity error; actual Unit A EOF fix and focused verification."
       }
     ]
   },
@@ -707,11 +713,12 @@
         "docs/programs/free-cloud-ai/evidence/2026-10-12-parent-inspector-build-checkpoint.json",
         "docs/programs/free-cloud-ai/evidence/2026-10-12-parent-result-and-crypto-checkpoint.json",
         "docs/programs/free-cloud-ai/evidence/2026-10-12-public-crypto-result-checkpoint.json",
-        "docs/programs/free-cloud-ai/evidence/2026-10-12-no-cache-source-and-guest-admission-checkpoint.json"
+        "docs/programs/free-cloud-ai/evidence/2026-10-12-no-cache-source-and-guest-admission-checkpoint.json",
+        "docs/programs/free-cloud-ai/evidence/2026-10-12-clean-installed-baseline-checkpoint.json"
       ],
       "artifact_hashes": {},
-      "blocker": "Sixstaticexistingmediafacts accepted andonecleanKVMguestinstall running; noactualinstalled/helper/live/Lenovo acceptance yet.",
-      "next_action": "Minimally monitor the ownedguestinstall, reconcile realinstall/pre-updatepristinebase evidence; retainguestforactualmatchedHub installation afterdelivery/recoveryready. NoISOcycle."
+      "blocker": "Clean installed pre-update baseline exists and is preserved; matched Hub/payload/recovery remain unfinished. Optional installation, typed use, live accounts, audio and Lenovo gates remain open.",
+      "next_action": "Preserve pristine base f46ced1a; boot an owned overlay for matched Hub installation after recovery source and signed QA payloads are ready. No OS update or ISO rebuild."
     },
     {
       "id": "FCAI-P6-REVIEW",

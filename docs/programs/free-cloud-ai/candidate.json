@@ -213,7 +213,8 @@
     "docs/programs/free-cloud-ai/evidence/2026-10-12-parent-result-and-crypto-checkpoint.json",
     "docs/programs/free-cloud-ai/evidence/2026-10-12-deferred-managed-mask-source-checkpoint.json",
     "docs/programs/free-cloud-ai/evidence/2026-10-12-public-crypto-result-checkpoint.json",
-    "docs/programs/free-cloud-ai/evidence/2026-10-12-no-cache-source-and-guest-admission-checkpoint.json"
+    "docs/programs/free-cloud-ai/evidence/2026-10-12-no-cache-source-and-guest-admission-checkpoint.json",
+    "docs/programs/free-cloud-ai/evidence/2026-10-12-clean-installed-baseline-checkpoint.json"
   ],
   "passed_source_gates": [
     "every-dispatch-provider-and-model-policy",
