@@ -646,11 +646,12 @@
         "docs/programs/free-cloud-ai/evidence/2026-10-11-reinstall-design-checkpoint.json",
         "docs/programs/free-cloud-ai/evidence/2026-10-12-voice40-connect8-native-build-checkpoint.json",
         "docs/programs/free-cloud-ai/evidence/2026-10-12-managed-source-and-owning-checkpoint.json",
-        "docs/programs/free-cloud-ai/evidence/2026-10-12-issuer-map-native-checkpoint.json"
+        "docs/programs/free-cloud-ai/evidence/2026-10-12-issuer-map-native-checkpoint.json",
+        "docs/programs/free-cloud-ai/evidence/2026-10-12-offline-lease-review-checkpoint.json"
       ],
       "artifact_hashes": {},
-      "blocker": "Original managed remove/reinstall source primitives pass409owning tests and independent review; public wiring/fresh recovery/crossboot and installed proof remain incomplete.",
-      "next_action": "Implement and review the bounded offline fresh-ticket recovery lease/current NEW-checkpoint unit, then fixed executor/public/initial-rejection/crossboot integration.",
+      "blocker": "Offline lease async verification/restore interleavings can overwrite newer quota and mutate after expiry; reviewed reproductions block acceptance. Guarded fix in progress; executor/public/crossboot/native still required.",
+      "next_action": "Retake exact guarded offlinelease/current-state mutations and WAL refusal after focused regressions; then original-current recovery executor/server and final delivery wiring.",
       "coordinator_only": true
     },
     {
