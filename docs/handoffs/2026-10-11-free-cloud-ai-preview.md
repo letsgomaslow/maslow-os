@@ -14,6 +14,8 @@ Clean installed baseline collected: the existing image installed and rebooted su
 
 ## Earlier checkpoints — historical next actions
 
+Overlay controls now accepted: all three review findings are independently resolved, including real FIFO, sparse oversize and growth probes. The actual inherited held-directory Docker CID path works in a tiny container check, with the exact container gone and launch group retired. [Overlay checkpoint](../programs/free-cloud-ai/evidence/2026-10-12-overlay-controls-and-cid-checkpoint.json) records identities. The read-only guest run remains unlaunched because available memory is below the unchanged 8GiB admission threshold; the user was asked to close unused apps/tabs. Continue exact QA Hub source/build preparation and review while waiting; no account/audio step is ready.
+
 The ledger and two current paragraphs above own the next action. The records below preserve earlier milestones and failed attempts; their next-action instructions are superseded.
 
 Current source milestone: Hub `5d74104d86121f4f9c850ad4bbaaf40942322de4` includes the independently reviewed private recovery executor and global Installer pending admission. Final 509 owning tests and UI checks pass. The original three retry/socket defects and inconsistent terminal-pair guard are corrected, with all failed source/log evidence preserved. [Accepted checkpoint](../programs/free-cloud-ai/evidence/2026-10-12-executor-admission-source-checkpoint.json) keeps actual recovery and installation incomplete. Sol high is now implementing only the typed Voice41 initial-rejection/latch and focused Hub codec; witnessed Root cleanup remains a separate reviewed unit.

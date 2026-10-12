@@ -223,7 +223,8 @@
     "docs/programs/free-cloud-ai/evidence/2026-10-12-rejection-authority-source-checkpoint.json",
     "docs/programs/free-cloud-ai/evidence/2026-10-12-keep-expiry-source-checkpoint.json",
     "docs/programs/free-cloud-ai/evidence/2026-10-12-overlay-crossboot-active-checkpoint.json",
-    "docs/programs/free-cloud-ai/evidence/2026-10-12-crossboot667-overlay-reader-checkpoint.json"
+    "docs/programs/free-cloud-ai/evidence/2026-10-12-crossboot667-overlay-reader-checkpoint.json",
+    "docs/programs/free-cloud-ai/evidence/2026-10-12-overlay-controls-and-cid-checkpoint.json"
   ],
   "passed_source_gates": [
     "every-dispatch-provider-and-model-policy",

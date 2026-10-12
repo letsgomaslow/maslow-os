@@ -1,0 +1,20 @@
+{
+  "schema": 1,
+  "status": "overlay-controls-accepted-VM-memory-admission-pending",
+  "manifestSha256": "b948a9eab1786aa4cdb45fe477b41157904be526f20329edda173f390e128942",
+  "independentReviewSha256": "9099df9ed1ec016f07edfa879129a8463bbbaccb9097c4f4f0ee851f9e422850",
+  "source": "380a3986ef4080a2f4ca554ded9818e49abf676e94b31095fb228064e3727a06",
+  "verification": "Author11 inert tests; independent3 targeted tests and2 growth probes. A1/A2/A3 resolved; cooperative syscall deadline limitation remains explicit.",
+  "actualCidCompatibility": {
+    "statePath": "/home/maslow/Maslow-ai-os/free-ai-build/hub-bundle-prep/overlay-acceptance-prep/evidence/7eeff99282e44cf3a738e26b1d50b002/state.json",
+    "exit": 0,
+    "stateSha256": "935ef51dce8f6ac797de23a71650685a718da099d0a9ea8390f439f4b1b247dd",
+    "containerGone": true,
+    "launchGroupRetired": true,
+    "scope": "Single immutable VM-tooling image, /usr/bin/true, CPU1/RAM128MiB/total256MiB/no network/no mounts. Actual inherited held-directory proc-fd CID file worked. Shared heavy lock held; no guest disk, firmware, account or key was accessed."
+  },
+  "vmBlocker": "Last available memory7790548KiB is below unchanged8GiB preflight. No VM GO or launch; user asked to close unused apps/tabs. Recheck headroom on actual admission.",
+  "parallelWork": "Separate four-literal unpublished QA Hub candidate and matched build preparation. Product gates remainfalse; unchanged native backend2/Voice41/Connect8 preserved.",
+  "nextAction": "Independently review QA candidate/build context; admit read-only owned guest overlay only when current memory, idle, pinned inputs and lock checks pass.",
+  "previewComplete": false
+}
