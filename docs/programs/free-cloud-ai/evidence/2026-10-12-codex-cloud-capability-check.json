@@ -1,0 +1,37 @@
+{
+  "schema": 1,
+  "status": "unknown-not-admitted-for-VM-transfer-or-execution",
+  "request": "Check existing available Codex Cloud for /dev/kvm, QEMU, disk and existing-harness permissions before any large VM upload, paid resource provisioning or new infrastructure.",
+  "observations": {
+    "cliReadOnlyTaskInventory": "codex cloud list --json --limit20 succeeded and returned0 tasks.",
+    "cliEnvironmentPicker": "Authenticated legacy CLI picker showed only All Environments (Global), no concrete configured environment. No task submitted; owned TUI exited normally.",
+    "currentCloudBrowser": "Direct existing-environment settings navigation redirected to ChatGPT sign-in. Login page retained for user participation; no credentials entered or environment created.",
+    "remoteExecutor": "No callable Codex Cloud remote shell was available in this session. Local Lenovo /dev/kvm results are not remote evidence."
+  },
+  "capabilities": {
+    "kvmDeviceAndNestedVirtualization": "unknown",
+    "qemuSystemX86_64AndQemuImg": "unknown",
+    "actualFreeDiskSpace": "unknown",
+    "dockerDaemonDeviceMountResourceAndUidPermissions": "unknown",
+    "actualMemoryHeadroom": "unknown"
+  },
+  "harnessRequirements": "Linux x86_64, actual readable/writable KVM character device, QEMU/qemu-img and fixed OVMF, usable Docker with device/bind mounts/user1000:1000/resource limits/network bridge, shared flock and owned process retirement. Guest4GiB; outerCPU2/RAM6GiB/total8GiB; at least8GiB currently available host memory. Sparse40GiB virtual guest disk is distinct from actual workspace free space; pinned tooling/base/overlays/packages need their own disk budget.",
+  "localInputDiskBudget": {
+    "pristineBaseBytes": 6417612800,
+    "uncompressedPinnedToolingImageBytes": 5547652817,
+    "baseAndToolingGiB": 11.144,
+    "scope": "Local artifact metadata, not cloud free-space evidence. Excludes overlays, packages, Docker overhead and any temporary extraction. An8GiB allocation cannot hold both inputs if both must reside in it; cloud mount/cache layout and actual free space remain unknown. No VM or image uploaded."
+  },
+  "officialDocumentation": {
+    "url": "https://learn.chatgpt.com/docs/environments/cloud-environments",
+    "retrieved": "2026-10-12",
+    "defaultResources": "Plus/EduPlus:2vCPU,8GiB RAM,8GiB disk. Pro/Business/Enterprise/Edu/EduPro:4vCPU,16GiB RAM,32GiB disk.",
+    "limits": "Resource entitlements are not measured availability. The fetched guide does not establish KVM passthrough/nested virtualization, QEMU installation, Docker device permissions or actual free space. Do not substitute separate paid Agents API sandbox specifications for Codex Cloud evidence."
+  },
+  "nextAction": "User signs into existing Cloud settings and identifies an already published environment. Only a small read-only remote capability probe may then inspect device/API version, binary versions, actual disk/cgroup headroom and existing permissions without VM uploads, new environments, package/infra provisioning or paid resources. Unknown results remain no-GO.",
+  "largeVmUploaded": false,
+  "cloudTaskSubmitted": false,
+  "resourcesProvisioned": false,
+  "infrastructureBuilt": false,
+  "previewComplete": false
+}
