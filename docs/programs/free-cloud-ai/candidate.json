@@ -224,7 +224,8 @@
     "docs/programs/free-cloud-ai/evidence/2026-10-12-keep-expiry-source-checkpoint.json",
     "docs/programs/free-cloud-ai/evidence/2026-10-12-overlay-crossboot-active-checkpoint.json",
     "docs/programs/free-cloud-ai/evidence/2026-10-12-crossboot667-overlay-reader-checkpoint.json",
-    "docs/programs/free-cloud-ai/evidence/2026-10-12-overlay-controls-and-cid-checkpoint.json"
+    "docs/programs/free-cloud-ai/evidence/2026-10-12-overlay-controls-and-cid-checkpoint.json",
+    "docs/programs/free-cloud-ai/evidence/2026-10-12-qa-source-build-and-postboot-checkpoint.json"
   ],
   "passed_source_gates": [
     "every-dispatch-provider-and-model-policy",
@@ -265,5 +266,13 @@
     "matched_hub_recognizes_candidate6": false,
     "security_advisory_clearance": false,
     "status": "built and scoped-tested, blocked for installation; do not add native6 identity to Hub"
+  },
+  "prepared_qa_hub": {
+    "source": "f37947b8a623d323d19635904d8ac1b64275ac2a",
+    "parent": "3577c663429420ffa9c981c3c9140069397d7c48",
+    "source_accepted": true,
+    "build_started": false,
+    "installation_accepted": false,
+    "status": "unpublished-four-literal-QA-derivative-only; build Git-hook fix and normal postboot operation proof design pending"
   }
 }

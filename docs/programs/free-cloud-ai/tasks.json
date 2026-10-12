@@ -434,7 +434,7 @@
       "worker": "current_recovery managed lifecycle contract/code; root integration",
       "actual_model": "gpt-6.1-sol/high implementation; gpt-6-astra/high independent review",
       "attempt": 2,
-      "last_checkpoint": "2026-10-12T16:06:47.099Z",
+      "last_checkpoint": "2026-10-12T16:22:55.274Z",
       "base_revision": "2a8c6eda15d92078fdd8656a879b1e93dd786a1d",
       "branch": "codex/free-cloud-ai-hub-current",
       "worktree": "/home/maslow/Projects/Maslow/free-ai-hub-current",
@@ -510,11 +510,12 @@
         "docs/programs/free-cloud-ai/evidence/2026-10-12-rejection-authority-source-checkpoint.json",
         "docs/programs/free-cloud-ai/evidence/2026-10-12-keep-expiry-source-checkpoint.json",
         "docs/programs/free-cloud-ai/evidence/2026-10-12-crossboot667-overlay-reader-checkpoint.json",
-        "docs/programs/free-cloud-ai/evidence/2026-10-12-overlay-controls-and-cid-checkpoint.json"
+        "docs/programs/free-cloud-ai/evidence/2026-10-12-overlay-controls-and-cid-checkpoint.json",
+        "docs/programs/free-cloud-ai/evidence/2026-10-12-qa-source-build-and-postboot-checkpoint.json"
       ],
       "artifact_hashes": {},
-      "blocker": "Crossboot667 source accepted; overlay A1/A2/A3 independently resolved and actual proc-fd Docker CID compatibility passed. Guest VM admission waiting8GiB current headroom. QA Hub/source/build independent review and actual installed/live/recovery gates remain open.",
-      "next_action": "Finish exact separate four-literal QA Hub/source/build preparation and independent review; build matched Hub once admitted, preserve unchanged native2/41/8."
+      "blocker": "QA source4literal derivative independently accepted; buildcontext review concretely reproduced unpinned Git fsmonitor execution, narrow fix active. Normal new managed operations after reboot require current-daemon boot proof and coordinated consumers; validator-only relaxation is unsafe. Guest stillwaiting8GiBmemory; installed/live gates open.",
+      "next_action": "Fix/independently retake build Git-hook finding; finalize bounded postboot private-proof charter before choosing final matched QA source. Preserve unchanged backend2/Voice41/Connect8 and public product gates."
     },
     {
       "id": "FCAI-P2-WORK",
@@ -651,7 +652,7 @@
       "worker": "current_recovery managed lifecycle contract/code; root installed recovery integration",
       "actual_model": "gpt-6.1-sol/high implementation; root coordinator",
       "attempt": 1,
-      "last_checkpoint": "2026-10-12T16:06:47.099Z",
+      "last_checkpoint": "2026-10-12T16:22:55.274Z",
       "base_revision": "09721dff",
       "branch": "codex/free-cloud-ai",
       "worktree": "/home/maslow/Maslow-ai-os/free-ai-runtime",
@@ -717,11 +718,12 @@
         "docs/programs/free-cloud-ai/evidence/2026-10-12-keep-expiry-source-checkpoint.json",
         "docs/programs/free-cloud-ai/evidence/2026-10-12-overlay-crossboot-active-checkpoint.json",
         "docs/programs/free-cloud-ai/evidence/2026-10-12-crossboot667-overlay-reader-checkpoint.json",
-        "docs/programs/free-cloud-ai/evidence/2026-10-12-overlay-controls-and-cid-checkpoint.json"
+        "docs/programs/free-cloud-ai/evidence/2026-10-12-overlay-controls-and-cid-checkpoint.json",
+        "docs/programs/free-cloud-ai/evidence/2026-10-12-qa-source-build-and-postboot-checkpoint.json"
       ],
       "artifact_hashes": {},
-      "blocker": "Crossboot667 source accepted; overlay A1/A2/A3 independently resolved and actual proc-fd Docker CID compatibility passed. Guest VM admission waiting8GiB current headroom. QA Hub/source/build independent review and actual installed/live/recovery gates remain open.",
-      "next_action": "Finish exact separate four-literal QA Hub/source/build preparation and independent review; build matched Hub once admitted, preserve unchanged native2/41/8.",
+      "blocker": "QA source4literal derivative independently accepted; buildcontext review concretely reproduced unpinned Git fsmonitor execution, narrow fix active. Normal new managed operations after reboot require current-daemon boot proof and coordinated consumers; validator-only relaxation is unsafe. Guest stillwaiting8GiBmemory; installed/live gates open.",
+      "next_action": "Fix/independently retake build Git-hook finding; finalize bounded postboot private-proof charter before choosing final matched QA source. Preserve unchanged backend2/Voice41/Connect8 and public product gates.",
       "coordinator_only": true
     },
     {
