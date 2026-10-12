@@ -697,11 +697,12 @@
         "docs/programs/free-cloud-ai/evidence/2026-10-12-no-cache-source-and-guest-admission-checkpoint.json",
         "docs/programs/free-cloud-ai/evidence/2026-10-12-rejection-wal-source-checkpoint.json",
         "docs/programs/free-cloud-ai/evidence/2026-10-12-recovery-units-active-checkpoint.json",
-        "docs/programs/free-cloud-ai/evidence/2026-10-12-combined-recovery-source-checkpoint.json"
+        "docs/programs/free-cloud-ai/evidence/2026-10-12-combined-recovery-source-checkpoint.json",
+        "docs/programs/free-cloud-ai/evidence/2026-10-12-rejection-authority-units-checkpoint.json"
       ],
       "artifact_hashes": {},
-      "blocker": "Combined600owning/no skips/UI/shell/diff accepted. Expired preparing review authority, V2 negative handling, staged/damaged DB/reboot and installed/live recovery remain open.",
-      "next_action": "Implement the independently reduced expired V1 review authority in disjoint ownership; design V2 initial negative forwarding/cleanup read-only. Preserve clean installed baseline and unchanged artifacts.",
+      "blocker": "Expired V1 fresh-review routing fix is awaiting independent retake; V2 negative handling is still coding/testing. Remaining staged/damaged DB/reboot and installed recovery/live gates open.",
+      "next_action": "Accept or fix the expired V1 routing retake; obtain exact V2 negative source freeze for independent review. Run combined owning/UI once both focused freezes accepted.",
       "coordinator_only": true
     },
     {
