@@ -35,9 +35,9 @@
     "runtime_implementation": "e7b8831a4fc81f6fdf0a1b8369dcc748274d9112",
     "connect_native3_baseline_not_managed_account_acceptance": "7545ba68c0b6759a7f65c88ccb1390777df5b812",
     "runtime_current_source": "c2b03842a81645998a79cbca525c03ddf67813b4",
-    "voice_managed_lifecycle_source": "0ad62e58b889bfa0fdedc8015e2e24f6a006b358",
-    "hub_current_source": "5d74104d86121f4f9c850ad4bbaaf40942322de4",
-    "packages_current_source": "42adaeca720dd8aced00d17bd4238225c15464cd",
+    "voice_managed_lifecycle_source": "914d77dda835cc3e884434ec18a589facdd4d8ae",
+    "hub_current_source": "f29a5c314b49d3129bc712996da8e818eb49245d",
+    "packages_current_source": "6cc15c3b297a375897f078fee7ef27afcbcfcf72",
     "connect_managed_source": "fd33682f3bcfdbce849a06304da0d74137b592f0",
     "hub_recovery_design": "0aafacbc8915d5db64e92bdb5a97bd604c76e6e1",
     "connect_previous_managed_source": "646aa1149f36050a470ded7e3658ad0b0a38bcbb",
@@ -121,7 +121,7 @@
       "recipe_commit": "488d7cede41c309be7202f2ef0bc2f8d57ff5fc2",
       "signed": false,
       "installed_acceptance": false,
-      "status": "actual static/source/retained-dependency and packaged507-test owning/UI checks passed with5 skips; installed/live/recovery open"
+      "status": "retained scoped-verified artifact for0ad; new914 typed-rejection source requires separate Voice41 verification; installed/live/recovery open"
     },
     {
       "path": "/home/maslow/Maslow-ai-os/free-ai-build/connect-package-8-prep/recipe/maslow-connect-0.1.0-8-x86_64.pkg.tar.zst",
@@ -134,6 +134,18 @@
       "signed": false,
       "installed_acceptance": false,
       "status": "independent scoped static/notice/SRI/closure/advisory/deployed/three-package overlap checks passed; exact Hub8/source map added; installed/account/confinement/live/recovery open"
+    },
+    {
+      "path": "/home/maslow/Maslow-ai-os/free-ai-build/voice41-prep/recipe/maslow-voice-0.1.5-41-x86_64.pkg.tar.zst",
+      "name": "maslow-voice",
+      "version": "0.1.5-41",
+      "sha256": "2c5e6666c753963049adc36059dffa048c52e8fb12a3bf2aeb546ce869f93800",
+      "bytes": 286110235,
+      "source_commit": "914d77dda835cc3e884434ec18a589facdd4d8ae",
+      "recipe_commit": "6cc15c3b297a375897f078fee7ef27afcbcfcf72",
+      "signed": false,
+      "installed_acceptance": false,
+      "status": "normal build completed/group retired; actual static/packaged owning/overlap/loaded41/native gates pending"
     }
   ],
   "accepted_capabilities": [],
@@ -190,7 +202,10 @@
     "docs/programs/free-cloud-ai/evidence/2026-10-12-connect7-native-build-checkpoint.json",
     "docs/programs/free-cloud-ai/evidence/2026-10-12-existing-media-artifact-collection.json",
     "docs/programs/free-cloud-ai/evidence/2026-10-12-executor-admission-source-checkpoint.json",
-    "docs/programs/free-cloud-ai/evidence/2026-10-12-existing-media-static-checkpoint.json"
+    "docs/programs/free-cloud-ai/evidence/2026-10-12-existing-media-static-checkpoint.json",
+    "docs/programs/free-cloud-ai/evidence/2026-10-12-typed-rejection-source-checkpoint.json",
+    "docs/programs/free-cloud-ai/evidence/2026-10-12-existing-media-public-input-checkpoint.json",
+    "docs/programs/free-cloud-ai/evidence/2026-10-12-voice41-build-and-error-safety-checkpoint.json"
   ],
   "passed_source_gates": [
     "every-dispatch-provider-and-model-policy",

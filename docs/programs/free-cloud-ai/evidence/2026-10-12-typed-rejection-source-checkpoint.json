@@ -1,0 +1,18 @@
+{
+  "schema": 1,
+  "status": "typed-rejection-first-unit-accepted-root-abort-still-unwired",
+  "voiceSource": "914d77dda835cc3e884434ec18a589facdd4d8ae",
+  "hubSource": "fd13da070634415fd3aac789d9f2de972a759086",
+  "voiceModuleSha256": "47753fa8bcaa097de05a873ec1b8b36353af3e7ee31b1078f2a5f6c99c0ff31a",
+  "hubCodecSha256": "0856fa4976124e43a970976e8e23485db19d3dc2f0f4c79ff41e779d2d7fbf41",
+  "originalReviewSha256": "e35aad330b8de20ea879175c837112801402012e9119d0a5acaa93f8273b5895",
+  "retakeSha256": "4c1980c5bd0d77b89036379fb5f0b4d8b5cc46604ae4a83d782e15952dc90362",
+  "checks": {"voiceTotal": 522, "voicePassed": 520, "voiceSkipped": 2, "voiceSeconds": 134.647, "voiceLogSha256": "74a49c56e4c8ba1d29013a3c650360fdcffdbe7c464d44e3f7584f9f4eb1b11b", "voiceUiOrbPassed": true, "hubPassed": 516, "hubSeconds": 151.357, "hubLogSha256": "b72bf3baf2ef5f16411bc9de8ce79bf592d02d1369a4bb6ec629dc4ffa38d38f", "hubUiPassed": true},
+  "fix": "Typed synchronous pre-admission rejection with full-ticket latch; failed lazy-constructor/capability/path attempts become ineligible before construction and can never later claim preparation did not start. Actual two-socket/disconnect and hostile retry controls pass. Original defect source/logs remain preserved.",
+  "preserved": "Backend2/c2 and its six recovery members, daemon/IPC/store/ordinary success schemas and current Connect8 artifact remain unchanged. Voice40 retains historical scoped evidence; new accepted Voice source requires a separate Voice41 artifact and loaded-code proof.",
+  "nextAction": "Review exact authenticated helper forwarding, protected Root witness and finish-only rejection cleanup contract. Remove all unsafe code-only no-preparation cleanup authority. Prepare/review/build Voice41 in the next bounded heavy slot.",
+  "remaining": ["Root witness/abort integration", "Loaded Voice41 provenance", "Reboot authority", "WAL/staging/damagedDB recovery", "Final matched Hub and signed delivery", "Installed guest", "Real Groq/selected-account/revocation", "Audible existing Voice and Lenovo acceptance"],
+  "publicGatesOpened": false,
+  "nativeAccepted": false,
+  "previewComplete": false
+}

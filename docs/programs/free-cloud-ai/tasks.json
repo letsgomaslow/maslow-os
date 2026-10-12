@@ -60,14 +60,14 @@
         " M docs/programs/craft-optional-apps/tasks/CRAFT-CORE-SANDBOX.md",
         "?? docs/handoffs/2026-10-11-freellmapi-review.md"
       ],
-      "implementation_revision": "0ad62e58b889bfa0fdedc8015e2e24f6a006b358",
+      "implementation_revision": "914d77dda835cc3e884434ec18a589facdd4d8ae",
       "unchanged_backend_artifact_source": "c2b03842a81645998a79cbca525c03ddf67813b4"
     },
     "hub": {
       "path": "/home/maslow/Projects/Maslow/free-ai-hub-current",
       "base_revision": "33940d2e8740b172b953cc3e091cbae1ba1cd303",
       "branch": "codex/free-cloud-ai-hub-current",
-      "implementation_revision": "5d74104d86121f4f9c850ad4bbaaf40942322de4",
+      "implementation_revision": "f29a5c314b49d3129bc712996da8e818eb49245d",
       "previous_free_ai_worktree": "/home/maslow/Projects/Maslow/free-ai-hub",
       "accepted_craft_source_reference": "2666609002dce8bb6cc16511ef2125bccb18dbe9"
     },
@@ -75,7 +75,7 @@
       "path": "/home/maslow/Projects/Maslow/free-ai-packages",
       "base_revision": "448856485e710caedfc24f544a027aea8652dd33",
       "branch": "codex/free-cloud-ai",
-      "implementation_revision": "42adaeca720dd8aced00d17bd4238225c15464cd"
+      "implementation_revision": "6cc15c3b297a375897f078fee7ef27afcbcfcf72"
     },
     "connect": {
       "path": "/home/maslow/Projects/Maslow/free-ai-connect-current",
@@ -649,11 +649,13 @@
         "docs/programs/free-cloud-ai/evidence/2026-10-12-issuer-map-native-checkpoint.json",
         "docs/programs/free-cloud-ai/evidence/2026-10-12-offline-lease-review-checkpoint.json",
         "docs/programs/free-cloud-ai/evidence/2026-10-12-guarded-lease-source-checkpoint.json",
-        "docs/programs/free-cloud-ai/evidence/2026-10-12-executor-admission-source-checkpoint.json"
+        "docs/programs/free-cloud-ai/evidence/2026-10-12-executor-admission-source-checkpoint.json",
+        "docs/programs/free-cloud-ai/evidence/2026-10-12-typed-rejection-source-checkpoint.json",
+        "docs/programs/free-cloud-ai/evidence/2026-10-12-voice41-build-and-error-safety-checkpoint.json"
       ],
       "artifact_hashes": {},
-      "blocker": "Private recovery executor and Installer pending admission accepted with509owning/UI checks. Typed Voice41 initial rejection, witnessed cleanup, reboot authority, WAL/staging/damagedDB and actualinstalled recovery remain required.",
-      "next_action": "Implement/review typed Voice41 initial rejection/latch and focused Hub receipt codec; then separately reviewed helper/witness/abort cleanup. No public gate opening or backend2/c2 change.",
+      "blocker": "Typed rejection/latch and V1 uncertain-error cleanup removal accepted. Hub520owning/UI pass; Voice41 built but static/packaged owning/loaded proof pending. Positive Root witness/masked proof, reboot/WAL/staging/damagedDB and actualinstalled recovery remain required.",
+      "next_action": "Verify actual Voice41 artifact and packaged checks; implement separately reviewed authenticated rejection witness and fixed masked provenance. Keep all required native/live gates and backend2 unchanged.",
       "coordinator_only": true
     },
     {
@@ -686,11 +688,12 @@
         "docs/programs/free-cloud-ai/evidence/2026-10-12-existing-media-targeted-checkpoint.json",
         "docs/programs/free-cloud-ai/evidence/2026-10-12-existing-media-artifact-collection.json",
         "docs/programs/free-cloud-ai/evidence/2026-10-12-existing-media-static-checkpoint.json",
-        "docs/programs/free-cloud-ai/evidence/2026-10-12-existing-media-mtree-checkpoint.json"
+        "docs/programs/free-cloud-ai/evidence/2026-10-12-existing-media-mtree-checkpoint.json",
+        "docs/programs/free-cloud-ai/evidence/2026-10-12-existing-media-public-input-checkpoint.json"
       ],
       "artifact_hashes": {},
-      "blocker": "All nine recorded MTREE inventories reconcile25498entries/20100regular hashes/1516symlinks; scoped optional absence verified. Fixed public-only trust inputs, complete trust comparison and independent six-fact media receipt remain required; no VM/installed acceptance.",
-      "next_action": "Collect/review the six fixed public keyring inputs and conditionally proved public pubring leaf, complete trust comparison and media receipt, then run the prepared real clean guest. No new ISO cycle."
+      "blocker": "All nine MTREE inventories reconcile; six public keyring inputs collected andOmarchy matches producer. Public pubring absence, official signed-keyring provenance/closedtrust and complete media receipt remain unproved; no guest/Lenovo/live acceptance.",
+      "next_action": "Complete narrow parent-only metadata and official keyring-package/signature provenance without private scans or anotherISO, then independentmedia receipt and realclean guest."
     },
     {
       "id": "FCAI-P6-REVIEW",

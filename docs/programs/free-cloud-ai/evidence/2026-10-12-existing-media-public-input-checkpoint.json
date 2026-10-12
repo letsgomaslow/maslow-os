@@ -1,0 +1,21 @@
+{
+  "schema": 1,
+  "status": "actual-public-inputs-collected-trust-not-accepted",
+  "run": "/home/maslow/Maslow-ai-os/free-ai-build/guest-baseline-prep/media-inspection/public-evidence/12973a2d09514cc88f154aedbf15ad95",
+  "stateSha256": "60c06134ef69880bf4caa8e970e78fb8c31bfad0211e3c51451d5934a74aa5a5",
+  "collectorSha256": "52d035bc898af46b13de2994d0c39601476fd6315ab58fbf8be23829dca08841",
+  "manifestSha256": "e5fa49f7d7742f7efcea62b6ee28b50c4d55657fe1547fffcdc765ffe9ed0d7f",
+  "controlReviewSha256": "b83f41cbad5bb627ca1e96b00acee7217feabf2cc450382f49b1b845df846cc1",
+  "actualExitCode": 0,
+  "checkedOwnedStages": 11,
+  "facts": "Six fixed public keyring files and isolated public-only GPG fingerprint outputs collected. Shipped Omarchy public bytes equal frozen source15d6aac44df688165b2ea35fe0b23af239bbc66a6909c10a5c219e8d94b707de; primary40DFB630FF42BCFFB047046CF0134EE680CAC571 and subkey2839BEED54A8B49AB60BA862FF4700E516FCE0A8 match source. Archlinux output contains492 public/subkey fingerprint records. Neither of the two known test fingerprints appears in these collected rings.",
+  "gpgDiagnostics": "Exit0 despite nonempty stderr: new isolated keybox/trustdb creation and Archlinux encryption-subkey warnings were observed. They are public-tool diagnostics, not ignored failure exits or package-signature verification.",
+  "pubringProbe": "unknown-not-absence; checked output lists only ancestors and proves no actual public regular leaf, so that leaf was not read",
+  "remaining": ["Independent public result/provenance/trust reconciliation", "Proven public-pubring presence or absence using a narrow safe metadata check", "Complete reviewed producer/test-key basis", "Independent six-fact media receipt", "Actual clean guest installation"],
+  "privateKeyRead": false,
+  "newIsoBuildOrRepair": false,
+  "testTrustAbsent": false,
+  "mediaVerified": false,
+  "guestVerified": false,
+  "previewComplete": false
+}
