@@ -207,7 +207,8 @@
     "docs/programs/free-cloud-ai/evidence/2026-10-12-existing-media-public-input-checkpoint.json",
     "docs/programs/free-cloud-ai/evidence/2026-10-12-voice41-build-and-error-safety-checkpoint.json",
     "docs/programs/free-cloud-ai/evidence/2026-10-12-voice41-scoped-artifact-checkpoint.json",
-    "docs/programs/free-cloud-ai/evidence/2026-10-12-existing-media-keyring-provenance-checkpoint.json"
+    "docs/programs/free-cloud-ai/evidence/2026-10-12-existing-media-keyring-provenance-checkpoint.json",
+    "docs/programs/free-cloud-ai/evidence/2026-10-12-deferred-managed-mask-design-checkpoint.json"
   ],
   "passed_source_gates": [
     "every-dispatch-provider-and-model-policy",

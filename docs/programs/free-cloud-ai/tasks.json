@@ -655,11 +655,12 @@
         "docs/programs/free-cloud-ai/evidence/2026-10-12-executor-admission-source-checkpoint.json",
         "docs/programs/free-cloud-ai/evidence/2026-10-12-typed-rejection-source-checkpoint.json",
         "docs/programs/free-cloud-ai/evidence/2026-10-12-voice41-build-and-error-safety-checkpoint.json",
-        "docs/programs/free-cloud-ai/evidence/2026-10-12-voice41-scoped-artifact-checkpoint.json"
+        "docs/programs/free-cloud-ai/evidence/2026-10-12-voice41-scoped-artifact-checkpoint.json",
+        "docs/programs/free-cloud-ai/evidence/2026-10-12-deferred-managed-mask-design-checkpoint.json"
       ],
       "artifact_hashes": {},
-      "blocker": "Typed rejection/latch, uncertain-error retention and Voice41 scoped artifact checks accepted. Positive Root witness/masked loaded-code proof, reboot/WAL/staging/damagedDB and actual installed recovery remain required.",
-      "next_action": "Correct shared-lock path and independently review harmless masked-service measurement; then implement authenticated helper forwarding/protected rejection witness and decision-only cleanup.",
+      "blocker": "Deferred-mask design independently accepted; implementation/focused verification active. Root rejection cleanup, damagedDB/WAL/staging/reboot and installed recovery still required; special masked-profile adapter no longer needed for this flow.",
+      "next_action": "Finish/review V1 managed deferred-mask preparation and companion exact-reservation recovery; preserve canonical readers and legacy fresh path. Then authenticated Root rejection witness/cleanup and remaining recovery gates.",
       "coordinator_only": true
     },
     {

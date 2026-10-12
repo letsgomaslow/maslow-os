@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "status": "reviewed-smaller-managed-update-order-implementation-active",
+  "designReviewPath": "/home/maslow/Maslow-ai-os/free-ai-build/masked-provenance-prep/v1-ordering-design-review.json",
+  "designReviewSha256": "fceee4f5b546288364fe8b20eb1a021e67a45a53c247df336cd1d933579b69a2",
+  "decision": "Reuse V2 order for positively proven managed V1: reserve first, canonical prepare/check, durable authenticated receipt, then exact mask publication/stop/reload/seal. Preserve legacy stopped-fresh early mask path.",
+  "requiredCompanion": "Current-operation recovery must idempotently publish the exact managed preparing reservation only after existing helper-ended, package and stopped-service guards.",
+  "scope": [
+    "Hub delivery/recovery and focused regression tests only",
+    "Seven V1 fields/phases and canonical readers unchanged",
+    "Loaded current Voice41 provenance and actual-before pair binding required"
+  ],
+  "optionalFixture": "17-control masked runtime fixture stays unexecuted optional research; no masked-profile product adapter is planned. Original lock/EXDEV/zombie failures retained.",
+  "independentWorker": "current_recovery gpt-6.1-sol/high",
+  "publicGatesOpened": false,
+  "installedAccepted": false,
+  "previewComplete": false,
+  "nextAction": "Review focused source/failure-order tests, then one owning/UI pass; authenticated rejection cleanup and remaining recovery gates still required."
+}
