@@ -84,7 +84,7 @@
       "path": "/home/maslow/Projects/Maslow/free-ai-hub-current",
       "base_revision": "33940d2e8740b172b953cc3e091cbae1ba1cd303",
       "branch": "codex/free-cloud-ai-hub-current",
-      "implementation_revision": "ceba096b7ea8d36e6124ffbf121b1eef192ecc75",
+      "implementation_revision": "3577c663429420ffa9c981c3c9140069397d7c48",
       "previous_free_ai_worktree": "/home/maslow/Projects/Maslow/free-ai-hub",
       "accepted_craft_source_reference": "2666609002dce8bb6cc16511ef2125bccb18dbe9"
     },
@@ -434,7 +434,7 @@
       "worker": "current_recovery managed lifecycle contract/code; root integration",
       "actual_model": "gpt-6.1-sol/high implementation; gpt-6-astra/high independent review",
       "attempt": 2,
-      "last_checkpoint": "2026-10-12T15:18:08.790646+00:00",
+      "last_checkpoint": "2026-10-12T15:59:42.886Z",
       "base_revision": "2a8c6eda15d92078fdd8656a879b1e93dd786a1d",
       "branch": "codex/free-cloud-ai-hub-current",
       "worktree": "/home/maslow/Projects/Maslow/free-ai-hub-current",
@@ -508,11 +508,12 @@
         "docs/programs/free-cloud-ai/evidence/2026-10-12-combined-recovery-source-checkpoint.json",
         "docs/programs/free-cloud-ai/evidence/2026-10-12-qa-pair-preparation-checkpoint.json",
         "docs/programs/free-cloud-ai/evidence/2026-10-12-rejection-authority-source-checkpoint.json",
-        "docs/programs/free-cloud-ai/evidence/2026-10-12-keep-expiry-source-checkpoint.json"
+        "docs/programs/free-cloud-ai/evidence/2026-10-12-keep-expiry-source-checkpoint.json",
+        "docs/programs/free-cloud-ai/evidence/2026-10-12-crossboot667-overlay-reader-checkpoint.json"
       ],
       "artifact_hashes": {},
-      "blocker": "657owning/no skips/UI/shell accepted. Overlay-only admission, guest dependencies/policy, offline crossboot recovery and actual installed paired recovery remain unresolved; public gates false.",
-      "next_action": "Prepare and independently review overlay-only guest admission for read-only dependency/policy/desktop facts. In parallel scope offline crossboot recovery and a concrete gated native-acceptance path; no VM GO, ISO build or gate bypass."
+      "blocker": "Hub crossboot source independently accepted; 667 owning tests/no skips/UI/shell pass. Overlay A1/A2 resolved; A3 blocking/unbounded evidence reader must be fixed and independently retaken. Matched QA Hub and actual installed recovery/live gates remain open.",
+      "next_action": "Prepare separate unpublished four-literal QA Hub candidate for independent diff/build-input review while overlay A3 is fixed. Public gates remain false; actual installed recovery required."
     },
     {
       "id": "FCAI-P2-WORK",
@@ -649,7 +650,7 @@
       "worker": "current_recovery managed lifecycle contract/code; root installed recovery integration",
       "actual_model": "gpt-6.1-sol/high implementation; root coordinator",
       "attempt": 1,
-      "last_checkpoint": "2026-10-12T15:18:08.790692+00:00",
+      "last_checkpoint": "2026-10-12T15:59:42.913Z",
       "base_revision": "09721dff",
       "branch": "codex/free-cloud-ai",
       "worktree": "/home/maslow/Maslow-ai-os/free-ai-runtime",
@@ -713,11 +714,12 @@
         "docs/programs/free-cloud-ai/evidence/2026-10-12-rejection-authority-units-checkpoint.json",
         "docs/programs/free-cloud-ai/evidence/2026-10-12-rejection-authority-source-checkpoint.json",
         "docs/programs/free-cloud-ai/evidence/2026-10-12-keep-expiry-source-checkpoint.json",
-        "docs/programs/free-cloud-ai/evidence/2026-10-12-overlay-crossboot-active-checkpoint.json"
+        "docs/programs/free-cloud-ai/evidence/2026-10-12-overlay-crossboot-active-checkpoint.json",
+        "docs/programs/free-cloud-ai/evidence/2026-10-12-crossboot667-overlay-reader-checkpoint.json"
       ],
       "artifact_hashes": {},
-      "blocker": "Independent reviews found missing crossboot boundary reread and overlay held-path evidence-write gap. Fix/retake required before any VM launch.",
-      "next_action": "Fix and independently retake the two specific review findings; keep no-GO and baseline preserved.",
+      "blocker": "Hub crossboot source independently accepted; 667 owning tests/no skips/UI/shell pass. Overlay A1/A2 resolved; A3 blocking/unbounded evidence reader must be fixed and independently retaken. Matched QA Hub and actual installed recovery/live gates remain open.",
+      "next_action": "Prepare separate unpublished four-literal QA Hub candidate for independent diff/build-input review while overlay A3 is fixed. Public gates remain false; actual installed recovery required.",
       "coordinator_only": true
     },
     {
@@ -738,7 +740,7 @@
       "worker": "root existing-image validation; independent bounded preparation/result review",
       "actual_model": "coordinator; gpt-6.1-sol/medium preparation, gpt-6.1-sol/high launch cleanup, gpt-6-astra/high review",
       "attempt": 1,
-      "last_checkpoint": "2026-10-12T15:18:08.790708+00:00",
+      "last_checkpoint": "2026-10-12T15:59:42.913Z",
       "base_revision": "c2b03842",
       "branch": "codex/free-cloud-ai",
       "worktree": "/home/maslow/Maslow-ai-os/free-ai-runtime",
@@ -759,11 +761,12 @@
         "docs/programs/free-cloud-ai/evidence/2026-10-12-no-cache-source-and-guest-admission-checkpoint.json",
         "docs/programs/free-cloud-ai/evidence/2026-10-12-clean-installed-baseline-checkpoint.json",
         "docs/programs/free-cloud-ai/evidence/2026-10-12-keep-expiry-source-checkpoint.json",
-        "docs/programs/free-cloud-ai/evidence/2026-10-12-overlay-crossboot-active-checkpoint.json"
+        "docs/programs/free-cloud-ai/evidence/2026-10-12-overlay-crossboot-active-checkpoint.json",
+        "docs/programs/free-cloud-ai/evidence/2026-10-12-crossboot667-overlay-reader-checkpoint.json"
       ],
       "artifact_hashes": {},
-      "blocker": "Independent reviews found missing crossboot boundary reread and overlay held-path evidence-write gap. Fix/retake required before any VM launch.",
-      "next_action": "Fix and independently retake the two specific review findings; keep no-GO and baseline preserved."
+      "blocker": "Hub crossboot source independently accepted; 667 owning tests/no skips/UI/shell pass. Overlay A1/A2 resolved; A3 blocking/unbounded evidence reader must be fixed and independently retaken. Matched QA Hub and actual installed recovery/live gates remain open.",
+      "next_action": "Finish overlay A3 fix/independent retake, then Root admits only read-only guest dependency/policy/desktop facts on an owned overlay. Preserve pristine base; no ISO rebuild."
     },
     {
       "id": "FCAI-P6-REVIEW",
