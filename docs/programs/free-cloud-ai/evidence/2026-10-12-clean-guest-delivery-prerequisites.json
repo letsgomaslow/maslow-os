@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "status": "clean-guest-delivery-prerequisites-open-native-lenovo-lane-separate",
+  "workerReport": "/home/maslow/Maslow-ai-os/free-ai-build/hub-bundle-prep/clean-guest-install-path.json",
+  "workerReportSha256": "6078806e24d480b780a4f00515c3e72f0e12dcca56ab8eb9661f3ef1d1c18c1e",
+  "routing": "Existing rejection_forwarding worker, actual gpt-6-sol/high; bounded read-only evidence/contract inventory. No build or VM.",
+  "findings": "Retained installed base has Hub0.3.8 and noVoice/FreeAI/Connect. Earlier actual guest checks found noVoice bundle/cache and no local repository candidate. Guest enrolled trust/private replay/pending state and exact signed priorHub0.3.8 rollback seed remain unproven. Small existing host0.3.8 archive is only a candidate,not automatically equivalent or signed.",
+  "rootReview": "Root read the report and fixed FreeAI delivery contract: previous-package retention and existing Voice preparation are real prerequisites. No archive/guest facts newly verified by this read. QA3 signed archive content audit is not a guest trust/install result.",
+  "next": "After native terminal outcome and heavy-slot release, use existing reviewed overlay harness to establish guest public trust/private pending/replay and priorHub seed plus actual normal Voice delivery availability. If unavailable, prepare a separately reviewed minimal delivery fix; no new ISO repair/rebuild,repo-policy bypass or direct opaque-pair installation.",
+  "limits": "Existing guest remains required for clean/fault installed proof. Lenovo is not a substitute. Guest surface black-frame/visual uncertainty remains open. No publication,candidate promotion,VM/archive upload,Cloud provision or host/guest mutation in this investigation.",
+  "previewComplete": false
+}
