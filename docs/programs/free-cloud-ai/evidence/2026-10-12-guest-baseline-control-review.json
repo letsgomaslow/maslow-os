@@ -1,0 +1,171 @@
+{
+  "schema": 1,
+  "reviewedAtUtc": "2026-10-12T01:02:37.098624+00:00",
+  "status": "bounded-controls-review-passed-coordinator-slot-admission-still-required",
+  "scope": "Independent bounded source/control review of disposable FreeAI QA baseline preparation. No ISO/container/VM execution or product source edits.",
+  "controlRoot": "/home/maslow/Maslow-ai-os/free-ai-build/guest-baseline-prep",
+  "controlManifestSha256": "608e3d9a1b14bb9d3869a9e3ae5463b4f1d0510c90cee0911679d3d2c9958f5f",
+  "reviewedFiles": {
+    "baseline-supervisor.py": "02cb8a13dee41fc8474253d7bb809cf6ca23c424fbb4ad51d35819ed36799394",
+    "build-baseline.sh": "a5a08916f6290322e532b83f8a27246311f16a3c5be99be17889ead54fc2ec46",
+    "invoke-source-wrapper.sh": "0baa53acfffb9830c1a818df35fa3a963770d22239a49362e96537fd8544a3ad",
+    "validate-preparation.py": "728342ce074045aaf126bde71c4cd5d2774839c42f8f53d442d1c23402699094",
+    "source-identities.json": "c0bf0117ccf6bd74fa627d457d7001a24052abffd1736d3a4706d5767e760749",
+    "harness-identity.json": "5d1cc5cf560a1bcf3e00995bda09470075f9ab4fa58691fa99fa1c5fe7b4082e",
+    "harness/test/integration.d/base-test.sh": "7c6f15de64722c877dfdb8cb662b8e8f0b0aa7b80d8633fc5d82b1eb92240de2",
+    "guest-install-only.sh": "1e7600a555bfb50079401527d09494cdcfa3324e24e47d98d5b6543931fd3d8c",
+    "test_baseline_controls.py": "ee4c9b6497562c864ecc69d86e4a7920e6b2c97add53b4b13a3691e1613b4ce1",
+    "PLAN.md": "d084ffc7c675778c00799d24440c67505debbed9a4ced42a45a284c04884ddc1",
+    "final-argv-example.json": "38b7673e87e001cef71398d001e2ea30ca33953afb70ac0c9e91612be0720a14"
+  },
+  "proofSha256": {
+    "controls-preparation-proof.json": "4f623275298e50f291fca606f7092dc99a20395f1d6a0fabf43687d551a2ceb3",
+    "final-argv-example.json": "38b7673e87e001cef71398d001e2ea30ca33953afb70ac0c9e91612be0720a14",
+    "control-tests.log": "375171e29a7a6a837218101599fccfcafb84f500cc3cbe8ba14379adaa81fdfa"
+  },
+  "sourceIdentities": {
+    "runtime": {
+      "revision": "477d9441705601b9d41e933bb9f3b39327bf6285",
+      "snapshot": "/home/maslow/Maslow-ai-os/free-ai-build/guest-baseline-prep/snapshots/runtime",
+      "inputSnapshot": "/home/maslow/Maslow-ai-os/craft-build/pilot-media/runtime-firmware",
+      "independentObjects": true
+    },
+    "packages": {
+      "revision": "2b1cdf03c4308800048493b3be9f02d87471cf4a",
+      "snapshot": "/home/maslow/Maslow-ai-os/free-ai-build/guest-baseline-prep/snapshots/packages",
+      "inputSnapshot": "/home/maslow/Maslow-ai-os/craft-build/pilot-media/packages-notice",
+      "independentObjects": true
+    },
+    "hub": {
+      "revision": "2666609002dce8bb6cc16511ef2125bccb18dbe9",
+      "snapshot": "/home/maslow/Maslow-ai-os/free-ai-build/guest-baseline-prep/snapshots/hub",
+      "inputSnapshot": "/home/maslow/Maslow-ai-os/craft-build/pilot-media/hub",
+      "independentObjects": true
+    },
+    "iso": {
+      "revision": "b030143a59de819929035d61e026647044d22e6d",
+      "snapshot": "/home/maslow/Maslow-ai-os/free-ai-build/guest-baseline-prep/snapshots/iso",
+      "inputSnapshot": "/home/maslow/Maslow-ai-os/craft-build/pilot-media/iso-archinstall",
+      "independentObjects": true
+    },
+    "archiso": {
+      "revision": "424e78130db2af6c1ceb55b442d7914b1109ff2b",
+      "snapshot": "/home/maslow/Maslow-ai-os/free-ai-build/guest-baseline-prep/snapshots/iso/archiso",
+      "independentObjects": true
+    }
+  },
+  "cleanupModule": {
+    "path": "/home/maslow/Maslow-ai-os/free-ai-build/native-2-39/sequential-build.py",
+    "sha256": "9e95a38ac3655f9330255667de18921ba046532d7da7b3ecfec402a26f342d6e",
+    "loadedFromHashCheckedSourceBytesWithoutPyc": true
+  },
+  "confirmedFinding": {
+    "id": "baseline-launch-group-after-term",
+    "priority": "P1",
+    "location": "baseline-supervisor.py: supervised_build subprocess.run wrapper and failure cleanup; invoke-source-wrapper.sh exported docker function creates Python proxy child",
+    "finding": "On SIGTERM, subprocess.run kills/reaps only its direct Bash source-wrapper process. A Python docker-proxy descendant can survive. If the container/CID does not yet exist, owned-container cleanup returns NotFound, the supervisor exits and its shared lock is released, but the surviving proxy may subsequently reach Docker launch.",
+    "reproduction": {
+      "kind": "Actual supervisor control flow with inert real child/grandchild and mocked Docker inspection; no Docker calls or native workload",
+      "steps": [
+        "Load frozen supervisor source; redirect ROOT and shared lock to exclusive temporary directory; stub manifest/preflight/image checks.",
+        "Replace source-wrapper invocation with an actual child process spawning a grandchild that writes ready, sleeps1.5seconds, then writes a late-launch marker. Direct child waits20seconds.",
+        "After ready marker, send SIGTERM to actual supervisor. Docker inspection facade returns exact supported NotFound.",
+        "Wait for supervisor exit then observe late-launch marker."
+      ],
+      "observed": {
+        "supervisorExit": 1,
+        "cleanupObservedNoContainer": true,
+        "grandchildReachedLateLaunchAfterSupervisorExit": true,
+        "dockerCalls": 0
+      },
+      "scratchLocation": "Exclusive /tmp/freeai-baseline-review-* directory automatically removed after inert reproduction; marker contained no private data.",
+      "rawStandaloneLog": "No standalone raw log retained; exact observed JSON captured in reviewer tool output."
+    },
+    "minimumFix": "Own a dedicated process session/group for the wrapper/proxy hierarchy; terminate and reap the owned launch group before final exact-ID container cleanup and releasing shared lock. Preserve immutable image/session/CID checks, bounded cleanup and original exception when journal writes fail.",
+    "requiredRetest": [
+      "TERM during delayed proxy before container creation cannot produce a late-launch marker after supervisor exit.",
+      "Repeated TERM and transient/persistent ENOSPC cannot skip launch-group retirement or exact-ID cleanup.",
+      "Existing direct-child/name-reuse/unknown-inspect/shared-lock controls still pass."
+    ],
+    "notProven": "No actual Docker daemon create-in-flight race was exercised; container daemon behavior and post-signal actual container retirement remain separate execution limitations.",
+    "resolution": {
+      "status": "fixed-and-independently-retested",
+      "supervisorSha256": "02cb8a13dee41fc8474253d7bb809cf6ca23c424fbb4ad51d35819ed36799394",
+      "change": "Dedicated Popen session/group captures PID/startTicks/SID/PGID; temporary deferred parent TERM/INT handlers install ownership without masking child signals; waitid WNOWAIT anchors leader until retirement. Temporary Linux child subreaper reaps only owned PGID. Every normal success/failure and TERM path retires the launch hierarchy before failure-path exact-ID container inspection and releasing shared lock. A still-live group after KILL retains lock and waits.",
+      "evidence": "All9 inert tests passed independently in18.332seconds, including real Bash-to-Python proxy ignoring TERM, missing CID, ordinary failure/success, repeated TERM with persistent ENOSPC, lock retention, unrelated-process survival, exact-ID and foreign/unknown inspection. Delayed marker remained absent beyond scheduled launch time; proxy was reaped before Docker facade inspection.",
+      "scope": "These tests exercise real Linux process/session/subreaper/signal/flock behavior with Docker facade responses; no actual Docker daemon call or heavy workload."
+    }
+  },
+  "independentlyPassed": [
+    "All10 manifest file hashes match approved a56567a6d633b5728e0c4b464b3ec7eba261c33ba5976f2b44df8f329528cf60.",
+    "Read-only validate-preparation.py without --require-idle passed: exact independent clone revisions/cleanliness/object isolation and minimal harness hash.",
+    "python3 -B -m unittest -v test_baseline_controls.py:5tests passed, including actual scratch TERM/ENOSPC direct-child tests and mocked immutable-ID/name-reuse/unknown-inspect controls.",
+    "Reviewed canonical fixed source mounts, image c556 digest, CPU2/RAM4GiB/total memory+swap6GiB/MAKEFLAGS-j2, private cache translation, exclusive UUID logs and shared flock."
+  ],
+  "testGap": "Initial5-test direct-child gap is historical; revised9-test suite adds actual delayed Bash-to-Python-proxy hierarchy and covers the reproduced finding.",
+  "proofHistory": "preparation-proof.json predates outer controls; its wrapper/PLAN hashes and command without approved-manifest argument are historical. controls-preparation-proof.json binds current frozen controls, and its goGranted remains false.",
+  "limits": [
+    "This baseline is disposable QA media; not a FreeAI preview package or release.",
+    "Current Connect5/6 advisory findings are not cleared by baseline creation. No private keys or live accounts should be exposed until repaired candidate7 is verified.",
+    "No FreeAI/Connect candidate added to baseline package set; inherited accepted ISO privileged architecture and legacy core nodeps roles are unchanged, not newly approved arbitrary bypasses.",
+    "Actual ISO artifact checksum, local package inventory, fresh installation, guest glibc/Qt/defaults, optional installation before OS update, native confinement, live providers/accounts and recovery remain unverified.",
+    "Guest VM outer controls are a separate unreviewed admission step.",
+    "No Docker/image/VM/build/host service/network/keyring/provider operation by reviewer.",
+    "The confirmed process hierarchy gap is cleared by this retake. Coordinator GO remains separate and requires Connect QA to finish, shared lock availability, real idle/headroom/image preflight and exact approved manifest608e3d9a1b14bb9d3869a9e3ae5463b4f1d0510c90cee0911679d3d2c9958f5f.",
+    "Actual Docker daemon create-in-flight behavior, SIGKILL of the supervisor, deliberately escaping sessions and uninterruptible kernel group retirement were not exercised. Do not infer those cases from inert tests."
+  ],
+  "claims": {
+    "controlsApprovedForGo": true,
+    "buildExecuted": false,
+    "guestInstalled": false,
+    "previewAccepted": false,
+    "productGatesEnabled": false,
+    "coordinatorGoGrantedByReviewer": false,
+    "controlsApprovedForGoScope": "Frozen outer ISO control source and inert regression scope only; conditional on separate coordinator slot admission. No media/guest/product acceptance."
+  },
+  "soleRepositoryWrite": "docs/programs/free-cloud-ai/evidence/2026-10-12-guest-baseline-control-review.json",
+  "initialReview": {
+    "status": "blocked-before-go-confirmed-launch-group-cleanup-race",
+    "controlManifestSha256": "a56567a6d633b5728e0c4b464b3ec7eba261c33ba5976f2b44df8f329528cf60",
+    "reviewedFiles": {
+      "baseline-supervisor.py": "7e36ff24deb13b5ad4a5f4293528a26783994aa80a0906dfcbf7d9dea29bb1c9",
+      "build-baseline.sh": "a5a08916f6290322e532b83f8a27246311f16a3c5be99be17889ead54fc2ec46",
+      "invoke-source-wrapper.sh": "0baa53acfffb9830c1a818df35fa3a963770d22239a49362e96537fd8544a3ad",
+      "validate-preparation.py": "728342ce074045aaf126bde71c4cd5d2774839c42f8f53d442d1c23402699094",
+      "source-identities.json": "c0bf0117ccf6bd74fa627d457d7001a24052abffd1736d3a4706d5767e760749",
+      "harness-identity.json": "5d1cc5cf560a1bcf3e00995bda09470075f9ab4fa58691fa99fa1c5fe7b4082e",
+      "harness/test/integration.d/base-test.sh": "7c6f15de64722c877dfdb8cb662b8e8f0b0aa7b80d8633fc5d82b1eb92240de2",
+      "guest-install-only.sh": "1e7600a555bfb50079401527d09494cdcfa3324e24e47d98d5b6543931fd3d8c",
+      "test_baseline_controls.py": "83ba5b0dace98d9748aceebef0c55c6b0f1cbe7681e1dab70050c5252dbd2e76",
+      "PLAN.md": "102d139cad5ed9f6b228ca8f7efba423409f08f4012522989e2f7dea579b78b4"
+    },
+    "proofSha256": {
+      "controls-preparation-proof.json": "7623f62014134bc4f5bf5c51ccb12c69c9a7610c24f2cc17b7acac4e39e71dd9",
+      "preparation-proof.json": "e81453266c89a0dda7fc1f0b82420206a26171f6cdab27131d862fcccd9621de",
+      "final-argv-example.json": "31421b11dc26286264f0b0c0b6374f89bb206c34f6073ce7e02dd6ddf0d5c972",
+      "control-tests.log": "0446160ac4f63d8fc76b952f4ac1a5ec25f5e8bc3b73dc35208443de7712774e"
+    },
+    "originalReportSha256": "80f3b4afa3716d2a13008b5ec26a1013cf9f808089e88600c986a89989b13f32"
+  },
+  "retake": {
+    "command": "python3 -B -m unittest -v test_baseline_controls.py",
+    "cwd": "/home/maslow/Maslow-ai-os/free-ai-build/guest-baseline-prep",
+    "testsPassed": 9,
+    "elapsedSeconds": 18.332,
+    "rawStandaloneReviewerLog": false,
+    "workerLogSha256": "375171e29a7a6a837218101599fccfcafb84f500cc3cbe8ba14379adaa81fdfa",
+    "all11CurrentManifestHashesMatched": true,
+    "all10OriginalManifestMembersPreserved": true,
+    "sevenOriginalPinnedInputsUnchanged": [
+      "build-baseline.sh",
+      "invoke-source-wrapper.sh",
+      "validate-preparation.py",
+      "source-identities.json",
+      "harness-identity.json",
+      "harness/test/integration.d/base-test.sh",
+      "guest-install-only.sh"
+    ],
+    "astComparison": "Only supervised_build changed among original definitions; new definitions process_identity/subreaper/LaunchGroup. Translation, immutable-ID cleanup import, proxy, manifest validation and source/resource policy unchanged.",
+    "noNewScopedFinding": true
+  }
+}

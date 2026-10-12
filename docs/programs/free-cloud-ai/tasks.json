@@ -66,7 +66,7 @@
       "path": "/home/maslow/Projects/Maslow/free-ai-hub-current",
       "base_revision": "33940d2e8740b172b953cc3e091cbae1ba1cd303",
       "branch": "codex/free-cloud-ai-hub-current",
-      "implementation_revision": "947348f0bfb285427936729d2c1861d0f03aa4e5",
+      "implementation_revision": "9562f8e3d764954ff2fe4ce5aa20a40aa2b7a421",
       "previous_free_ai_worktree": "/home/maslow/Projects/Maslow/free-ai-hub",
       "accepted_craft_source_reference": "2666609002dce8bb6cc16511ef2125bccb18dbe9"
     },
@@ -338,7 +338,7 @@
       "worker": "root sequential native admission/builds; hub_worker acceptance prep complete",
       "actual_model": "coordinator; gpt-6.1-sol/medium preparation, Astra/high review",
       "attempt": 1,
-      "last_checkpoint": "2026-10-11T23:18:19.728430+00:00",
+      "last_checkpoint": "2026-10-12T01:20:33.660740+00:00",
       "base_revision": "448856485e710caedfc24f544a027aea8652dd33",
       "branch": "codex/free-cloud-ai",
       "worktree": "/home/maslow/Projects/Maslow/free-ai-packages",
@@ -362,14 +362,19 @@
         "docs/programs/free-cloud-ai/evidence/2026-10-11-package-preparation-review.json",
         "docs/programs/free-cloud-ai/evidence/2026-10-11-c2-package-repin-review.json",
         "docs/programs/free-cloud-ai/evidence/2026-10-11-c2-final-context-inventory.json",
-        "docs/programs/free-cloud-ai/evidence/2026-10-11-native-sequence-admission.json"
+        "docs/programs/free-cloud-ai/evidence/2026-10-11-native-sequence-admission.json",
+        "docs/programs/free-cloud-ai/evidence/2026-10-12-native-build-checkpoint.json",
+        "docs/programs/free-cloud-ai/evidence/2026-10-12-native-validation-checkpoint.json"
       ],
       "artifact_hashes": {
         "/home/maslow/Maslow-ai-os/free-ai-build/native/maslow-free-ai-0.1.0-1-x86_64.pkg.tar.zst": "5b2d989d58451ac9744f9c0e8c2c3dcde5f99657d1fef931d2c4a348fb5e4143",
-        "/home/maslow/Maslow-ai-os/free-ai-build/voice38/maslow-voice-0.1.5-38-x86_64.pkg.tar.zst": "3593c33d16574fae8667da41617c3d7facfda29b3dbaa8672f03f3a7da53f0f2"
+        "/home/maslow/Maslow-ai-os/free-ai-build/voice38/maslow-voice-0.1.5-38-x86_64.pkg.tar.zst": "3593c33d16574fae8667da41617c3d7facfda29b3dbaa8672f03f3a7da53f0f2",
+        "/home/maslow/Maslow-ai-os/free-ai-build/native-2-39/maslow-free-ai/maslow-free-ai-0.1.0-2-x86_64.pkg.tar.zst": "68af1f9c764bcd3cc5b37c5318e23348ac2719ea0b829672ae40399c39341a07",
+        "/home/maslow/Maslow-ai-os/free-ai-build/native-2-39/maslow-voice/maslow-voice-0.1.5-39-x86_64.pkg.tar.zst": "a8933c4b783a63786ec58fa3d22df53ef054355ecc3908ae785572f61593118f",
+        "/home/maslow/Maslow-ai-os/free-ai-build/connect-package-prep/native/recipe/maslow-connect-0.1.0-6-x86_64.pkg.tar.zst": "32890f539c5c06649cbee62e3872b99a1fa77f4bb0694f9ee7e08740fb87633c"
       },
-      "blocker": "Craft owner must release its newly started ISO container and acknowledge the handoff. Both containers are currently paused. The runner rejects even paused foreign containers before the next stage.",
-      "next_action": "After the Craft owner releases the slot, verify full container ID, image and session label and unpause only the owned Free AI container. Finish Free AI, Voice and Connect sequentially, then audit actual archives and compiled runtimes.",
+      "blocker": "Connect6 current dependency advisories block coordinated delivery; FreeAI2/Voice39 scoped native checks pass, installed/recovery/live acceptance open.",
+      "next_action": "Preserve exact2/39 artifacts; finish Connect patch source/owning checks and build reviewed replacement, then matched Hub and installed recovery.",
       "coordinator_only": false
     },
     {
@@ -406,7 +411,7 @@
       "status": "active",
       "owner": "root",
       "session": "2026-10-11-free-cloud-ai-root",
-      "worker": "current_recovery implementation complete; boundary_review independent source review complete; root integration",
+      "worker": "current_recovery managed lifecycle contract/code; root integration",
       "actual_model": "gpt-6.1-sol/high implementation; gpt-6-astra/high independent review",
       "attempt": 2,
       "last_checkpoint": "2026-10-11T23:18:19.728430+00:00",
@@ -420,7 +425,8 @@
         "0aafacbc8915d5db64e92bdb5a97bd604c76e6e1",
         "7e14cbaf091e847db07b2726694f27fe5e7d1837",
         "2a8c6eda15d92078fdd8656a879b1e93dd786a1d",
-        "947348f0bfb285427936729d2c1861d0f03aa4e5"
+        "947348f0bfb285427936729d2c1861d0f03aa4e5",
+        "9562f8e3d764954ff2fe4ce5aa20a40aa2b7a421"
       ],
       "integration_commits": [
         "c856c683de8e66a43d326b435bbf73504f5ca6a2",
@@ -446,6 +452,10 @@
         {
           "check": "947348f guided setup: 304 owning tests, 114 focused tests, UI contract and 12 changed-scope namespace cases passed; independent 21 targeted tests and lock/absence/persistence controls passed. Neither production gate enabled.",
           "result": "pass"
+        },
+        {
+          "check": "9562f8e preservation foundation23+launch2/fullHub328/UI; independently reviewed, no removal/reinstall wiring or gates enabled.",
+          "result": "pass"
         }
       ],
       "evidence": [
@@ -457,7 +467,7 @@
         "docs/programs/free-cloud-ai/evidence/2026-10-11-guided-hub-source-checkpoint.json"
       ],
       "artifact_hashes": {},
-      "blocker": "Native delivery, recovery, real combined UI and live acceptance remain pending; both acceptance gates are false.",
+      "blocker": "Managed removal/reinstall lifecycle and installed signed delivery/recovery remain incomplete; Connect6 blocked, no new native identity admitted.",
       "next_action": "After native Connect 6 archive and deployed compatibility checks pass, add only its exact matched identity while preserving accepted native 5; then build the matched Hub candidate and verify guided setup in an installed guest."
     },
     {
@@ -530,7 +540,7 @@
       "status": "implementation-complete",
       "owner": "root",
       "session": "2026-10-11-free-cloud-ai-root",
-      "worker": "root integration; boundary_review independent review",
+      "worker": "current_recovery dependency remediation; root integration",
       "actual_model": "coordinator; gpt-6-astra/high independent review",
       "attempt": 1,
       "last_checkpoint": "2026-10-11T20:52:17.856Z",
@@ -560,8 +570,8 @@
         "docs/programs/free-cloud-ai/evidence/2026-10-11-connect-current-integration.json"
       ],
       "artifact_hashes": {},
-      "blocker": "No accepted managed native package/root marker/liveaccount proof.",
-      "next_action": "Review additive candidate managed Connect package recipe, then native marker/self-contained package and real selected-account/revocation gates."
+      "blocker": "Five current advisories in native6; minimum pinned source fixes/9 upstream controls/typecheck pass, full owning sandbox QA failed in container and new native package remains unbuilt.",
+      "next_action": "Finish exact repaired owning QA in namespace-capable admitted environment, independent source review, then replacement native package/deployed/advisory/identity proof before live account acceptance."
     },
     {
       "id": "FCAI-P4-RECOVERY",
@@ -589,8 +599,8 @@
       "status": "active",
       "owner": "root",
       "session": "2026-10-11-free-cloud-ai-root",
-      "worker": "root",
-      "actual_model": "coordinator not exposed",
+      "worker": "current_recovery managed lifecycle contract/code; root installed recovery integration",
+      "actual_model": "gpt-6.1-sol/high implementation; root coordinator",
       "attempt": 1,
       "last_checkpoint": "2026-10-11T19:11:20.265138+00:00",
       "base_revision": "09721dff",
@@ -644,23 +654,25 @@
       ],
       "acceptance": "Clean guest install and Lenovo run cover typed question, draft, explicit Markdown creation, selected read-only account, existing Voice, revocation, recovery, physical microphone/speaker route and live authorized account; evidence observed directly, mocks cannot pass.",
       "phase": 5,
-      "status": "queued",
-      "owner": null,
-      "session": null,
-      "worker": null,
-      "actual_model": null,
-      "attempt": 0,
-      "last_checkpoint": null,
-      "base_revision": "09721dff",
+      "status": "active",
+      "owner": "root",
+      "session": "2026-10-11-free-cloud-ai-root",
+      "worker": "root baseline ISO/guest; reviewed source snapshots and external lifecycle controls",
+      "actual_model": "coordinator; gpt-6.1-sol/medium preparation, gpt-6.1-sol/high launch cleanup, gpt-6-astra/high review",
+      "attempt": 1,
+      "last_checkpoint": "2026-10-12T01:20:33.660740+00:00",
+      "base_revision": "c2b03842",
       "branch": "codex/free-cloud-ai",
-      "worktree": null,
+      "worktree": "/home/maslow/Maslow-ai-os/free-ai-runtime",
       "implementation_commits": [],
       "integration_commits": [],
       "tests": [],
-      "evidence": [],
+      "evidence": [
+        "docs/programs/free-cloud-ai/evidence/2026-10-12-baseline-admission.json"
+      ],
       "artifact_hashes": {},
-      "blocker": "Clean guest, Lenovo, live-account, and physical microphone/speaker evidence is absent; mocks cannot satisfy these gates.",
-      "next_action": "Verify guest and Lenovo system acceptance including physical audio and live account"
+      "blocker": "Independent baseline ISO currently building; actual fresh installed guest/glibc/Qt/pre-update optional installation remain unverified.",
+      "next_action": "Monitor exact supervisor/ISO batch, verify actual media and artifacts, then admit install-only4GiBguest under same serialized slot and measure compatibility beforeOSupdate."
     },
     {
       "id": "FCAI-P6-REVIEW",
@@ -770,5 +782,6 @@
     "active_workers": [
       "current_recovery: isolated Hub recovery atomic publication and cleanup-preservation fixes, actual gpt-6.1-sol/high"
     ]
-  }
+  },
+  "user_priority": "Free AI through completion of approved scope. Craft development paused; do not resume it, merge product branches or publish production artifacts."
 }

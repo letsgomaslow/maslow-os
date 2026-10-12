@@ -1,0 +1,73 @@
+{
+  "schema": 1,
+  "date": "2026-10-12",
+  "recorded_at": "2026-10-12T00:01:41.037215+00:00",
+  "status": "three-native-builds-complete-validation-in-progress",
+  "user_priority": "Free AI through approved scope; Craft paused. Do not resume Craft, merge product branches or publish production artifacts.",
+  "source": "c2b03842a81645998a79cbca525c03ddf67813b4",
+  "recipes": "333f4f83ddcba6651687a7723c6778f68023cc5b",
+  "context_proof_sha256": "08bca127d23a3cdd7e193d0a05dbc5a4a09d4d6213faa2e227155b600a3aea65",
+  "sequence_session": "200e3daafe734d22a6aa2b2f5881f1c2",
+  "heavy_limits": {
+    "cpus": 2,
+    "ram_gib": 4,
+    "ram_plus_swap_gib": 6,
+    "make_jobs": 2,
+    "exclusive_lock": "/home/maslow/Maslow-ai-os/heavy-work.lock"
+  },
+  "handoff": {
+    "actual_owner_ack": "/home/maslow/Maslow-ai-os/maslow-os/docs/handoffs/2026-10-11-craft-optional-apps.md (Free AI owns heavy-job slot section)",
+    "pause_receipt_sha256": "49bbf891cd24fdb495958a1e84b61380fc2b12c1bffc2e159f17ef30585b80bd",
+    "formal_ack_file": "absent; actual owning handoff used",
+    "craft_container": "ended by owner during admission",
+    "free_ai_resume": "Exact owned ID/image/session/no unrelated heavy processes/>=6GiB available memory checked; only own container unpaused. No Craft process changed."
+  },
+  "archives": [
+    {
+      "path": "/home/maslow/Maslow-ai-os/free-ai-build/native-2-39/maslow-free-ai/maslow-free-ai-0.1.0-2-x86_64.pkg.tar.zst",
+      "name": "maslow-free-ai",
+      "version": "0.1.0-2",
+      "sha256": "68af1f9c764bcd3cc5b37c5318e23348ac2719ea0b829672ae40399c39341a07",
+      "bytes": 46638619,
+      "source_commit": "c2b03842a81645998a79cbca525c03ddf67813b4",
+      "signed": false,
+      "installed_acceptance": false,
+      "status": "built; exact native artifact checks in progress, no installed/live acceptance"
+    },
+    {
+      "path": "/home/maslow/Maslow-ai-os/free-ai-build/native-2-39/maslow-voice/maslow-voice-0.1.5-39-x86_64.pkg.tar.zst",
+      "name": "maslow-voice",
+      "version": "0.1.5-39",
+      "sha256": "a8933c4b783a63786ec58fa3d22df53ef054355ecc3908ae785572f61593118f",
+      "bytes": 286222664,
+      "source_commit": "c2b03842a81645998a79cbca525c03ddf67813b4",
+      "signed": false,
+      "installed_acceptance": false,
+      "status": "built; exact native artifact checks in progress, no installed/live acceptance"
+    },
+    {
+      "path": "/home/maslow/Maslow-ai-os/free-ai-build/connect-package-prep/native/recipe/maslow-connect-0.1.0-6-x86_64.pkg.tar.zst",
+      "name": "maslow-connect",
+      "version": "0.1.0-6",
+      "sha256": "32890f539c5c06649cbee62e3872b99a1fa77f4bb0694f9ee7e08740fb87633c",
+      "bytes": 7685816,
+      "source_commit": "97ac20eed146a8c6b37e33c2c29901a00f3045ff",
+      "signed": false,
+      "installed_acceptance": false,
+      "status": "built; exact native artifact checks in progress, no installed/live acceptance"
+    }
+  ],
+  "postbuild_evidence": "/home/maslow/Maslow-ai-os/free-ai-build/native-2-39/postbuild-evidence-c2b03842",
+  "postbuild_status": "running; no complete receipt yet",
+  "pending": [
+    "static source/closure/capsule/ABI/notice checks",
+    "packaged compiled runtime and Voice owning checks",
+    "deployed Connect native 5 compatibility proof",
+    "current production dependency advisories",
+    "matched Hub native 6 identity",
+    "managed reinstall implementation/review",
+    "working disposable guest and installed recovery",
+    "Groq/account/Voice/Lenovo acceptance"
+  ],
+  "accepted_preview": false
+}

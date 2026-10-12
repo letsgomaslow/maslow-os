@@ -1,0 +1,32 @@
+{
+  "schema": 1,
+  "date": "2026-10-12",
+  "status": "independent-qa-baseline-build-running",
+  "purpose": "FreeAI disposable installed acceptance only; consumes accepted Maslow core snapshots, no Craft resumption, FreeAI base inclusion or production/media release.",
+  "manifest_sha256": "608e3d9a1b14bb9d3869a9e3ae5463b4f1d0510c90cee0911679d3d2c9958f5f",
+  "supervisor_sha256": "02cb8a13dee41fc8474253d7bb809cf6ca23c424fbb4ad51d35819ed36799394",
+  "review": "docs/programs/free-cloud-ai/evidence/2026-10-12-guest-baseline-control-review.json",
+  "review_sha256": "a79a4ae9844351a33dd7575d62aa8feb4c71d9c38983b912d9ca91aa1d4759e4",
+  "session": "996567349ef6439bbfcff197aecc7dda",
+  "evidence": "/home/maslow/Maslow-ai-os/free-ai-build/guest-baseline-prep/evidence/996567349ef6439bbfcff197aecc7dda",
+  "exec_session": 53497,
+  "source_revisions": {
+    "runtime": "477d9441705601b9d41e933bb9f3b39327bf6285",
+    "packages": "2b1cdf03c4308800048493b3be9f02d87471cf4a",
+    "hub": "2666609002dce8bb6cc16511ef2125bccb18dbe9",
+    "iso": "b030143a59de819929035d61e026647044d22e6d",
+    "archiso": "424e78130db2af6c1ceb55b442d7914b1109ff2b"
+  },
+  "limits": {
+    "cpus": 2,
+    "ram_gib": 4,
+    "ram_plus_swap_gib": 6,
+    "make_jobs": 2,
+    "exclusive_shared_lock": true
+  },
+  "safety": "Original hierarchy TERM cleanup finding fixed and independently9tests passed; exact owned launch session/group retired before container cleanup/lock release. Docker daemon create-inflight and media/guest behavior remain unverified.",
+  "candidate_iso_built": false,
+  "guest_verified": false,
+  "no_craft_source_cache_or_job_mutation": true,
+  "production_publication_or_product_merge": false
+}

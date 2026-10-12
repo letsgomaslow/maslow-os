@@ -1,0 +1,79 @@
+{
+  "schema": 1,
+  "date": "2026-10-12",
+  "status": "scoped-native-validation-passed-connect-security-clearance-blocked",
+  "recorded_at": "2026-10-12T01:20:33.660740+00:00",
+  "native_source": "c2b03842a81645998a79cbca525c03ddf67813b4",
+  "native_recipes": "333f4f83ddcba6651687a7723c6778f68023cc5b",
+  "receipt": "/home/maslow/Maslow-ai-os/free-ai-build/native-2-39/postbuild-evidence-c2b03842-metadata-reviewed/receipt.json",
+  "receipt_sha256": "124aae4375d528c65a2ad350df8b27bbce036ca90ad3eae2c30750a92576f250",
+  "review": "docs/programs/free-cloud-ai/evidence/2026-10-12-native-artifact-review.json",
+  "review_sha256": "ccd9f1fd4f0e62c59304cd3149fbf6f0b3fb87664a839fb5c083ca15a41af6b4",
+  "checks": {
+    "private_node_version": "22.23.3",
+    "sqlite_abi": 127,
+    "sqlite_minimum_glibc": "2.44",
+    "free_ai_backend_tests": 49,
+    "voice_run": 489,
+    "voice_pass": 484,
+    "voice_skip": 5,
+    "skip_names": "not individually captured; not inferred",
+    "compiled_router_network_none": "pass synthetic keys/transport only",
+    "connect_deployed": "pass scope-only fixed launcher/capabilities/catalog/profile exports",
+    "ownership_overlap": "pass three packages",
+    "connect_old_dependency_files_byte_equal": 8667,
+    "connect_old_compiled_files_byte_equal": 87,
+    "connect_dependency_layout_link_targets": "exact match; informational pnpm metadata normalized narrowly"
+  },
+  "advisories": {
+    "free_ai_npm": {
+      "exit": 0,
+      "reported": 0,
+      "physical_external_packages": 116,
+      "server_workspace": 1,
+      "npm_counts_include_root_workspace_and_link_nodes": true
+    },
+    "connect_pnpm": {
+      "exit": 1,
+      "code": "ERR_PNPM_AUDIT_NO_LOCKFILE",
+      "full_workspace_lock_not_used": true
+    },
+    "connect_exact_production_bulk": {
+      "inventory_sha256": "4e3f8ff3d8d608f5f03d37b42fda7759c13cb36389d2178204cdac2b8af1e9bc",
+      "external_tuples": 105,
+      "private_workspace_roots": 1,
+      "request_sha256": "8ba6f1e3e74e9b8fb35fcc067be49cdd56ce7b25a6ba0d25da943885b5ea50fc",
+      "response_sha256": "84cbba89736f47e348f9caa5c02bc64e9d00cf8e882f77234e7895ba96b575d8",
+      "reported": 5,
+      "critical": 1,
+      "high": 1,
+      "moderate": 3,
+      "matched_offline_with_pinned_npm_semver": true,
+      "clearance": false
+    }
+  },
+  "failures_preserved": [
+    "Original raw-byte pnpm metadata comparison; narrow semantic exception independently reviewed and13 controls passed. Prior FreeAI/Voice static reports reused only with exact report/archive/context and unchanged shared-verifier AST; all executable trees freshly extracted.",
+    "Initial bulk schema rejection did not preserve raw body. Corrected capture preserves HTTP200 body; parent-package-key interpretation corrected from official npm Registry API and analyzed offline, no third query. Six parser controls pass.",
+    "Connect remediation source QA: nine new controls/typechecks pass, full owning suite fails17 cases in unsuitable container; second smoke stops on nested proc mount restriction. No tests weakened."
+  ],
+  "connect_remediation": {
+    "source_worktree": "/home/maslow/Projects/Maslow/free-ai-connect-current",
+    "source_committed": false,
+    "prepared_lock_sha256": "e6d717577fc92a37a03e630eb2c4acfcf2225900d155e6e2c832655bedbe10e1",
+    "replacements": [
+      "SDK1.30.0 to1.31.0",
+      "fast-uri3.1.7 to3.1.8",
+      "fast-uri4.1.4 to4.1.5 (workspace only)",
+      "ip-address10.7.0 to10.7.1",
+      "proxy-addr2.0.7 to2.0.8"
+    ],
+    "no_unrelated_resolution_or_composio_toolkit_changes": true,
+    "owning_full_clearance": false,
+    "rebuilt_native_clearance": false
+  },
+  "hub_source": "9562f8e3d764954ff2fe4ce5aa20a40aa2b7a421",
+  "hub_scope": "Preservation anchor foundation unused; launch-only busy race fixed.23 foundation+2 targeted checks and328 owning/UI pass; independent review accepted. No removal/reinstall implementation or gates enabled.",
+  "installed_live_preview_accepted": false,
+  "next_action": "Finish independent baseline ISO/guest, verify compatibility before OSupdate; finish repaired Connect owning/native/advisory proof and managed lifecycle implementation before installed/live/Lenovo acceptance."
+}
