@@ -67,7 +67,7 @@
       "path": "/home/maslow/Projects/Maslow/free-ai-hub-current",
       "base_revision": "33940d2e8740b172b953cc3e091cbae1ba1cd303",
       "branch": "codex/free-cloud-ai-hub-current",
-      "implementation_revision": "f29a5c314b49d3129bc712996da8e818eb49245d",
+      "implementation_revision": "690285be868fef835ec424905a03b94df44302cb",
       "previous_free_ai_worktree": "/home/maslow/Projects/Maslow/free-ai-hub",
       "accepted_craft_source_reference": "2666609002dce8bb6cc16511ef2125bccb18dbe9"
     },
@@ -429,7 +429,8 @@
         "7e14cbaf091e847db07b2726694f27fe5e7d1837",
         "2a8c6eda15d92078fdd8656a879b1e93dd786a1d",
         "947348f0bfb285427936729d2c1861d0f03aa4e5",
-        "9562f8e3d764954ff2fe4ce5aa20a40aa2b7a421"
+        "9562f8e3d764954ff2fe4ce5aa20a40aa2b7a421",
+        "690285be868fef835ec424905a03b94df44302cb"
       ],
       "integration_commits": [
         "c856c683de8e66a43d326b435bbf73504f5ca6a2",
@@ -472,7 +473,8 @@
         "docs/programs/free-cloud-ai/evidence/2026-10-12-managed-source-and-owning-checkpoint.json",
         "docs/programs/free-cloud-ai/evidence/2026-10-12-connect8-native-result-review.json",
         "docs/programs/free-cloud-ai/evidence/2026-10-12-issuer-map-native-checkpoint.json",
-        "docs/programs/free-cloud-ai/evidence/2026-10-12-voice41-scoped-artifact-checkpoint.json"
+        "docs/programs/free-cloud-ai/evidence/2026-10-12-voice41-scoped-artifact-checkpoint.json",
+        "docs/programs/free-cloud-ai/evidence/2026-10-12-deferred-managed-mask-source-checkpoint.json"
       ],
       "artifact_hashes": {},
       "blocker": "Matched source preserves Craft native5 and admits verified Connect8; final Hub package, managed removal/reinstall and installed signed delivery/recovery remain incomplete.",
@@ -623,7 +625,8 @@
         "784eca20",
         "b192d593",
         "9a90e545",
-        "76fb5d08ca65662be1b16da1cce1eb0eee13f37b"
+        "76fb5d08ca65662be1b16da1cce1eb0eee13f37b",
+        "690285be868fef835ec424905a03b94df44302cb"
       ],
       "integration_commits": [],
       "tests": [
@@ -656,11 +659,12 @@
         "docs/programs/free-cloud-ai/evidence/2026-10-12-typed-rejection-source-checkpoint.json",
         "docs/programs/free-cloud-ai/evidence/2026-10-12-voice41-build-and-error-safety-checkpoint.json",
         "docs/programs/free-cloud-ai/evidence/2026-10-12-voice41-scoped-artifact-checkpoint.json",
-        "docs/programs/free-cloud-ai/evidence/2026-10-12-deferred-managed-mask-design-checkpoint.json"
+        "docs/programs/free-cloud-ai/evidence/2026-10-12-deferred-managed-mask-design-checkpoint.json",
+        "docs/programs/free-cloud-ai/evidence/2026-10-12-deferred-managed-mask-source-checkpoint.json"
       ],
       "artifact_hashes": {},
-      "blocker": "Deferred-mask design independently accepted; implementation/focused verification active. Root rejection cleanup, damagedDB/WAL/staging/reboot and installed recovery still required; special masked-profile adapter no longer needed for this flow.",
-      "next_action": "Finish/review V1 managed deferred-mask preparation and companion exact-reservation recovery; preserve canonical readers and legacy fresh path. Then authenticated Root rejection witness/cleanup and remaining recovery gates.",
+      "blocker": "Managed V1canonical preparation/repeated reservation recovery sourceaccepted;534owning/UI pass. Fixedno-cache Root/helperprefix prerequisiteactive; forwarding/witness/decision cleanup, WAL/staging/damagedDB/reboot/native recovery stillrequired.",
+      "next_action": "Review no-cache fixed FreeAI Root/helper/pacman/hook launch prefix and exact parent validator prerequisite, then implement separately reviewed initial-rejection forwarding/witness and cleanup.",
       "coordinator_only": true
     },
     {
@@ -697,11 +701,12 @@
         "docs/programs/free-cloud-ai/evidence/2026-10-12-existing-media-public-input-checkpoint.json",
         "docs/programs/free-cloud-ai/evidence/2026-10-12-existing-media-keyring-provenance-checkpoint.json",
         "docs/programs/free-cloud-ai/evidence/2026-10-12-parent-inspector-build-checkpoint.json",
-        "docs/programs/free-cloud-ai/evidence/2026-10-12-parent-result-and-crypto-checkpoint.json"
+        "docs/programs/free-cloud-ai/evidence/2026-10-12-parent-result-and-crypto-checkpoint.json",
+        "docs/programs/free-cloud-ai/evidence/2026-10-12-public-crypto-result-checkpoint.json"
       ],
       "artifact_hashes": {},
-      "blocker": "Actual exact parent listing independently reconciled: no gnupg entry. Crypto stopped after successful public import because freeform GPG diagnostics were decoded as UTF8; targeted byte handling correction active. Signatures/complete media receipt and actual guest/live/Lenovo gates remain open.",
-      "next_action": "Review byte-safe diagnostic retake, run one fresh isolated public crypto verification, reconcile complete media receipt, then clean installed guest. Preserve accepted parent result and all failed evidence; no ISO cycle."
+      "blocker": "Parentabsence andtwo publickeyring signature/selectedcertificate proofs independentlyaccepted. Completeproducerallowlist/trust-consumer/six-factmediareceipt reviewactive; actualguest/live/Lenovo acceptanceopen.",
+      "next_action": "Finish independent six-fact existingmedia review; any missingfact needs a concrete narrow evidence action. Then admit one clean installedguest usingexistingimage, no ISOcycle."
     },
     {
       "id": "FCAI-P6-REVIEW",
