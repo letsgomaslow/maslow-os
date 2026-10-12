@@ -225,7 +225,8 @@
     "docs/programs/free-cloud-ai/evidence/2026-10-12-overlay-crossboot-active-checkpoint.json",
     "docs/programs/free-cloud-ai/evidence/2026-10-12-crossboot667-overlay-reader-checkpoint.json",
     "docs/programs/free-cloud-ai/evidence/2026-10-12-overlay-controls-and-cid-checkpoint.json",
-    "docs/programs/free-cloud-ai/evidence/2026-10-12-qa-source-build-and-postboot-checkpoint.json"
+    "docs/programs/free-cloud-ai/evidence/2026-10-12-qa-source-build-and-postboot-checkpoint.json",
+    "docs/programs/free-cloud-ai/evidence/2026-10-12-guest-login-and-postboot-owning-checkpoint.json"
   ],
   "passed_source_gates": [
     "every-dispatch-provider-and-model-policy",
@@ -273,6 +274,6 @@
     "source_accepted": true,
     "build_started": false,
     "installation_accepted": false,
-    "status": "unpublished-four-literal-QA-derivative-only; build Git-hook fix and normal postboot operation proof design pending"
+    "status": "f379 retained prior QA source; final derivative waits accepted postboot source/full owning and repin"
   }
 }

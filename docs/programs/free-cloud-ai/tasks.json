@@ -434,7 +434,7 @@
       "worker": "current_recovery managed lifecycle contract/code; root integration",
       "actual_model": "gpt-6.1-sol/high implementation; gpt-6-astra/high independent review",
       "attempt": 2,
-      "last_checkpoint": "2026-10-12T16:22:55.274Z",
+      "last_checkpoint": "2026-10-12T17:37:51.122Z",
       "base_revision": "2a8c6eda15d92078fdd8656a879b1e93dd786a1d",
       "branch": "codex/free-cloud-ai-hub-current",
       "worktree": "/home/maslow/Projects/Maslow/free-ai-hub-current",
@@ -511,11 +511,12 @@
         "docs/programs/free-cloud-ai/evidence/2026-10-12-keep-expiry-source-checkpoint.json",
         "docs/programs/free-cloud-ai/evidence/2026-10-12-crossboot667-overlay-reader-checkpoint.json",
         "docs/programs/free-cloud-ai/evidence/2026-10-12-overlay-controls-and-cid-checkpoint.json",
-        "docs/programs/free-cloud-ai/evidence/2026-10-12-qa-source-build-and-postboot-checkpoint.json"
+        "docs/programs/free-cloud-ai/evidence/2026-10-12-qa-source-build-and-postboot-checkpoint.json",
+        "docs/programs/free-cloud-ai/evidence/2026-10-12-guest-login-and-postboot-owning-checkpoint.json"
       ],
       "artifact_hashes": {},
-      "blocker": "QA source4literal derivative independently accepted; buildcontext review concretely reproduced unpinned Git fsmonitor execution, narrow fix active. Normal new managed operations after reboot require current-daemon boot proof and coordinated consumers; validator-only relaxation is unsafe. Guest stillwaiting8GiBmemory; installed/live gates open.",
-      "next_action": "Fix/independently retake build Git-hook finding; finalize bounded postboot private-proof charter before choosing final matched QA source. Preserve unchanged backend2/Voice41/Connect8 and public product gates."
+      "blocker": "Postboot private proof independently accepted; first full677 run has one unchanged EOF timeout, isolated diagnostics pass original5s limit, exact full retake active. Actual guest facts suitable but Voice absent and desktop check stopped at normal greeter; signed-in driver independently accepted. Matched QA/build/installed/live gates open.",
+      "next_action": "Finish full Hub retake, integrate exact source and repin final four-literal QA/build context. Preserve unchanged2/41/8 and run only one heavy job at a time."
     },
     {
       "id": "FCAI-P2-WORK",
@@ -652,7 +653,7 @@
       "worker": "current_recovery managed lifecycle contract/code; root installed recovery integration",
       "actual_model": "gpt-6.1-sol/high implementation; root coordinator",
       "attempt": 1,
-      "last_checkpoint": "2026-10-12T16:22:55.274Z",
+      "last_checkpoint": "2026-10-12T17:37:51.123Z",
       "base_revision": "09721dff",
       "branch": "codex/free-cloud-ai",
       "worktree": "/home/maslow/Maslow-ai-os/free-ai-runtime",
@@ -719,11 +720,12 @@
         "docs/programs/free-cloud-ai/evidence/2026-10-12-overlay-crossboot-active-checkpoint.json",
         "docs/programs/free-cloud-ai/evidence/2026-10-12-crossboot667-overlay-reader-checkpoint.json",
         "docs/programs/free-cloud-ai/evidence/2026-10-12-overlay-controls-and-cid-checkpoint.json",
-        "docs/programs/free-cloud-ai/evidence/2026-10-12-qa-source-build-and-postboot-checkpoint.json"
+        "docs/programs/free-cloud-ai/evidence/2026-10-12-qa-source-build-and-postboot-checkpoint.json",
+        "docs/programs/free-cloud-ai/evidence/2026-10-12-guest-login-and-postboot-owning-checkpoint.json"
       ],
       "artifact_hashes": {},
-      "blocker": "QA source4literal derivative independently accepted; buildcontext review concretely reproduced unpinned Git fsmonitor execution, narrow fix active. Normal new managed operations after reboot require current-daemon boot proof and coordinated consumers; validator-only relaxation is unsafe. Guest stillwaiting8GiBmemory; installed/live gates open.",
-      "next_action": "Fix/independently retake build Git-hook finding; finalize bounded postboot private-proof charter before choosing final matched QA source. Preserve unchanged backend2/Voice41/Connect8 and public product gates.",
+      "blocker": "Postboot private proof independently accepted; first full677 run has one unchanged EOF timeout, isolated diagnostics pass original5s limit, exact full retake active. Actual guest facts suitable but Voice absent and desktop check stopped at normal greeter; signed-in driver independently accepted. Matched QA/build/installed/live gates open.",
+      "next_action": "Finish full Hub retake, integrate exact source and repin final four-literal QA/build context. Preserve unchanged2/41/8 and run only one heavy job at a time.",
       "coordinator_only": true
     },
     {
@@ -744,7 +746,7 @@
       "worker": "root existing-image validation; independent bounded preparation/result review",
       "actual_model": "coordinator; gpt-6.1-sol/medium preparation, gpt-6.1-sol/high launch cleanup, gpt-6-astra/high review",
       "attempt": 1,
-      "last_checkpoint": "2026-10-12T16:06:47.099Z",
+      "last_checkpoint": "2026-10-12T17:37:51.123Z",
       "base_revision": "c2b03842",
       "branch": "codex/free-cloud-ai",
       "worktree": "/home/maslow/Maslow-ai-os/free-ai-runtime",
@@ -767,11 +769,12 @@
         "docs/programs/free-cloud-ai/evidence/2026-10-12-keep-expiry-source-checkpoint.json",
         "docs/programs/free-cloud-ai/evidence/2026-10-12-overlay-crossboot-active-checkpoint.json",
         "docs/programs/free-cloud-ai/evidence/2026-10-12-crossboot667-overlay-reader-checkpoint.json",
-        "docs/programs/free-cloud-ai/evidence/2026-10-12-overlay-controls-and-cid-checkpoint.json"
+        "docs/programs/free-cloud-ai/evidence/2026-10-12-overlay-controls-and-cid-checkpoint.json",
+        "docs/programs/free-cloud-ai/evidence/2026-10-12-guest-login-and-postboot-owning-checkpoint.json"
       ],
       "artifact_hashes": {},
-      "blocker": "Crossboot667 source accepted; overlay A1/A2/A3 independently resolved and actual proc-fd Docker CID compatibility passed. Guest VM admission waiting8GiB current headroom. QA Hub/source/build independent review and actual installed/live/recovery gates remain open.",
-      "next_action": "Recheck headroom/idle/lock/pinned inputs before Root GO for read-only owned overlay. User asked to close unused tabs/apps; no threshold weakening or further ISO."
+      "blocker": "Postboot private proof independently accepted; first full677 run has one unchanged EOF timeout, isolated diagnostics pass original5s limit, exact full retake active. Actual guest facts suitable but Voice absent and desktop check stopped at normal greeter; signed-in driver independently accepted. Matched QA/build/installed/live gates open.",
+      "next_action": "After current heavy job retires, Root rechecks headroom/idle/lock/pins and admits signed-in read-only guest retry to inspect normal Voice setup bundle and actual desktop. Preserve first failedjob; no ISO rebuild."
     },
     {
       "id": "FCAI-P6-REVIEW",
