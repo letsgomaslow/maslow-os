@@ -691,8 +691,8 @@
         "docs/programs/free-cloud-ai/evidence/2026-10-12-recovery-units-active-checkpoint.json"
       ],
       "artifact_hashes": {},
-      "blocker": "Two source units accepted with 560 owning tests/no skips and UI. V1 decision cleanup is active; durable progress, V2 dispatcher, staging/damaged DB/reboot and actual installed recovery remain required.",
-      "next_action": "Fix independently found Unit B internal fsync retry gaps and retake; continue disjoint WAL progress implementation. Both source units remain unaccepted until review and owning checks.",
+      "blocker": "Unit B focused source independently accepted after internal fsync fixes; combined owning pending WAL progress freeze/review. V2 dispatcher, expiry-review, staged/damaged DB/reboot and installed recovery remain open.",
+      "next_action": "boundary_review: gpt-6-astra/high, WAL progress source implementation and focused checks; independent final source review required. Obtain exact freeze for independent source review, then combined owning/UI.",
       "coordinator_only": true
     },
     {
@@ -848,8 +848,8 @@
     "worker_limit": 2,
     "integration": "No product/shared merge, host installation, production signing or publication. Program completed source commits only.",
     "active_workers": [
-      "rejection_forwarding: gpt-6-sol/high, Unit B P1 internal fsync retry fixes; 3 owned helper/test files only.",
-      "boundary_review: gpt-6-astra/high, WAL progress lease/executor/issuer/private progress module + owning tests only."
+      "boundary_review: gpt-6-astra/high, WAL progress source implementation and focused checks; independent final source review required.",
+      "rejection_forwarding: gpt-6-sol/high, gated V2 dispatcher/parent/structural-ticket prerequisite implementation; four disjoint source/four test files."
     ]
   },
   "user_priority": "Free AI through completion of approved scope. Craft development paused; do not resume it, merge product branches or publish production artifacts."

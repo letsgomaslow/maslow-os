@@ -16,7 +16,7 @@
     "rootApproved": true,
     "scope": "Read-only WAL plan; protected ready then observed; exact settings serialization, physical/logical data, matching keys and fresh current authority. No copy/staging/damage/reboot authority."
   },
-  "nextAction": "Sol is fixing Unit B internal fsync retry gaps; request independent retake on its exact new freeze. Astra continues disjoint WAL progress coding. Combine owning/UI only after both source freezes are accepted.",
+  "nextAction": "Obtain WAL progress exact freeze for independent review. V2 prerequisite coding continues in disjoint files; Unit B focused retake accepted. Run combined owning/UI after current source units are frozen and independently accepted.",
   "unchangedArtifacts": [
     "backend2",
     "Voice41",
@@ -32,5 +32,22 @@
       "B-R2 missing reservation/public ticket still require parent fsync before later barrier deletion."
     ],
     "actualInternalFsyncProbes": 4
+  },
+  "unitBRetake": {
+    "checkpoint": "/home/maslow/Maslow-ai-os/free-ai-build/initial-rejection-prep/unit-b/source-checkpoint-durability-fixes.json",
+    "checkpointSha256": "68afc173cca54cf6a08f66c4d40d943065d7348a2e762b8d748b1f9ab6c0e694",
+    "independentReport": "/home/maslow/Projects/Maslow/free-ai-hub-current/docs/evidence/2026-10-12-v1-rejection-cleanup-retake.json",
+    "independentReportSha256": "97f6382615378289a9f7d8a363e51fe73aaaa83cc7864e0c365c27dc48c5dca9",
+    "status": "focused-source-accepted-pending-combined-owning",
+    "tests": 17,
+    "internalDoubleFailureProbes": 4,
+    "newFindings": []
+  },
+  "v2Prerequisite": {
+    "path": "/home/maslow/Maslow-ai-os/free-ai-build/initial-rejection-prep/v2-dispatch-prerequisite-design.json",
+    "sha256": "6a88dcad627fd95d9020fe24d521e4d52725bab25ad3f54e74ce992f20988294",
+    "rootApproved": true,
+    "status": "implementation-active-unreviewed",
+    "scope": "Four source/four test files: gated fixed Root dispatcher, strict V2 initial parent/action and structural ticket validator. No typed rejection, cleanup or gate enablement."
   }
 }
