@@ -1,0 +1,29 @@
+{
+  "schema": 1,
+  "status": "read-only-installed-observations-complete-preview-blockers-retained",
+  "session": "6bcc1f5730cf4a3fb6d97717a5299883",
+  "executionExit": 0,
+  "manifestSha256": "3d7c78f79ec0eaa6676fd12320e9c350dc10b490bccbbfe4bde30b3e53bb92b5",
+  "independentAdmissionSha256": "be6db31e10a4203028d20b67ea7960153cb6a9764ec032fcb24477490e814b7a",
+  "stateSha256": "aa66d31808a8152d6457c8b29eb536a1d3983f82d080e4dcf1d98bf6825ca640",
+  "evidenceSealSha256": "932b581d2e675d9825bcb47a923d1b73701592bbf2dd0f3fc62c72ab8faf1b9f",
+  "ownedRetirement": "launchGroupRetired=true; exact container d5f38d216d098b6f0e14f0377796843d825f82820d20bd8ae04c3e2623698184 gone, docker ps empty after completion.",
+  "resources": "Existing shared lock, CPU2/guest4GiB/container6GiB/total8GiB; unchanged memory admission. No concurrent heavy job.",
+  "voiceDelivery": {
+    "normalCommand": "Root-owned executable /usr/bin/omarchy-install-voice, 1168 bytes, SHA256 ae4496691d3a9ab558f7031d8d7616688113ad65e8775571c6c9698c958ab927.",
+    "installed": "Voice absent; Hermes0.21.0-3 installed; no standalone Hub Voice bundle.",
+    "repository": "pacman -Si returned1 for Voice, Voice-local and Hermes; no metadata records from the current guest databases. No repository refresh or installation performed.",
+    "cache": "Cache directory present, no cached Voice archive.",
+    "blocker": "Normal setup command exists, but required Voice package delivery inputs are unavailable in this pristine guest. Establish an existing reviewed signed delivery path; do not hide this with a partial OS update or developer launcher."
+  },
+  "desktop": {
+    "observed": "Actual Quickshell PID995, Secret Service bus-name presence, one Hyprland instance and 1280x800 Virtual-1 monitor. Mapped omarchy-bar layer; no clients. Bounded priority<=4 journal summaries report zero entries.",
+    "diagnosticSeconds": 0.366,
+    "frameSha256": "7c350f0256b7814fc484ed0e9b25c2c145dafda57d098bff46ae81a897c3f4ca",
+    "frameInspection": "Root inspected actual retained PNG: dark screen with pointer, no visible bar or Hub. Process/layer readiness is not visual acceptance.",
+    "visualAccepted": false
+  },
+  "checks": "Real installed read-only package, command, repository/cache, service, compositor and late QMP frame observations. No optional installation, OS update, provider/account/keyring item access or ISO work.",
+  "nextAction": "Finish retained Hub artifact audit admission in parallel with bounded recovery source work. Resolve normal signed Voice bootstrap inputs using existing Hub delivery tooling before another installation guest. Diagnose black frame during an explicitly scoped interactive Hub check; no automatic ISO rebuild.",
+  "previewComplete": false
+}
