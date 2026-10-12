@@ -73,7 +73,7 @@
       "path": "/home/maslow/Projects/Maslow/free-ai-hub-current",
       "base_revision": "33940d2e8740b172b953cc3e091cbae1ba1cd303",
       "branch": "codex/free-cloud-ai-hub-current",
-      "implementation_revision": "545036affacb5f880d323083035cdd6fc894a1eb",
+      "implementation_revision": "c53d4e5",
       "previous_free_ai_worktree": "/home/maslow/Projects/Maslow/free-ai-hub",
       "accepted_craft_source_reference": "2666609002dce8bb6cc16511ef2125bccb18dbe9"
     },
@@ -423,7 +423,7 @@
       "worker": "current_recovery managed lifecycle contract/code; root integration",
       "actual_model": "gpt-6.1-sol/high implementation; gpt-6-astra/high independent review",
       "attempt": 2,
-      "last_checkpoint": "2026-10-11T23:18:19.728430+00:00",
+      "last_checkpoint": "2026-10-12T12:58:06.429284+00:00",
       "base_revision": "2a8c6eda15d92078fdd8656a879b1e93dd786a1d",
       "branch": "codex/free-cloud-ai-hub-current",
       "worktree": "/home/maslow/Projects/Maslow/free-ai-hub-current",
@@ -437,7 +437,9 @@
         "947348f0bfb285427936729d2c1861d0f03aa4e5",
         "9562f8e3d764954ff2fe4ce5aa20a40aa2b7a421",
         "690285be868fef835ec424905a03b94df44302cb",
-        "545036affacb5f880d323083035cdd6fc894a1eb"
+        "545036affacb5f880d323083035cdd6fc894a1eb",
+        "ccf2ea4",
+        "c53d4e5"
       ],
       "integration_commits": [
         "c856c683de8e66a43d326b435bbf73504f5ca6a2",
@@ -482,11 +484,12 @@
         "docs/programs/free-cloud-ai/evidence/2026-10-12-issuer-map-native-checkpoint.json",
         "docs/programs/free-cloud-ai/evidence/2026-10-12-voice41-scoped-artifact-checkpoint.json",
         "docs/programs/free-cloud-ai/evidence/2026-10-12-deferred-managed-mask-source-checkpoint.json",
-        "docs/programs/free-cloud-ai/evidence/2026-10-12-no-cache-source-and-guest-admission-checkpoint.json"
+        "docs/programs/free-cloud-ai/evidence/2026-10-12-no-cache-source-and-guest-admission-checkpoint.json",
+        "docs/programs/free-cloud-ai/evidence/2026-10-12-rejection-wal-source-checkpoint.json"
       ],
       "artifact_hashes": {},
-      "blocker": "Matched source preserves Craft native5 and admits verified Connect8; final Hub package, managed removal/reinstall and installed signed delivery/recovery remain incomplete.",
-      "next_action": "Finish authenticated rejection cleanup and remaining recovery cases, then build matched Hub and verify complete ownership/signature/installed flows."
+      "blocker": "Two source units accepted with 560 owning tests/no skips and UI. V1 decision cleanup is active; durable progress, V2 dispatcher, staging/damaged DB/reboot and actual installed recovery remain required.",
+      "next_action": "Complete V1 decision-only cleanup with independent review; implement the reviewed WAL no-copy reply-loss progress slice in disjoint ownership. Preserve the installed baseline and unchanged backend2/Voice41/Connect8 artifacts."
     },
     {
       "id": "FCAI-P2-WORK",
@@ -623,7 +626,7 @@
       "worker": "current_recovery managed lifecycle contract/code; root installed recovery integration",
       "actual_model": "gpt-6.1-sol/high implementation; root coordinator",
       "attempt": 1,
-      "last_checkpoint": "2026-10-12T08:21:56.993521+00:00",
+      "last_checkpoint": "2026-10-12T12:58:06.429284+00:00",
       "base_revision": "09721dff",
       "branch": "codex/free-cloud-ai",
       "worktree": "/home/maslow/Maslow-ai-os/free-ai-runtime",
@@ -635,7 +638,9 @@
         "9a90e545",
         "76fb5d08ca65662be1b16da1cce1eb0eee13f37b",
         "690285be868fef835ec424905a03b94df44302cb",
-        "545036affacb5f880d323083035cdd6fc894a1eb"
+        "545036affacb5f880d323083035cdd6fc894a1eb",
+        "ccf2ea4",
+        "c53d4e5"
       ],
       "integration_commits": [],
       "tests": [
@@ -670,11 +675,12 @@
         "docs/programs/free-cloud-ai/evidence/2026-10-12-voice41-scoped-artifact-checkpoint.json",
         "docs/programs/free-cloud-ai/evidence/2026-10-12-deferred-managed-mask-design-checkpoint.json",
         "docs/programs/free-cloud-ai/evidence/2026-10-12-deferred-managed-mask-source-checkpoint.json",
-        "docs/programs/free-cloud-ai/evidence/2026-10-12-no-cache-source-and-guest-admission-checkpoint.json"
+        "docs/programs/free-cloud-ai/evidence/2026-10-12-no-cache-source-and-guest-admission-checkpoint.json",
+        "docs/programs/free-cloud-ai/evidence/2026-10-12-rejection-wal-source-checkpoint.json"
       ],
       "artifact_hashes": {},
-      "blocker": "Fixedno-cache launch prerequisite sourceaccepted;540owning/UI pass. V1authenticatedforwarding/context/witness implementationactive; decisioncleanup, V2dispatcher, WAL/staging/damagedDB/reboot andinstalledrecovery required.",
-      "next_action": "Review V1managed authenticated forwarding and actualexit0/witness UnitA, then implement Rootdecision-only cleanup UnitB and separately scoped remaining recovery cases.",
+      "blocker": "Two source units accepted with 560 owning tests/no skips and UI. V1 decision cleanup is active; durable progress, V2 dispatcher, staging/damaged DB/reboot and actual installed recovery remain required.",
+      "next_action": "Complete V1 decision-only cleanup with independent review; implement the reviewed WAL no-copy reply-loss progress slice in disjoint ownership. Preserve the installed baseline and unchanged backend2/Voice41/Connect8 artifacts.",
       "coordinator_only": true
     },
     {
