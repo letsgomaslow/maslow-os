@@ -84,7 +84,7 @@
       "path": "/home/maslow/Projects/Maslow/free-ai-hub-current",
       "base_revision": "33940d2e8740b172b953cc3e091cbae1ba1cd303",
       "branch": "codex/free-cloud-ai-hub-current",
-      "implementation_revision": "bb66f9e053b5701d43ee98294498f089ff8a20eb",
+      "implementation_revision": "4def9b7cc916c5a71ccce20059c50fcd5d754fdd",
       "previous_free_ai_worktree": "/home/maslow/Projects/Maslow/free-ai-hub",
       "accepted_craft_source_reference": "2666609002dce8bb6cc16511ef2125bccb18dbe9"
     },
@@ -434,7 +434,7 @@
       "worker": "current_recovery managed lifecycle contract/code; root integration",
       "actual_model": "gpt-6.1-sol/high implementation; gpt-6-astra/high independent review",
       "attempt": 2,
-      "last_checkpoint": "2026-10-12T14:05:38.422637+00:00",
+      "last_checkpoint": "2026-10-12T14:44:55.241966+00:00",
       "base_revision": "2a8c6eda15d92078fdd8656a879b1e93dd786a1d",
       "branch": "codex/free-cloud-ai-hub-current",
       "worktree": "/home/maslow/Projects/Maslow/free-ai-hub-current",
@@ -453,7 +453,9 @@
         "c53d4e5db8de7b8d2957e5cccffba0b0f3020da7",
         "8f61dd2f9bd7cf9e8ebe9b6d3d34789b014c2061",
         "67fc348234aa65b66af3379d7e6f9faa744c89dd",
-        "bb66f9e053b5701d43ee98294498f089ff8a20eb"
+        "bb66f9e053b5701d43ee98294498f089ff8a20eb",
+        "c65c646722d6cf437f1b2159ff2d50400e8bfb18",
+        "4def9b7cc916c5a71ccce20059c50fcd5d754fdd"
       ],
       "integration_commits": [
         "c856c683de8e66a43d326b435bbf73504f5ca6a2",
@@ -501,11 +503,12 @@
         "docs/programs/free-cloud-ai/evidence/2026-10-12-no-cache-source-and-guest-admission-checkpoint.json",
         "docs/programs/free-cloud-ai/evidence/2026-10-12-rejection-wal-source-checkpoint.json",
         "docs/programs/free-cloud-ai/evidence/2026-10-12-combined-recovery-source-checkpoint.json",
-        "docs/programs/free-cloud-ai/evidence/2026-10-12-qa-pair-preparation-checkpoint.json"
+        "docs/programs/free-cloud-ai/evidence/2026-10-12-qa-pair-preparation-checkpoint.json",
+        "docs/programs/free-cloud-ai/evidence/2026-10-12-rejection-authority-source-checkpoint.json"
       ],
       "artifact_hashes": {},
-      "blocker": "Combined600owning/no skips/UI/shell/diff accepted. Expired preparing review authority, V2 negative handling, staged/damaged DB/reboot and installed/live recovery remain open.",
-      "next_action": "Implement the independently reduced expired V1 review authority in disjoint ownership; design V2 initial negative forwarding/cleanup read-only. Preserve clean installed baseline and unchanged artifacts."
+      "blocker": "631owning/no skips/UI/shell accepted. Standalone preservation and V2 expired review remain unfinished; damaged/staging/reboot and native/live recovery gates open.",
+      "next_action": "Implement reviewed standalone current-data preservation and independently review it. Design the small V2 expired-negative review in disjoint ownership. Preserve signed QA pair, accepted archives and pristine guest."
     },
     {
       "id": "FCAI-P2-WORK",
@@ -642,7 +645,7 @@
       "worker": "current_recovery managed lifecycle contract/code; root installed recovery integration",
       "actual_model": "gpt-6.1-sol/high implementation; root coordinator",
       "attempt": 1,
-      "last_checkpoint": "2026-10-12T14:05:38.422705+00:00",
+      "last_checkpoint": "2026-10-12T14:44:55.242011+00:00",
       "base_revision": "09721dff",
       "branch": "codex/free-cloud-ai",
       "worktree": "/home/maslow/Maslow-ai-os/free-ai-runtime",
@@ -659,7 +662,9 @@
         "c53d4e5db8de7b8d2957e5cccffba0b0f3020da7",
         "8f61dd2f9bd7cf9e8ebe9b6d3d34789b014c2061",
         "67fc348234aa65b66af3379d7e6f9faa744c89dd",
-        "bb66f9e053b5701d43ee98294498f089ff8a20eb"
+        "bb66f9e053b5701d43ee98294498f089ff8a20eb",
+        "c65c646722d6cf437f1b2159ff2d50400e8bfb18",
+        "4def9b7cc916c5a71ccce20059c50fcd5d754fdd"
       ],
       "integration_commits": [],
       "tests": [
@@ -698,11 +703,12 @@
         "docs/programs/free-cloud-ai/evidence/2026-10-12-rejection-wal-source-checkpoint.json",
         "docs/programs/free-cloud-ai/evidence/2026-10-12-recovery-units-active-checkpoint.json",
         "docs/programs/free-cloud-ai/evidence/2026-10-12-combined-recovery-source-checkpoint.json",
-        "docs/programs/free-cloud-ai/evidence/2026-10-12-rejection-authority-units-checkpoint.json"
+        "docs/programs/free-cloud-ai/evidence/2026-10-12-rejection-authority-units-checkpoint.json",
+        "docs/programs/free-cloud-ai/evidence/2026-10-12-rejection-authority-source-checkpoint.json"
       ],
       "artifact_hashes": {},
-      "blocker": "Expired V1 fresh-review routing fix is awaiting independent retake; V2 negative handling is still coding/testing. Remaining staged/damaged DB/reboot and installed recovery/live gates open.",
-      "next_action": "Accept or fix the expired V1 routing retake; obtain exact V2 negative source freeze for independent review. Run combined owning/UI once both focused freezes accepted.",
+      "blocker": "631owning/no skips/UI/shell accepted. Standalone preservation and V2 expired review remain unfinished; damaged/staging/reboot and native/live recovery gates open.",
+      "next_action": "Implement reviewed standalone current-data preservation and independently review it. Design the small V2 expired-negative review in disjoint ownership. Preserve signed QA pair, accepted archives and pristine guest.",
       "coordinator_only": true
     },
     {
@@ -858,8 +864,8 @@
     "worker_limit": 2,
     "integration": "No product/shared merge, host installation, production signing or publication. Program completed source commits only.",
     "active_workers": [
-      "boundary_review: gpt-6-astra/high, independent expired V1 review source check, no edits.",
-      "rejection_cleanup_review: gpt-6-astra/high, V2 initial typed rejection/witness/cleanup source author in disjoint managed files/tests."
+      "rejection_forwarding: gpt-6-sol/high, standalone verified current-data preservation in lease/progress/executor + scoped tests.",
+      "boundary_review: gpt-6-astra/high, read-only V2 expired-negative review design, no edits."
     ]
   },
   "user_priority": "Free AI through completion of approved scope. Craft development paused; do not resume it, merge product branches or publish production artifacts."

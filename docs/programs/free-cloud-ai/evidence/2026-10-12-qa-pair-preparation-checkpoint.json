@@ -33,5 +33,10 @@
   "hostTrustChanged": false,
   "hubBuilt": false,
   "previewComplete": false,
-  "nextAction": "Independently review public pair input scope and freeze final matched Hub source/recipe/context after remaining delivery/recovery units. Use public payload and public trust only in any build context; keep QA private key external."
+  "nextAction": "Independently review public pair input scope and freeze final matched Hub source/recipe/context after remaining delivery/recovery units. Use public payload and public trust only in any build context; keep QA private key external.",
+  "independentPublicInputReview": {
+    "path": "/home/maslow/Maslow-ai-os/free-ai-build/hub-bundle-prep/qa-pair-1/independent-public-input-review.json",
+    "sha256": "9083a6cddb6f09f4436a24b3e8e361fcd579cc9e73c5a5a1e7c806cb3d8a3aa5",
+    "verdict": "public-input-scope-accepted-no-installation"
+  }
 }
