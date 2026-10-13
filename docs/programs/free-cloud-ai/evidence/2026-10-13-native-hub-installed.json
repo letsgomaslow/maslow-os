@@ -1,0 +1,33 @@
+{
+  "schema": 1,
+  "status": "native-Hub-installed-optional-components-running-preview-incomplete",
+  "installation": {
+    "outputs": "/home/maslow/Maslow-ai-os/free-ai-build/hub-bundle-prep/native-preview-prep/native-install-2",
+    "steps": "Protected preflight,protected previousVoice37 copy and installed Hub apply all saved exit0. User completed local administrator prompt; Root independently inspected results.",
+    "installedHub": "0.3.9-1",
+    "archiveSha256": "f5222d795673af3f10581c0b7dc65e49e12beabf1cb306ad1de7512246c339cc",
+    "sourceCommit": "e0ebb476764fee5a7cabff3d0b786cbeba09838c",
+    "productParent": "b222265142b585fe50743ac5a705c8da39ac2b27"
+  },
+  "actualVerification": {
+    "packageIntegrity": "pacman-Qkk:73total files,0altered",
+    "mappedFiles": "43 exact immutable Git payloads and1 recipe-generated root manifest match installed bytes/size/mode/root UID/GID/single-link regular files. Initial mapping expected44 direct blobs; diagnosed missing generated manifest and checked it separately. No installed mismatch.",
+    "rootPublicAnchor": "sequence10 / manifestSHA dbce1a5b65b14a3380a083865c4e17fe19f99b30470c93fb52cb89c9972ecefb,exact approved local manifest",
+    "enrolledTrustSha256Unchanged": "1c0134a2171832127b6f6f607f8e5b18fc8d4bec51b4afe0e995d4859e74bb3f",
+    "voiceBeforeOptionalInstall": "0.1.5-37,stopped under owned runtime mask; retained root-owned cache archive independently rehashed9d7847e731003c3797204e16c66ed66c61e83bd013b823186eb07b31eec369a9",
+    "freeAiStatus": "Actual installed Hub returns installAvailabletrue,installed/configured/readyfalse. Truthful before optional component installation.",
+    "limits": "Protected trusted Hub rollback records and actual rollback not yet independently read/exercised; do not claim successful recovery. No live provider/account/audio/visual acceptance."
+  },
+  "optionalComponents": {
+    "command": "Installed /usr/bin/maslow-hubctl --json free-ai install",
+    "handoff": "Actual product reservation returned terminalLaunchedtrue/duplicatefalse; mapped Maslow OS terminalPID2009568 and running install user-helperPID2009705. No fake handoff/source launcher/direct opaque pacman install.",
+    "result": "Pending normal local administrator participation/actual installation result; backend absent andVoice37 at last query.",
+    "slot": "Root advisory shared-heavylock holder session31733 observes product progress. No concurrent Docker/build/VM. Native Hub pipeline CPU1/nice10; product component installer retains own security/process/package guards.",
+    "userParticipation": "Only normal fingerprint/login-password prompt in local product terminal; Root handles commands and saved results."
+  },
+  "next": "Read actual optional installer outcome; independently verify packaged backend2/Voice41,permissions/privateNode/source/provenance/preservation and cleanup. Use owning recovery for any pending failure. Only then private Groq product setup and bounded live typed/note/account/Voice tests; mandatory clean/fault guest and independent final review remain.",
+  "publication": false,
+  "productMerges": false,
+  "craft": "paused",
+  "previewComplete": false
+}
