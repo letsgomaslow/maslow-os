@@ -929,9 +929,9 @@
   ],
   "coordination": {
     "shared_owners": "Craft remains paused per owner handoff; preserve Craft Hub2666609 and Connect native5/source2e872f50 compatibility. Free AI edits only isolated worktrees; coordinate shared Hub/install/helper, Connect and Voice changes before installation.",
-    "build_serialization": "No heavy build active; CPU1 focused GO timing regression tests only. Serialize native recovery/builds under heavy-work.lock.",
+    "build_serialization": "No heavy job. Matched Hub0.3.12 preparation only; no build admission or native retry while recovery is unresolved.",
     "worker_limit": 2,
-    "integration": "Hub0.3.11 installed and verified. Voice43 update failed before package mutation; Voice41/backend2 retained. Installed recovery refused because Voice restarted during authentication; investigate caller before retry.",
+    "integration": "Hub0.3.11 installed and verified; Voice41/backend2 retained. GO timing fix1dc89cf passes692 owning+UI and independent review, not installed. Recovery retry with Voice watcher disabled failed verification after publishing recovery ticket/verifier/mask. Exact user-side failure diagnosis pending.",
     "active_workers": [
       "managed_go_fix",
       "hub_poststate_check"

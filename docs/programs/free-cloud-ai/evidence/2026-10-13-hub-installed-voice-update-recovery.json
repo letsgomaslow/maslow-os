@@ -33,7 +33,7 @@
     "managed_go_fix": "gpt-6.1-sol/high: isolated GO timing fix; focused CPU1 tests authorized",
     "hub_poststate_check": "independent recovery restart diagnosis and security review"
   },
-  "next_action": "Read current installed recovery result after user authentication; verify cleanup before restoring Voice panel. Finish independent GO-fix review and owning tests.",
+  "next_action": "Identify exact user recovery verification failure using safe read-only checks; keep Voice plugin disabled and owning mask intact. Matched Hub0.3.12 preparation proceeds separately; no installation until recovery settled.",
   "limits": [
     "Voice43 remains signed and uninstalled; reuse unchanged archive.",
     "Current pending absence is not proven; do not manually remove records or masks.",
@@ -50,6 +50,23 @@
     "pending_recovery": "free-ai-build/hub-bundle-prep/native-preview-prep/0311/recover-voice43-watcher-paused-i5daq7s7",
     "exec_session": 93155,
     "restore_after_settled": "omarchy plugin enable maslow.voice",
-    "warning": "Do not invoke voice-control status or reenable panel until installed recovery settles pending transaction."
+    "warning": "Do not invoke voice-control status or reenable panel until installed recovery settles pending transaction.",
+    "pending_recovery_result": {
+      "exit": 1,
+      "seconds": 143.389,
+      "message": "The current Free AI operation could not be verified. Its startup barrier and recovery material were retained.",
+      "observed_after": "Voice inactive/dead PID0; public ticket action free-ai-recover; verifier present; owning HOME mask /dev/null present. No records or barriers manually cleared."
+    }
+  },
+  "go_fix": {
+    "commit": "1dc89cf62778753d0687edd030e101fb506f45e7",
+    "focused": 58,
+    "owning": 692,
+    "failures": 0,
+    "skips": 0,
+    "ui": "passed",
+    "independent_review": "accepted",
+    "installed": false,
+    "evidence": "free-ai-build/hub-bundle-prep/hub-managed-update-fix-evidence/verification.json"
   }
 }
