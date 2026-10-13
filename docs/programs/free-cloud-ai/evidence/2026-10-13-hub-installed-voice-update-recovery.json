@@ -33,11 +33,23 @@
     "managed_go_fix": "gpt-6.1-sol/high: isolated GO timing fix; focused CPU1 tests authorized",
     "hub_poststate_check": "independent recovery restart diagnosis and security review"
   },
-  "next_action": "Identify Voice restart trigger; settle pending operation with installed recovery before any new install. Verify and independently review GO timing fix, then prepare only affected matched Hub package.",
+  "next_action": "Read current installed recovery result after user authentication; verify cleanup before restoring Voice panel. Finish independent GO-fix review and owning tests.",
   "limits": [
     "Voice43 remains signed and uninstalled; reuse unchanged archive.",
     "Current pending absence is not proven; do not manually remove records or masks.",
     "Post-43 managed operation exact-version support and rollback cache retention remain unresolved.",
     "Craft paused; no publication, merge or full preview acceptance."
-  ]
+  ],
+  "restart_diagnosis": {
+    "confirmed": "Desktop VoiceController watch reconnect calls control.connect(), which starts the service. Closing Voice panel alone leaves keepLoaded watcher active.",
+    "temporary_actions": [
+      "Closed Hub view using maslowHub close",
+      "Disabled only maslow.voice using supported plugin command",
+      "Stopped maslow-voice.service; confirmed inactive/dead PID0"
+    ],
+    "pending_recovery": "free-ai-build/hub-bundle-prep/native-preview-prep/0311/recover-voice43-watcher-paused-i5daq7s7",
+    "exec_session": 93155,
+    "restore_after_settled": "omarchy plugin enable maslow.voice",
+    "warning": "Do not invoke voice-control status or reenable panel until installed recovery settles pending transaction."
+  }
 }
