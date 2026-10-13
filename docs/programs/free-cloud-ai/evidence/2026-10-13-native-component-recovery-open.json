@@ -16,7 +16,7 @@
     "slot": "Shared heavy-lock monitor session78112 holds slot until terminal progress; previous install monitor31733 exited on interruption. No concurrent build/VM.",
     "result": "Pending; inspect actual outcome and retain pending barriers/records if recovery refuses. No speculative retry or manual stale-grant restoration."
   },
-  "review": "Existing boundary_review worker performs disjoint bounded read-only recovery contract/cleanup review; Root owns native actions. No source rebuild or new infrastructure.",
+  "review": "Existing boundary_review worker,actual gpt-6-astra/high,completed disjoint bounded read-only contract review. For the conditional EARLY legacy-fresh pre-package case, owning recovery must close unchanged via inspect,not resume install; verify retainedpair/endedhelpers/noALPM/stoppedcanonicalVoice/ownedmask/absence ofbackendstate-key. Only durable recovery-completed permits exact installer-created mask,ticket,Rootrecord cleanup; no service start or grant renewal. Actual Root phase/result still must be observed. No source rebuild or new infrastructure.",
   "next": "Read owning recovery outcome, verify terminal decision/barrier cleanup and unchanged package/user/key state. Follow accepted owning continuation only; if fresh abort is proven, use real Hub install again under compatible stopped-profile conditions. All live/account/audio/clean/fault and full restoration gates remain open.",
   "previewComplete": false,
   "publication": false,
