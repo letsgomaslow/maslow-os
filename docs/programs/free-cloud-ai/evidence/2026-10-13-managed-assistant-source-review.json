@@ -1,0 +1,47 @@
+{
+  "schema": 1,
+  "date": "2026-10-13",
+  "scope": "Independent source review of seven frozen managed-assistant files; no provider, account, native service or package action.",
+  "freezeSha256": "4d5549192dd5f1a464f320fc8c699858c4b95ca5ef8b3e5aafd759583f4a9afb",
+  "filesSha256": {
+    "voice/assistant_plugin/__init__.py": "553916a1bf89aa87ecc5e6b3e49ce372e31cca1a2c2be00916ea09bc454609ae",
+    "voice/assistant_worker.py": "66f6b68f06fc1ab1b5ad15dee5388475d0fe41c0eaed2d1fd137c68a8257277b",
+    "voice/maslow_voice/assistant_runtime.py": "d9e53fef89aa8a7834eff4032bffa9f9873507788250f025b4e221ee510b220c",
+    "voice/maslow_voice/tasks.py": "787a02353447238ce7328c1e1bb0ad99570e72c77b202537b945e6e68fe4eff8",
+    "voice/tests/test_assistant.py": "a777946f9f6cd01cfed124c2bc87f66b02912704c6db8305243529d885da4d31",
+    "voice/tests/test_assistant_runtime.py": "a079552d55bc078917f90feca8255b06ee083192f7b6877af18dd01d664613aa",
+    "voice/tests/test_tasks.py": "277b3550635f8add5816b63af5c4f305375a961532d8d09db06cd78f572df360"
+  },
+  "verdict": "Blocked by Stop-versus-running-quota interleaving before source acceptance/build.",
+  "finding": {
+    "id": "MANAGED-QUOTA-STOP-01",
+    "priority": "P1",
+    "location": "voice/maslow_voice/assistant_runtime.py AssistantClient.status and voice/maslow_voice/tasks.py TaskManager._run quota exception transition",
+    "problem": "The new running-status cooldown detection can raise from an in-flight status response after a concurrent user Stop has already persisted stopping. The outer quota exception handler unconditionally writes waiting_input, undoing the Stop state and exposing Continue semantics after cancellation. Excluding upstream status=stopping is insufficient because the returned status can be stale running.",
+    "actualInertResult": {
+      "afterStop": "stopping",
+      "afterStaleStatus": "waiting_input",
+      "error": "FREE_AI_QUOTA_PAUSED",
+      "released": true,
+      "stopCalls": 1
+    },
+    "probe": "/home/maslow/Maslow-ai-os/free-ai-build/hub-bundle-prep/managed-assistant-stop-quota-probe.py",
+    "probeSha256": "7a9c106960f6a8dc106fce800075523f33b932299f90bb0a34db62ede72a63a6",
+    "command": "PYTHONPATH=voice:free_ai:voice/tests /usr/lib/maslow-voice/venv/bin/python -B /home/maslow/Maslow-ai-os/free-ai-build/hub-bundle-prep/managed-assistant-stop-quota-probe.py",
+    "fixtureScope": "Actual TaskManager, AssistantClient and temporary SQLite task store. Held in-memory request response, mocked stop/process termination/router release; no socket, provider, account or service call. One CPU/nice10.",
+    "minimumFix": "At the quota exception transition, freshly inspect the task state and preserve current stopping/terminal precedence without an intervening await. Ensure owned process release and account cleanup still occur, without automatic resubmit or conversion back to waiting_input. Add deterministic Stop-during-status coverage and terminal-state protection; retain the normal running-to-waiting quota case."
+  },
+  "verifiedReviewPoints": [
+    "All seven frozen source SHA values and three recorded installed SDK static SHA values matched.",
+    "Installed Hermes agent_init explicitly interprets api_max_retries=1 as a single app-level attempt and auto_recovery_cycles=0 as disabling recovery. conversation_loop uses retry_count < max_retries; primary OpenAI construction in agent_runtime_helpers defaults max_retries to zero, avoiding an extra transport retry layer on the reviewed path.",
+    "Managed worker rejects missing or differing retry attributes after construction and retains the exact managed-tool allowlist. This is compatibility checking, not a guarantee for arbitrary future SDK versions.",
+    "Actual Hermes Runs emits event/tool with tool.started/tool.completed. Normalization retains only string type/tool_name/status fields; arguments, previews, results and reasoning fields are omitted. Legacy event shape remains supported.",
+    "Workspace-relative instructions clarify granted paths without modifying tool authorization, file validation or checked-note receipts.",
+    "Normal quota pause retains task capabilities and attempt/idempotency identity and releases the owned process/router reservation; it does not automatically resubmit. Completed/cancelled/stopping upstream statuses are exempt, but the separate local Stop race above remains."
+  ],
+  "testsAndLimits": {
+    "authorEvidence": "60 focused tests and network-isolated actual SDK profile probe reported in exact frozen checkpoint; not duplicated by reviewer.",
+    "independentExecution": "One deterministic adversarial interleaving, reproduced against actual source. No full suite or live provider call.",
+    "notAccepted": "Installed fix, Voice42 artifact, live document/note completion, live account cleanup, audio/hardware and quota-recovery behavior remain unaccepted. Long AF_UNIX heartbeat-path limitation remains separate and noncausal for this source finding."
+  }
+}

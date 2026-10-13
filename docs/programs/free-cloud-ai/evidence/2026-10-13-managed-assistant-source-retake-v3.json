@@ -1,0 +1,31 @@
+{
+  "schema": 1,
+  "date": "2026-10-13",
+  "scope": "Independent corrective review of Stop/quota execution identity and cleanup; no live or installed execution.",
+  "freezeSha256": "09e0e902b56e861983b731bab7a43218c4559bd5c370932d97f964a0b55716c7",
+  "priorBlockedReviewSha256": "be7bcc997f230e2f89ed3191b2fc6f0c9faa09e208645b89e49285ec5652b345",
+  "changedSourceSha256": {
+    "voice/maslow_voice/tasks.py": "2905635c19d73772b4bde14bb4ad01a267768e65a68ac89d7eece2186864e5ba",
+    "voice/tests/test_assistant.py": "95f0a4de4d3730b71169f0d8ea76104be3bbeabaac75822ffba7e4ad9ef965dd"
+  },
+  "identityCheck": "All seven source files matched the v3 freeze. Five unchanged files retain the initial SDK/retry/progress/path review scope.",
+  "verdict": "Accepted at source scope: both reproduced Stop/quota findings are corrected. Root may proceed to the owning suite and subsequent artifact preparation; this does not establish installed or live acceptance.",
+  "verifiedCorrections": [
+    "Captured attempt, run_id, session_id and connect_session fence quota state reconciliation and post-release cancellation. A current terminal state is preserved, and stopping becomes cancelled only after successful owned process release.",
+    "Late Stop responses apply neither stopping nor final account cleanup to a newer execution identity. The original interleaving is now exercised with actual TaskManager/AssistantClient: held old Stop, quota cleanup, explicit Continue to attempt1/queued, old reply; the exact new record remains unchanged.",
+    "Old cleanup releases only its owned client and preserves a newer client's reservation; account revoke errors cannot attach cleanup-needed metadata to a newer execution.",
+    "Owned cleanup failure retains stopping and reservation rather than claiming cancellation. No automatic resubmit, capability expansion, alternate provider or tool authorization change was introduced."
+  ],
+  "independentVerification": {
+    "command": "Four focused AssistantTests: test_stop_during_held_status_preserves_intent_and_finishes_after_owned_cleanup; test_old_quota_cleanup_cannot_cancel_or_revoke_a_newer_execution_session; test_late_account_revoke_failure_cannot_mark_a_newer_session; test_stop_with_failed_owned_cleanup_does_not_claim_cancellation",
+    "passed": 4,
+    "failed": 0,
+    "skipped": 0,
+    "seconds": 0.305,
+    "log": "/home/maslow/Maslow-ai-os/free-ai-build/hub-bundle-prep/managed-assistant-v3-independent-focused.log",
+    "logSha256": "c018a37d3433edad6f266926e033e216fba129af2c344e6500632627b19a6663",
+    "resources": "One CPU/nice10; installed private Voice Python; temporary task stores and inert HTTP/process/account adapters. No production data or credentials.",
+    "authorBroaderEvidence": "65 focused tests reported passing in frozen v3; unchanged full suite and actual SDK probe were not duplicated by reviewer."
+  },
+  "limits": "Original failure reports/probes and v1/v2/v3 freezes remain preserved. No product source edit, service change, provider call, keyring access, full owning suite, package build, installation or audio action by reviewer. Installed quota pause/Continue, document-to-note completion, live account cleanup, and native Voice42 acceptance remain future evidence. Long AF_UNIX heartbeat path limitation remains separate and unresolved."
+}

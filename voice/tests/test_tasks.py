@@ -49,6 +49,61 @@ class StoreTests(unittest.TestCase):
 
 
 class HermesTests(unittest.IsolatedAsyncioTestCase):
+    async def progress(self, events):
+        class Client:
+            async def events(self, run_id):
+                for event in events:
+                    yield event
+        with tempfile.TemporaryDirectory() as root:
+            store = TaskStore(root)
+            task, _ = store.create("progress", BRIEF, root, "gemini_live", "Fix navigation")
+            manager = TaskManager(store, AsyncMock(), AsyncMock())
+            try:
+                await manager._events(task["id"], Client(), "run")
+                return [event["data"] for event in store.events(task["id"]) if event["kind"] == "progress"]
+            finally:
+                await manager.close()
+                store.close()
+
+    async def test_current_hermes_tool_progress_maps_event_and_tool_without_private_content(self):
+        events = [
+            {"event": "run.started", "run_id": "run", "timestamp": 123},
+            {"event": "tool.started", "tool": "maslow_read_document", "preview": "private arguments", "args": {"path": "private.md"}},
+            {"event": "tool.completed", "tool": "maslow_read_document", "preview": "private document bytes", "duration": 0.5, "error": False},
+            {"event": "run.completed", "output": "private result", "status": "completed"},
+        ]
+        self.assertEqual(await self.progress(events), [
+            {"type": "run.started"},
+            {"type": "tool_start", "tool_name": "maslow_read_document"},
+            {"type": "tool_complete", "tool_name": "maslow_read_document"},
+            {"type": "run.completed", "status": "completed"},
+        ])
+
+    async def test_legacy_progress_keeps_existing_shape_and_privacy_whitelist(self):
+        events = [
+            {"type": "tool_start", "tool_name": "read_file", "status": "running", "preview": "private"},
+            {"type": "tool_progress", "tool_name": "read_file", "text": "private"},
+            {"type": "tool_complete", "tool_name": "read_file", "status": "completed", "result": "private"},
+            {"type": "approval.required", "command": "private command"},
+        ]
+        self.assertEqual(await self.progress(events), [
+            {"type": "tool_start", "tool_name": "read_file", "status": "running"},
+            {"type": "tool_progress", "tool_name": "read_file"},
+            {"type": "tool_complete", "tool_name": "read_file", "status": "completed"},
+            {"type": "approval.required"},
+        ])
+
+    async def test_unreviewed_events_and_nonstring_progress_fields_are_not_persisted(self):
+        events = [
+            {"event": "reasoning.available", "text": "private reasoning"},
+            {"event": "message.delta", "delta": "private answer"},
+            {"event": "tool.unknown", "tool": "private"},
+            {"type": ["tool_start"], "tool_name": "private"},
+            {"event": "tool.started", "tool": {"private": "arguments"}, "status": ["private"]},
+            {"type": "tool_start", "tool_name": "read_file"},
+        ]
+        self.assertEqual(await self.progress(events), [{"type": "tool_start"}, {"type": "tool_start", "tool_name": "read_file"}])
+
     async def test_codex_continue_reuses_the_saved_thread_on_a_new_attempt(self):
         class Client:
             def __init__(self):

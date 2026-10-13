@@ -1,0 +1,34 @@
+{
+  "schema": 1,
+  "date": "2026-10-13",
+  "freezeSha256": "102b34c560546be1638ddfef871c681a2244f618c2f0dd1cd941dae0b8176d83",
+  "priorReviewSha256": "7fd341142aa31510a0a0672a8a2b1f11b4005142b93e89e0bb4edc0261e79a08",
+  "changedSourceSha256": {
+    "voice/maslow_voice/tasks.py": "a027db180228facf6a32911591837eabe76aac087536f0a5fa153fa36e2ac1c8",
+    "voice/tests/test_assistant.py": "0e2607406e1d2c1eeae8b160e315db2774e52a49741d3fffddf3376623c61fe8"
+  },
+  "identityCheck": "All seven source hashes match the v2 freeze; five unchanged files retain prior review scope.",
+  "verdict": "Original quota-overwrites-Stop finding fixed; blocked by a late Stop response affecting a newer explicit Continue attempt.",
+  "fixedFinding": "Current stopping/terminal state is reread at the quota transition. Successful owned release precedes stopping-to-cancelled; failed release retains stopping and reservation; newer terminal outcomes are preserved. Three independent focused tests passed, including held status/cleanup/Stop response and cleanup failure.",
+  "finding": {
+    "id": "MANAGED-QUOTA-STOP-02",
+    "priority": "P1",
+    "location": "voice/maslow_voice/tasks.py TaskManager.action post-await client.stop reconciliation",
+    "problem": "The late Stop guard checks only terminal state, not the captured attempt/run identity. Quota cleanup can complete cancellation while Stop's HTTP response is still held. An explicit Continue then creates attempt1/queued. When attempt0's Stop response arrives, action writes stopping into attempt1. The final account-cleanup call can consequently act on the newer task state/session rather than the old operation.",
+    "reproduction": "Actual TaskManager and AssistantClient with temporary store: held old Stop reply; released stale running+quota response; owned cleanup yielded cancelled; actual action(continue) incremented attempt to1 and queued; released old Stop response; resulting attempt1 became stopping. Only new monitor startup was suppressed, with HTTP/process/router operations inert. No provider or account calls.",
+    "probe": "/home/maslow/Maslow-ai-os/free-ai-build/hub-bundle-prep/managed-assistant-late-stop-probe.py",
+    "probeSha256": "c7cd77431c73e79fc19923495aa8eae9d465349b9d7ce4ab386c63417dab89d2",
+    "minimumFix": "Bind post-stop mutation and related cleanup to the captured task attempt and run_id. If either changed, return/publish the current record without applying old cancellation state or cleanup to the newer attempt. Add held old Stop -> successful quota cleanup -> explicit Continue -> old reply regression, retaining same-attempt terminal protection."
+  },
+  "verification": {
+    "focusedTests": 3,
+    "passed": 3,
+    "failed": 0,
+    "skipped": 0,
+    "seconds": 0.230,
+    "log": "/home/maslow/Maslow-ai-os/free-ai-build/hub-bundle-prep/managed-assistant-v2-independent-focused.log",
+    "logSha256": "6b87d6ba6d6f23162f4195ad2ca3cd4e0f87d367fee367f1e7fa8e61b9d7ed18",
+    "resources": "One CPU/nice10, installed private Voice interpreter, temporary task store only."
+  },
+  "limits": "No source edits, full suite, provider, installed patch, service, keyring, account, build or native action. Original and v2 freezes/failures remain preserved. Live note, installed retry behavior and audio acceptance remain pending."
+}

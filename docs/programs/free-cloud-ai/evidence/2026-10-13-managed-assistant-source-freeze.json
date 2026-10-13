@@ -1,0 +1,91 @@
+{
+  "recorded_at_utc": "2026-10-13T05:05:17.996326+00:00",
+  "scope": "Uncommitted managed assistant source fix; independent review pending; installed runtime unchanged.",
+  "base_commit": "1dfb7244207f28a6eab57d1001fe247a2189faf0",
+  "source_sha256": {
+    "voice/assistant_plugin/__init__.py": "553916a1bf89aa87ecc5e6b3e49ce372e31cca1a2c2be00916ea09bc454609ae",
+    "voice/assistant_worker.py": "66f6b68f06fc1ab1b5ad15dee5388475d0fe41c0eaed2d1fd137c68a8257277b",
+    "voice/maslow_voice/assistant_runtime.py": "d9e53fef89aa8a7834eff4032bffa9f9873507788250f025b4e221ee510b220c",
+    "voice/maslow_voice/tasks.py": "787a02353447238ce7328c1e1bb0ad99570e72c77b202537b945e6e68fe4eff8",
+    "voice/tests/test_assistant.py": "a777946f9f6cd01cfed124c2bc87f66b02912704c6db8305243529d885da4d31",
+    "voice/tests/test_assistant_runtime.py": "a079552d55bc078917f90feca8255b06ee083192f7b6877af18dd01d664613aa",
+    "voice/tests/test_tasks.py": "277b3550635f8add5816b63af5c4f305375a961532d8d09db06cd78f572df360"
+  },
+  "installed_sdk_reported_version": "hermes-agent 0.21.6-3",
+  "installed_sdk_static_sha256": {
+    "/opt/hermes-agent/agent/agent_init.py": "6e10efdbedc52a9204538a66eeacd320efb6add23a784a45f28fb70e5a5aa8f3",
+    "/opt/hermes-agent/gateway/platforms/api_server_runs.py": "67315fb146f3f5d124675c4dd0e2c5fbe233618c94af2799c438175592dfba97",
+    "/opt/hermes-agent/gateway/shutdown_watchdog.py": "e4febf3cc51e7117e3b2f7daf3dd3c85889f5a63956340409ed06b5d7b73a71f"
+  },
+  "sanitized_native_task_findings": {
+    "task_id": "c23d3872-493c-495e-a3d0-1f59b4045921",
+    "tool_call_names": [
+      "maslow_read_document",
+      "maslow_read_document"
+    ],
+    "first_read": "Absolute selected fixture path rejected with INVALID_DOCUMENT.",
+    "second_read": "Relative selected fixture path succeeded; result keys path/content/size/sha256.",
+    "subsequent_failure_classes": [
+      "RateLimitError"
+    ],
+    "subsequent_known_error_markers": [
+      "rate_limit_exceeded",
+      "429",
+      "cooldown"
+    ],
+    "retry_outlasting_cooldown": "Inference only; authoritative timestamp comparison not performed.",
+    "private_material_exported": false
+  },
+  "fix": [
+    "Use reviewed Hermes agent.api_max_retries=1 and agent.auto_recovery_cycles=0; fail closed if actual agent attributes differ or are absent.",
+    "Consult authoritative router cooldown while Runs status is started/pending/running as well as failed/interrupted; preserve completed/cancelled/stopping results.",
+    "Explicitly instruct exact workspace-relative granted document/note paths.",
+    "Normalize actual SDK event/tool and tool.started/tool.completed into legacy type/tool_name and tool_start/tool_complete; persist only string type/tool_name/status fields."
+  ],
+  "sdk_static_contract_proof": [
+    "agent/agent_init.py:1432-1446 reads agent.api_max_retries and agent.auto_recovery_cycles into _api_max_retries/_auto_recovery_cycles; defaults 3/5.",
+    "gateway/platforms/api_server_runs.py:93-97 maps actual tool.started/tool.completed payloads to tool; previews contain arguments/results and must be omitted.",
+    "gateway/platforms/api_server_runs.py:176-178 emits event rather than type; HermesClient.events yields the parsed dictionary unchanged.",
+    "gateway/shutdown_watchdog.py:191-202 hardcodes socket under HERMES_HOME/state; no dedicated shorter socket override found in that module/constants."
+  ],
+  "verification": {
+    "focused_command": "PYTHONPATH=voice:free_ai:voice/tests /usr/lib/maslow-voice/venv/bin/python -m unittest test_assistant test_assistant_accounts test_assistant_runtime test_tasks",
+    "tests": 60,
+    "failures": 0,
+    "errors": 0,
+    "skips": 0,
+    "elapsed_seconds": 1.508,
+    "diff_check": "passed",
+    "actual_sdk_probe": {
+      "command": "unshare -Urn /usr/lib/maslow-voice/venv/bin/python free_ai/tests/hermes_profile_probe.py (minimal environment; captured output sanitized)",
+      "exit_code": 0,
+      "inference_submitted": false,
+      "network_access": false,
+      "result": {
+        "tools": [
+          "maslow_create_note",
+          "maslow_list_documents",
+          "maslow_read_document"
+        ],
+        "skip_context_files": true,
+        "memory_store": false,
+        "memory_manager": false,
+        "api_max_retries": 1,
+        "auto_recovery_cycles": 0
+      }
+    }
+  },
+  "separate_limitation": "Native long profile triggered noncausal heartbeat OSError/AF_UNIX path too long. No supported minimal dedicated short socket override found; no path framework or SDK monkeypatch added.",
+  "not_performed": [
+    "live API retries",
+    "installed patches",
+    "service changes",
+    "package builds",
+    "heavy suite"
+  ],
+  "gates": {
+    "independent_review": false,
+    "installed_fix": false,
+    "live_selected_documents_and_note": false
+  }
+}

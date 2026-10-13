@@ -31,6 +31,8 @@ def install_boundary():
             expected = TOOLS | ({"maslow_read_calendar"} if os.environ.get("MASLOW_ASSISTANT_ACCOUNTS") == "1" else set())
             if set(self.valid_tool_names) != expected:
                 raise RuntimeError("Managed assistant tool compatibility gate failed: " + json.dumps(sorted(self.valid_tool_names)))
+            if getattr(self, "_api_max_retries", None) != 1 or getattr(self, "_auto_recovery_cycles", None) != 0:
+                raise RuntimeError("Managed assistant retry compatibility gate failed")
 
     run_agent.AIAgent = ManagedAgent
     return ManagedAgent
@@ -50,7 +52,8 @@ def main():
             api_key="local-probe-only", quiet_mode=True, platform="api_server")
         print(json.dumps({"tools": sorted(agent.valid_tool_names), "skip_context_files": agent.skip_context_files,
             "memory_store": getattr(agent, "_memory_store", None) is not None,
-            "memory_manager": getattr(agent, "_memory_manager", None) is not None}))
+            "memory_manager": getattr(agent, "_memory_manager", None) is not None,
+            "api_max_retries": agent._api_max_retries, "auto_recovery_cycles": agent._auto_recovery_cycles}))
         return
     if sys.argv[1:]:
         raise SystemExit(1)

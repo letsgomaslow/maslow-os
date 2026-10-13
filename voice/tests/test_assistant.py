@@ -205,6 +205,263 @@ class AssistantTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(cancelled["state"], "cancelled")
         self.assertFalse(self.store.active())
 
+    async def test_running_managed_quota_parks_task_and_releases_process_without_resubmit(self):
+        from maslow_voice.assistant_runtime import AssistantClient
+        process = Mock(returncode=None)
+        router = Mock(cooldown_message=Mock(return_value="Use Continue after the cooldown."), release=AsyncMock())
+        client = AssistantClient("http://127.0.0.1:18574", "fixture-token", process, router, "fixture-owner")
+        client.request = AsyncMock(side_effect=[{"run_id": "managed"}, {"status": "running"}])
+        self.manager.assistant_factory = AsyncMock(return_value=client)
+        with patch("maslow_voice.assistant_runtime._terminate_hermes_process_group", new_callable=AsyncMock) as terminate:
+            task = await self.manager.submit_assistant("running-quota", "Save a note", str(self.workspace), {"note": "new.md"})
+            await asyncio.gather(*list(self.manager.monitors.values()))
+        saved = self.store.get(task["id"])
+        self.assertEqual(saved["state"], "waiting_input")
+        self.assertEqual(saved["error"]["code"], "FREE_AI_QUOTA_PAUSED")
+        self.assertEqual(saved["granted_capabilities"], task["granted_capabilities"])
+        self.assertEqual(saved["attempt"], task["attempt"])
+        self.assertEqual(client.request.await_count, 2, "one submit and one status; no automatic resubmit")
+        terminate.assert_awaited_once_with(process)
+        router.release.assert_awaited_once_with("fixture-owner")
+        self.assertTrue(client.released)
+        self.assertFalse(self.manager.assistant_reservations)
+        self.assertFalse((self.workspace / "new.md").exists())
+
+    async def test_stop_during_held_status_preserves_intent_and_finishes_after_owned_cleanup(self):
+        from maslow_voice.assistant_runtime import AssistantClient
+        for hold_stop, terminal_during_cleanup, continue_before_stop_reply in ((False, False, False), (True, False, False), (False, True, False), (True, False, True)):
+            with self.subTest(hold_stop=hold_stop, terminal_during_cleanup=terminal_during_cleanup, continue_before_stop_reply=continue_before_stop_reply):
+                status_started, status_reply = asyncio.Event(), asyncio.Event()
+                stop_started, stop_reply = asyncio.Event(), asyncio.Event()
+                cleanup_started, cleanup_done = asyncio.Event(), asyncio.Event()
+                if not hold_stop:
+                    stop_reply.set()
+                process = Mock(returncode=None)
+                router = Mock(cooldown_message=Mock(return_value="Use Continue after the cooldown."), release=AsyncMock())
+                client = AssistantClient("http://127.0.0.1:18574", "fixture-token", process, router, "fixture-owner")
+
+                async def request(url, method="GET", *args, **kwargs):
+                    if method == "POST" and url.endswith("/v1/runs"):
+                        return {"run_id": "managed"}
+                    if method == "POST" and url.endswith("/stop"):
+                        stop_started.set()
+                        await stop_reply.wait()
+                        return {"status": "stopping"}
+                    self.assertEqual(method, "GET")
+                    status_started.set()
+                    await status_reply.wait()
+                    return {"status": "running"}
+
+                async def terminate(owned):
+                    self.assertIs(owned, process)
+                    cleanup_started.set()
+                    await cleanup_done.wait()
+                    process.returncode = 0
+
+                client.request = AsyncMock(side_effect=request)
+                self.manager.assistant_factory = AsyncMock(return_value=client)
+                stop = None
+                with patch("maslow_voice.assistant_runtime._terminate_hermes_process_group", side_effect=terminate) as terminate_owned:
+                    try:
+                        task = await self.manager.submit_assistant("stop-quota-" + str(hold_stop) + str(terminal_during_cleanup) + str(continue_before_stop_reply), "Save a note", str(self.workspace), {"note": "new.md"})
+                        await asyncio.wait_for(status_started.wait(), 2)
+                        stop = asyncio.create_task(self.manager.action(task["id"], "cancel"))
+                        await asyncio.wait_for(stop_started.wait(), 2)
+                        if not hold_stop:
+                            self.assertEqual((await stop)["state"], "stopping")
+                        status_reply.set()
+                        await asyncio.wait_for(cleanup_started.wait(), 2)
+                        self.assertEqual(self.store.get(task["id"])["state"], "stopping", "Stop remains pending until owned cleanup finishes")
+                        self.assertIsNone(self.store.get(task["id"])["error"])
+                        expected_error = {"code": "LOCAL_CANCELLED", "message": "Stopped."} if terminal_during_cleanup else None
+                        if terminal_during_cleanup:
+                            self.store.update(task["id"], state="cancelled", error=expected_error)
+                        cleanup_done.set()
+                        await asyncio.gather(*list(self.manager.monitors.values()))
+                        self.assertEqual(self.store.get(task["id"])["state"], "cancelled")
+                        if continue_before_stop_reply:
+                            with patch.object(self.manager, "_start") as start:
+                                continued = await self.manager.action(task["id"], "continue", "Continue after the cooldown.")
+                            start.assert_called_once_with(continued)
+                            self.assertEqual(continued["attempt"], task["attempt"] + 1)
+                        stop_reply.set()
+                        if hold_stop:
+                            stopped = await stop
+                            if continue_before_stop_reply:
+                                self.assertEqual(stopped, continued, "old Stop response cannot mutate a newer attempt")
+                            else:
+                                self.assertEqual(stopped["state"], "cancelled", "a late Stop response cannot resurrect stopping")
+                    finally:
+                        status_reply.set()
+                        stop_reply.set()
+                        cleanup_done.set()
+                        if stop:
+                            await asyncio.gather(stop, return_exceptions=True)
+                        await asyncio.gather(*list(self.manager.monitors.values()))
+                saved = self.store.get(task["id"])
+                self.assertEqual(saved["state"], "queued" if continue_before_stop_reply else "cancelled")
+                self.assertEqual(saved["error"], expected_error, "owned cleanup preserves any newer terminal outcome")
+                self.assertEqual(saved["granted_capabilities"], task["granted_capabilities"])
+                self.assertEqual(saved["attempt"], task["attempt"] + int(continue_before_stop_reply))
+                self.assertEqual(client.request.await_count, 3, "one submit, one status and one Stop")
+                terminate_owned.assert_awaited_once_with(process)
+                router.release.assert_awaited_once_with("fixture-owner")
+                self.assertTrue(client.released)
+                self.assertEqual(process.returncode, 0)
+                self.assertFalse(self.manager.assistant_reservations)
+                if not continue_before_stop_reply:
+                    self.assertFalse(self.store.active())
+                self.assertNotIn("waiting_input", [event["data"].get("state") for event in self.store.events(task["id"])])
+                self.assertFalse((self.workspace / "new.md").exists())
+
+    async def test_old_quota_cleanup_cannot_cancel_or_revoke_a_newer_execution_session(self):
+        from maslow_voice.assistant_runtime import AssistantClient
+        status_started, status_reply = asyncio.Event(), asyncio.Event()
+        cleanup_started, cleanup_done = asyncio.Event(), asyncio.Event()
+        process = Mock(returncode=None)
+        router = Mock(cooldown_message=Mock(return_value="Use Continue after the cooldown."), release=AsyncMock())
+        client = AssistantClient("http://127.0.0.1:18574", "fixture-token", process, router, "fixture-owner")
+
+        async def request(url, method="GET", *args, **kwargs):
+            if method == "POST":
+                return {"status": "stopping"} if url.endswith("/stop") else {"run_id": "managed"}
+            status_started.set()
+            await status_reply.wait()
+            return {"status": "running"}
+
+        async def terminate(owned):
+            cleanup_started.set()
+            await cleanup_done.wait()
+            process.returncode = 0
+
+        client.request = AsyncMock(side_effect=request)
+        self.manager.assistant_factory = AsyncMock(return_value=client)
+        self.manager.account_bridge = Mock(revoke=AsyncMock())
+        worker = None
+        newer_client = Mock(release=AsyncMock())
+        with patch("maslow_voice.assistant_runtime._terminate_hermes_process_group", side_effect=terminate) as terminate_owned:
+            try:
+                task = await self.manager.submit_assistant("old-cleanup-new-session", "Save a note", str(self.workspace), {"note": "new.md"})
+                worker = self.manager.monitors[task["id"]]
+                await asyncio.wait_for(status_started.wait(), 2)
+                await self.manager.action(task["id"], "cancel")
+                status_reply.set()
+                await asyncio.wait_for(cleanup_started.wait(), 2)
+                self.store.update(task["id"], state="cancelled")
+                with patch.object(self.manager, "_start"):
+                    continued = await self.manager.action(task["id"], "continue", "Continue after the cooldown.")
+                self.assertEqual(continued["attempt"], task["attempt"] + 1)
+                expected = self.store.update(task["id"], state="stopping", run_id="new-run", session_id="new-session",
+                    connect_session={"sessionId": "new-account-grant"})
+                self.manager.clients[task["id"]] = newer_client
+                cleanup_done.set()
+                await worker
+            finally:
+                status_reply.set()
+                cleanup_done.set()
+                if worker:
+                    await asyncio.gather(worker, return_exceptions=True)
+        self.assertEqual(self.store.get(task["id"]), expected)
+        self.assertEqual(expected["granted_capabilities"], task["granted_capabilities"])
+        self.manager.account_bridge.revoke.assert_not_awaited()
+        newer_client.release.assert_not_awaited()
+        terminate_owned.assert_awaited_once_with(process)
+        router.release.assert_awaited_once_with("fixture-owner")
+        self.assertIn(task["id"], self.manager.assistant_reservations, "old cleanup cannot clear a newer client's reservation")
+
+    async def test_late_account_revoke_failure_cannot_mark_a_newer_session(self):
+        revoke_started, revoke_reply = asyncio.Event(), asyncio.Event()
+
+        async def revoke(task):
+            revoke_started.set()
+            await revoke_reply.wait()
+            raise VoiceError("FIXTURE_REVOKE_FAILED", "Fixture failure.")
+
+        self.manager.account_bridge = Mock(revoke=AsyncMock(side_effect=revoke))
+        task = await self.create({})
+        old = self.store.update(task["id"], state="stopping", run_id="old-run", session_id="old-session",
+            connect_session={"sessionId": "old-account-grant"})
+        worker = asyncio.create_task(self.manager._revoke_finished_accounts(old))
+        try:
+            await asyncio.wait_for(revoke_started.wait(), 2)
+            expected = self.store.update(task["id"], state="stopping", attempt=old["attempt"] + 1,
+                run_id="new-run", session_id="new-session")
+        finally:
+            revoke_reply.set()
+            await worker
+        self.assertEqual(self.store.get(task["id"]), expected)
+        self.manager.account_bridge.revoke.assert_awaited_once_with(old)
+        self.assertFalse(self.store.get(task["id"]).get("account_cleanup_needed", False))
+
+    async def test_stop_with_failed_owned_cleanup_does_not_claim_cancellation(self):
+        from maslow_voice.assistant_runtime import AssistantClient
+        status_started, status_reply = asyncio.Event(), asyncio.Event()
+        process = Mock(returncode=None)
+        router = Mock(cooldown_message=Mock(return_value="Use Continue after the cooldown."), release=AsyncMock())
+        client = AssistantClient("http://127.0.0.1:18574", "fixture-token", process, router, "fixture-owner")
+
+        async def request(url, method="GET", *args, **kwargs):
+            if method == "POST":
+                return {"status": "stopping"} if url.endswith("/stop") else {"run_id": "managed"}
+            status_started.set()
+            await status_reply.wait()
+            return {"status": "running"}
+
+        client.request = AsyncMock(side_effect=request)
+        self.manager.assistant_factory = AsyncMock(return_value=client)
+        worker = None
+        with patch("maslow_voice.assistant_runtime._terminate_hermes_process_group", new_callable=AsyncMock, side_effect=RuntimeError("fixture cleanup failure")) as terminate:
+            try:
+                task = await self.manager.submit_assistant("stop-quota-cleanup-failure", "Save a note", str(self.workspace), {"note": "new.md"})
+                worker = self.manager.monitors[task["id"]]
+                await asyncio.wait_for(status_started.wait(), 2)
+                self.assertEqual((await self.manager.action(task["id"], "cancel"))["state"], "stopping")
+                status_reply.set()
+                with self.assertRaisesRegex(RuntimeError, "fixture cleanup failure"):
+                    await worker
+            finally:
+                status_reply.set()
+                if worker:
+                    await asyncio.gather(worker, return_exceptions=True)
+        saved = self.store.get(task["id"])
+        self.assertEqual(saved["state"], "stopping")
+        self.assertIsNone(saved["error"])
+        self.assertEqual(saved["granted_capabilities"], task["granted_capabilities"])
+        self.assertEqual(saved["attempt"], task["attempt"])
+        self.assertIsNone(process.returncode)
+        self.assertIn(task["id"], self.manager.assistant_reservations)
+        self.assertEqual(client.request.await_count, 3)
+        terminate.assert_awaited_once_with(process)
+        router.release.assert_awaited_once_with("fixture-owner")
+        self.assertFalse({"cancelled", "waiting_input"} & {event["data"].get("state") for event in self.store.events(task["id"])})
+
+    async def test_quota_response_cannot_overwrite_a_current_terminal_task(self):
+        from maslow_voice.assistant_runtime import AssistantClient
+        status_started, status_reply = asyncio.Event(), asyncio.Event()
+        router = Mock(cooldown_message=Mock(return_value="Use Continue after the cooldown."), release=AsyncMock())
+        client = AssistantClient("http://127.0.0.1:18574", "fixture-token", Mock(returncode=None), router, "fixture-owner")
+
+        async def request(url, method="GET", *args, **kwargs):
+            if method == "POST":
+                return {"run_id": "managed"}
+            status_started.set()
+            await status_reply.wait()
+            return {"status": "running"}
+
+        client.request = AsyncMock(side_effect=request)
+        self.manager.assistant_factory = AsyncMock(return_value=client)
+        with patch("maslow_voice.assistant_runtime._terminate_hermes_process_group", new_callable=AsyncMock):
+            try:
+                task = await self.manager.submit_assistant("terminal-quota", "Draft text", str(self.workspace), {})
+                await asyncio.wait_for(status_started.wait(), 2)
+                expected = self.store.update(task["id"], state="cancelled", error={"code": "LOCAL_CANCELLED", "message": "Stopped."})
+            finally:
+                status_reply.set()
+                await asyncio.gather(*list(self.manager.monitors.values()))
+        self.assertEqual(self.store.get(task["id"]), expected)
+        router.release.assert_awaited_once_with("fixture-owner")
+        self.assertTrue(client.released)
+
     async def test_model_claim_cannot_complete_a_requested_note_without_checked_bytes(self):
         class Client:
             async def submit(self, task):

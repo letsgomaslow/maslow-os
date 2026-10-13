@@ -11,6 +11,11 @@ from .store import TERMINAL
 DEAD_COORDINATOR_ERRORS = {"OFFLINE_UNAVAILABLE", "OFFLINE_HERMES_EXITED"}
 
 
+def _same_execution(task, owner):
+    return task.get("attempt", 0) == owner.get("attempt", 0) and all(
+        task.get(key) == owner.get(key) for key in ("run_id", "session_id", "connect_session"))
+
+
 def _capabilities(agent, mode=None):
     return {"steer": agent in {"codex", "hermes"} and not (agent == "codex" and mode == "offline"),
             "continue": agent in {"codex", "claude", "hermes"}}
@@ -252,11 +257,14 @@ class TaskManager:
 
     async def _run(self, task_id):
         task = self.store.get(task_id)
+        owned_task = task
         lock = self.project_locks.setdefault(task["project"], asyncio.Lock())
         stream, client = None, None
+        cancel_after_release = False
         try:
             async with lock:
                 task = self.store.get(task_id)
+                owned_task = task
                 if task["state"] in TERMINAL | {"proposed"}:
                     return
                 if self.admission:
@@ -270,6 +278,7 @@ class TaskManager:
                         if not self.account_bridge:
                             raise VoiceError("MANAGED_ACCOUNTS_UNAVAILABLE", "The accepted managed account bridge is unavailable.")
                         task = await self.account_bridge.ensure(task, self.store)
+                        owned_task = task
                         task = self.store.get(task_id)
                         if task["state"] in TERMINAL | {"stopping"}:
                             return
@@ -286,6 +295,7 @@ class TaskManager:
                     response = await client.submit(task)
                     stopped = self.store.get(task_id)["state"] == "stopping"
                     task = self.store.update(task_id, state="stopping" if stopped else "accepted", run_id=response["run_id"], session_id=task.get("session_id") or task_id)
+                    owned_task = task
                     if stopped:
                         await client.stop(task["run_id"])
                     await self.publish()
@@ -347,9 +357,20 @@ class TaskManager:
             if exc.code in DEAD_COORDINATOR_ERRORS:
                 await self._interrupt_dead_coordinator(task_id, client)
                 return
-            if self.children:
+            quota_pause = task.get("execution_connection") == "free-cloud" and exc.code == "FREE_AI_QUOTA_PAUSED"
+            if self.children and not quota_pause:
                 await self.children.cancel(task_id)
             task = self.store.get(task_id)
+            if quota_pause:
+                if not _same_execution(task, owned_task):
+                    return
+                if task["state"] in TERMINAL:
+                    return
+                if task["state"] == "stopping":
+                    # Stop may have completed while the status request was in
+                    # flight. Finish that intent only after owned cleanup.
+                    cancel_after_release = True
+                    return
             state = "waiting_input" if task.get("execution_connection") == "free-cloud" and exc.code == "FREE_AI_QUOTA_PAUSED" else "interrupted" if task["state"] == "submitting" or task.get("run_id") else "failed"
             self.store.update(task_id, state=state, error=exc.as_dict())
             await self.publish()
@@ -366,16 +387,24 @@ class TaskManager:
             if task.get("execution_connection") == "free-cloud":
                 if callable(release):
                     await release()
-                self.assistant_reservations.discard(task_id)
-                await self._revoke_finished_accounts(self.store.get(task_id))
+                    current = self.store.get(task_id)
+                    if cancel_after_release and _same_execution(current, owned_task) and current["state"] == "stopping":
+                        self.store.update(task_id, state="cancelled", error=None)
+                        await self.publish()
+                if client is None or self.clients.get(task_id) is client:
+                    self.assistant_reservations.discard(task_id)
+                current = self.store.get(task_id)
+                if _same_execution(current, owned_task):
+                    await self._revoke_finished_accounts(current)
 
     async def _revoke_finished_accounts(self, task):
-        if task["state"] in {"completed", "cancelled", "stopping"} and task.get("connect_session") and self.account_bridge:
+        if task["state"] in {"completed", "cancelled", "stopping"} and task.get("connect_session") and self.account_bridge and _same_execution(self.store.get(task["id"]), task):
             try:
                 await self.account_bridge.revoke(task)
             except VoiceError:
-                self.store.update(task["id"], event="account_cleanup_needed", account_cleanup_needed=True)
-                await self.publish()
+                if _same_execution(self.store.get(task["id"]), task):
+                    self.store.update(task["id"], event="account_cleanup_needed", account_cleanup_needed=True)
+                    await self.publish()
 
     async def _interrupt_dead_coordinator(self, task_id, client):
         record_exit = getattr(client, "record_process_exit", None)
@@ -390,12 +419,21 @@ class TaskManager:
         await self.publish()
 
     async def _events(self, task_id, client, run_id):
+        aliases = {"tool.started": "tool_start", "tool.completed": "tool_complete"}
         try:
             async for event in client.events(run_id):
                 # Persist progress facts, not arbitrary raw provider logs or reasoning.
-                kind = str(event.get("type", ""))
+                # Current Hermes Runs uses event/tool; older adapters use
+                # type/tool_name. Keep the persisted progress shape stable.
+                kind = event.get("type", event.get("event", ""))
+                if not isinstance(kind, str):
+                    continue
+                if kind in aliases:
+                    event = {"type": aliases[kind], "tool_name": event.get("tool"), "status": event.get("status")}
+                    kind = aliases[kind]
                 if kind in {"tool_start", "tool_complete", "tool_progress", "run.started", "run.completed", "approval.required"}:
                     safe = {key: event[key] for key in ("type", "tool_name", "status") if isinstance(event.get(key), str)}
+                    safe["type"] = kind
                     self.store._event(task_id, "progress", safe)
                     await self.publish()
         except (Exception, asyncio.CancelledError):
@@ -406,6 +444,7 @@ class TaskManager:
         if operation in {"start", "continue", "steer", "approve", "deny"} and self.admission:
             self.admission()
         task = self.store.get(task_id)
+        action_task = task
         if operation == "start" and task["state"] == "proposed":
             if task.get("selected_agent") == "codex" and self._active_codex_task(task_id):
                 raise VoiceError("CODEX_TASK_ACTIVE", "Codex is already working on another task. Finish or stop it before starting this task.")
@@ -487,9 +526,11 @@ class TaskManager:
                 try:
                     await client.stop(task["run_id"])
                 finally:
-                    if self.children:
+                    if self.children and _same_execution(self.store.get(task_id), action_task):
                         await self.children.cancel(task_id)
-                result = self.store.update(task_id, state="stopping")
+                result = self.store.get(task_id)
+                if _same_execution(result, action_task) and result["state"] not in TERMINAL:
+                    result = self.store.update(task_id, state="stopping")
             elif operation == "steer":
                 if task.get("execution_connection") == "free-cloud":
                     raise VoiceError("INVALID_TASK_ACTION", "Stop or continue this assistant request; its granted permissions stay fixed.")
@@ -504,7 +545,7 @@ class TaskManager:
                 result = self.store.update(task_id, event="approval_answered", approval=None)
             else:
                 raise VoiceError("INVALID_TASK_ACTION", "That task action is not supported.")
-        if operation == "cancel":
+        if operation == "cancel" and _same_execution(result, action_task):
             await self._revoke_finished_accounts(result)
         await self.publish()
         return result
