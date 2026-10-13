@@ -35,9 +35,9 @@
     "runtime_implementation": "e7b8831a4fc81f6fdf0a1b8369dcc748274d9112",
     "connect_native3_baseline_not_managed_account_acceptance": "7545ba68c0b6759a7f65c88ccb1390777df5b812",
     "runtime_current_source": "c2b03842a81645998a79cbca525c03ddf67813b4",
-    "voice_managed_lifecycle_source": "914d77dda835cc3e884434ec18a589facdd4d8ae",
+    "voice_managed_lifecycle_source": "21e7a467e388b6bb9143b2f6f8e7ab00121edd6f",
     "hub_current_source": "2bf25ef6315b85cdabdb4941e2c97900641a579a",
-    "packages_current_source": "6cc15c3b297a375897f078fee7ef27afcbcfcf72",
+    "packages_current_source": "0f9cb467a60d6dfb30a1fdd0bc946eafd57493cf",
     "connect_managed_source": "fd33682f3bcfdbce849a06304da0d74137b592f0",
     "hub_recovery_design": "0aafacbc8915d5db64e92bdb5a97bd604c76e6e1",
     "connect_previous_managed_source": "646aa1149f36050a470ded7e3658ad0b0a38bcbb",
@@ -198,6 +198,18 @@
       "signed": true,
       "installed_acceptance": false,
       "status": "Actual Lenovo Hub0.3.10 update0; all44mapped payloads/integrity73/0altered/visibleversion verified. Protected rollback metadata check and feature installed/live/recovery acceptance remain pending."
+    },
+    {
+      "path": "/home/maslow/Maslow-ai-os/free-ai-build/voice42-prep/recipe/maslow-voice-0.1.5-42-x86_64.pkg.tar.zst",
+      "name": "maslow-voice",
+      "version": "0.1.5-42",
+      "sha256": "4a49caa9f1b524ffce6dc34bf57b54f95afebc8fbcbd6b294ad8e06809833951",
+      "bytes": 286149272,
+      "source_commit": "21e7a467e388b6bb9143b2f6f8e7ab00121edd6f",
+      "recipe_commit": "0f9cb467a60d6dfb30a1fdd0bc946eafd57493cf",
+      "signed": false,
+      "installed_acceptance": false,
+      "status": "Actuallybuilt afterindependentreview/538owning2skip/UIorbpass; actualarchiveaudit/signatures/matcheddelivery/installedliveacceptancepending."
     }
   ],
   "accepted_capabilities": [],
@@ -288,7 +300,8 @@
     "docs/programs/free-cloud-ai/evidence/2026-10-13-root-socket-0310-accepted-source.json",
     "docs/programs/free-cloud-ai/evidence/2026-10-13-qa4-audit-and-signatures.json",
     "docs/programs/free-cloud-ai/evidence/2026-10-13-hub0310-installed.json",
-    "docs/programs/free-cloud-ai/evidence/2026-10-13-native-groq-typed-checkpoint.json"
+    "docs/programs/free-cloud-ai/evidence/2026-10-13-native-groq-typed-checkpoint.json",
+    "docs/programs/free-cloud-ai/evidence/2026-10-13-voice42-build.json"
   ],
   "passed_source_gates": [
     "every-dispatch-provider-and-model-policy",
