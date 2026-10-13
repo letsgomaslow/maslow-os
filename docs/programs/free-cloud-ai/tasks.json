@@ -931,10 +931,8 @@
     "shared_owners": "Craft remains paused per owner handoff; preserve Craft Hub2666609 and Connect native5/source2e872f50 compatibility. Free AI edits only isolated worktrees; coordinate shared Hub/install/helper, Connect and Voice changes before installation.",
     "build_serialization": "Voice43 and Hub0.3.11 built/audited/signed; no heavy job. Native apply blocked by new workspace-write/approval-never session policy. Preserve exact artifacts; no rebuild or resign unless inputs/expiry change.",
     "worker_limit": 2,
-    "integration": "Installed Hub0.3.10/backend2/Voice41 read-only confirmed. Target Hub0.3.11/Voice43 signed and audited, not installed. System permissions must be restored before native apply; no bypass, publication or product merge.",
-    "active_workers": [
-      "final_local_apply_review: gpt-6-sol/medium; read-only final literal-argv guard review"
-    ],
+    "integration": "Final literal install-argument review accepted by gpt-6.1-sol/medium. Signed/audited Hub0.3.11 and Voice43 remain uninstalled because session is workspace-write/approval-never. Installed Hub0.3.10/backend2/Voice41 confirmed unchanged.",
+    "active_workers": [],
     "investor_demo": "2026-10-13 user deadline: investor conversation tomorrow and next demo in one week. Existing-agent/Gemini rehearsal takes immediate priority; next-week Hindsight/context/route-choice scope is a proposal. See evidence/2026-10-13-investor-demo-priority.json. Craft stays paused and required Free AI gates remain open.",
     "worker_checkpoint": "Read-only demo inventory completed by gpt-6-sol/medium and memory inventory by gpt-6-luna/medium. Previous live_tools_fix followup failed at model capacity. Connect terminal-admission correction remains frozen, awaiting independent review; recovery remains open."
   },

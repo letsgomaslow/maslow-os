@@ -78,5 +78,13 @@
     "required_change": "User restores an environment permitting the already-authorized system installation; a chat approval alone does not alter sandbox policy"
   },
   "preserved": "No system installation attempted in restricted mode; all signatures/artifacts retained; no publication, Craft resume or product merge",
-  "next_action": "After actual permission restoration, complete final activated-guard review, recheck idle/manifest validity and native admission, then normal guarded Hub apply followed by fixed Free AI managed update to Voice43. Verify installed bytes/state and repeat spoken continuity test; overall preview remains incomplete."
+  "next_action": "After actual permission restoration, recheck idle/manifest validity and native admission, then execute the exact reviewed guarded Hub apply, followed by fixed managed Voice43 update. Verify installed state and repeat spoken continuity test; no rebuild/resign unless inputs or expiry change.",
+  "final_apply_review": {
+    "path": "/home/maslow/Maslow-ai-os/free-ai-build/hub-bundle-prep/native-preview-prep/0311/independent-final-apply-review.json",
+    "sha256": "2666c82c5542e63e10ff50697f97e91ad17f44e4b64b7257b2798fcd0b86fff2",
+    "model": "gpt-6.1-sol",
+    "reasoning": "medium",
+    "verdict": "accepted preparation; privileged preflight still required",
+    "prior_worker": "gpt-6-sol/medium review stalled without report and was interrupted"
+  }
 }
