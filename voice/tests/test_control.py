@@ -5,11 +5,23 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import AsyncMock, patch
 
 from maslow_voice.ipc import MAX_REQUEST
 
 
 class WatchControlTests(unittest.IsolatedAsyncioTestCase):
+    async def test_passive_missing_socket_never_starts_service(self):
+        from maslow_voice import control
+        from maslow_voice.errors import VoiceError
+        with patch("maslow_voice.control.runtime_directory", return_value=Path("/missing")), \
+             patch("maslow_voice.control.asyncio.open_unix_connection", new=AsyncMock(side_effect=FileNotFoundError)), \
+             patch("maslow_voice.control.asyncio.create_subprocess_exec", new=AsyncMock()) as process:
+            with self.assertRaises(VoiceError) as caught:
+                await control.connect(passive=True)
+        self.assertEqual("VOICE_NOT_RUNNING", caught.exception.code)
+        process.assert_not_called()
+
     async def test_server_eof_exits_while_stdin_pipe_remains_open(self):
         with tempfile.TemporaryDirectory() as temporary:
             runtime = Path(temporary) / "maslow-voice"

@@ -124,6 +124,7 @@ class VoiceService:
         self.voice_toggle_lock = asyncio.Lock()
         self.lifecycle_lock = asyncio.Lock()
         self.configuration_lock = asyncio.Lock()
+        self.hub_configuring = False
         self.turn_lock = asyncio.Lock()
         self.conversation_requests = set()
         self.startup_task = None
@@ -1660,6 +1661,11 @@ class VoiceService:
                 await self.publish()
 
     async def dispatch(self, request):
+        if request.get("action") == "hub_status":
+            if set(request) != {"action"}:
+                raise VoiceError("INVALID_REQUEST", "Hub status does not accept additional fields.")
+            from .hub import snapshot
+            return {"hub": snapshot(self)}
         if request.get("action") == "free_ai_delivery":
             return await self.delivery.handle(request)
         self.delivery.admit_control(request)
@@ -1674,6 +1680,28 @@ class VoiceService:
                 self.control_requests.discard(current)
 
     async def _dispatch_admitted(self, request):
+        if request.get("action") == "hub_configure":
+            if set(request) != {"action", "request"}:
+                raise VoiceError("INVALID_REQUEST", "Send one supported Voice settings request.")
+            from .hub import configuration, snapshot
+            changes = configuration(request.get("request"))
+            async with self.configuration_lock:
+                status = snapshot(self)
+                if status["sessionActive"]:
+                    raise VoiceError("SESSION_ACTIVE", "End the current Voice conversation or preview before changing settings.")
+                if status["tasksActive"]:
+                    raise VoiceError("TASKS_ACTIVE", "Finish or stop current tasks before changing settings.")
+                if not status["canConfigure"]:
+                    raise VoiceError("SETTINGS_BUSY", "A Voice action is still finishing. Try again after it ends.")
+                self.hub_configuring = True
+                try:
+                    if changes["action"] != "credential" or changes["value"].strip():
+                        await self._dispatch(changes)
+                finally:
+                    self.hub_configuring = False
+            return {"saved": True}
+        if self.hub_configuring and request.get("action") in {"start_voice", "submit_text", "toggle_voice", "pause_voice", "preview_gemini_voice", "task_submit", "task_action"}:
+            raise VoiceError("SETTINGS_BUSY", "Voice settings are being saved. Try again after they finish.")
         if self.preview_task is not None and request.get("action") not in {"status", "stop_gemini_voice_preview", "end_voice", "silence", "mute", "pause_voice", "test", "models"}:
             raise VoiceError("PREVIEW_ACTIVE", "Stop the voice preview before starting a conversation or changing settings.")
         if request.get("action") in {"configure", "configure_livekit", "configure_gemini_live", "credential"}:
