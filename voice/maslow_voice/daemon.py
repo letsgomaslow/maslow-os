@@ -429,20 +429,28 @@ class VoiceService:
         await self.publish()
 
     def current_task(self):
-        active = self.store.active()
+        active = [task for task in self.store.active() if self.conversation_task_visible(task)
+                  and (not self.project or task["project"] == self.project or task["id"] == self.current_task_id)]
         if self.current_task_id:
             task = self.store.get(self.current_task_id)
-            if task in active or time.time() - float(task.get("updated_at") or 0) < 3600:
+            if self.conversation_task_visible(task) and (task["state"] not in TERMINAL or time.time() - float(task.get("updated_at") or 0) < 3600):
                 return task
         if len(active) == 1:
             return active[0]
         if len(active) > 1:
             raise VoiceError("TASK_AMBIGUOUS", "Choose the task in Voice before changing it.")
-        recent = self.store.list(1)
+        recent = [task for task in self.store.recent() if self.conversation_task_visible(task)
+                  and (not self.project or task["project"] == self.project)
+                  and time.time() - float(task.get("updated_at") or 0) < 3600]
         # A finished job from hours ago is not "the task" the person means now.
-        if recent and time.time() - float(recent[0].get("updated_at") or 0) < 3600:
+        if len(recent) == 1:
             return recent[0]
+        if len(recent) > 1:
+            raise VoiceError("TASK_AMBIGUOUS", "Choose the task in Voice before changing it.")
         raise VoiceError("TASK_NOT_FOUND", "There is no recent delegated job. Web tasks are checked with agent_status.")
+
+    def conversation_task_visible(self, task):
+        return not task.get("dismissed") and (self.settings.value["mode"] == "offline" or task.get("mode") != "offline")
 
     @staticmethod
     def private_assistant(task):
@@ -689,11 +697,36 @@ class VoiceService:
             minutes = int((time.time() - job["started"]) // 60)
             label = "Obsidian note" if job.get("kind") == "note" else "Web task"
             lines.append(f"- {label} {job['id']} \"{job['title']}\": {job['state']}, started {minutes} min ago.")
-        for task in self.store.active():
+        active = [task for task in self.store.active() if self.conversation_task_visible(task)
+                  and (not self.project or task["project"] == self.project or task["id"] == self.current_task_id)]
+        for task in active:
             title = "Private assistant request" if self.private_assistant(task) else task.get("title", "")[:60]
             lines.append(f"- Delegated job \"{title}\": {task['state']}.")
-        if not self.jobs and not self.store.active():
-            lines.append("- No tasks are running.")
+        # Completed jobs survive the conversation and daemon, but are absent
+        # from active(). Brief only a selected or unambiguous recent job.
+        recent = [task for task in self.store.recent()
+                  if self.conversation_task_visible(task) and task["state"] in TERMINAL
+                  and time.time() - float(task.get("updated_at") or 0) < 3600]
+        selected = None
+        if self.current_task_id:
+            try:
+                candidate = self.store.get(self.current_task_id)
+            except VoiceError:
+                pass
+            else:
+                if (self.conversation_task_visible(candidate) and candidate["state"] in TERMINAL
+                        and time.time() - float(candidate.get("updated_at") or 0) < 3600):
+                    selected = candidate
+        related = [task for task in recent if not self.project or task["project"] == self.project]
+        if not selected and not active and len(related) == 1:
+            selected = related[0]
+        if selected:
+            title = "Private assistant request" if self.private_assistant(selected) else selected.get("title", "")[:60]
+            lines.append(f"- Recent delegated job \"{title}\": {selected['state']}. Check its saved result with task_control status.")
+        elif not active and len(related) > 1:
+            lines.append("- Several recent delegated jobs are in Work. Ask which one the person means before reporting a result.")
+        if not self.jobs and not active:
+            lines.append("- No jobs are running now. Completed jobs above retain their saved results in Work.")
         if self.reconnecting and self.session["transcript"]:
             lines.append("The connection to the voice service dropped a moment ago and has been restored. Continue this same conversation "
                          "naturally from where it left off: do not greet the person or mention the reconnection unless they ask. "
@@ -702,7 +735,7 @@ class VoiceService:
         elif time.time() - self.last_conversation["ended"] < 30 * 60:
             lines.append("The previous conversation ended a few minutes ago. Its last lines were:")
             lines += [f"  {line.get('role', '')}: {str(line.get('text', ''))[:200]}" for line in self.last_conversation["lines"]]
-        lines.append("When the user asks about 'the task' or progress, they mean the tasks above; check them with agent_status.")
+        lines.append("For a delegated job, use task_control status to check its saved state and result. Use agent_status for web and visible terminal jobs.")
         return "\n".join(lines)
 
     def watch_agent(self, agent, limit=30 * 60):

@@ -49,6 +49,7 @@ class GeminiPromptTests(unittest.TestCase):
                 self.assertIn("never summarise the content yourself", agent.instructions)
                 self.assertIn("Use submit_intent only for explicitly requested external work.", agent.instructions)
                 self.assertIn("Use task_control for progress, corrections, cancellation, continuation or results of the current job.", agent.instructions)
+                self.assertIn("Use agent_status for web and visible terminal jobs", agent.instructions)
 
 
 class GeminiSdkTests(unittest.IsolatedAsyncioTestCase):

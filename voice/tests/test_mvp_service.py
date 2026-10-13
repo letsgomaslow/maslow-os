@@ -325,8 +325,109 @@ class MvpServiceTests(unittest.IsolatedAsyncioTestCase):
         self.assertIn('Web task web-1 "find cheap flights": working', briefing)
         self.assertIn("user: Find cheap flights to Austin", briefing)
         self.assertIn("agent_status", briefing)
+        self.assertIn("task_control status", briefing)
         self.service.last_conversation["ended"] -= 3600
         self.assertNotIn("Find cheap flights to Austin", self.service.briefing())
+
+    async def test_completed_delegated_job_is_briefed_after_daemon_restart(self):
+        brief = dict(BRIEF, objective="Build a calculator")
+        task, _ = self.service.store.create("calculator", brief, str(self.root), "gemini_live", "Build a calculator")
+        self.service.store.update(task["id"], state="completed", result="Created index.html and passed the checks.")
+        await self.service.end_voice()
+        self.service.store.close()
+        self.service = VoiceService(self.root / "state", self.root / "runtime", provider_factory=FakeProvider, credentials=AsyncMock())
+        await self.service.start_voice(audio=False)
+        briefing = self.service.provider.config["voice_briefing"]
+        self.assertIn('Recent delegated job "Build a calculator": completed', briefing)
+        self.assertIn("task_control status", briefing)
+        await self.turn("status", "Is my calculator ready? What did you finish?")
+        result = await self.service.provider.submit({"operation": "task", "action": "status"}, "status")
+        self.assertEqual(result["state"], "completed")
+        self.assertIn("index.html", result["result"])
+
+    async def test_recent_delegated_jobs_require_selection_when_ambiguous(self):
+        for request_id, title in (("calculator", "Build a calculator"), ("tracker", "Build a tracker")):
+            brief = dict(BRIEF, objective=title)
+            task, _ = self.service.store.create(request_id, brief, str(self.root), "gemini_live", title)
+            self.service.store.update(task["id"], state="completed")
+            if request_id == "calculator":
+                calculator_id = task["id"]
+        briefing = self.service.briefing()
+        self.assertIn("Several recent delegated jobs are in Work", briefing)
+        self.assertNotIn('Recent delegated job "Build a calculator"', briefing)
+        self.assertNotIn('Recent delegated job "Build a tracker"', briefing)
+        with self.assertRaises(VoiceError) as raised:
+            self.service.current_task()
+        self.assertEqual(raised.exception.code, "TASK_AMBIGUOUS")
+        self.service.current_task_id = calculator_id
+        self.assertIn('Recent delegated job "Build a calculator": completed', self.service.briefing())
+        self.assertEqual(self.service.current_task()["id"], calculator_id)
+
+    async def test_selected_completed_job_stays_targeted_with_another_running(self):
+        finished, _ = self.service.store.create("finished", dict(BRIEF, objective="Calculator"), str(self.root), "gemini_live", "Calculator")
+        self.service.store.update(finished["id"], state="completed")
+        running, _ = self.service.store.create("running", dict(BRIEF, objective="Tracker"), str(self.root), "gemini_live", "Tracker")
+        self.service.current_task_id = finished["id"]
+        self.assertEqual(self.service.current_task()["id"], finished["id"])
+        briefing = self.service.briefing()
+        self.assertIn('Recent delegated job "Calculator": completed', briefing)
+        self.assertIn('Delegated job "Tracker": queued', briefing)
+        self.service.current_task_id = running["id"]
+        self.assertEqual(self.service.current_task()["id"], running["id"])
+
+    async def test_selected_completed_job_survives_busy_history(self):
+        selected, _ = self.service.store.create("selected", dict(BRIEF, objective="Selected calculator"), str(self.root), "gemini_live", "Selected")
+        self.service.store.update(selected["id"], state="completed")
+        for index in range(51):
+            noise, _ = self.service.store.create(f"dismissed-{index}", dict(BRIEF), str(self.root), "gemini_live", "Noise")
+            self.service.store.update(noise["id"], state="completed", dismissed=True)
+        self.service.current_task_id = selected["id"]
+        self.assertEqual(self.service.current_task()["id"], selected["id"])
+        self.assertIn('Recent delegated job "Selected calculator": completed', self.service.briefing())
+
+    async def test_busy_history_does_not_hide_recent_task_ambiguity(self):
+        first, _ = self.service.store.create("first", dict(BRIEF, objective="Calculator"), str(self.root), "gemini_live", "Calculator")
+        self.service.store.update(first["id"], state="completed")
+        for index in range(51):
+            noise, _ = self.service.store.create(f"hidden-{index}", dict(BRIEF), str(self.root), "gemini_live", "Noise")
+            self.service.store.update(noise["id"], state="completed", dismissed=True)
+        second, _ = self.service.store.create("second", dict(BRIEF, objective="Tracker"), str(self.root), "gemini_live", "Tracker")
+        self.service.store.update(second["id"], state="completed")
+        self.assertIn("Several recent delegated jobs are in Work", self.service.briefing())
+        with self.assertRaises(VoiceError) as raised:
+            self.service.current_task()
+        self.assertEqual(raised.exception.code, "TASK_AMBIGUOUS")
+
+    async def test_dismissed_and_offline_jobs_are_not_recalled_to_gemini(self):
+        dismissed, _ = self.service.store.create("dismissed", dict(BRIEF, objective="Dismissed job"), str(self.root), "gemini_live", "Dismissed")
+        self.service.store.update(dismissed["id"], state="completed", dismissed=True)
+        offline, _ = self.service.store.create("offline", dict(BRIEF, objective="Offline secret job"), str(self.root), "offline", "Offline secret")
+        self.service.store.update(offline["id"], state="completed")
+        self.service.current_task_id = offline["id"]
+        briefing = self.service.briefing()
+        self.assertNotIn("Dismissed job", briefing)
+        self.assertNotIn("Offline secret job", briefing)
+        with self.assertRaises(VoiceError) as raised:
+            self.service.current_task()
+        self.assertEqual(raised.exception.code, "TASK_NOT_FOUND")
+        # Work can still select the saved task for local review.
+        await self.service.dispatch({"action": "task_action", "id": offline["id"], "operation": "select"})
+        self.assertEqual(self.service.current_task_id, offline["id"])
+
+    async def test_implicit_recent_job_stays_in_selected_project(self):
+        other = self.root / "other"
+        other.mkdir()
+        task, _ = self.service.store.create("other-project", dict(BRIEF, objective="Other project"), str(other), "gemini_live", "Other")
+        self.service.store.update(task["id"], state="completed")
+        self.service.project = str(self.root)
+        self.assertNotIn("Other project", self.service.briefing())
+        with self.assertRaises(VoiceError) as raised:
+            self.service.current_task()
+        self.assertEqual(raised.exception.code, "TASK_NOT_FOUND")
+        current, _ = self.service.store.create("current-project", dict(BRIEF, objective="Current project"), str(self.root), "gemini_live", "Current")
+        self.service.store.update(current["id"], state="completed")
+        self.assertIn('Recent delegated job "Current project": completed', self.service.briefing())
+        self.assertEqual(self.service.current_task()["id"], current["id"])
 
     async def test_private_task_title_is_redacted_at_voice_start_and_reconnect(self):
         marker = "private-calendar-request-marker"
@@ -340,6 +441,12 @@ class MvpServiceTests(unittest.IsolatedAsyncioTestCase):
         self.assertIn("Private assistant request", self.service.provider.config["voice_briefing"])
         self.service.reconnecting = True
         self.assertNotIn(marker, self.service.briefing())
+        self.service.store.update(task["id"], state="completed", result=marker)
+        self.assertNotIn(marker, self.service.briefing())
+        self.assertIn('Recent delegated job "Private assistant request": completed', self.service.briefing())
+        await self.turn("private-status", "What happened with that request?")
+        result = await self.service.provider.submit({"operation": "task", "action": "status"}, "private-status")
+        self.assertNotIn(marker, str(result))
         self.assertEqual(self.service.store.get(task["id"])["title"], marker)
         self.service.reconnecting = False
 

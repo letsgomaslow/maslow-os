@@ -96,6 +96,10 @@ class TaskStore:
     def list(self, limit=100):
         return [json.loads(row[0]) for row in self.db.execute("SELECT data FROM tasks ORDER BY updated_at DESC LIMIT ?", (limit,))]
 
+    def recent(self, seconds=3600):
+        return [json.loads(row[0]) for row in self.db.execute(
+            "SELECT data FROM tasks WHERE updated_at>=? ORDER BY updated_at DESC", (time.time() - seconds,))]
+
     def by_request(self, request_id):
         row = self.db.execute("SELECT data FROM tasks WHERE request_id=?", (request_id,)).fetchone()
         return json.loads(row[0]) if row else None
