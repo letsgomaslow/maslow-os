@@ -1,0 +1,70 @@
+{
+  "schema": 1,
+  "status": "installed-live-partial-verification-required-fix-pending",
+  "installed": {
+    "hub": "0.3.10-1",
+    "freeAi": "0.1.0-2",
+    "voice": "0.1.5-41",
+    "connect": "absent",
+    "componentInstallerExit": 0,
+    "componentEvidence": "/home/maslow/Maslow-ai-os/free-ai-build/hub-bundle-prep/native-preview-prep/0310/gui-free-ai-install-babz2ltp/result.json",
+    "freeAiIntegrity": "2764 files, 0 altered",
+    "voiceIntegrity": "9138 files, 0 altered",
+    "privateNode": "22.23.3",
+    "systemNodePreserved": "26.11.1"
+  },
+  "preservation": {
+    "originalSettingsAndWorkspacesEqualBeforeEnable": true,
+    "allOriginalTaskEventRowsEqual": true,
+    "originalTaskCount": 4,
+    "originalEventCount": 342,
+    "privateStableCopyVerificationPassed": true,
+    "verificationAttempts": "Immutable SQLite read refused the nonempty WAL. Direct read-only SQLite matched rows but updated SHM metadata. Final stable private-copy verification passed without changing source database, WAL or SHM.",
+    "exactOwnedHomeMaskRemovedAfterOwningCompletion": true,
+    "voiceDaemonActive": true,
+    "conversationAudioOff": true,
+    "providerKeysReadByCoordinator": false
+  },
+  "protectedHubCheck": {
+    "actualCorrectedCheckerExit": 0,
+    "ordinaryTransactionNull": true,
+    "freeAiV1AndV2AbsentBeforeInstall": true,
+    "rollbackVersion": "0.3.9",
+    "replaySequence": 11,
+    "enrolledTrustUnchanged": true,
+    "initialCheckerDefect": "It wrongly required SUDO_UID absence despite genuine PKEXEC_UID=1000. Both diagnostics failed before protected reads. Corrected checker requires the matching owning caller policy; conflicts remain rejected."
+  },
+  "groq": {
+    "userCompletedMaskedProductSetup": true,
+    "connectionReady": true,
+    "bothApprovedRoutesVerified": true,
+    "freePlan": "user-confirmed",
+    "billingIndependentlyVerified": false,
+    "enabled": true,
+    "retainedLoggedCalls": {"openai/gpt-oss-120b": 8, "openai/gpt-oss-20b": 1},
+    "batchCallCeiling": 12,
+    "furtherLiveRequestsHeld": true,
+    "countLimit": "Retained router accounting, not exact remaining organization allowance; logging failure/pruning may affect counts."
+  },
+  "typed": {
+    "question": {"taskId": "3fc66c56-caef-4b5f-b663-5164c95e37ef", "state": "completed", "checkedAnswer": "42", "microphoneAndSpeakingOff": true},
+    "draft": {"taskId": "31fd83c3-3fd9-453f-bb5a-aacdad407a8d", "state": "completed", "threeSentenceReminderReturned": true, "generatedDraftNotUserAccountFact": true, "microphoneAndSpeakingOff": true},
+    "documentAndNote": {"taskId": "c23d3872-493c-495e-a3d0-1f59b4045921", "state": "failed", "absolutePathDenied": "INVALID_DOCUMENT", "selectedRelativeReadSucceeded": true, "subsequentFailure": "RateLimitError/HTTP429", "noteCreated": false, "txtReadAndNoteGatePassed": false},
+    "idempotency": {"sameRequestSameTask": true, "changedFileCapabilitiesRejected": "REQUEST_CONFLICT", "changedExecutionConnectionRejected": "REQUEST_CONFLICT", "noAdditionalGroqCalls": true},
+    "routerListener18573AbsentAfterIdle": true
+  },
+  "nativeVisual": {
+    "workComposerInspected": true,
+    "image": "/home/maslow/Maslow-ai-os/free-ai-build/hub-bundle-prep/native-preview-prep/0310/work-composer-native.png",
+    "keyBrowserExcludedFromCapture": true,
+    "visible": "Free cloud AI connected, workspace/request/selected-text controls, requested Markdown checkbox and optional Calendar accounts.",
+    "lockRecovery": "Launcher correctly refused inconsistent shell aggregate locked=true. Normal supported shell restart, after verified compositor unlock, restored all-false lock fields and one replacement Quickshell; task daemon remained running. No lock bypass or configuration change."
+  },
+  "remaining": [
+    "Independent acceptance and owning checks for managed retry/cooldown/progress/Stop-Continue source fixes; build only affected Voice and matched Hub artifacts before installed retry.",
+    "Finish Connect fixed signed delivery integration, actual selected-account binding/read/revocation and state compatibility.",
+    "Normal standalone Voice bootstrap and signed prior Hub seed/trust for retained clean guest; no new ISO cycle.",
+    "Actual notes, quota pause/Stop-Continue/restart, package/database/key restoration/removal/reinstall, physical Voice and Lenovo resources/reboot, required clean/fault guest and final review."
+  ],
+  "releaseBoundary": "Preview incomplete; Craft paused, production publication and product merges excluded. Existing verified backend2/Connect8 artifacts remain unchanged."
+}

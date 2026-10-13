@@ -87,9 +87,9 @@
       "sha256": "68af1f9c764bcd3cc5b37c5318e23348ac2719ea0b829672ae40399c39341a07",
       "bytes": 46638619,
       "source_commit": "c2b03842a81645998a79cbca525c03ddf67813b4",
-      "signed": false,
+      "signed": true,
       "installed_acceptance": false,
-      "status": "scoped native artifact/runtime checks passed; installed/live/recovery acceptance open"
+      "status": "Actually installedonLenovo withsignedHubpair/integrity2764/0altered/liveGroqsetup/question/draft. Full lifecycle/recovery/installedpreviewacceptanceopen."
     },
     {
       "path": "/home/maslow/Maslow-ai-os/free-ai-build/native-2-39/maslow-voice/maslow-voice-0.1.5-39-x86_64.pkg.tar.zst",
@@ -156,9 +156,9 @@
       "bytes": 286110235,
       "source_commit": "914d77dda835cc3e884434ec18a589facdd4d8ae",
       "recipe_commit": "6cc15c3b297a375897f078fee7ef27afcbcfcf72",
-      "signed": false,
+      "signed": true,
       "installed_acceptance": false,
-      "status": "Independent scoped static, packaged owning (517 passed/5 skipped), UI/controller/composer and three-package overlap checks accepted; loaded-code/installed/live/recovery open"
+      "status": "Actually installedonLenovo/matchedpair/integrity9138/0altered/originaluserdata+typedquestion/draft audiooff. Sourcequota/progress/Stopfix requires affectedVoice rebuild; no relabeling thisartifact."
     },
     {
       "path": "/home/maslow/Maslow-ai-os/free-ai-build/hub-bundle-prep/qa-hub-build-1/evidence/99f88f71815b4a76b5954abacda89a6f/work/maslow-hub-0.3.9-1-any.pkg.tar.zst",
@@ -287,7 +287,8 @@
     "docs/programs/free-cloud-ai/evidence/2026-10-12-hub036-reconstructed-build.json",
     "docs/programs/free-cloud-ai/evidence/2026-10-13-root-socket-0310-accepted-source.json",
     "docs/programs/free-cloud-ai/evidence/2026-10-13-qa4-audit-and-signatures.json",
-    "docs/programs/free-cloud-ai/evidence/2026-10-13-hub0310-installed.json"
+    "docs/programs/free-cloud-ai/evidence/2026-10-13-hub0310-installed.json",
+    "docs/programs/free-cloud-ai/evidence/2026-10-13-native-groq-typed-checkpoint.json"
   ],
   "passed_source_gates": [
     "every-dispatch-provider-and-model-policy",
