@@ -35,14 +35,15 @@
     "runtime_implementation": "e7b8831a4fc81f6fdf0a1b8369dcc748274d9112",
     "connect_native3_baseline_not_managed_account_acceptance": "7545ba68c0b6759a7f65c88ccb1390777df5b812",
     "runtime_current_source": "c2b03842a81645998a79cbca525c03ddf67813b4",
-    "voice_managed_lifecycle_source": "21e7a467e388b6bb9143b2f6f8e7ab00121edd6f",
+    "voice_managed_lifecycle_source": "1093cf71601f6b566c86754ffc314d8a9d9f6549",
     "hub_current_source": "2bf25ef6315b85cdabdb4941e2c97900641a579a",
-    "packages_current_source": "0f9cb467a60d6dfb30a1fdd0bc946eafd57493cf",
+    "packages_current_source": "0a8ee756988e5318d37781f7b91d549479770b39",
     "connect_managed_source": "fd33682f3bcfdbce849a06304da0d74137b592f0",
     "hub_recovery_design": "0aafacbc8915d5db64e92bdb5a97bd604c76e6e1",
     "connect_previous_managed_source": "646aa1149f36050a470ded7e3658ad0b0a38bcbb",
     "connect_accepted_craft_baseline": "2e872f50a28706e70c159380e2b7186869415b7f",
-    "hub_accepted_craft_baseline": "2666609002dce8bb6cc16511ef2125bccb18dbe9"
+    "hub_accepted_craft_baseline": "2666609002dce8bb6cc16511ef2125bccb18dbe9",
+    "hub_demo_qa_source": "23eabfbf060371300b108f33d28330e0fcd0816f"
   },
   "artifacts": [
     {
@@ -209,7 +210,19 @@
       "recipe_commit": "0f9cb467a60d6dfb30a1fdd0bc946eafd57493cf",
       "signed": false,
       "installed_acceptance": false,
-      "status": "Actualarchiveauditpassed63mapped/9141members/source/marker/ownership/deps againstverified41; retainexact4a49bytes. Signatures/matchedHub/installedliveacceptancepending."
+      "status": "Retained exact audited artifact; Voice43 adds the reviewed task-continuity correction. Voice42 remains unsigned/uninstalled and is not relabelled as Voice43."
+    },
+    {
+      "path": "/home/maslow/Maslow-ai-os/free-ai-build/voice43-prep/recipe/maslow-voice-0.1.5-43-x86_64.pkg.tar.zst",
+      "name": "maslow-voice",
+      "version": "0.1.5-43",
+      "sha256": "8a5386f18be249a4051b55530c723607bc2d19a635db601ce40e13ecd248a0aa",
+      "bytes": 286122171,
+      "source_commit": "1093cf71601f6b566c86754ffc314d8a9d9f6549",
+      "recipe_commit": "0a8ee756988e5318d37781f7b91d549479770b39",
+      "signed": false,
+      "installed_acceptance": false,
+      "status": "Actual archive audit passed:63 mappedsource/9141 members, source/marker/ownership/dependencies checked. Pair signing awaiting local passphrase; matched Hub and installed/live acceptance pending."
     }
   ],
   "accepted_capabilities": [],
@@ -302,7 +315,8 @@
     "docs/programs/free-cloud-ai/evidence/2026-10-13-hub0310-installed.json",
     "docs/programs/free-cloud-ai/evidence/2026-10-13-native-groq-typed-checkpoint.json",
     "docs/programs/free-cloud-ai/evidence/2026-10-13-voice42-build.json",
-    "docs/programs/free-cloud-ai/evidence/2026-10-13-voice42-artifact-audit.json"
+    "docs/programs/free-cloud-ai/evidence/2026-10-13-voice42-artifact-audit.json",
+    "docs/programs/free-cloud-ai/evidence/2026-10-13-voice43-source-and-preparation.json"
   ],
   "passed_source_gates": [
     "every-dispatch-provider-and-model-policy",
@@ -345,12 +359,23 @@
     "status": "built and scoped-tested, blocked for installation; do not add native6 identity to Hub"
   },
   "prepared_qa_hub": {
-    "source": "266c6073344db5d0064d0a74f70bafc196bc1d96",
-    "parent": "2bf25ef6315b85cdabdb4941e2c97900641a579a",
+    "source": "23eabfbf060371300b108f33d28330e0fcd0816f",
+    "parent": "266c6073344db5d0064d0a74f70bafc196bc1d96",
     "source_accepted": true,
-    "build_started": true,
-    "artifact_audit_passed": true,
+    "build_started": false,
+    "artifact_audit_passed": false,
     "installation_accepted": false,
-    "status": "QA4 Hub0.3.10 actually installed on Lenovo with exact payload/integrity/visible version proof; optional components and all required feature acceptance remain open."
-  }
+    "status": "QA5 Hub0.3.11 source accepted; build context blocked on actual backend2/Voice43 pair signatures and final reviewed pins. Current Hub0.3.10/Voice41 installation preserved."
+  },
+  "prepared_qa_hub_history": [
+    {
+      "source": "266c6073344db5d0064d0a74f70bafc196bc1d96",
+      "parent": "2bf25ef6315b85cdabdb4941e2c97900641a579a",
+      "source_accepted": true,
+      "build_started": true,
+      "artifact_audit_passed": true,
+      "installation_accepted": false,
+      "status": "QA4 Hub0.3.10 actually installed on Lenovo with exact payload/integrity/visible version proof; optional components and all required feature acceptance remain open."
+    }
+  ]
 }
