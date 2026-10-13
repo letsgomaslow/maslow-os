@@ -1,0 +1,29 @@
+{
+  "schema": 1,
+  "status": "actual-archive-audit-passed-signing-matched-delivery-pending",
+  "source": "21e7a467e388b6bb9143b2f6f8e7ab00121edd6f",
+  "recipe": "0f9cb467a60d6dfb30a1fdd0bc946eafd57493cf",
+  "archiveSha256": "4a49caa9f1b524ffce6dc34bf57b54f95afebc8fbcbd6b294ad8e06809833951",
+  "archiveBytes": 286149272,
+  "independentAuditAdmissionSha256": "d4ccce92e2ba5e1907080188b66a8bf32f14d9369252cbd48e5e3831650ab0e8",
+  "actualAudit": {
+    "directory": "/home/maslow/Maslow-ai-os/free-ai-build/voice42-prep",
+    "exit": 0,
+    "seconds": 101.975,
+    "sourceFilesMapped": 63,
+    "members": 9141,
+    "sourceAndLifecycleMarkerMatched": true,
+    "ownershipModesLinksMatched": true,
+    "dependenciesAndRemainingPayloadMatchVerifiedVoice41": true,
+    "limits": "CPU1/nice10/AS2GiB/300s/shared heavy lock"
+  },
+  "nextAction": "Complete the gated Connect terminal-admission/recovery integration and normal guest Voice/Hermes bootstrap inputs, then prepare one matched signed Hub bundle. Retain the audited Voice42; do not rebuild unchanged bytes.",
+  "installed": "Hub0.3.10/backend2/Voice41 remain installed. Groq configured/enabled, Free plan user-confirmed, question/draft/audio-off/idempotency checked. Nine logged calls; further live requests held until updated candidate is installed.",
+  "blockers": [
+    "Connect shared guard must accept strictly validated completed receipt while denying all pending/unsafe records; successful current module must not permanently block other package operations.",
+    "Connect undecided interruption recovery, signatures, consent/UI/recipe and actual existing-state/account binding/revocation remain open.",
+    "Clean guest requires normal standalone Voice bootstrap and proven compatible Hermes plus exact signed prior Hub0.3.8 seed/trust/replay. Historical old Hermes compatibility remains unknown, not inferred from installed0.21.6.",
+    "Actual note/quota/Stop-Continue/restart/recovery/remove-reinstall/physical Voice/Lenovo resources/clean-fault guest/final review remain required."
+  ],
+  "releaseBoundary": "No production publication, product merge, new ISO or Craft work. Preview remains incomplete."
+}
