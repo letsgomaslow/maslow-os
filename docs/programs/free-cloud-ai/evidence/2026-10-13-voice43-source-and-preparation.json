@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "status": "built-and-audited-awaiting-local-pair-signatures",
+  "status": "Voice43-built-audited-and-pair-signed-Hub-context-review-pending",
   "source_commit": "1093cf71601f6b566c86754ffc314d8a9d9f6549",
   "recipe_commit": "0a8ee756988e5318d37781f7b91d549479770b39",
   "source_freeze": {
@@ -37,7 +37,7 @@
   "installed_voice": "0.1.5-41",
   "installed_hub": "0.3.10-1",
   "free_ai_preview_complete": false,
-  "next_action": "Verify two actual signatures after local passphrase entry, finalize matched Hub0.3.11 context and independent admission, then one serialized Hub build/audit/signing/native update.",
+  "next_action": "Finish independent Hub build-context admission; build Hub0.3.11 once, audit and sign it, then normal native update and live continuity retest.",
   "build_session": "fe635e4c209d441d9bce7e0da5164ff7",
   "actual_build": {
     "exit": 0,
@@ -81,8 +81,13 @@
     "independent_review": "accepted constants-only change",
     "root_check_only": "passed",
     "output": "/home/maslow/Maslow-ai-os/free-ai-build/hub-bundle-prep/local-preview-signatures-1eza4c2b",
-    "state": "awaiting-local-signing-passphrase; compositor reports laptop locked",
+    "state": "signed-and-independently-verified",
     "window": "Maslow OS, mapped on workspace1",
-    "focus_attempt": "Withheld because desktop is locked; terminal preserved, no lock bypass"
+    "focus_attempt": "Withheld because desktop is locked; terminal preserved, no lock bypass",
+    "root_verification": "/home/maslow/Maslow-ai-os/free-ai-build/hub-bundle-prep/qa-pair-staging-2/root-signature-verification.json",
+    "signature_sha256": {
+      "manifest.json.sig": "98a025195703e70489b6ca26bacdfd89ed596b8348f25cfdebdf9814b0173883",
+      "maslow-voice-0.1.5-43-x86_64.pkg.tar.zst.sig": "0094dc58dadcfcf7ce710a521dfe2928485439dceff18afe0247cb0f37d10716"
+    }
   }
 }

@@ -1,5 +1,8 @@
 # Maslow AI-OS development: start here
 
+Hub0.3.11 and Voice43 signed; installation blocked (2026-10-13): actual Hub archive `5e8b9644…` / 332801985 bytes passed 44-source/76-member/6-opaque and four-package overlap checks. Final Hub and sequence12 manifest signatures independently verify against enrolled trust. [Exact checkpoint](programs/free-cloud-ai/evidence/2026-10-13-hub0311-signed-installation-blocked.json). Current session changed to workspace-write with approval never, so no system installation was attempted. Installed Hub0.3.10/backend2/Voice41 remain. Next: restore an environment permitting system installation, finish final guard admission, apply the exact signed Hub, then managed Voice43 update and live continuity retest. Manifest expires 2026-10-15T15:14:23Z; retain artifacts and signatures, do not rebuild unchanged inputs. Craft paused; no publication or full preview claim.
+
+
 Voice43 built and audited (2026-10-13): archive `8a5386f1…` is 286122171 bytes from source `1093cf71` / recipe `0a8ee756`. Actual audit passed in 83.049 seconds: 63 mapped source files, 9141 archive members, ownership/mode/link checks and all remaining dependencies match verified42. [Exact checkpoint](programs/free-cloud-ai/evidence/2026-10-13-voice43-source-and-preparation.json). The reviewed fixed pair signer passed Root check-only and is waiting in the Maslow OS terminal for the user signing passphrase; output `local-preview-signatures-1eza4c2b`. Next: verify actual signatures, finalize/admit/build the matched Hub0.3.11, then install and retest continuity. Installed41 remains. No heavy job, publication, Hindsight integration or full preview acceptance.
 
 

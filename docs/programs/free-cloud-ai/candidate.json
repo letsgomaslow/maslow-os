@@ -220,9 +220,20 @@
       "bytes": 286122171,
       "source_commit": "1093cf71601f6b566c86754ffc314d8a9d9f6549",
       "recipe_commit": "0a8ee756988e5318d37781f7b91d549479770b39",
-      "signed": false,
+      "signed": true,
       "installed_acceptance": false,
-      "status": "Actual archive audit passed:63 mappedsource/9141 members, source/marker/ownership/dependencies checked. Pair signing awaiting local passphrase; matched Hub and installed/live acceptance pending."
+      "status": "Built/audited and actual signature independently verified against enrolled key. Matched Hub build and installed/live acceptance pending."
+    },
+    {
+      "path": "/home/maslow/Maslow-ai-os/free-ai-build/hub-bundle-prep/qa-hub-build-5/evidence/6c19fb547acb44fb9f86c48e0d6a115d/work/maslow-hub-0.3.11-1-any.pkg.tar.zst",
+      "name": "maslow-hub",
+      "version": "0.3.11-1",
+      "sha256": "5e8b96447b7708c1cb732d0849722d7f5ed06908db28c32733f87afa1c7a7bc6",
+      "bytes": 332801985,
+      "source_commit": "23eabfbf060371300b108f33d28330e0fcd0816f",
+      "signed": true,
+      "installed_acceptance": false,
+      "status": "Actual archive audit and enrolled-key signatures passed; system installation blocked by session workspace-only permissions."
     }
   ],
   "accepted_capabilities": [],
@@ -316,7 +327,8 @@
     "docs/programs/free-cloud-ai/evidence/2026-10-13-native-groq-typed-checkpoint.json",
     "docs/programs/free-cloud-ai/evidence/2026-10-13-voice42-build.json",
     "docs/programs/free-cloud-ai/evidence/2026-10-13-voice42-artifact-audit.json",
-    "docs/programs/free-cloud-ai/evidence/2026-10-13-voice43-source-and-preparation.json"
+    "docs/programs/free-cloud-ai/evidence/2026-10-13-voice43-source-and-preparation.json",
+    "docs/programs/free-cloud-ai/evidence/2026-10-13-hub0311-signed-installation-blocked.json"
   ],
   "passed_source_gates": [
     "every-dispatch-provider-and-model-policy",
@@ -362,10 +374,10 @@
     "source": "23eabfbf060371300b108f33d28330e0fcd0816f",
     "parent": "266c6073344db5d0064d0a74f70bafc196bc1d96",
     "source_accepted": true,
-    "build_started": false,
-    "artifact_audit_passed": false,
+    "build_started": true,
+    "artifact_audit_passed": true,
     "installation_accepted": false,
-    "status": "QA5 Hub0.3.11 source accepted; build context blocked on actual backend2/Voice43 pair signatures and final reviewed pins. Current Hub0.3.10/Voice41 installation preserved."
+    "status": "QA5 Hub0.3.11 built, audited and signed. Installation not performed: workspace-write session restriction."
   },
   "prepared_qa_hub_history": [
     {
