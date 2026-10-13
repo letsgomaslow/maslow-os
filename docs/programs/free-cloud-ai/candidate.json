@@ -328,7 +328,8 @@
     "docs/programs/free-cloud-ai/evidence/2026-10-13-voice42-build.json",
     "docs/programs/free-cloud-ai/evidence/2026-10-13-voice42-artifact-audit.json",
     "docs/programs/free-cloud-ai/evidence/2026-10-13-voice43-source-and-preparation.json",
-    "docs/programs/free-cloud-ai/evidence/2026-10-13-hub0311-signed-installation-blocked.json"
+    "docs/programs/free-cloud-ai/evidence/2026-10-13-hub0311-signed-installation-blocked.json",
+    "docs/programs/free-cloud-ai/evidence/2026-10-13-hub-installed-voice-update-recovery.json"
   ],
   "passed_source_gates": [
     "every-dispatch-provider-and-model-policy",

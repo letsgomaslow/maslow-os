@@ -929,12 +929,15 @@
   ],
   "coordination": {
     "shared_owners": "Craft remains paused per owner handoff; preserve Craft Hub2666609 and Connect native5/source2e872f50 compatibility. Free AI edits only isolated worktrees; coordinate shared Hub/install/helper, Connect and Voice changes before installation.",
-    "build_serialization": "Voice43 and Hub0.3.11 built/audited/signed; no heavy job. Native apply blocked by new workspace-write/approval-never session policy. Preserve exact artifacts; no rebuild or resign unless inputs/expiry change.",
+    "build_serialization": "No heavy build active; CPU1 focused GO timing regression tests only. Serialize native recovery/builds under heavy-work.lock.",
     "worker_limit": 2,
-    "integration": "Final literal install-argument review accepted by gpt-6.1-sol/medium. Signed/audited Hub0.3.11 and Voice43 remain uninstalled because session is workspace-write/approval-never. Installed Hub0.3.10/backend2/Voice41 confirmed unchanged.",
-    "active_workers": [],
+    "integration": "Hub0.3.11 installed and verified. Voice43 update failed before package mutation; Voice41/backend2 retained. Installed recovery refused because Voice restarted during authentication; investigate caller before retry.",
+    "active_workers": [
+      "managed_go_fix",
+      "hub_poststate_check"
+    ],
     "investor_demo": "2026-10-13 user deadline: investor conversation tomorrow and next demo in one week. Existing-agent/Gemini rehearsal takes immediate priority; next-week Hindsight/context/route-choice scope is a proposal. See evidence/2026-10-13-investor-demo-priority.json. Craft stays paused and required Free AI gates remain open.",
-    "worker_checkpoint": "Read-only demo inventory completed by gpt-6-sol/medium and memory inventory by gpt-6-luna/medium. Previous live_tools_fix followup failed at model capacity. Connect terminal-admission correction remains frozen, awaiting independent review; recovery remains open."
+    "worker_checkpoint": "Sol high authors bounded GO ordering fix; independent reviewer diagnoses restart and reviews security. No installer bypass."
   },
   "user_priority": "Investor conversation tomorrow and next demo in one week: rehearse the installed Gemini-to-agent-to-result flow first, then shared context and explicit route choice. Preserve the incomplete Free AI preview and required gates. Craft remains paused; no product merges or publication."
 }
