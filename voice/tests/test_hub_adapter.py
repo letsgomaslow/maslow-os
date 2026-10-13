@@ -65,6 +65,17 @@ class HubAdapterTests(unittest.IsolatedAsyncioTestCase):
         self.assertLessEqual(len(view["tasks"]), 50)
         self.assertNotIn(latest["id"], [task["id"] for task in view["tasks"]])
 
+    async def test_older_active_work_precedes_bounded_completed_history(self):
+        active, _ = self.service.store.create("older-active", {"objective": "Keep working", "summary": "Work"}, str(self.root), "gemini_live", "Work")
+        self.service.store.update(active["id"], state="running")
+        for number in range(55):
+            task, _ = self.service.store.create(str(number), {"objective": f"Finished {number}", "summary": "Work"}, str(self.root), "gemini_live", "Work")
+            self.service.store.update(task["id"], state="completed")
+        view = (await self.service.dispatch({"action": "hub_status"}))["hub"]
+        self.assertEqual(50, len(view["tasks"]))
+        self.assertEqual(active["id"], view["tasks"][0]["id"])
+        self.assertEqual("running", view["tasks"][0]["status"])
+
     async def test_hub_configuration_blocks_active_session_and_tasks(self):
         self.service.voice["enabled"] = True
         with self.assertRaises(VoiceError) as caught:
