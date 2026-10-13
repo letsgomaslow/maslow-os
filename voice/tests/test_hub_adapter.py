@@ -41,6 +41,10 @@ class HubAdapterTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(task["id"], view["tasks"][0]["handoff"]["taskId"])
         self.assertEqual("awaiting_approval", view["tasks"][0]["status"])
         self.assertFalse(view["canConfigure"])
+        self.assertTrue(view["maintenance"])
+        self.assertEqual("maintenance", view["state"])
+        self.assertFalse(view["ready"])
+        self.assertFalse(view["capabilities"]["taskOpen"])
         self.assertNotIn("server_url", view["settings"])
         self.assertIn("Puck", view["voices"]["gemini_live_voice"])
         self.assertIn("cedar", view["voices"]["realtime_voice"])
@@ -76,6 +80,37 @@ class HubAdapterTests(unittest.IsolatedAsyncioTestCase):
     async def test_blank_credential_retains_without_reading_or_writing_keyring(self):
         result = await self.service.dispatch({"action": "hub_configure", "request": {"action": "credential", "name": "google", "value": "  "}})
         self.assertEqual({"saved": True}, result)
+        self.assertEqual([], self.credentials.mock_calls)
+
+    async def test_reconnect_and_provider_cleanup_are_active_conversations(self):
+        self.service.voice["enabled"] = False
+        self.service.provider = None
+        for field in ("reconnect_task", "provider_cleanup"):
+            worker = Mock()
+            worker.done.return_value = False
+            setattr(self.service, field, worker)
+            view = (await self.service.dispatch({"action": "hub_status"}))["hub"]
+            self.assertTrue(view["sessionActive"])
+            self.assertFalse(view["canConfigure"])
+            with self.assertRaises(VoiceError) as caught:
+                await self.service.dispatch({"action": "hub_configure", "request": {"action": "configure", "settings": {"mode": "gpt_live"}}})
+            self.assertEqual("SESSION_ACTIVE", caught.exception.code)
+            worker.cancel.assert_not_called()
+            setattr(self.service, field, None)
+        self.assertEqual([], self.credentials.mock_calls)
+
+    async def test_background_work_blocks_configuration(self):
+        cases = [("agent_jobs", {"web-1"}), ("jobs", {"job": {"state": "running"}}), ("action_work", {"action": 1})]
+        for field, value in cases:
+            original = getattr(self.service, field)
+            setattr(self.service, field, value)
+            view = (await self.service.dispatch({"action": "hub_status"}))["hub"]
+            self.assertTrue(view["tasksActive"])
+            self.assertFalse(view["canConfigure"])
+            with self.assertRaises(VoiceError) as caught:
+                await self.service.dispatch({"action": "hub_configure", "request": {"action": "credential", "name": "google", "value": "synthetic-key"}})
+            self.assertEqual("TASKS_ACTIVE", caught.exception.code)
+            setattr(self.service, field, original)
         self.assertEqual([], self.credentials.mock_calls)
 
     async def test_configuration_uses_existing_action_and_no_secret_in_response(self):

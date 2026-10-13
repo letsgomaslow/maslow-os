@@ -54,9 +54,24 @@ def snapshot(service):
     current = asyncio.current_task()
     pending = any(task is not current for task in service.control_requests)
     session_active = bool(service.provider or service.voice.get("enabled") or service.startup_task
-                          or service.conversation_requests or service.preview_task)
-    tasks_active = bool(service.store.active())
-    summaries = [task_summary(task) for task in service.store.list(50) if not task.get("dismissed")]
+                          or service.conversation_requests or service.preview_task
+                          or (service.reconnect_task and not service.reconnect_task.done())
+                          or (service.provider_cleanup and not service.provider_cleanup.done())
+                          or service.lifecycle_lock.locked())
+    # Match the existing delivery boundary's active-work predicates while
+    # excluding this read/configure request and its own configuration lock.
+    active_tasks = service.store.active()
+    tasks_active = bool(active_tasks or service.tasks.assistant_reservations
+                        or any(not worker.done() for worker in service.tasks.monitors.values())
+                        or service.agent_jobs or service.action_work or service.action_lock.locked()
+                        or any(job.get("state") not in {"finished", "closed"} for job in service.jobs.values()))
+    recent = {task["id"]: task for task in active_tasks if not task.get("dismissed")}
+    for task in service.store.list(50):
+        if len(recent) >= 50:
+            break
+        if not task.get("dismissed"):
+            recent.setdefault(task["id"], task)
+    summaries = [task_summary(task) for task in list(recent.values())[:50]]
     settings = {key: value for key, value in service.settings.value.items() if key in SETTINGS}
     # String preferences are display data only. A malicious/corrupt old setting
     # must not become a secret-bearing Hub payload.
@@ -68,17 +83,19 @@ def snapshot(service):
         # presence bit here, never account identifiers embedded in URL paths.
         settings.pop(key, None)
     state = service.voice.get("state")
-    return {"schemaVersion": 1, "running": True, "ready": readiness.get("ready") is True,
+    maintenance = bool(service.delivery.closed)
+    return {"schemaVersion": 1, "running": True, "ready": not maintenance and readiness.get("ready") is True,
             "enabled": service.voice.get("enabled") is True,
-            "state": state if isinstance(state, str) and state in VOICE_STATES else "unknown",
-            "capabilities": {"taskSummaries": True, "taskOpen": True, "typeOpen": True, "settings": True},
+            "state": "maintenance" if maintenance else state if isinstance(state, str) and state in VOICE_STATES else "unknown",
+            "maintenance": maintenance,
+            "capabilities": {"taskSummaries": True, "taskOpen": not maintenance, "typeOpen": not maintenance, "settings": not maintenance},
             "tasks": [task for task in summaries if task is not None], "settings": settings,
             "voices": {"gemini_live_voice": list(GEMINI_VOICES), "realtime_voice": list(OPENAI_VOICES),
                        "live_voice": list(LIVE_VOICES), "livekit_voice": list(LIVEKIT_VOICES)},
             "endpoints": {key: bool(service.settings.value.get(key)) for key in ("server_url", "livekit_url")},
-            "readiness": {"ready": readiness.get("ready") is True,
-                          "conversationReady": isinstance(conversation, dict) and conversation.get("ready") is True,
-                          "tasksReady": isinstance(tasks, dict) and tasks.get("ready") is True,
+            "readiness": {"ready": not maintenance and readiness.get("ready") is True,
+                          "conversationReady": not maintenance and isinstance(conversation, dict) and conversation.get("ready") is True,
+                          "tasksReady": not maintenance and isinstance(tasks, dict) and tasks.get("ready") is True,
                           "checked": bool(readiness.get("checks"))},
             "sessionActive": session_active, "tasksActive": tasks_active,
             "canConfigure": not session_active and not tasks_active and not pending and not service.hub_configuring and not service.delivery.closed}
