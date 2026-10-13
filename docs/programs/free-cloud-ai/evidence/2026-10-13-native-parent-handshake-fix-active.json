@@ -1,0 +1,22 @@
+{
+  "schema": 1,
+  "status": "native-helper-handshake-fix-active-preview-incomplete",
+  "authentication": "Genuine installed PKEXEC_UID/fixedRoothelper graphical path works. User entered normal login password in actual inspected centred omarchy-polkit dialog. No PAM/auth-policy change,UID spoofing,password capture or provider-key request.",
+  "recoveryEvidence": "Initial GUI recover refused while a recorded helper remained alive. Independent reviewed privileged read-only snapshot later proved originalHelper2187821/start10486392 ended and recoveryHelper2255662/start10607477 ended,pacman recordsnull,noALPMlock,originalphasepreparing/recoveryphasesealed. No process needed signaling. Subsequent owning GUI recovery exit0,public ticketabsent and exact ended/current recovery UI record reconciled under installed Setup.locked. Packages unchanged.",
+  "freshGuiFailure": "After cleared recovery, actual fixed GUI install returned1 and known message 'Voice must be idle, or explicitly stopped for its legacy version, with a verifiable recovery pair.' Backendabsent/Voice37; stopped/canonical/fullactualfreshcheck passes. Pending operation is being closed only through owning recovery; no blind equivalent install retry.",
+  "sourceDiagnosis": {
+    "path": "/home/maslow/Maslow-ai-os/free-ai-build/hub-bundle-prep/native-preview-prep/user-helper-parent-exe-diagnosis.json",
+    "sha256": "16f3ee19635ca617cea47e828f54fcde15a2154433ffafceb2cebcf46157cb5e",
+    "evidence": "Nonroot UID1000 actual readlink/proc/1/exe returns EACCES13; Path.resolve returns unresolved path. Initial helper requires reading ROOTparent exe,while native tests mocked that operation. Error collapses through differing exception classes to generic user preflight failure. This is a leading kernel/source cause; original helper traceback was not retained.",
+    "securityConstraint": "Do not drop executable/parent authentication,set Root dumpable,relax Linux permissions or bypass guards."
+  },
+  "implementation": {
+    "worker": "Existing rejection_forwarding actual gpt-6-sol/high",
+    "reviewer": "Existing boundary_review actual gpt-6-astra/high,disjoint review/evidence ownership",
+    "scope": "Small private GO transport change in isolated Hub source: Root self-checks fixed executable/argv; Root-created AF_UNIX socketpair; child kernel SO_PEERCRED RootUID/PIDactualparent plus existing fullUID/argv/start/GO/context/ticket/receipt/record-before-GO and EOF guards. Include V2 equivalent,retain public/private record schema and product gatesFalse.",
+    "validationPending": "Focused negative/regression tests,actual two-UID kernel-positive with Root exe read denied,owningchecks and independent frozen-source review. No passing-result inference from implementation."
+  },
+  "delivery": "Only changed Hub needs a new reviewed candidate(version0.3.10 planned),exact signed local manifest and native update; unchanged backend2/Voice41/Connect8 archives retained. No product merge/publication/newISO or Cloudresources. One heavy job with limits; Craftpaused.",
+  "next": "Read current GUI owning recovery result(session1431),preserve externalHOME mask while pending. Workers freeze corrected source/tests; coordinator runs bounded realkernel/owningchecks under sharedlock,reviews then prepares affected Hub candidate. No further command-copy requests; user only local private/physical steps whenready.",
+  "previewComplete": false
+}
