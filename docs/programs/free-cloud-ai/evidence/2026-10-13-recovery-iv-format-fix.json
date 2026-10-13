@@ -1,0 +1,49 @@
+{
+  "status": "source-verified-installed-repair-pending",
+  "cause": "Pinned FreeLLMAPI writer emits16-byte IV; previous recovery verifier requires12-byte IV and rejects before AES-GCM authentication. Read-only actual-database compatibility checks prove writer-format match.",
+  "change": "Accept exactly32 hex-character IV matching supported writer; other key/provider/cardinality/ciphertext/tag/plaintext checks unchanged. Update synthetic fixtures and add explicit writer-format/tamper regressions.",
+  "files": {
+    "free_ai/maslow_free_ai/recovery.py": "5fef7b923345dd454182e686adceef15ff3f5bffb79ee260cdc123daf7f348ee",
+    "free_ai/tests/test_recovery.py": "c9ac896dfc4749f3b8d53a8c0a949bb3215b83406cc77e5ca6148a94e77a6590",
+    "free_ai/tests/secret_service_probe.py": "410b67c988dbd8b544a47e2d64d23510fc2081c996f68506a582638d7ca60452"
+  },
+  "verification": {
+    "regression_before_fix": "RECOVERY_KEY_MISMATCH with16-byte synthetic writer ciphertext",
+    "focused": {
+      "tests": 19,
+      "seconds": 11.183,
+      "result": "pass"
+    },
+    "owning": {
+      "tests": 51,
+      "seconds": 13.362,
+      "result": "pass"
+    },
+    "disposable_recovery": {
+      "real": "GNOME Keyring/privateDBus, SQLite/WAL, Node22.23.3",
+      "result": "pass",
+      "host_keyring_touched": false,
+      "live_provider_requests": 0,
+      "package_restore_verified": false
+    }
+  },
+  "corrected_test_invocations": [
+    "Initial focused test used wrong cwd and failed import; corrected cwd reproduced expected real defect.",
+    "Disposable probe initially referenced removed /tmp Node path; added installed private Node fallback retaining exactversion assertion, then passed."
+  ],
+  "independent_review": {
+    "status": "accepted-no-blocking-findings",
+    "file": "free-ai-build/hub-bundle-prep/hub-managed-update-fix-evidence/independent-runtime-iv16-review.json",
+    "sha256": "1d983ef40fd75f5f4b46ee9e7ba40252c5d13061c5553cba02640b8bbc49a067"
+  },
+  "native_state": {
+    "hub": "0.3.11-1",
+    "voice": "0.1.5-41",
+    "backend": "0.1.0-2",
+    "voice_panel": "temporarily disabled",
+    "voice_service": "inactive",
+    "pending_recovery": "retained with owning mask/ticket; no manual cleanup"
+  },
+  "delivery_blocker": "Existing pending operation pins previous backend verifier. Source fix alone cannot repair it; exact trusted compatibility correction needs independent review. Hub update blocked while operation pending.",
+  "next_action": "Prepare smallest exact-operation compatibility repair with original capsule pins and owning recovery state machine; independent review/test before signing or root execution. Actual authority fields stay unset during preparation."
+}

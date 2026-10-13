@@ -19,7 +19,7 @@ NODE = Path('/tmp/maslow-freellmapi-tools/node-v22.23.3-linux-x64/bin/node')
 if not NODE.exists():
     NODE = Path(shutil.which('node') or '/nonexistent/node')
 KEY = 'a' * 64
-ENCRYPT = """const c=require('crypto');let k=Buffer.from('a'.repeat(64),'hex'),iv=c.randomBytes(12),e=c.createCipheriv('aes-256-gcm',k,iv);let s=e.update('gsk_'+ 'f'.repeat(32),'utf8','hex')+e.final('hex');process.stdout.write(JSON.stringify([s,iv.toString('hex'),e.getAuthTag().toString('hex')]));"""
+ENCRYPT = """const c=require('crypto');let k=Buffer.from('a'.repeat(64),'hex'),iv=c.randomBytes(16),e=c.createCipheriv('aes-256-gcm',k,iv);let s=e.update('gsk_'+ 'f'.repeat(32),'utf8','hex')+e.final('hex');process.stdout.write(JSON.stringify([s,iv.toString('hex'),e.getAuthTag().toString('hex')]));"""
 
 
 @unittest.skipUnless(NODE.is_file(), 'Node crypto unavailable for actual ciphertext proof')
@@ -44,6 +44,26 @@ class RecoveryTests(unittest.IsolatedAsyncioTestCase):
 
     def tearDown(self):
         self.temp.cleanup()
+
+    async def test_installed_writer_16_byte_iv_verifies(self):
+        # The pinned FreeLLMAPI writer uses randomBytes(16), not GCM's
+        # commonly recommended 12-byte IV. Exercise its actual stored format.
+        with closing(sqlite3.connect(self.database)) as db:
+            self.assertEqual(len(db.execute('SELECT iv FROM api_keys').fetchone()[0]), 32)
+        await self.recovery.verify_key(self.database, KEY)
+
+    async def test_iv_format_and_authentication_tampering_are_rejected(self):
+        with closing(sqlite3.connect(self.database)) as db:
+            original_iv, original_tag = db.execute('SELECT iv,auth_tag FROM api_keys').fetchone()
+        for iv, tag in [('a' * 24, original_tag), ('a' * 30, original_tag),
+                        ('a' * 34, original_tag), ('z' * 32, original_tag),
+                        (original_iv, ('0' if original_tag[0] != '0' else '1') + original_tag[1:])]:
+            with self.subTest(iv_length=len(iv), malformed=iv.startswith('z')):
+                with closing(sqlite3.connect(self.database)) as db, db:
+                    db.execute('UPDATE api_keys SET iv=?,auth_tag=?', (iv, tag))
+                with self.assertRaises(FreeAIError) as error:
+                    await self.recovery.verify_key(self.database, KEY)
+                self.assertEqual(error.exception.code, 'RECOVERY_KEY_MISMATCH')
 
     async def test_actual_sqlite_wal_snapshot_keeps_committed_quota_and_ciphertext(self):
         with closing(sqlite3.connect(self.database)) as active, active:

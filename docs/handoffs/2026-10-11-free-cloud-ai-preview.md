@@ -1,5 +1,8 @@
 # Free cloud AI implementation checkpoint — 2026-10-11
 
+Recovery format bug corrected in source (2026-10-13): actual router writes16-byte IVs; retained recovery incorrectly requires12. The focused correction passes51 backend tests,19 recovery tests, real disposable GNOME Keyring/SQLite/Node recovery and independent review. [Exact evidence](programs/free-cloud-ai/evidence/2026-10-13-recovery-iv-format-fix.json). Installed backend2/Voice41 stay unchanged. The pending transaction pins the old verifier, so next is a narrowly reviewed compatibility repair preserving original capsule bytes, keys/data and owning cleanup. Voice panel remains temporarily disabled; restore only after recovery settles. No package build, publication or preview completion.
+
+
 ## Latest checkpoint — October 13 native update
 
 Hub installed; Voice update recovery blocked (2026-10-13): Hub0.3.11 is installed and its payload verified. Voice remains41/backend2. After exact rollback-cache restoration, the Voice43 updater failed at its GO handshake because expensive validation ran after helper launch. The installed recovery then refused because Voice restarted during authentication. [Current checkpoint](programs/free-cloud-ai/evidence/2026-10-13-hub-installed-voice-update-recovery.json). Next: identify restart trigger and settle pending operation through owning recovery; independently review/test GO fix before a new matched Hub build. Signed Voice43 is preserved. Craft paused; preview incomplete.

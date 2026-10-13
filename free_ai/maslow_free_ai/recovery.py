@@ -30,7 +30,7 @@ process.stdin.on('end', () => { try {
   const {key, rows} = JSON.parse(data);
   if(!/^[a-f0-9]{64}$/.test(key) || rows.length !== 1) throw Error();
   for(const row of rows) {
-    if(row.platform !== 'groq' || !/^[a-f0-9]+$/i.test(row.encrypted_key) || !/^[a-f0-9]{24}$/i.test(row.iv) || !/^[a-f0-9]{32}$/i.test(row.auth_tag)) throw Error();
+    if(row.platform !== 'groq' || !/^[a-f0-9]+$/i.test(row.encrypted_key) || !/^[a-f0-9]{32}$/i.test(row.iv) || !/^[a-f0-9]{32}$/i.test(row.auth_tag)) throw Error();
     const decipher = crypto.createDecipheriv('aes-256-gcm', Buffer.from(key, 'hex'), Buffer.from(row.iv,'hex'), {authTagLength:16});
     decipher.setAuthTag(Buffer.from(row.auth_tag,'hex'));
     const clear = decipher.update(row.encrypted_key,'hex','utf8') + decipher.final('utf8');

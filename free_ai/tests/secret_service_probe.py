@@ -39,10 +39,12 @@ async def bounded_output(process):
 async def recovery_probe(keys):
     """Real SQLite/WAL, Node crypto and disposable Secret Service; no packages."""
     node = Path('/tmp/maslow-freellmapi-tools/node-v22.23.3-linux-x64/bin/node')
+    if not node.is_file():
+        node = Path('/usr/lib/maslow-free-ai/node/bin/node')
     version = await asyncio.create_subprocess_exec(str(node),'--version',stdout=asyncio.subprocess.PIPE)
     output, _ = await bounded_output(version)
     assert version.returncode == 0 and output == b'v22.23.3\n'
-    encrypt = """const c=require('node:crypto'),iv=c.randomBytes(12),e=c.createCipheriv('aes-256-gcm',Buffer.from('a'.repeat(64),'hex'),iv);const v=e.update('gsk_'+'f'.repeat(32),'utf8','hex')+e.final('hex');process.stdout.write(JSON.stringify([v,iv.toString('hex'),e.getAuthTag().toString('hex')]));"""
+    encrypt = """const c=require('node:crypto'),iv=c.randomBytes(16),e=c.createCipheriv('aes-256-gcm',Buffer.from('a'.repeat(64),'hex'),iv);const v=e.update('gsk_'+'f'.repeat(32),'utf8','hex')+e.final('hex');process.stdout.write(JSON.stringify([v,iv.toString('hex'),e.getAuthTag().toString('hex')]));"""
     child = await asyncio.create_subprocess_exec(str(node),'--eval',encrypt,stdout=asyncio.subprocess.PIPE)
     output, _ = await bounded_output(child)
     assert child.returncode == 0
