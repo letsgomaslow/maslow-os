@@ -538,7 +538,7 @@
       ],
       "artifact_hashes": {},
       "blocker": "Installed Hub0.3.9 initial parent handshake failed before package change; owning recovery exited0 and cleared ticket. Corrected source2bf25ef accepted; new Hub0.3.10 build/audit/signing/install and all live/recovery/clean-guest/audio gates remain required.",
-      "next_action": "Read actual QA4 build outcome, audit new archive against exact source and retained signed pair, sign Hub/fresh local manifest11, then normal installed Hub update and graphical-authorized fixed component installation. User runs no commands; participation only local secret prompts or physical tests."
+      "next_action": "Actual QA4 archive audit passed. Finish independent signer2 review, local enrolled-key Hub/manifest11 signing and verification, then locked normal graphical Hub update and fixed optional installation. Keep signed previous0.3.9, backups and exact external HOME mask ownership."
     },
     {
       "id": "FCAI-P2-WORK",
@@ -806,8 +806,8 @@
         "docs/programs/free-cloud-ai/evidence/2026-10-12-hub036-reconstructed-build.json"
       ],
       "artifact_hashes": {},
-      "blocker": "Native-first diligence completed,previousVoice37 exactbytecheck and reconstructedHub036 payload audit pass; Mac signatures/finalmatchedHub and actualprivate-state/quiescence prerequisites pending. Guest fresh/destructive and native/live/audio gates open.",
-      "next_action": "Use retained installed guest only for required clean-install/destructive recovery proof; no further ISO cycle. Local Lenovo preview path awaits explicit replay-effect decision and concrete safe installation preflight."
+      "blocker": "Lenovo Hub0.3.9 installed, signatures/backups verified and user accepted disclosed local replay pause. Corrected Hub0.3.10 package built/audited; final local signing/update pending. Guest retained baseline lacks proven standalone Voice install input/trust/rollback seed and visual proof. Live account/audio/fault gates remain open.",
+      "next_action": "Finish corrected native delivery and live/audio tests on Lenovo; use retained clean installed guest for mandatory fresh/fault tests after targeted delivery/trust prerequisites. No ISO cycle or waived resource threshold."
     },
     {
       "id": "FCAI-P6-REVIEW",

@@ -1,0 +1,36 @@
+{
+  "schema": 1,
+  "status": "audited-and-enrolled-signatures-verified-native-update-pending",
+  "hubVersion": "0.3.10-1",
+  "archiveSha256": "d71e572fe1a5f483a6726741d047424d02c53b852d3a504adeb4583df16a8bd9",
+  "archiveBytes": 332787124,
+  "audit": {
+    "independentAdmissionSha256": "f048d610d7abc572049394b3c4ce71f0493e416591128b6e9df4ee592178d81c",
+    "actualResultSha256": "9e120479c9167f006a332c083b4a545c09aba23eda3d98359f062624b069048c",
+    "actualLogSha256": "a55804d05ef2d2ffebe02e811ef5033fa00b6f56553335ea2e8263597b60c092",
+    "exit": 0,
+    "seconds": 34.117,
+    "mappedPayloadFiles": 44,
+    "archiveMembers": 76,
+    "signedOpaquePairFiles": 6,
+    "fourPackageOverlapFree": true,
+    "limits": "CPU1/nice10/AS1GiB/240s/shared heavy lock"
+  },
+  "signing": {
+    "independentSignerReviewSha256": "d57c59f12c8ec11e830ec7d168c57ab9bfa159748f4ff5993e8f57d0475bc1b0",
+    "copyReadbackResultSha256": "c1d4185f87ac1574da491db44caf11063076392a78cf3b5e2a10a525b0db2423",
+    "operatorCompleted": true,
+    "rootHeldFdVerificationSha256": "6f8e5f34db062b884aae493765c0451c513ccac69b04be981dfc0d92e8851819",
+    "directory": "/home/maslow/Maslow-ai-os/free-ai-build/hub-bundle-prep/local-preview-signatures-w25uqb92",
+    "manifestSequence": 11,
+    "manifestSha256": "ba3fdabd4e2adf328533415960e1187acdfda391102353899c9aacd14bbe7ff7",
+    "manifestSignatureSha256": "1f68f694087841fbdeecd8cc84fd449727b413eb4b2b9cbbd81fc4a4668cda17",
+    "hubSignatureSha256": "8b2bbcb87874f7f493a7f6995e092a20d567be1056e079d371c9cd3d5b346998",
+    "enrolledPublicKeySha256": "1c0134a2171832127b6f6f607f8e5b18fc8d4bec51b4afe0e995d4859e74bb3f",
+    "bothVerified": true,
+    "published": false
+  },
+  "currentLaptop": "Hub0.3.9 integrity73/0altered; public replay10/dbce unchanged; no ALPM lock. Voice37 stopped, backend absent and recorded HOME mask retained. Private Root pending/ordinary transaction will be rechecked under owning lock before update.",
+  "nextAction": "Review exact activated one-off locked installed-helper apply guard, then graphical authorization for normal Hub0.3.10 update with signed previous0.3.9 retained. Verify actual outcome before optional installation.",
+  "limitations": "No live Groq requests or installed FreeAI/Voice41/Connect8, account, audio, recovery or clean-guest feature acceptance. Production gates remain false, Craft paused; no product merge or publication."
+}

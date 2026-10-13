@@ -54,9 +54,9 @@
       "source_commit": "e0ebb476764fee5a7cabff3d0b786cbeba09838c",
       "product_source_parent": "b222265142b585fe50743ac5a705c8da39ac2b27",
       "recipe_commit": "8709933da1c2d89cd3c185902084b5dc3e45ad0d",
-      "signed": false,
+      "signed": true,
       "installed_acceptance": false,
-      "status": "Final QA3-only candidate: normal bounded build and actual source/metadata/signed opaque-pair/four-package audit passed; final archive signature and installed acceptance pending."
+      "status": "Enrolled signature independently verified; actually installed on Lenovo as Hub0.3.9 with exact payload/integrity proof. Preserve as immediate signed rollback seed for0.3.10; feature acceptance incomplete."
     },
     {
       "path": "/home/maslow/Maslow-ai-os/free-ai-build/native/maslow-free-ai-0.1.0-1-x86_64.pkg.tar.zst",
@@ -182,9 +182,22 @@
       "source_commit": "33940d2e8740b172b953cc3e091cbae1ba1cd303",
       "recipe_commit": "5e423aeddea4b5b42d7fbfbe5bd7f85391c10db4",
       "classification": "Reconstructed rollback seed,not original archive",
-      "signed": false,
+      "signed": true,
       "installed_acceptance": false,
-      "status": "Actual complete installed-payload/localrecord/source/metadata audit passed; staging signature and realretention/rollback stillrequired."
+      "status": "Reconstructed payload audited and enrolled signature verified; retained history, actual package rollback acceptance remains open."
+    },
+    {
+      "path": "/home/maslow/Maslow-ai-os/free-ai-build/hub-bundle-prep/qa-hub-build-4/evidence/06577bcbffa2443e87c0fe8bfc8e535d/work/maslow-hub-0.3.10-1-any.pkg.tar.zst",
+      "name": "maslow-hub",
+      "version": "0.3.10-1",
+      "sha256": "d71e572fe1a5f483a6726741d047424d02c53b852d3a504adeb4583df16a8bd9",
+      "bytes": 332787124,
+      "source_commit": "266c6073344db5d0064d0a74f70bafc196bc1d96",
+      "product_source_parent": "2bf25ef6315b85cdabdb4941e2c97900641a579a",
+      "recipe_commit": "8709933da1c2d89cd3c185902084b5dc3e45ad0d",
+      "signed": true,
+      "installed_acceptance": false,
+      "status": "Actual reviewed build/archive audit and independently verified enrolled signature passed; native upgrade pending."
     }
   ],
   "accepted_capabilities": [],
@@ -272,7 +285,8 @@
     "docs/programs/free-cloud-ai/evidence/2026-10-12-lenovo-pivot-diligence.json",
     "docs/programs/free-cloud-ai/evidence/2026-10-12-native-signing-ready-checkpoint.json",
     "docs/programs/free-cloud-ai/evidence/2026-10-12-hub036-reconstructed-build.json",
-    "docs/programs/free-cloud-ai/evidence/2026-10-13-root-socket-0310-accepted-source.json"
+    "docs/programs/free-cloud-ai/evidence/2026-10-13-root-socket-0310-accepted-source.json",
+    "docs/programs/free-cloud-ai/evidence/2026-10-13-qa4-audit-and-signatures.json"
   ],
   "passed_source_gates": [
     "every-dispatch-provider-and-model-policy",
@@ -319,8 +333,8 @@
     "parent": "2bf25ef6315b85cdabdb4941e2c97900641a579a",
     "source_accepted": true,
     "build_started": true,
-    "artifact_audit_passed": false,
+    "artifact_audit_passed": true,
     "installation_accepted": false,
-    "status": "QA4 0.3.10 source/build context independently accepted; actual bounded build started. No final archive or installed acceptance inferred."
+    "status": "Actual QA4 build/archive audit and local enrolled Hub/manifest11 signatures verified. Native upgrade and feature acceptance pending."
   }
 }
