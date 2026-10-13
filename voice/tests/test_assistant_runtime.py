@@ -67,4 +67,3 @@ class AssistantWorkerTests(unittest.TestCase):
     def test_retry_control_does_not_relax_tool_allowlist(self):
         with self.assertRaisesRegex(RuntimeError, "tool compatibility gate"):
             self.agent(tools=assistant_worker.TOOLS | {"terminal"})
-
