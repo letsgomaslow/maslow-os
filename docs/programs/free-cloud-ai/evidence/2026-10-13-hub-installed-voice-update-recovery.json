@@ -68,5 +68,15 @@
     "independent_review": "accepted",
     "installed": false,
     "evidence": "free-ai-build/hub-bundle-prep/hub-managed-update-fix-evidence/verification.json"
+  },
+  "user_recovery_diagnostic": {
+    "preflights": "canonical service profile, service stopped, no active tasks/sessions, settings schema, DB private regular single-link metadata, lock metadata/availability all pass; maintenance marker absent",
+    "result": {
+      "stage": "verify_key",
+      "code": "RECOVERY_KEY_MISMATCH"
+    },
+    "meaning": "Existing key retrieval succeeds; retained verifier rejects actual database/key pair. Error also covers SQLite/read/crypto/output failure, not proof key is wrong.",
+    "privacy": "Bounded product verifier, no state constructors, no key/database values exposed or stored, no secret argv/env.",
+    "next": "Read-only schema/crypto-format compatibility diagnosis; no key replacement or data reset."
   }
 }
