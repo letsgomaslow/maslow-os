@@ -209,7 +209,7 @@
       "recipe_commit": "0f9cb467a60d6dfb30a1fdd0bc946eafd57493cf",
       "signed": false,
       "installed_acceptance": false,
-      "status": "Actuallybuilt afterindependentreview/538owning2skip/UIorbpass; actualarchiveaudit/signatures/matcheddelivery/installedliveacceptancepending."
+      "status": "Actualarchiveauditpassed63mapped/9141members/source/marker/ownership/deps againstverified41; retainexact4a49bytes. Signatures/matchedHub/installedliveacceptancepending."
     }
   ],
   "accepted_capabilities": [],
@@ -301,7 +301,8 @@
     "docs/programs/free-cloud-ai/evidence/2026-10-13-qa4-audit-and-signatures.json",
     "docs/programs/free-cloud-ai/evidence/2026-10-13-hub0310-installed.json",
     "docs/programs/free-cloud-ai/evidence/2026-10-13-native-groq-typed-checkpoint.json",
-    "docs/programs/free-cloud-ai/evidence/2026-10-13-voice42-build.json"
+    "docs/programs/free-cloud-ai/evidence/2026-10-13-voice42-build.json",
+    "docs/programs/free-cloud-ai/evidence/2026-10-13-voice42-artifact-audit.json"
   ],
   "passed_source_gates": [
     "every-dispatch-provider-and-model-policy",
