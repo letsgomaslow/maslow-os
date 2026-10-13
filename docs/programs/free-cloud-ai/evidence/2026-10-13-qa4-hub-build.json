@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "status": "built-awaiting-actual-archive-audit",
+  "productSource": "2bf25ef6315b85cdabdb4941e2c97900641a579a",
+  "qaSource": "266c6073344db5d0064d0a74f70bafc196bc1d96",
+  "qaTree": "a83a86188b6d49dd6a53eba1f9315ecbe3116437",
+  "independentSourceReviewSha256": "a6a658220cedbf78b31798855fb8e0b1734ffe9505cccdf5669452382be68659",
+  "independentBuildReviewSha256": "3c44e1c4cb2a3455d2ec746826d8cffe71fdf6e08539d345d6c441017ca5dbb4",
+  "buildManifestSha256": "dbdab40782efcbf1f69d14a8983e1ac4b1f738840a857b2e83480703b249e219",
+  "session": "06577bcbffa2443e87c0fe8bfc8e535d",
+  "archive": "/home/maslow/Maslow-ai-os/free-ai-build/hub-bundle-prep/qa-hub-build-4/evidence/06577bcbffa2443e87c0fe8bfc8e535d/work/maslow-hub-0.3.10-1-any.pkg.tar.zst",
+  "archiveSha256": "d71e572fe1a5f483a6726741d047424d02c53b852d3a504adeb4583df16a8bd9",
+  "archiveBytes": 332787124,
+  "stateSha256": "709db13120a73223d33ff9440c4d0ea6f361bb7657fb0f3e6891449d96c31c88",
+  "logSha256": "2a52733535642bd7cac56745b983511daa196fd1b3002d677c3612cb8ad51471",
+  "actualBuildExit": 0,
+  "launchGroupRetired": true,
+  "exactContainerGone": true,
+  "limits": {"cpu": 2, "memoryGiB": 4, "memoryAndSwapGiB": 6, "network": "none", "nice": 10, "deadlineSeconds": 900, "sharedLock": "/home/maslow/Maslow-ai-os/heavy-work.lock"},
+  "preservation": "Backend2, Voice41, Connect8 and older QA artifacts unchanged; Craft remains paused. Installed Hub0.3.9 and Voice37 unchanged by build.",
+  "nextAction": "Independently review postbuild4 admission, then audit this actual archive. Only after audit prepare enrolled-key Hub and fresh local manifest11 signatures, normal Hub update and optional component installation.",
+  "limitations": "Build is not installation, account, Groq, audio, recovery, clean-guest or Lenovo feature acceptance. All required preview gates remain open; no production publication or product merge."
+}

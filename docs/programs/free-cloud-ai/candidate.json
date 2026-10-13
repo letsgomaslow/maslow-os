@@ -36,7 +36,7 @@
     "connect_native3_baseline_not_managed_account_acceptance": "7545ba68c0b6759a7f65c88ccb1390777df5b812",
     "runtime_current_source": "c2b03842a81645998a79cbca525c03ddf67813b4",
     "voice_managed_lifecycle_source": "914d77dda835cc3e884434ec18a589facdd4d8ae",
-    "hub_current_source": "b222265142b585fe50743ac5a705c8da39ac2b27",
+    "hub_current_source": "2bf25ef6315b85cdabdb4941e2c97900641a579a",
     "packages_current_source": "6cc15c3b297a375897f078fee7ef27afcbcfcf72",
     "connect_managed_source": "fd33682f3bcfdbce849a06304da0d74137b592f0",
     "hub_recovery_design": "0aafacbc8915d5db64e92bdb5a97bd604c76e6e1",
@@ -271,7 +271,8 @@
     "docs/programs/free-cloud-ai/evidence/2026-10-12-retained-hub-artifact-audit.json",
     "docs/programs/free-cloud-ai/evidence/2026-10-12-lenovo-pivot-diligence.json",
     "docs/programs/free-cloud-ai/evidence/2026-10-12-native-signing-ready-checkpoint.json",
-    "docs/programs/free-cloud-ai/evidence/2026-10-12-hub036-reconstructed-build.json"
+    "docs/programs/free-cloud-ai/evidence/2026-10-12-hub036-reconstructed-build.json",
+    "docs/programs/free-cloud-ai/evidence/2026-10-13-root-socket-0310-accepted-source.json"
   ],
   "passed_source_gates": [
     "every-dispatch-provider-and-model-policy",
@@ -314,12 +315,12 @@
     "status": "built and scoped-tested, blocked for installation; do not add native6 identity to Hub"
   },
   "prepared_qa_hub": {
-    "source": "e0ebb476764fee5a7cabff3d0b786cbeba09838c",
-    "parent": "b222265142b585fe50743ac5a705c8da39ac2b27",
+    "source": "266c6073344db5d0064d0a74f70bafc196bc1d96",
+    "parent": "2bf25ef6315b85cdabdb4941e2c97900641a579a",
     "source_accepted": true,
     "build_started": true,
-    "artifact_audit_passed": true,
+    "artifact_audit_passed": false,
     "installation_accepted": false,
-    "status": "Final QA3 f522 candidate built normally and actual artifact audit passed; final enrolled signatures and installed/live/recovery acceptance open."
+    "status": "QA4 0.3.10 source/build context independently accepted; actual bounded build started. No final archive or installed acceptance inferred."
   }
 }

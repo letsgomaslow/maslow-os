@@ -84,7 +84,7 @@
       "path": "/home/maslow/Projects/Maslow/free-ai-hub-current",
       "base_revision": "33940d2e8740b172b953cc3e091cbae1ba1cd303",
       "branch": "codex/free-cloud-ai-hub-current",
-      "implementation_revision": "b222265142b585fe50743ac5a705c8da39ac2b27",
+      "implementation_revision": "2bf25ef6315b85cdabdb4941e2c97900641a579a",
       "previous_free_ai_worktree": "/home/maslow/Projects/Maslow/free-ai-hub",
       "accepted_craft_source_reference": "2666609002dce8bb6cc16511ef2125bccb18dbe9"
     },
@@ -436,10 +436,10 @@
       "status": "active",
       "owner": "root",
       "session": "2026-10-11-free-cloud-ai-root",
-      "worker": "current_recovery managed lifecycle contract/code; root integration",
-      "actual_model": "gpt-6.1-sol/high implementation; gpt-6-astra/high independent review",
+      "worker": "rejection_forwarding source/context preparation; boundary_review independent review; root actual build/integration",
+      "actual_model": "gpt-6-sol/high implementation/preparation; gpt-6-astra/high independent review",
       "attempt": 2,
-      "last_checkpoint": "2026-10-12T17:37:51.122Z",
+      "last_checkpoint": "2026-10-13T02:39:43Z",
       "base_revision": "2a8c6eda15d92078fdd8656a879b1e93dd786a1d",
       "branch": "codex/free-cloud-ai-hub-current",
       "worktree": "/home/maslow/Projects/Maslow/free-ai-hub-current",
@@ -465,7 +465,8 @@
         "015e9f426931b200c7945739f3b5adb913b3bef3",
         "ceba096b7ea8d36e6124ffbf121b1eef192ecc75",
         "52966604271db965147b25c9997121b584bf15fc",
-        "b222265142b585fe50743ac5a705c8da39ac2b27"
+        "b222265142b585fe50743ac5a705c8da39ac2b27",
+        "2bf25ef6315b85cdabdb4941e2c97900641a579a"
       ],
       "integration_commits": [
         "c856c683de8e66a43d326b435bbf73504f5ca6a2",
@@ -494,6 +495,10 @@
         },
         {
           "check": "9562f8e preservation foundation23+launch2/fullHub328/UI; independently reviewed, no removal/reinstall wiring or gates enabled.",
+          "result": "pass"
+        },
+        {
+          "check": "Hub2bf25ef:687 owning tests,0 failures/skips,UI passed; actual UID0-to1000 install/remove/reinstall socket proofs and independent security/test review passed. QA4 source and bounded build context independently accepted.",
           "result": "pass"
         }
       ],
@@ -528,11 +533,12 @@
         "docs/programs/free-cloud-ai/evidence/2026-10-12-qa3-source-admission.json",
         "docs/programs/free-cloud-ai/evidence/2026-10-12-local-signing-prompt-checkpoint.json",
         "docs/programs/free-cloud-ai/evidence/2026-10-12-local-signing-workstation-correction.json",
-        "docs/programs/free-cloud-ai/evidence/2026-10-12-local-preview-signatures-verified.json"
+        "docs/programs/free-cloud-ai/evidence/2026-10-12-local-preview-signatures-verified.json",
+        "docs/programs/free-cloud-ai/evidence/2026-10-13-root-socket-0310-accepted-source.json"
       ],
       "artifact_hashes": {},
-      "blocker": "Final QA3 Hub and manifest signatures independently verified; local replay pause explicitly accepted, private backups verified. Reviewed native Hub-only pipeline is open awaiting administrator authentication/outcome. Actual protected preflight/Voice37 retention/Hub installation and later optional components/live gates remain required.",
-      "next_action": "Protected manual readonly check2 passed. User runs exact isolated native pipeline2; inspect native-preview-prep/native-install-2 statuses and independently verify actual installed Hub/Root provenance/rollback retention. Preserve failed attempt1. Then normal Hub optional component installation and live acceptance; no publication or replay reset."
+      "blocker": "Installed Hub0.3.9 initial parent handshake failed before package change; owning recovery exited0 and cleared ticket. Corrected source2bf25ef accepted; new Hub0.3.10 build/audit/signing/install and all live/recovery/clean-guest/audio gates remain required.",
+      "next_action": "Read actual QA4 build outcome, audit new archive against exact source and retained signed pair, sign Hub/fresh local manifest11, then normal installed Hub update and graphical-authorized fixed component installation. User runs no commands; participation only local secret prompts or physical tests."
     },
     {
       "id": "FCAI-P2-WORK",
@@ -909,11 +915,12 @@
   ],
   "coordination": {
     "shared_owners": "Craft remains paused per owner handoff; preserve Craft Hub2666609 and Connect native5/source2e872f50 compatibility. Free AI edits only isolated worktrees; coordinate shared Hub/install/helper, Connect and Voice changes before installation.",
-    "build_serialization": "Final QA3 Hub built/audited/signed; unchanged backend2/Voice41/Connect8 retained. Reviewed native Hub-only terminal holds heavy/user update locks while awaiting administrator participation; no concurrent build/VM. CPU1/nice10; Craft stays paused.",
+    "build_serialization": "QA4 Hub0.3.10 build admitted after independent review; one bounded CPU2/RAM4GiB/total6GiB/offline build under shared flock. Backend2/Voice41/Connect8 unchanged; no parallel VM/heavy build. Craft paused.",
     "worker_limit": 2,
-    "integration": "No product/shared merge, host installation, production signing or publication. Program completed source commits only.",
+    "integration": "Local Lenovo preview installation authorized; Hub0.3.9 installed, backend absent and Voice37 preserved. No product merges, production signing/publication or replay reset.",
     "active_workers": [
-      "rejection_forwarding: gpt-6-sol/high; bounded read-only clean-guest delivery prerequisites. Other workers stopped after focused independent reviews."
+      "rejection_forwarding: gpt-6-sol/high; postbuild4 audit preparation only",
+      "boundary_review: gpt-6-astra/high; QA4 source/build review completed; next audit review"
     ]
   },
   "user_priority": "Free AI through completion of approved scope. Craft development paused; do not resume it, merge product branches or publish production artifacts."
