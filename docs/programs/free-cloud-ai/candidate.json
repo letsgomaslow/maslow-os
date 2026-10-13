@@ -197,7 +197,7 @@
       "recipe_commit": "8709933da1c2d89cd3c185902084b5dc3e45ad0d",
       "signed": true,
       "installed_acceptance": false,
-      "status": "Actual reviewed build/archive audit and independently verified enrolled signature passed; native upgrade pending."
+      "status": "Actual Lenovo Hub0.3.10 update0; all44mapped payloads/integrity73/0altered/visibleversion verified. Protected rollback metadata check and feature installed/live/recovery acceptance remain pending."
     }
   ],
   "accepted_capabilities": [],
@@ -286,7 +286,8 @@
     "docs/programs/free-cloud-ai/evidence/2026-10-12-native-signing-ready-checkpoint.json",
     "docs/programs/free-cloud-ai/evidence/2026-10-12-hub036-reconstructed-build.json",
     "docs/programs/free-cloud-ai/evidence/2026-10-13-root-socket-0310-accepted-source.json",
-    "docs/programs/free-cloud-ai/evidence/2026-10-13-qa4-audit-and-signatures.json"
+    "docs/programs/free-cloud-ai/evidence/2026-10-13-qa4-audit-and-signatures.json",
+    "docs/programs/free-cloud-ai/evidence/2026-10-13-hub0310-installed.json"
   ],
   "passed_source_gates": [
     "every-dispatch-provider-and-model-policy",
@@ -335,6 +336,6 @@
     "build_started": true,
     "artifact_audit_passed": true,
     "installation_accepted": false,
-    "status": "Actual QA4 build/archive audit and local enrolled Hub/manifest11 signatures verified. Native upgrade and feature acceptance pending."
+    "status": "QA4 Hub0.3.10 actually installed on Lenovo with exact payload/integrity/visible version proof; optional components and all required feature acceptance remain open."
   }
 }

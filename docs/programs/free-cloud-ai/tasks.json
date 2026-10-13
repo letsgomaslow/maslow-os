@@ -534,11 +534,12 @@
         "docs/programs/free-cloud-ai/evidence/2026-10-12-local-signing-prompt-checkpoint.json",
         "docs/programs/free-cloud-ai/evidence/2026-10-12-local-signing-workstation-correction.json",
         "docs/programs/free-cloud-ai/evidence/2026-10-12-local-preview-signatures-verified.json",
-        "docs/programs/free-cloud-ai/evidence/2026-10-13-root-socket-0310-accepted-source.json"
+        "docs/programs/free-cloud-ai/evidence/2026-10-13-root-socket-0310-accepted-source.json",
+        "docs/programs/free-cloud-ai/evidence/2026-10-13-hub0310-installed.json"
       ],
       "artifact_hashes": {},
-      "blocker": "Installed Hub0.3.9 initial parent handshake failed before package change; owning recovery exited0 and cleared ticket. Corrected source2bf25ef accepted; new Hub0.3.10 build/audit/signing/install and all live/recovery/clean-guest/audio gates remain required.",
-      "next_action": "Actual QA4 archive audit passed. Finish independent signer2 review, local enrolled-key Hub/manifest11 signing and verification, then locked normal graphical Hub update and fixed optional installation. Keep signed previous0.3.9, backups and exact external HOME mask ownership."
+      "blocker": "Corrected Hub0.3.10 installed and payload/integrity/native version verified. Protected rollback/pending snapshot under review before optional components; FreeAI, matchedVoice41/Connect8 and all live/recovery/guest/audio gates remain open.",
+      "next_action": "Review/run frozen protected post-update metadata checker, then actual fixed FreeAI install via genuine graphical authorization. Read saved outcome and verify actual matched packages/cleanup before any Groq setup; no rebuild/signing/update repeat."
     },
     {
       "id": "FCAI-P2-WORK",
@@ -915,12 +916,12 @@
   ],
   "coordination": {
     "shared_owners": "Craft remains paused per owner handoff; preserve Craft Hub2666609 and Connect native5/source2e872f50 compatibility. Free AI edits only isolated worktrees; coordinate shared Hub/install/helper, Connect and Voice changes before installation.",
-    "build_serialization": "QA4 Hub0.3.10 build admitted after independent review; one bounded CPU2/RAM4GiB/total6GiB/offline build under shared flock. Backend2/Voice41/Connect8 unchanged; no parallel VM/heavy build. Craft paused.",
+    "build_serialization": "Hub0.3.10 build/audit/signing/update completed with bounded shared-lock operations. No heavy job now; next native installation will hold shared lock. Backend2/Voice41/Connect8 unchanged, Craft paused.",
     "worker_limit": 2,
     "integration": "Local Lenovo preview installation authorized; Hub0.3.9 installed, backend absent and Voice37 preserved. No product merges, production signing/publication or replay reset.",
     "active_workers": [
-      "rejection_forwarding: gpt-6-sol/high; postbuild4 audit preparation only",
-      "boundary_review: gpt-6-astra/high; QA4 source/build review completed; next audit review"
+      "boundary_review: gpt-6-astra/high; protected post-update read-only checker review",
+      "rejection_forwarding: gpt-6-sol/high; bounded existing clean-guest Voice bootstrap inventory"
     ]
   },
   "user_priority": "Free AI through completion of approved scope. Craft development paused; do not resume it, merge product branches or publish production artifacts."
