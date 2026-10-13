@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "status": "optional-component-install-interrupted-before-package-change-owning-recovery-open",
+  "installed": "Hub0.3.9-1 remains installed; backend absent,Voice0.1.5-37 at actual query. No successful optional install inferred.",
+  "failure": "Product progress actioninstall/stageinterrupted; actual Hub status maintenance/deliveryInterruptedtrue/installAvailablefalse/recoveryAvailabletrue. Persistent installer barrier exists; do not manually clear its Root record/ticket/mask.",
+  "causeAndCorrection": {
+    "cause": "Root's temporary runtime service mask used for preservation is explicitly rejected by installed canonical_service_profile's runtime-unit guard. This was incompatible preparation,not permission to weaken that guard.",
+    "correction": "Root verified exact original e34e quiescence receipt and owned runtime symlink device/inode/owner/timestamps,target/dev/null; removed only that inode. The persistent installer barrier's device/inode/owner/target remained unchanged. Voice verified inactive/MainPID0/ControlPID0.",
+    "actualProfileCheck": "Installed canonical_service_profile(user_identity1000) now passes. This does not prove any other fresh preflight or recovery stage succeeded.",
+    "externalProof": "/home/maslow/Maslow-ai-os/free-ai-build/hub-bundle-prep/native-preview-prep/root-runtime-mask-correction.json",
+    "sourceChanged": false
+  },
+  "recovery": {
+    "command": "Installed /usr/bin/maslow-hubctl --json free-ai recover",
+    "actualHandoff": "terminalLaunchedtrue/duplicatefalse, mapped Maslow OS PID2034246; actionrecover/stagerunning/userhelperPID2034389. Normal local administrator participation requested,no command copying.",
+    "slot": "Shared heavy-lock monitor session78112 holds slot until terminal progress; previous install monitor31733 exited on interruption. No concurrent build/VM.",
+    "result": "Pending; inspect actual outcome and retain pending barriers/records if recovery refuses. No speculative retry or manual stale-grant restoration."
+  },
+  "review": "Existing boundary_review worker performs disjoint bounded read-only recovery contract/cleanup review; Root owns native actions. No source rebuild or new infrastructure.",
+  "next": "Read owning recovery outcome, verify terminal decision/barrier cleanup and unchanged package/user/key state. Follow accepted owning continuation only; if fresh abort is proven, use real Hub install again under compatible stopped-profile conditions. All live/account/audio/clean/fault and full restoration gates remain open.",
+  "previewComplete": false,
+  "publication": false,
+  "craft": "paused"
+}
