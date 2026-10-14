@@ -1,5 +1,15 @@
 # Hub 2.0 native preview
 
+## Visual follow-up — supersedes the original presentation
+
+The user rejected the earlier visual design, especially its monospace font and weak prototype fidelity. Hub source `5393d2bdb543fec649aee2011d44e7b9ac514b81` now restores the official Gradient Bridge mark and existing Manrope from the runtime branding system; reuses the supplied prototype artwork with a readable native-theme overlay; and replaces the old stacked presentation with icon navigation, compact shortcuts, 60/40 Home cards, quieter Work columns, tool/context cards and a private credential modal. Backend, release and launcher code are unchanged. Voice UI/audio and Craft/Connect holds remain intact.
+
+Full Hub710 tests and UI/private-settings/brand contracts pass. Real Quickshell dark/light/strong-accent, normal/compact, enlarged text, keyboard, credential-clear and theme-preservation checks pass, with independent visual review. This is review of rendered fixtures, not user approval or installed acceptance. The approved SVG and supplied illustration bytes are hash-checked unchanged. New screenshot/evidence root: `/home/maslow/Maslow-ai-os/hub-2-build/redesign/`; see its `verification.json` and `artifact-audit.json`. Owning Hub documentation: `docs/hub-2-visual-revision.md`.
+
+Replacement unsigned Hub2.0.0 archive: 2,453,752 bytes, SHA-256 `c8eb911aeae06b26e92b01287a8cb362e1c7b04b921adc01d83659f4d30f128d`, actual audit53 source files/79 members. The prior archive below is preserved but superseded as a visual candidate. The unchanged supporting Voice44 archive and previous backend checks are reused. Installed versions and retained recovery transaction are unchanged; installation still requires the reviewed owning recovery path followed by matching signed admission.
+
+## Original implementation checkpoint
+
 Reviewed source and local artifacts are complete; installation and native update/recovery acceptance remain open. This work does not complete the broader Free AI program.
 
 ## Ownership and exact inputs
