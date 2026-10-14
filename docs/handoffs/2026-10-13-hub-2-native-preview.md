@@ -1,5 +1,11 @@
 # Hub 2.0 native preview
 
+## Wallpaper-consistent product logo
+
+Hub commit `b05681f` replaces the reconstructed sidebar wordmark with unchanged canonical runtime `themes/maslow-dark/unlock.png` and `themes/maslow-light/unlock.png` assets: Gradient Bridge plus MASLOW | AI-OS lettering. Existing approved Manrope interface typography remains. The sidebar is sized for the complete logo in compact and normal windows. UI and brand contracts pass; native dark and compact-light renders were inspected at `/home/maslow/Maslow-ai-os/hub-2-build/install-goal/brand-preview`. This evidence uses synthetic fixtures and does not prove installed behavior. The previous archive must be rebuilt to include this change.
+
+Owning recovery adapter source is integrated as Hub `815ceee`, with its isolated source run reporting716 Python tests and UI checks passing. Exact Voice41/44 compatibility changes remain separate pending integration checks. A reviewed read-only administrator metadata capture was launched; it has not returned an admitted result as of this checkpoint. No recovery barrier has been cleared and no new package has been installed. Next action: obtain and review the capture result, then freeze and independently review the exact owning recovery executor before execution. Do not bypass recovery to deliver branding.
+
 ## Visual follow-up — supersedes the original presentation
 
 The user rejected the earlier visual design, especially its monospace font and weak prototype fidelity. Hub source `5393d2bdb543fec649aee2011d44e7b9ac514b81` now restores the official Gradient Bridge mark and existing Manrope from the runtime branding system; reuses the supplied prototype artwork with a readable native-theme overlay; and replaces the old stacked presentation with icon navigation, compact shortcuts, 60/40 Home cards, quieter Work columns, tool/context cards and a private credential modal. Backend, release and launcher code are unchanged. Voice UI/audio and Craft/Connect holds remain intact.
