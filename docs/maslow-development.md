@@ -6,6 +6,8 @@ Hub **2.0.3-1**, Voice **0.1.5-44**, and Free AI **0.1.0-3** are installed and r
 
 ## Resume safely
 
+The [source integration closeout](handoffs/2026-10-15-hub-2-main-integration.md) records Hub/runtime `main`, scoped packages `maslow`, future-agent entry points, separately backed-up Connect WIP and the hosted-CI billing limitation. Source merge status and installed acceptance remain separate facts; use the product branches for subsequent iterations.
+
 1. Read [AGENTS.md](../AGENTS.md), the [baseline](hub-2-baseline.md), and the owning repository instructions before changing anything. Preserve the accepted prototype-aligned Hub design, official logo and Manrope; keep Voice UI/audio and security boundaries intact.
 2. Run `git status --short --branch`, `git log -5 --oneline`, and `git worktree list` in each repository being touched. Rediscover active worktrees rather than following historical feature-branch names. The [repository map](lenovo-development.md) documents ownership; its dated checkout examples are historical.
 3. Keep installed versions, tested product revisions, later documentation commits, branch integration and publication distinct. Runtime and Hub product branches are `main`; packages and ISO use `maslow`. Integration/push status must be checked in Git, not inferred from installed acceptance.

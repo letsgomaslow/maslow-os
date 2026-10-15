@@ -1,6 +1,6 @@
 # Accepted Hub 2 baseline
 
-Accepted installed Lenovo preview, 2026-10-15: **Hub 2.0.3-1 / Voice 0.1.5-44 / Free AI 0.1.0-3**. The next action is user testing of the installed branded preview. This is local signed-preview acceptance, not a public release, stable channel, ISO rebuild, or assertion that feature branches have already merged.
+Accepted installed Lenovo preview, 2026-10-15: **Hub 2.0.3-1 / Voice 0.1.5-44 / Free AI 0.1.0-3**. The next action is user testing of the installed branded preview. Local signed-preview acceptance, source integration and publication are distinct; [the integration closeout](handoffs/2026-10-15-hub-2-main-integration.md) records the product-branch merges and future-agent entry points. No public release, stable channel or ISO rebuild is implied.
 
 ## Product and design contract
 
