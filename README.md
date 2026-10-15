@@ -8,11 +8,11 @@ Maslow OS is based on [Omarchy](https://omarchy.org/) and [Arch Linux](https://a
 
 ## What makes Maslow different
 
-- **Maslow Hub** is the home for your AI setup. It shows which agents are installed and signed in, checking with each provider instead of asking you to vouch for it. It also delivers signed Hub updates you can roll back.
+- **Maslow Hub** brings together Home, Work, Connections, My context, Apps, and Settings. It shows existing work and account readiness through supported checks, preserves provider sign-in and permission flows, and delivers signed Hub updates with recovery and rollback.
 - **Maslow Voice** lets you talk to your computer. Describe what you want, and Voice hands the work to Codex, Claude Code or Hermes, keeps the work visible, and asks you before anything that needs your permission. Press **Super+H** to start talking.
 - **You stay in control.** Agents explain what they can do before their first autonomous launch, approvals are always yours, and provider sign-in stays in each provider's own flow.
 
-Voice and Hub are preview features that are still being tested on hardware.
+Voice and Hub are preview features that are still being tested on hardware. The accepted October 15 installed preview is Hub **2.0.3-1**, Voice **0.1.5-44**, and Free AI **0.1.0-3**. Its official Maslow logo and Manrope design, native handoffs, and canonical Hub rollback/reapply were checked on the Lenovo. This is a local preview, not a public package-channel release; provider and physical audio acceptance remain separate. See the [current baseline and evidence limits](docs/hub-2-baseline.md).
 
 ## Which computers is it for?
 
@@ -89,13 +89,14 @@ Preview images; appearance may change.
 - [Compatible Omarchy commands](manual/14-omarchy-cli.md)
 - [Report a problem](https://github.com/letsgomaslow/maslow-os/issues)
 
-Development is split across three repositories:
+Development uses three OS repositories and separate Hub source:
 
 - **[maslow-os](https://github.com/letsgomaslow/maslow-os)** — desktop, commands, and defaults; product branch `main`.
 - **[maslow-os-pkgs](https://github.com/letsgomaslow/maslow-os-pkgs)** — package recipes; product branch `maslow`.
 - **[maslow-os-iso](https://github.com/letsgomaslow/maslow-os-iso)** — installer and ISO builds; product branch `maslow`.
+- **[maslow-hub](https://github.com/letsgomaslow/maslow-hub)** — native Hub UI and bounded helper/updater; product branch `main`.
 
-Contributors should read [AGENTS.md](AGENTS.md), the [downstream maintenance guide](DOWNSTREAM.md), and the [testing guide](docs/testing.md). Keep source tests, native test results, and release readiness separate. A public release still needs verified install/update/recovery paths and Maslow-owned package signing and distribution.
+Contributors should start with [current development status](docs/maslow-development.md), [AGENTS.md](AGENTS.md), the [downstream maintenance guide](DOWNSTREAM.md), and the [testing guide](docs/testing.md). Keep source tests, native test results, and release readiness separate. A public release still needs verified install/update/recovery paths and Maslow-owned package signing and distribution.
 
 ## License and credits
 
