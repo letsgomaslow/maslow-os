@@ -1,0 +1,48 @@
+{
+  "schema": 1,
+  "status": "preview-incomplete-focused-local-completion",
+  "userConstraint": "Limited Lenovo resources; reduce elapsed work and redundant verification without weakening required acceptance.",
+  "acceptedSource": {
+    "hubCommit": "52966604271db965147b25c9997121b584bf15fc",
+    "owning": "677 tests passed, zero failures/skips, 204.552 seconds; UI/shell/diff checks passed. First EOF timeout preserved; unchanged isolated controls and one full retake passed.",
+    "owningEvidence": "/home/maslow/Projects/Maslow/free-ai-hub-current/docs/evidence/2026-10-12-postboot-operation-owning.json",
+    "qaSourceCommit": "c00b88da49a0bf8a350ca5ac7a5c5a6cd44a60a5",
+    "qaScope": "Only four reviewed literal acceptance-gate changes; product gates remain false. No installed acceptance inferred."
+  },
+  "retainedBuild": {
+    "job": "99f88f71815b4a76b5954abacda89a6f",
+    "candidatePath": "/home/maslow/Maslow-ai-os/free-ai-build/hub-bundle-prep/qa-hub-build-1/evidence/99f88f71815b4a76b5954abacda89a6f/work/maslow-hub-0.3.9-1-any.pkg.tar.zst",
+    "bytes": 332772871,
+    "accepted": false,
+    "originalState": "stopped-on-failure; exact owned group/container retired. makepkg succeeded but postcheck rejected its normal deterministic pkgver rewrite. Preserve original failed state.",
+    "postcheckReviewSha256": "acf1ece8cbee91b4b360ab96c340453b9a159796ac74615a6f9469cfa332fa84",
+    "next": "Separate reviewed admission and actual archive audit; avoid rebuilding solely for the corrected postcheck."
+  },
+  "guestFacts": {
+    "latestSession": "0741b9ffe21d42fbba52964112db7e48",
+    "evidenceSealSha256": "901703102499a9cd14fde2d4062f014e578937f5d22bc223d9502f1dcf6fe75b",
+    "observed": "Normal QA sign-in, real Quickshell process and Secret Service bus name. Required dependencies available; Voice, Free AI and Connect absent. No standalone Hub Voice bundle. Black frame means visual acceptance remains open.",
+    "next": "One independently admitted read-only diagnostic guest to determine normal Voice setup/repository/cache availability and actual desktop surfaces with a late frame. No installation, OS update, account access or new ISO."
+  },
+  "remainingDeliveryBlockers": [
+    "Retained matched Hub archive audit/admission.",
+    "Verified normal Voice prerequisite installation path on clean installed guest.",
+    "Actual current-operation physical database restoration success; package/key restoration with intact data is a distinct reachable check."
+  ],
+  "executionRules": [
+    "Reuse unchanged backend2, Voice41 and Connect8 artifacts and passing evidence; build only affected inputs.",
+    "At most two independent lightweight workers with disjoint ownership; Root owns integration and actual heavy jobs.",
+    "One heavy job under the existing shared flock. Retain CPU2, guest4GiB, outer6GiB and total8GiB limits and unchanged memory/ownership admission.",
+    "Use the existing installed base and disposable overlays. No new ISO or infrastructure cycle.",
+    "Each run answers named open gates. Preserve failures and diagnose before a revised attempt; repeat unchanged suites only for new changes or unresolved failures.",
+    "Keep Craft paused and compatibility intact. No production publication or product merges."
+  ],
+  "cloud": "Signed-in Codex Cloud settings report No saved environments. Capabilities unknown; no VM upload, environment creation, paid provisioning or infrastructure.",
+  "workers": [
+    "rejection_cleanup_review: independent diagnostic import/deadline retake; no heavy job or source edits.",
+    "rejection_forwarding: external retained-artifact audit admission adaptation; no heavy job or product edits."
+  ],
+  "nextAction": "Finish the diagnostic retake, then run one bounded read-only guest while the disjoint retained-Hub admission adaptation completes. Audit the retained Hub archive after independent admission review. Prepare installed delivery/recovery checks using those exact inputs.",
+  "openAcceptance": "Actual Hub installation, recovery/removal/reinstall, typed questions/drafts/notes without audio, live Groq/routes, exact selected-account reads/revocation, heard Voice, visual/resource and Lenovo acceptance, independent final review.",
+  "previewComplete": false
+}

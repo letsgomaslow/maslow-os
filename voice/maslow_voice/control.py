@@ -9,11 +9,13 @@ from .errors import VoiceError
 from .ipc import MAX_REQUEST, MAX_RESPONSE
 
 
-async def connect():
+async def connect(*, passive=False):
     path = runtime_directory() / "control.sock"
     try:
         return await asyncio.open_unix_connection(str(path), limit=MAX_RESPONSE + 1)
     except (FileNotFoundError, ConnectionRefusedError):
+        if passive:
+            raise VoiceError("VOICE_NOT_RUNNING", "Voice is stopped. Open Voice when you want to use it.") from None
         # A user service is the sole daemon owner. This does not capture audio.
         process = await asyncio.create_subprocess_exec("systemctl", "--user", "start", "maslow-voice.service",
                                                        stdout=asyncio.subprocess.DEVNULL, stderr=asyncio.subprocess.DEVNULL)
@@ -27,8 +29,8 @@ async def connect():
         raise VoiceError("VOICE_NOT_RUNNING", "Voice could not start. Check its installation in Hub.") from None
 
 
-async def run(watch=False):
-    reader, writer = await connect()
+async def run(watch=False, *, passive=False):
+    reader, writer = await connect(passive=passive)
     try:
         if watch:
             writer.write(b'{"action":"watch"}\n')
@@ -84,9 +86,9 @@ async def run(watch=False):
 
 def main():
     try:
-        if sys.argv[1:] not in ([], ["--watch"]):
-            raise VoiceError("INVALID_ARGUMENT", "Use --watch or send one JSON request on standard input.")
-        asyncio.run(run(sys.argv[1:] == ["--watch"]))
+        if sys.argv[1:] not in ([], ["--watch"], ["--passive"]):
+            raise VoiceError("INVALID_ARGUMENT", "Use --watch, --passive, or send one JSON request on standard input.")
+        asyncio.run(run(sys.argv[1:] == ["--watch"], passive=sys.argv[1:] == ["--passive"]))
     except (VoiceError, OSError, TimeoutError) as error:
         safe = error.as_dict() if isinstance(error, VoiceError) else {"code": "VOICE_UNAVAILABLE", "message": "The local Voice service is unavailable."}
         print(json.dumps({"ok": False, "error": safe}), flush=True)

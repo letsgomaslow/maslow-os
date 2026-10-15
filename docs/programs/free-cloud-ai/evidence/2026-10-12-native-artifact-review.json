@@ -1,0 +1,565 @@
+{
+  "schema": 1,
+  "reviewedAtUtc": "2026-10-12T00:33:06.813959+00:00",
+  "reviewer": "independent boundary_review worker",
+  "status": "scoped-native-artifact-evidence-reviewed-connect-advisory-clearance-blocked",
+  "scope": "Read-only review of frozen native archives, source/context provenance, postbuild auditor and bounded static-reuse correction, actual postbuild logs, ELF/ABI/closure/notices, Connect native5 preservation and exact shipped dependency inventory. No independent final preview acceptance.",
+  "source": {
+    "runtime": "c2b03842a81645998a79cbca525c03ddf67813b4",
+    "freeAIAndVoiceRecipes": "333f4f83ddcba6651687a7723c6778f68023cc5b",
+    "connect": "97ac20eed146a8c6b37e33c2c29901a00f3045ff",
+    "connectRecipe": "f4df4dad2da480ce95c7e53a3fc263b79a87c5c0",
+    "runtimeSourceArchiveSha256": "c7dd7013a33f264a9f9523af70e4ae82e982490644d37494ad416d2bf5562bc1",
+    "connectSourceArchiveSha256": "8a9929b9d9652bd38bc36b8426df6cc2783fadc9c5246ccbfa26599d74351906",
+    "connectSourceLockSha256": "79a99838174e1ea36662534d370f778ff121835a5bf0a9c5b4515abc4194d5cf"
+  },
+  "archives": {
+    "maslow-free-ai": "68af1f9c764bcd3cc5b37c5318e23348ac2719ea0b829672ae40399c39341a07",
+    "maslow-voice": "a8933c4b783a63786ec58fa3d22df53ef054355ecc3908ae785572f61593118f",
+    "maslow-connect": "32890f539c5c06649cbee62e3872b99a1fa77f4bb0694f9ee7e08740fb87633c"
+  },
+  "evidenceRoot": "/home/maslow/Maslow-ai-os/free-ai-build/native-2-39",
+  "evidenceSha256": {
+    "actual-batch-monitor.json": "2eea177626a47233fc736db1a45cb46324e6cbeb6f4005f91ccdf0540b86c858",
+    "build-context-proof-c2b03842.json": "08bca127d23a3cdd7e193d0a05dbc5a4a09d4d6213faa2e227155b600a3aea65",
+    "audit-candidate-archive.py": "51489ac8324623ee3b47bb78214f36b07cfb9dfd0bd4741a80ee82566c106b61",
+    "audit-candidate-archive-before-metadata-fix.py": "6e160529f36223a4b3947bdf857dd4f689198fe36fe2b40ebcb39e3cdbaaa2e2",
+    "postbuild-acceptance.py": "12aaf3652b285947bddc6a80ba334310db46cccfccc013bcaa37fa84a4877ab8",
+    "static-reuse-proof-c2b03842.json": "8fdd7d4a5d63d94a37bed5a3f108f8ec987be708bb9cc74c3fca5aac067bfa9d",
+    "test_static_reuse.py": "2f9959cfc3e0aeb5813db0bb1d16d199c9e5dc23cab8c5230014001b43a8fe8f",
+    "connect-native5-dependency-delta.json": "8144e0f21e850fa7b661416f956c2077a73d92df0030e29e2fb530f9aa91edf8",
+    "connect-native5-dependency-layout.json": "f2197a578c933a5fd6e6c1926dfdfdd0caa344158140efa9f77de4a72bf19305",
+    "connect-production-package-inventory.json": "4e3f8ff3d8d608f5f03d37b42fda7759c13cb36389d2178204cdac2b8af1e9bc",
+    "postbuild-evidence-c2b03842-metadata-reviewed/receipt.json": "124aae4375d528c65a2ad350df8b27bbce036ca90ad3eae2c30750a92576f250",
+    "postbuild-evidence-c2b03842-metadata-reviewed/maslow-free-ai-static.json": "6d422261926178dcc14cd6388952d4b73c76ea043c5cb9b4a1802b670c86d6a1",
+    "postbuild-evidence-c2b03842-metadata-reviewed/maslow-voice-static.json": "12d1be78f0623471a88791003f51e162ec4b78d20985e83521f3b5a717725c63",
+    "postbuild-evidence-c2b03842-metadata-reviewed/maslow-connect-static.json": "f6823a9f19294752e64986d1211b989555f53e479c7774972b2ab10aaa550eda",
+    "postbuild-evidence-c2b03842-metadata-reviewed/native-elf.json": "140a7857b3426ac17d363992a4e3045c7286e46c87b20e68dbdcd78d3c6ce8e7",
+    "postbuild-evidence-c2b03842-metadata-reviewed/compiled-free-ai-network-none.log": "7f925c02da25f2cd38abb44816109b4ab26528ec3b74441596d358027d72178b",
+    "postbuild-evidence-c2b03842-metadata-reviewed/voice-owning-network-none.log": "6a28a62e4642e72b6272b102f840c4ecbfd48fe3e441386d5d7852373319b60e",
+    "postbuild-evidence-c2b03842-metadata-reviewed/connect-deployed-network-none.log": "c9a4bc6488d61de91bac3fa4389e3344aa8e39c755d89ced5a6eb4e4c9df8f14",
+    "postbuild-evidence-c2b03842-metadata-reviewed/package-overlap.log": "1f23a49411cb5d2bdc31470bbfaddd5b8c1b13a27675518d58d2bf9c1d1217c1",
+    "advisory-evidence-c2b03842/command-exits.json": "5b59af50362408ef0035b2507e6dbdd15523cf418f0a6b3fbf084bc33dceeced",
+    "advisory-evidence-c2b03842/free-ai-npm-audit.log": "62aa2176f1dbda73fb869f5e675afa339877be2410ffe213bf5bd951fb0c94ae",
+    "advisory-evidence-c2b03842/connect-pnpm-audit.log": "d8dd88dffeec529f48811baaf7bbaa2ffdaeb051ff06377df1fec05cc5390a1c",
+    "advisory-evidence-c2b03842/connect-exact-production-bulk.log": "7dcfefbb8c4fb6c8532581e25cba90ce915996103cb70ee26f6a132b1d967ab1",
+    "advisory-evidence-c2b03842/connect-exact-production-bulk-captured.log": "9d6b06a1a4fde3cba5cc2f14b44715a88012c4001a3a9166959e027c56931a9f"
+  },
+  "independentChecks": [
+    "Streamed and matched all three compressed archive SHA256 values; no extraction or build by reviewer.",
+    "Reviewed auditor, ELF checker and execution/proof scope; reconciled immutable source, recipe, context, archive and report identities.",
+    "Six metadata-normalization tests and seven static-reuse negative tests passed; an additional bool-versus-integer metadata digest control passed. No heavy suite repeated.",
+    "Read archived package metadata/markers from coordinator fresh extractions; no new executable tree or host installation created.",
+    "Connect compiled output inventory has exactly99 js/declaration/map files corresponding to33 sourceTS files, with every output byte matching the frozen native build output. This is not an independent recompilation.",
+    "Enumerated all106 physical Connect dependency/workspace roots in the fresh extraction and verified every package.json digest/name/version against the archive-bound inventory. Exactly105 external name/version tuples across104 names; the one local @maslow/connect-contracts0.1.0 root is explicitly excluded from registry queries.",
+    "Reconstructed canonical Connect advisory request payload SHA8ba6f1e3e74e9b8fb35fcc067be49cdd56ce7b25a6ba0d25da943885b5ea50fc and verified captured HTTP200 body SHA84cbba89736f47e348f9caa5c02bc64e9d00cf8e882f77234e7895ba96b575d8."
+  ],
+  "staticAndRuntimeEvidence": {
+    "freeAI": {
+      "version": "0.1.0-2",
+      "sourceManifestSha256": "176016eac685253bd0046fe9f2e515d3565b4d37334369294c0945a14d2dd30d",
+      "upstream": "65ec96df6450224a95a0eabfff8b41b394b2396f",
+      "compiledEntrySha256": "4ab1de17ebabdabd450014cf4f8c03480b9949e40e46e697644ce3dfcaac99ca",
+      "productionLockSha256": "843dcda1e14f77c8fea99598d1f16b4846b9a3c0d95bdaccc9539f8f3c63946e",
+      "physicalExternalPackages": 116,
+      "serverWorkspacePackages": 1,
+      "capsuleMembers": 6,
+      "nodeVersion": "22.23.3",
+      "nodeABI": 127,
+      "nodeSha256": "fde6a4bf8d0562f7751d1a2d6cb9b417c4cfe107bbcb0aa3e9a24e125e348f48",
+      "sqliteAddonSha256": "34c82fec22105dc2ec7b24d5a7c9c20eb33c1eb7bfb3f891d3d92a4f1e00870a",
+      "sqliteRequiredGLIBC": "2.44",
+      "actualNodeSQLiteExecutionPassed": true,
+      "compiledHTTPTextFunctionResultMediaChecksPassed": true,
+      "proofBoundary": "Actual compiled entry, packaged dependency graph, loopback HTTP and owned process lifecycle; synthetic keys and test-only preloaded upstream fetch, outbound network disabled. Python proof imports unpacked package library. Installed root-owned omarchy-free-ai entry/hostile-cwd behavior was not exercised by this batch.",
+      "staticScope": "Root ownership/path/mode/link checks, strict dependency closure and production lock identity, six capsule pins, notice inventory and bytes, source/entry hashes, executable allowlist."
+    },
+    "voice": {
+      "version": "0.1.5-39",
+      "archiveSourceIntegrityMatched": true,
+      "owningTestsRun": 489,
+      "owningTestsPassed": 484,
+      "owningTestsSkipped": 5,
+      "skipNamesAndReasonsConfirmed": false,
+      "backendTestsRun": 49,
+      "backendTestsPassed": 49,
+      "uiControllerOrbWorkComposerChecksPassed": true,
+      "proofBoundary": "Coordinator ran reviewed first-party source with actual packaged venv interpreter/dependencies in network-disabled container. Static integrity binds archive first-party code to source. No live daemon, microphone, spoken conversation or visual acceptance inferred."
+    },
+    "connect": {
+      "version": "0.1.0-6",
+      "native5CompiledFilesBytePreserved": 87,
+      "native5DependencyRegularFilesBytePreserved": 8667,
+      "native5DependencyMembersLayoutMatched": 10119,
+      "native5DependencySymlinksMatched": 288,
+      "native5DependencyDirectoriesMatched": 1163,
+      "native5DependencyLayoutSha256": "430076d46ec6302bea730027362bb2f948e19de5b1b03813a817a4b794cb84d2",
+      "deployedFixedLauncherAndCompiledCapabilitiesPassed": true,
+      "compiledCatalogAndNativeProfileRootChecksPassed": true,
+      "marker": {
+        "schema": 1,
+        "policyRevision": "maslow-everyday-1",
+        "operations": [
+          "calendar.events.list"
+        ],
+        "sourceRevision": "97ac20eed146a8c6b37e33c2c29901a00f3045ff"
+      },
+      "proofBoundary": "Actual packaged fixed launcher and compiled exports were executed by coordinator with network disabled. No grants, live accounts, installed package admission or native confinement acceptance."
+    },
+    "packageOwnershipOverlap": "Coordinator check passed for selected three archives only; not a whole installed OS ownership proof."
+  },
+  "resolvedEvidenceFindings": [
+    {
+      "finding": "Initial strict Connect native5 comparison failed; claiming all8668 dependency/workspace regular files byte-identical would be false.",
+      "resolution": "One metadata member node_modules/.modules.yaml differs. Preserve8667 exact raw files plus full path/type/mode/UID/GID/link layout. Bounded unique-key JSON normalization validates exact old/new storeDir and canonical GMT prunedAt; every other field compares semantically, including hoisting flags. No broad ignore or dependency/source change.",
+      "oldMetadataSha256": "0656ac4424f05fff76a6ceb8d286a117cf6d9072be7d20015e8e29a36c990c4f",
+      "newMetadataSha256": "99df0ee14678aa1df6ae11676b85686690d5ab768afa503adf6e6e49e163fd70",
+      "originalFailurePreserved": "/home/maslow/Maslow-ai-os/free-ai-build/native-2-39/postbuild-evidence-c2b03842/maslow-connect-static.log"
+    },
+    {
+      "finding": "Postbuild continuation must not reuse mutable execution trees or stale/widened static results.",
+      "resolution": "Explicit hash-pinned reuse proof permits only the exact prior FreeAI/Voice static report and archive identities under unchanged shared verifierAST. Connect cannot be reused; fresh extraction and dynamic execution occurred. Negative controls passed."
+    }
+  ],
+  "advisories": {
+    "freeAI": {
+      "command": "npm audit --omit=dev --workspace server --json",
+      "exitCode": 0,
+      "reportedVulnerabilities": 0,
+      "scope": "Pinned production lock; physical116 external+1workspace graph already statically reconciled. npm metadata119prod/118total also counts root/workspace/link nodes; not a physical shipped package count."
+    },
+    "connect": {
+      "pnpmCliAuditPassed": false,
+      "pnpmFailure": "ERR_PNPM_AUDIT_NO_LOCKFILE",
+      "fullWorkspaceLockAudited": false,
+      "method": "Direct npm Bulk Advisory request over exact archived105 external tuples. Complete workspace deployment lock was not substituted.",
+      "endpoint": "https://registry.npmjs.org/-/npm/v1/security/advisories/bulk",
+      "capturedAtUtc": "2026-10-12T00:29:57.872648+00:00",
+      "httpStatus": 200,
+      "requestSha256": "8ba6f1e3e74e9b8fb35fcc067be49cdd56ce7b25a6ba0d25da943885b5ea50fc",
+      "responseSha256": "84cbba89736f47e348f9caa5c02bc64e9d00cf8e882f77234e7895ba96b575d8",
+      "reportedAdvisoryCount": 5,
+      "issues": [
+        {
+          "package": "@modelcontextprotocol/sdk",
+          "shippedVersion": "1.30.0",
+          "packageJsonPath": ".pnpm/@modelcontextprotocol+sdk@1.30.0_@cfworker+json-schema@4.1.1_zod@4.5.4/node_modules/@modelcontextprotocol/sdk/package.json",
+          "packageJsonSha256": "0690cbe02511a95d1ff199acf20b5a12ac4dfde1bbe30c82a0de73afa92dffc9",
+          "url": "https://github.com/advisories/GHSA-6qxp-vccf-f47h",
+          "severity": "high",
+          "reportedVulnerableRange": ">=1.12.0 <1.31.0",
+          "rangeMatchesShippedVersion": true,
+          "reachabilityIndependentlyEstablished": false
+        },
+        {
+          "package": "fast-uri",
+          "shippedVersion": "3.1.7",
+          "packageJsonPath": ".pnpm/fast-uri@3.1.7/node_modules/fast-uri/package.json",
+          "packageJsonSha256": "e634f3848a2c6c7e1cdc28b119b16e072e10dada8a3ca3f175a2372d0dd83360",
+          "url": "https://github.com/advisories/GHSA-hrr3-gc8f-f4qj",
+          "severity": "moderate",
+          "reportedVulnerableRange": ">=3.0.0 <3.1.8",
+          "rangeMatchesShippedVersion": true,
+          "reachabilityIndependentlyEstablished": false
+        },
+        {
+          "package": "ip-address",
+          "shippedVersion": "10.7.0",
+          "packageJsonPath": ".pnpm/ip-address@10.7.0/node_modules/ip-address/package.json",
+          "packageJsonSha256": "e11a129b22bf8eeb12d7b90e6631b83eafe8c9ea81f48afcda9311a6459ce28f",
+          "url": "https://github.com/advisories/GHSA-j6r3-76f7-8jcv",
+          "severity": "moderate",
+          "reportedVulnerableRange": "<=10.7.0",
+          "rangeMatchesShippedVersion": true,
+          "reachabilityIndependentlyEstablished": false
+        },
+        {
+          "package": "ip-address",
+          "shippedVersion": "10.7.0",
+          "packageJsonPath": ".pnpm/ip-address@10.7.0/node_modules/ip-address/package.json",
+          "packageJsonSha256": "e11a129b22bf8eeb12d7b90e6631b83eafe8c9ea81f48afcda9311a6459ce28f",
+          "url": "https://github.com/advisories/GHSA-h3mg-xc3c-68pw",
+          "severity": "moderate",
+          "reportedVulnerableRange": "<=10.7.0",
+          "rangeMatchesShippedVersion": true,
+          "reachabilityIndependentlyEstablished": false
+        },
+        {
+          "package": "proxy-addr",
+          "shippedVersion": "2.0.7",
+          "packageJsonPath": ".pnpm/proxy-addr@2.0.7/node_modules/proxy-addr/package.json",
+          "packageJsonSha256": "e490a79f8058cbb7c0e9fd3b9977013102b5cbd8d232259b93bb2ebf85834a51",
+          "url": "https://github.com/advisories/GHSA-jqcg-44mw-7w3h",
+          "severity": "critical",
+          "reportedVulnerableRange": ">=1.1.0 <2.0.8",
+          "rangeMatchesShippedVersion": true,
+          "reachabilityIndependentlyEstablished": false
+        }
+      ],
+      "parserStatus": "Both preserved Bulk runs rejected response because entry.name is absent; package identity is given by the response object key. Second attempt captured raw body/HTTP metadata before rejection. Reviewer independently parsed captured unique package-key response and matched returned ranges to shipped versions. No successful audit CLI or clean result claimed.",
+      "clearance": "blocked pending primary-advisory/reachability/remediation review; critical/high matches were reported immediately to coordinator. No dependency update or mitigation accepted here.",
+      "requestPayload": {
+        "@cfworker/json-schema": [
+          "4.1.1"
+        ],
+        "@composio/client": [
+          "2.0.0-rc.8"
+        ],
+        "@composio/core": [
+          "0.22.0"
+        ],
+        "@composio/json-schema-to-zod": [
+          "0.3.3"
+        ],
+        "@hono/node-server": [
+          "2.1.1"
+        ],
+        "@modelcontextprotocol/sdk": [
+          "1.30.0"
+        ],
+        "@types/json-schema": [
+          "7.0.15"
+        ],
+        "accepts": [
+          "2.0.0"
+        ],
+        "ajv": [
+          "8.20.0"
+        ],
+        "ajv-formats": [
+          "3.0.1"
+        ],
+        "body-parser": [
+          "2.3.0"
+        ],
+        "bytes": [
+          "3.1.2"
+        ],
+        "call-bind-apply-helpers": [
+          "1.0.2"
+        ],
+        "call-bound": [
+          "1.0.4"
+        ],
+        "content-disposition": [
+          "1.1.0"
+        ],
+        "content-type": [
+          "1.0.5",
+          "2.1.0"
+        ],
+        "cookie": [
+          "0.7.2"
+        ],
+        "cookie-signature": [
+          "1.2.2"
+        ],
+        "cors": [
+          "2.8.6"
+        ],
+        "cross-spawn": [
+          "7.0.6"
+        ],
+        "debug": [
+          "4.4.3"
+        ],
+        "depd": [
+          "2.0.0"
+        ],
+        "dequal": [
+          "2.0.3"
+        ],
+        "dunder-proto": [
+          "1.0.1"
+        ],
+        "ee-first": [
+          "1.1.1"
+        ],
+        "encodeurl": [
+          "2.0.0"
+        ],
+        "es-define-property": [
+          "1.0.1"
+        ],
+        "es-errors": [
+          "1.3.0"
+        ],
+        "es-object-atoms": [
+          "1.1.2"
+        ],
+        "escape-html": [
+          "1.0.3"
+        ],
+        "etag": [
+          "1.8.1"
+        ],
+        "eventsource": [
+          "3.0.7"
+        ],
+        "eventsource-parser": [
+          "3.1.1"
+        ],
+        "express": [
+          "5.2.1"
+        ],
+        "express-rate-limit": [
+          "8.7.0"
+        ],
+        "fast-deep-equal": [
+          "3.1.3"
+        ],
+        "fast-uri": [
+          "3.1.7"
+        ],
+        "finalhandler": [
+          "2.1.1"
+        ],
+        "forwarded": [
+          "0.2.0"
+        ],
+        "fresh": [
+          "2.0.0"
+        ],
+        "function-bind": [
+          "1.1.2"
+        ],
+        "get-intrinsic": [
+          "1.3.0"
+        ],
+        "get-proto": [
+          "1.0.1"
+        ],
+        "gopd": [
+          "1.2.0"
+        ],
+        "has-symbols": [
+          "1.1.0"
+        ],
+        "hasown": [
+          "2.0.4"
+        ],
+        "hono": [
+          "4.13.7"
+        ],
+        "http-errors": [
+          "2.0.1"
+        ],
+        "iconv-lite": [
+          "0.7.3"
+        ],
+        "inherits": [
+          "2.0.4"
+        ],
+        "ip-address": [
+          "10.7.0"
+        ],
+        "ipaddr.js": [
+          "1.9.1"
+        ],
+        "is-fs-case-sensitive": [
+          "2.0.0"
+        ],
+        "is-promise": [
+          "4.0.0"
+        ],
+        "isexe": [
+          "2.0.0"
+        ],
+        "jose": [
+          "6.2.12"
+        ],
+        "json-schema-traverse": [
+          "1.0.0"
+        ],
+        "json-schema-typed": [
+          "8.0.2"
+        ],
+        "math-intrinsics": [
+          "1.1.0"
+        ],
+        "media-typer": [
+          "1.1.1"
+        ],
+        "merge-descriptors": [
+          "2.0.0"
+        ],
+        "mime-db": [
+          "1.54.0"
+        ],
+        "mime-types": [
+          "3.0.2"
+        ],
+        "ms": [
+          "2.1.3"
+        ],
+        "negotiator": [
+          "1.1.0"
+        ],
+        "object-assign": [
+          "4.1.1"
+        ],
+        "object-inspect": [
+          "1.13.4"
+        ],
+        "on-finished": [
+          "2.4.1"
+        ],
+        "once": [
+          "1.4.0"
+        ],
+        "openai": [
+          "7.32.0"
+        ],
+        "parseurl": [
+          "1.3.3"
+        ],
+        "path-key": [
+          "3.1.1"
+        ],
+        "path-to-regexp": [
+          "8.4.2"
+        ],
+        "picocolors": [
+          "1.1.1"
+        ],
+        "pkce-challenge": [
+          "5.0.1"
+        ],
+        "proxy-addr": [
+          "2.0.7"
+        ],
+        "pusher-js": [
+          "8.6.0"
+        ],
+        "qs": [
+          "6.16.0"
+        ],
+        "range-parser": [
+          "1.3.0"
+        ],
+        "raw-body": [
+          "3.0.2"
+        ],
+        "require-from-string": [
+          "2.0.2"
+        ],
+        "router": [
+          "2.2.0"
+        ],
+        "safer-buffer": [
+          "2.1.2"
+        ],
+        "semver": [
+          "7.8.5"
+        ],
+        "send": [
+          "1.2.1"
+        ],
+        "serve-static": [
+          "2.2.1"
+        ],
+        "setprototypeof": [
+          "1.2.0"
+        ],
+        "shebang-command": [
+          "2.0.0"
+        ],
+        "shebang-regex": [
+          "3.0.0"
+        ],
+        "side-channel": [
+          "1.1.1"
+        ],
+        "side-channel-list": [
+          "1.0.1"
+        ],
+        "side-channel-map": [
+          "1.0.1"
+        ],
+        "side-channel-weakmap": [
+          "1.0.2"
+        ],
+        "statuses": [
+          "2.0.2"
+        ],
+        "toidentifier": [
+          "1.0.1"
+        ],
+        "tweetnacl": [
+          "1.0.3"
+        ],
+        "type-is": [
+          "2.1.0"
+        ],
+        "undici": [
+          "7.29.1"
+        ],
+        "unpipe": [
+          "1.0.0"
+        ],
+        "vary": [
+          "1.1.2"
+        ],
+        "which": [
+          "2.0.2"
+        ],
+        "wrappy": [
+          "1.0.2"
+        ],
+        "zod": [
+          "4.5.4"
+        ],
+        "zod-to-json-schema": [
+          "3.25.2"
+        ]
+      },
+      "rawResponse": "{\"@modelcontextprotocol/sdk\":[{\"id\":1241339,\"url\":\"https://github.com/advisories/GHSA-6qxp-vccf-f47h\",\"title\":\"MCP TypeScript SDK: OAuth client could send credentials to an authorization server chosen by the MCP server\",\"severity\":\"high\",\"vulnerable_versions\":\">=1.12.0 <1.31.0\",\"cwe\":[\"CWE-345\",\"CWE-522\"],\"cvss\":{\"score\":7.5,\"vectorString\":\"CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N\"}}],\"fast-uri\":[{\"id\":1240091,\"url\":\"https://github.com/advisories/GHSA-hrr3-gc8f-f4qj\",\"title\":\"fast-uri vulnerable to inconsistent host case normalization via percent-encoded octets\",\"severity\":\"moderate\",\"vulnerable_versions\":\">=3.0.0 <3.1.8\",\"cwe\":[\"CWE-178\"],\"cvss\":{\"score\":4.8,\"vectorString\":\"CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:L/I:L/A:N\"}}],\"ip-address\":[{\"id\":1240097,\"url\":\"https://github.com/advisories/GHSA-j6r3-76f7-8jcv\",\"title\":\"ip-address: isInSubnet() and isHostInSubnet() compare addresses of different families as if they shared an address space, allowing an allowlist check to admit an address outside its range\",\"severity\":\"moderate\",\"vulnerable_versions\":\"<=10.7.0\",\"cwe\":[\"CWE-697\",\"CWE-843\"],\"cvss\":{\"score\":0,\"vectorString\":null}},{\"id\":1240098,\"url\":\"https://github.com/advisories/GHSA-h3mg-xc3c-68pw\",\"title\":\"ip-address: Address6 builds a parse diagnostic proportional to the input with no length bound, allowing a single long string to stall or crash the process\",\"severity\":\"moderate\",\"vulnerable_versions\":\"<=10.7.0\",\"cwe\":[\"CWE-400\",\"CWE-770\"],\"cvss\":{\"score\":0,\"vectorString\":null}}],\"proxy-addr\":[{\"id\":1241210,\"url\":\"https://github.com/advisories/GHSA-jqcg-44mw-7w3h\",\"title\":\"proxy-addr vulnerable to IP spoofing via IPv4-mapped IPv6 trust subnet\",\"severity\":\"critical\",\"vulnerable_versions\":\">=1.1.0 <2.0.8\",\"cwe\":[\"CWE-290\",\"CWE-348\",\"CWE-697\"],\"cvss\":{\"score\":9.1,\"vectorString\":\"CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:N\"}}]}",
+      "responseDate": "Mon, 12 Oct 2026 00:29:57 GMT",
+      "parentReportedPrimaryFixedVersions": {
+        "@modelcontextprotocol/sdk": "1.31.0",
+        "fast-uri": "3.1.8",
+        "ip-address": "10.7.1",
+        "proxy-addr": "2.0.8"
+      },
+      "parentReportedPrimaryFixedVersionsScope": "Coordinator reported primary upstream advisory verification; this reviewer did not fetch primary pages or approve dependency changes."
+    },
+    "dependencyAdvisoryReviewComplete": false,
+    "limits": [
+      "Point-in-time registry findings only; not an exhaustive vulnerability guarantee.",
+      "No pnpm metavulnerability or remediation graph computation.",
+      "No independent network request or primary-advisory fetch by this reviewer under read-only/no-network scope.",
+      "No Voice Python/OS/privateNode/native-library advisory clearance inferred from npm results."
+    ]
+  },
+  "remainingGates": [
+    "Resolve Connect critical/high and moderate reported advisory matches before admitting native6; preserve existing archive and failed audit logs.",
+    "Fresh installed guest proof with package ownership, fixed root-owned launcher hostile-cwd behavior, real user/systemd identity and Secret Service.",
+    "Signed fixed-pair delivery/update/current-operation recovery with normal pacman signature policy and crash ordering; both source acceptance gates remain false.",
+    "Hub native6 exact identity recognition is separate from artifact smoke and remains unaccepted.",
+    "Native confinement, actual Quickshell visual/interaction and hardware speech acceptance.",
+    "Live Groq two-route and selected-account functionality/consent/revocation; no real account/provider content tested.",
+    "Managed uninstall/reinstall remains foundation/design scope, not an accepted product flow."
+  ],
+  "claims": {
+    "buildArtifactEvidenceReviewed": true,
+    "scopedNetworkDisabledRuntimeEvidenceReviewed": true,
+    "installedVerified": false,
+    "liveVerified": false,
+    "dependencyAdvisoryReviewComplete": false,
+    "nativeConfinementVerified": false,
+    "hubNative6AdmissionAccepted": false,
+    "previewAcceptanceComplete": false,
+    "sourceGatesEnabled": false,
+    "productMergeOrPublication": false
+  },
+  "reviewerOperations": {
+    "docker": false,
+    "vm": false,
+    "build": false,
+    "network": false,
+    "bigArchiveExtraction": false,
+    "hostServiceOrConfigurationChange": false,
+    "secretRead": false,
+    "soleRepositoryWrite": "docs/programs/free-cloud-ai/evidence/2026-10-12-native-artifact-review.json"
+  }
+}

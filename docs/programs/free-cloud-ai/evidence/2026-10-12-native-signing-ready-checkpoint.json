@@ -1,0 +1,38 @@
+{
+  "schema": 1,
+  "status": "source-and-rollback-artifact-verified-operator-staging-signatures-pending",
+  "source": {
+    "hubCommit": "b222265142b585fe50743ac5a705c8da39ac2b27",
+    "independentReviewSha256": "4e6107a6dd958efe66ad80933e2cb87030b3dbfe7d2a7c54c7caeee39de3def6",
+    "owning": "684 tests passed,0 failures/skips,220.665s; UI and diff checks passed, frozen hashes unchanged and owned groups retired. CPU1/nice10/2GiB/900s/shared lock.",
+    "pythonLogSha256": "f999ad4d270ea2262e97cb031c67e34be9d7c62e06a660a0a5953984bdd05716",
+    "uiLogSha256": "e0e5cf01d4ef65427327110295ca9842fc13c33da8ae59bcff8de359e6bb38dd",
+    "productGates": "Four constants remainFalse; no product merge. QA3 four-literal derivative separately preparing.",
+    "limitations": "Only bound current missing-standalone reconstruction. Corrupt-present/newer data and unrecorded-stage gap remain safe-denial blockers; real installed recovery required. Inert package/broker fixtures are not native proof."
+  },
+  "rollbackArtifact": {
+    "classification": "Reconstructed,not original",
+    "package": "maslow-hub-0.3.6-1-any.pkg.tar.zst",
+    "sha256": "987ae012f1cad9502a60a6715d7736138c4e7fb485b7ee8dda016f8b611c5294",
+    "bytes": 474644171,
+    "auditExit": 0,
+    "auditSeconds": 18.39,
+    "auditLogSha256": "3c94a6dd7b1a492939847cd3f7a76af1b56c3f4264b7998ab566cb82ce793310",
+    "independentAuditorRetakeSha256": "6513132d9394f1f300d53c3011f10d8085a39668c8144f97708b3ca89b70e353",
+    "checked": "Actual held-FD archive hash/metadata/53payload+3metadata members,26 source-mapped files,three opaque packages,every installed payload byte/mode/link/local record. Complete audit passes; signature and actual rollback remain unverified."
+  },
+  "operatorHandoff": {
+    "folder": "/home/maslow/Maslow-ai-os/free-ai-build/hub-bundle-prep/lenovo-staging-signing-inputs-1",
+    "fileCount": 6,
+    "inputBytes": 807394242,
+    "contents": "Verified rollbackHub,unchanged backend2/Voice41,exact pair manifest,enrolled public key and OPERATOR-HANDOFF.json. Streaming copy verified hashes and original FD/named identities; no hardlinks or private inputs.",
+    "keyFingerprintSpkiDer": "daacaa5aac138710a3950097b29a05abd3f69c9a8efad512321c45f3103d1ee4",
+    "request": "User transfers public folder to existing release Mac and produces four operator-controlled staging preview signatures. Keep private key/passphrase on Mac; no publication,trust substitution or production rollout.",
+    "future": "After final matchedHub audit, separately sign that exact target and review live/replay-safe staging manifest. Do not reset replay anchors or reserve arbitrary high sequence numbers."
+  },
+  "hostFacts": "Current public replay anchor sequence9/hash eefe4e2527573ff570e33c4503f6e3bde1ca59210c2cea476b91369b6844fa81; final installer must recheck. User reports three protected FreeAI paths absent. Active Voice37/Hermes gateway and existing Connect state preserved. No host package,trust,config or service mutation.",
+  "nextAction": "Finish/review QA3 exact-source derivative while operator transfer/signing proceeds. Validate returned signatures with enrolled key before preparing final matchedHub build. Admit native install only with protected priorVoice archive,consistent private-state/key preservation and supported quiescence/restoration checks.",
+  "heavyJob": "None running; Craft remains paused. Use one shared-lock job at a time. No VM/ISO work this checkpoint.",
+  "openAcceptance": "Matched trustedHub installation,real keyring and lifecycle,typed questions/drafts/notes without audio,live Groq routes,selected-account reads/revocation,heardVoice,installed recovery/removal/reinstall/full-disk,visual/resources/Lenovo and required clean-guest fault tests,independent final review.",
+  "previewComplete": false
+}

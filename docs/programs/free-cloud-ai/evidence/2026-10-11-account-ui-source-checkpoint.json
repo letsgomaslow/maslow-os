@@ -1,0 +1,82 @@
+{
+  "schema": 1,
+  "recorded_at": "2026-10-11T17:14:04.043151+00:00",
+  "runtime_source": "784aea2b453815a55b1551ab2d1b1ed84dbbf529",
+  "hub_source": "732c235",
+  "packages_source": "05ab21a",
+  "connect_source": "646aa1149f36050a470ded7e3658ad0b0a38bcbb",
+  "status": "source-checked-preview-incomplete",
+  "tests": {
+    "voice_owning": {
+      "passed": 472,
+      "skipped": 2,
+      "reason": "expected Mac sandbox skips",
+      "command": "bash test/shell.d/voice-test.sh",
+      "interpreter": "/usr/lib/maslow-voice/venv/bin/python 3.14.8"
+    },
+    "free_ai": {
+      "passed": 29,
+      "details": "real SQLite/WAL and Node AES-GCM plus synthetic key backend; current-operation-only recovery; hostile Python import fixture"
+    },
+    "connect_owning": {
+      "passed": 328,
+      "skipped": 10,
+      "reason": "1 macOS keychain, 9 Postgres environment skips"
+    },
+    "hub": {
+      "passed": 172,
+      "additional_maintenance_focused": 8
+    },
+    "hermes_calendar_runs": {
+      "passed": true,
+      "inference_requests": 2,
+      "account_backend": "synthetic fixture",
+      "real_installed_Hermes": true,
+      "actual_router_policy_compatible": true,
+      "process_cleanup": true,
+      "consumer_speech_withheld": true
+    }
+  },
+  "external_evidence": [
+    {
+      "path": "/home/maslow/Maslow-ai-os/free-ai-build/work-qa/account-ui-freeze.json",
+      "sha256": "16a4ef2e65326f47590b2207f8b9cadca529e049024ef92bbaa888530d023c0b"
+    },
+    {
+      "path": "/home/maslow/Maslow-ai-os/free-ai-build/work-qa/account-ui-final-voice-check.json",
+      "sha256": "410413ba12d1beaade323f1402c4c96cf513f42c80cc2b776d69faf76c0f74e1"
+    },
+    {
+      "path": "/home/maslow/Maslow-ai-os/free-ai-build/delivery-validator/proof.json",
+      "sha256": "1f10fad43bac67caf9962d24bdf36fca725ebc0021983fd4d78bc5a45e698aad"
+    },
+    {
+      "path": "/home/maslow/Maslow-ai-os/free-ai-build/secret-service-probe.json",
+      "sha256": "5746529a8779d34089469a5094f7951fc54e9c1457411bdbacee38ef1742dee6"
+    },
+    {
+      "path": "/home/maslow/Maslow-ai-os/free-ai-build/hermes-calendar-runs-proof.log",
+      "sha256": "cbb633ee51172476ec3bcbfc276b529c8735a3aeea0e61a39504ad5a1bf07e60"
+    },
+    {
+      "path": "/home/maslow/Projects/Maslow/free-ai-connect/docs/evidence/2026-10-11-managed-accounts.json",
+      "sha256": "d580bebabfd70dd83febcb6bf48e01f87dbe82e6fe6c0d23c1b7d4025e71b21e"
+    }
+  ],
+  "native_work_visual": "Coordinator inspected all three final480x800 screenshots; explicitselection/consent/send/retry/refresh tested in actualQuickshell fixture. Qt6.11.2/Sway, not installedproduct. No microphone/speech started.",
+  "private_keyring": "Actual GNOME Secret Service on disposable private D-Bus/home with fakekeys. Active+recovery roundtrip and locked rejection passed; host keyring untouched; ownedprocesses reaped. Earlier privatecollection foreground-only setup failed withoutGUI; corrected probe records success, not installeduserUX.",
+  "independent_review": "Five reproduced findings fixed: startupbriefing, Stop/inflightread, grantpersistcleanup, splitpipe transport, pre-markerreadiness/admission. Reviewed hashesin account-recovery-review.json. ExtraCLI importisolation fixed/tested separately.",
+  "prior_packages": "e7b8831a FreeAI1/Voice38 archives retain historical hashes but are superseded for current source. Rebuild pending final delivery API.",
+  "remaining": [
+    "Privileged fixeduser/root preflight, servicebarrier, retainedarchives, normalpacman policy+ALPMrace gate",
+    "Integrated Connectsource/nativepackage reconciliation withCraft; accepted managedmarker absent",
+    "Freshinstalledguest beforeOSupdate; glibc2.44 minimum forpriornative candidate",
+    "UserperformedGroqFree/privatekey setup andliveapprovedmodel/tool quality",
+    "Realexact-accountselection/two-accountbinding/revocation",
+    "Lenovoresources/reboot/physicalmicrophone+speaker/Voice results",
+    "Paired actualpackage/database/key interruption/recovery; fullhistoricalrollback excluded pendingcompatibilityreview",
+    "Independent integratedfinalacceptance"
+  ],
+  "live_provider_requests": 0,
+  "candidate_ready": false
+}

@@ -1,0 +1,63 @@
+{
+  "schema": 1,
+  "date": "2026-10-11",
+  "status": "source-integration-reviewed-native-and-visual-pending",
+  "source_revision": "c856c683de8e66a43d326b435bbf73504f5ca6a2",
+  "candidate_version": "0.3.9",
+  "worktree": "/home/maslow/Projects/Maslow/free-ai-hub-current",
+  "parents": [
+    "2a8c6eda15d92078fdd8656a879b1e93dd786a1d",
+    "2666609002dce8bb6cc16511ef2125bccb18dbe9"
+  ],
+  "reports": [
+    {
+      "path": "/home/maslow/Projects/Maslow/free-ai-hub-current/docs/evidence/2026-10-11-free-ai-hub-current-integration.json",
+      "sha256": "c45d3e200fe5449665caa1e55b04fe9199388167c852b5a90eb0a05f95eca90d"
+    },
+    {
+      "path": "/home/maslow/Projects/Maslow/free-ai-hub-current/docs/evidence/2026-10-11-free-ai-hub-current-review.json",
+      "sha256": "8bf4ad23f1bee5c99594ea10768ba3e3b0c96d7079610240606ecebdb76f2483"
+    }
+  ],
+  "checks": {
+    "owning_tests": 265,
+    "ui_contract": "pass",
+    "compile": "pass",
+    "diff_and_conflicts": "pass",
+    "independent_native6_rejection": 1,
+    "independent_parser_controls": 5
+  },
+  "preservation": {
+    "reviewed_recovery_files": 9,
+    "other_unchanged_free_ai_files": 80,
+    "craft_apps_helper_and_component": "Exact accepted Craft266",
+    "native5_identity": "0.1.0-5 / 2e872f50a28706e70c159380e2b7186869415b7f",
+    "native6_recognized": false,
+    "featured_schema_and_main_updater": "unchanged",
+    "original_worktrees": "preserved clean",
+    "product_merge": false
+  },
+  "routing": {
+    "implementation": "actual GPT-6.1 Sol high",
+    "review": "actual GPT-6 Astra high"
+  },
+  "gates": {
+    "real_quickshell": false,
+    "native_artifact": false,
+    "installation_accepted": false,
+    "recovery_accepted": false,
+    "live_provider_account": false
+  },
+  "build_queue": {
+    "free_ai": "0.1.0-2",
+    "voice": "0.1.5-39",
+    "connect": "0.1.0-6",
+    "started": false,
+    "blocking_workload": "Actual Craft upbeat_bell, imagec556, CPU2/RAM6GiB",
+    "prepared_contexts": [
+      "/home/maslow/Maslow-ai-os/free-ai-build/native-2-39/build-context-proof.json",
+      "/home/maslow/Maslow-ai-os/free-ai-build/connect-package-prep/native/build-context-proof.json"
+    ]
+  },
+  "next_action": "Reconcile shared workload before admitting exact bounded native builds sequentially; then artifact/owning/overlap and real combined Quickshell checks. Verify native6 before adding its exact identity to the matched Hub while preserving native5."
+}

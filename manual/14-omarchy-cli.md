@@ -1,28 +1,28 @@
 # Maslow OS CLI
 
-Maslow OS is usually controlled through the hotkeys and the Maslow OS menu (`Super + Space`). The compatible engine retains the literal `omarchy` CLI, package names, and paths so upstream tools and extensions continue to work. The CLI is particularly helpful when you're having an AI agent work with you on customization or configuration.
+Maslow OS is usually controlled through the hotkeys and the Maslow OS menu (`Super + Space`). From a terminal, use `maslow` — for example `maslow update` or `maslow theme list`. It runs exactly the same commands as the compatible engine's `omarchy` CLI, which stays available along with its package names and paths so upstream tools and extensions continue to work. The CLI is particularly helpful when you're having an AI agent work with you on customization or configuration.
 
-The CLI has access to all the internal tooling that is used both via the menu and otherwise. You can see everything that's available by running `omarchy` in the terminal.
+The CLI has access to all the internal tooling that is used both via the menu and otherwise. You can see everything that's available by running `maslow` in the terminal.
 
 It looks something like this:
 
 ```
-~ ❯ omarchy
+~ ❯ maslow
 Maslow OS command center
 
 Usage:
-  omarchy <command> [args...]
-  omarchy commands [--all] [--json] [--check]
-  omarchy <group> --help
-  omarchy <group> <command> --help
+  maslow <command> [args...]
+  maslow commands [--all] [--json] [--check]
+  maslow <group> --help
+  maslow <group> <command> --help
 
 Common commands:
-  omarchy update              Update Maslow OS and system packages
-  omarchy theme list          List available themes
-  omarchy theme set <name>    Apply a theme
-  omarchy font list           List available fonts
-  omarchy screenshot          Take a screenshot
-  omarchy debug               Print debugging information
+  maslow update              Update Maslow OS and system packages
+  maslow theme list          List available themes
+  maslow theme set <name>    Apply a theme
+  maslow font list           List available fonts
+  maslow screenshot          Take a screenshot
+  maslow debug               Print debugging information
 
 Groups:
   agent          AI coding agent usage data

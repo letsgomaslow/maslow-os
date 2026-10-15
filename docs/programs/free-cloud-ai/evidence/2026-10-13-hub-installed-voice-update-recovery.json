@@ -1,0 +1,82 @@
+{
+  "recorded_at": "2026-10-13T16:31:43.500731+00:00",
+  "status": "incomplete",
+  "installed": {
+    "hub": "0.3.11-1",
+    "voice": "0.1.5-41",
+    "free_ai": "0.1.0-2"
+  },
+  "verified": [
+    "Hub 0.3.11 actual installation exit 0; 43 mapped source plus generated manifest matched; package integrity 73 files, zero altered.",
+    "Protected post-Hub check confirmed sequence 12, previous Hub 0.3.10 retained and pending absence before component update.",
+    "Exact prior Voice41 and FreeAI2 rollback archives restored through reviewed fixed local preparation, exit 0. This is not a product retention fix."
+  ],
+  "failed_attempts": [
+    {
+      "operation": "Voice43 update before cache restoration",
+      "outcome": "Required previous package cache archives absent; no package mutation."
+    },
+    {
+      "operation": "Voice43 update after cache restoration",
+      "outcome": "BrokenPipeError sending GO: expensive archive verification after helper launch exceeds helper ten-second GO deadline; installed versions unchanged.",
+      "evidence": "free-ai-build/hub-bundle-prep/native-preview-prep/0311/gui-voice43-retake-0k6rm_m8"
+    },
+    {
+      "operation": "Installed free-ai-recover",
+      "exit": 1,
+      "seconds": 358.56,
+      "outcome": "FREE_AI_SERVICE_ACTIVE: Voice restarted after coordinator stopped it and while authentication was pending. No service stopped or mask published by this recovery.",
+      "evidence": "free-ai-build/hub-bundle-prep/native-preview-prep/0311/recover-voice43-preparation-3urmmmz9"
+    }
+  ],
+  "workers": {
+    "managed_go_fix": "gpt-6.1-sol/high: isolated GO timing fix; focused CPU1 tests authorized",
+    "hub_poststate_check": "independent recovery restart diagnosis and security review"
+  },
+  "next_action": "Identify exact user recovery verification failure using safe read-only checks; keep Voice plugin disabled and owning mask intact. Matched Hub0.3.12 preparation proceeds separately; no installation until recovery settled.",
+  "limits": [
+    "Voice43 remains signed and uninstalled; reuse unchanged archive.",
+    "Current pending absence is not proven; do not manually remove records or masks.",
+    "Post-43 managed operation exact-version support and rollback cache retention remain unresolved.",
+    "Craft paused; no publication, merge or full preview acceptance."
+  ],
+  "restart_diagnosis": {
+    "confirmed": "Desktop VoiceController watch reconnect calls control.connect(), which starts the service. Closing Voice panel alone leaves keepLoaded watcher active.",
+    "temporary_actions": [
+      "Closed Hub view using maslowHub close",
+      "Disabled only maslow.voice using supported plugin command",
+      "Stopped maslow-voice.service; confirmed inactive/dead PID0"
+    ],
+    "pending_recovery": "free-ai-build/hub-bundle-prep/native-preview-prep/0311/recover-voice43-watcher-paused-i5daq7s7",
+    "exec_session": 93155,
+    "restore_after_settled": "omarchy plugin enable maslow.voice",
+    "warning": "Do not invoke voice-control status or reenable panel until installed recovery settles pending transaction.",
+    "pending_recovery_result": {
+      "exit": 1,
+      "seconds": 143.389,
+      "message": "The current Free AI operation could not be verified. Its startup barrier and recovery material were retained.",
+      "observed_after": "Voice inactive/dead PID0; public ticket action free-ai-recover; verifier present; owning HOME mask /dev/null present. No records or barriers manually cleared."
+    }
+  },
+  "go_fix": {
+    "commit": "1dc89cf62778753d0687edd030e101fb506f45e7",
+    "focused": 58,
+    "owning": 692,
+    "failures": 0,
+    "skips": 0,
+    "ui": "passed",
+    "independent_review": "accepted",
+    "installed": false,
+    "evidence": "free-ai-build/hub-bundle-prep/hub-managed-update-fix-evidence/verification.json"
+  },
+  "user_recovery_diagnostic": {
+    "preflights": "canonical service profile, service stopped, no active tasks/sessions, settings schema, DB private regular single-link metadata, lock metadata/availability all pass; maintenance marker absent",
+    "result": {
+      "stage": "verify_key",
+      "code": "RECOVERY_KEY_MISMATCH"
+    },
+    "meaning": "Existing key retrieval succeeds; retained verifier rejects actual database/key pair. Error also covers SQLite/read/crypto/output failure, not proof key is wrong.",
+    "privacy": "Bounded product verifier, no state constructors, no key/database values exposed or stored, no secret argv/env.",
+    "next": "Read-only schema/crypto-format compatibility diagnosis; no key replacement or data reset."
+  }
+}

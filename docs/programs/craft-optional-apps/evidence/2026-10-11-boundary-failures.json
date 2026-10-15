@@ -1,0 +1,23 @@
+{
+  "source_revision": "21fdf8ae46de11cfc8b0a634d4489cf6abd0e937",
+  "level": "coordinator-reproduced-synthetic-host-boundary",
+  "resource_failure": {
+    "host_user_threads": 1442,
+    "outer_nproc_256_namespace_start": "EAGAIN",
+    "raw_bwrap_namespace_start": "pass",
+    "nproc_256_set_after_namespace_start": "pass"
+  },
+  "hardlink_failure": {
+    "fixture": "/home/maslow/Maslow-ai-os/craft-build/hardlink-probe/probe.mjs",
+    "sandbox_factory": "actual compiled sandboxPlan with injected Python ELF fixture, normal mounts/seccomp and fd pins",
+    "launcher": "raw bwrap/supervise avoids separately diagnosed outer nproc failure; not claimed as packaged native app workflow",
+    "result": {
+      "code": 0,
+      "outside": "outside modified",
+      "readOnlyProjectOriginal": "project modified"
+    },
+    "affected_files": "two synthetic fixtures only; no user documents/provider/account files touched"
+  },
+  "gate": "failed; candidate manifest remains not-ready",
+  "next_action": "Independent review of repair before new source/package acceptance"
+}

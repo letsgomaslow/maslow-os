@@ -1,0 +1,60 @@
+{
+  "schema": 1,
+  "date": "2026-10-11",
+  "scope": "Isolated source integration only; no native managed package, live account or full preview acceptance",
+  "source_revision": "97ac20eed146a8c6b37e33c2c29901a00f3045ff",
+  "accepted_craft_source": "2e872f50a28706e70c159380e2b7186869415b7f",
+  "managed_implementation_preserved": "646aa1149f36050a470ded7e3658ad0b0a38bcbb",
+  "worktree": "/home/maslow/Projects/Maslow/free-ai-connect-current",
+  "preserved_worktrees": [
+    "/home/maslow/Projects/Maslow/craft-connect",
+    "/home/maslow/Projects/Maslow/free-ai-connect"
+  ],
+  "owning_check": {
+    "command": "npx --yes pnpm@10.33.3 check",
+    "exit_code": 0,
+    "pass": 369,
+    "skip": 10,
+    "skip_reasons": "Nine existing database-backed gateway checks without configured database and one existing Mac-layout test",
+    "typecheck": "pass",
+    "build": "pass",
+    "node_version": "26.11.1",
+    "package_manager": "10.33.3",
+    "dependency_install": "Frozen offline install; no dependency or lock changes",
+    "log": "/home/maslow/Maslow-ai-os/free-ai-build/connect-current-owning-check.log",
+    "log_sha256": "da6fc3be8cbef4798906e0cdc5430fb8563fb50ddbf8866ccd1fc24d6adb8453"
+  },
+  "independent_review": {
+    "worker": "boundary_review",
+    "model": "gpt-6-astra",
+    "reasoning": "high",
+    "status": "passed-no-scoped-finding",
+    "unchanged_baseline_files": 158,
+    "checks": [
+      "Direct child of accepted Craft source",
+      "Eight intended delta paths only",
+      "CLI adds one lazy managed-accounts dispatch; remaining CLI identical to accepted source",
+      "Managed source, test, documentation and account revocation changes byte-identical to prior managed implementation",
+      "Accepted native cancellation, recovery and admission code/tests unchanged",
+      "Both original worktrees preserved clean",
+      "Lock/manifests unchanged; git diff --check passes"
+    ]
+  },
+  "hashes": {
+    "lockfile": "79a99838174e1ea36662534d370f778ff121835a5bf0a9c5b4515abc4194d5cf",
+    "cli": "c889325d7d829e798820a21bf3c30298ef1e23cb993699cb9a8c5e4d6923fbff",
+    "accounts": "0f8b3c48adf68530ab69f9f338c89e454bd79e24526d9751001bb1c1938b2f92"
+  },
+  "craft_native5_reference": {
+    "source_revision": "2e872f50a28706e70c159380e2b7186869415b7f",
+    "version": "0.1.0-5",
+    "sha256": "a9ccb3a7d4577d673941dd717bfee23977f63a390f65a3ebad133f826cda68de",
+    "scope": "Craft accepted bounded offline container native checks; does not contain this managed account contract"
+  },
+  "gates": {
+    "native_managed_package": false,
+    "installed_account_binding": false,
+    "live_read_revocation": false,
+    "preview_verified": false
+  }
+}

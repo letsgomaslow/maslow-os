@@ -1,0 +1,59 @@
+{
+  "schema": 1,
+  "date": "2026-10-11",
+  "status": "bounded-source-review-passed-repin-required",
+  "baseCommit": "6db3622d04a4e06bfc01b65f86e99ff91d6e1ab9",
+  "scope": "Only control.py read-only status and its focused tests. No wider runtime/refactor, gate, build or installed acceptance.",
+  "sourceSha256": {
+    "free_ai/maslow_free_ai/control.py": "ba9c880be02832125ad247112b41781faa35a8a2cddeab5e83574cd394028aed",
+    "free_ai/tests/test_control.py": "f640c02074b194eeea08a5a963b94dc63850d9b702ddf0c34fd5f98ece3bd132"
+  },
+  "unchangedModuleSha256": {
+    "free_ai/maslow_free_ai/state.py": "fff0eaade37b37cdfbaa4ee76f4e83663bc867400c6f97db3be0adaa93758f4a",
+    "free_ai/maslow_free_ai/recovery.py": "f884789500354d2b09bb6bb913c285f79ea1895bc200aeb9e3318a93bd537e17",
+    "free_ai/maslow_free_ai/credentials.py": "8b1b3e99500d1bd815d015f73362e4b2e9dde1ccf7662d922894b4f5120830f4",
+    "free_ai/maslow_free_ai/runtime.py": "45d0a28708ca7896a05f7f938b607c53fc6c096d0a1837b82dbe3f5992b29a88"
+  },
+  "verified": [
+    "The status path no longer constructs RouterRuntime, State, Recovery or EncryptionKey and does not call request, service startup, keyring or provider operations. Missing storage returns defaults without creating directories.",
+    "Directory traversal uses anchored directory descriptors and O_NOFOLLOW. Existing final storage must be private and user-owned; settings must be a private user-owned regular single-link file, bounded to16KiB. O_NONBLOCK prevents a FIFO open from hanging before type rejection.",
+    "Settings require strict UTF-8, unique JSON keys, exact schema fields/types, approved unique routes and the existing plan vocabulary. Invalid metadata returns a fixed error without repair, chmod or content changes.",
+    "Any existing maintenance marker, including malformed bytes, a broken symlink or a directory, prevents readiness. The earlier fixed public-ticket presence path and its no-prompt/no-service behavior remain intact.",
+    "Installed/task-support checks and ready/disabled/needs-setup/maintenance fields retain the cold status envelope. Unknown or unsafe state cannot imply readiness.",
+    "AST comparison shows the only change inside main is the status call. request and all non-status action logic are unchanged. The four listed runtime/capsule-related modules match their parent bytes exactly; no recovery capsule member changed."
+  ],
+  "independentChecks": {
+    "targetedTestsPassed": 12,
+    "command": "python3 -B inline unittest suite selecting the twelve named DeliveryStatusTests methods",
+    "methods": [
+      "test_actual_cold_cli_leaves_state_absent_without_a_ticket",
+      "test_actual_configured_cli_preserves_bytes_modes_and_tree",
+      "test_actual_isolated_cli_poll_leaves_fresh_state_absent",
+      "test_saved_status_matches_ready_disabled_and_partial_contract",
+      "test_missing_package_or_task_support_cannot_report_ready",
+      "test_malformed_schema_routes_and_duplicate_fields_are_read_only_errors",
+      "test_marker_presence_is_maintenance_including_broken_symlinks",
+      "test_public_unaliased_and_bounded_settings_require_safe_storage",
+      "test_symlink_ancestors_and_settings_are_rejected_without_changes",
+      "test_settings_open_error_does_not_create_or_repair_storage",
+      "test_wrong_owner_and_nonregular_settings_fail_closed",
+      "test_pending_setup_and_mutations_do_not_prompt_or_start_service"
+    ],
+    "additionalControls": [
+      "Actual isolated CLI with an8000-level nested invalid setting below16KiB returns STATE_UNREADABLE JSON, no stderr and unchanged file bytes.",
+      "64 repeated nonregular-settings failures preserve the actual process FD count at4; opened directory/settings descriptors close on rejection.",
+      "Frozen source hashes, unchanged module bytes and git diff --check pass."
+    ],
+    "limits": "Actual isolated Python CLI and temporary filesystem checks, with synthetic settings and package-presence fixtures where noted. No live backend, Secret Service, provider, service or installed-package action."
+  },
+  "coordinatorEvidenceInspectedNotRepeated": {
+    "testsPassed": 49,
+    "log": "/home/maslow/Maslow-ai-os/free-ai-build/free-ai-readonly-status-owning-tests.log",
+    "logSha256Verified": "53d70ff03a4a2b1a2ef3fae034df088c3b8c5f2bbbec555200cf82bb5d458a11",
+    "history": "An initial directory-fd wrapping error was corrected before this freeze by validating metadata before fdopen and closing descriptors on failure. The final targeted nonregular and repeated-FD controls pass."
+  },
+  "remainingConfirmedScopedFindings": [],
+  "requiredBeforeBuild": "Root commits the two source files, produces the coherent new source archive, refreshes both package manifests/recipe pins and copied contexts/runner proof, and completes the bounded identity review. Keep native source hold until that step; prior6db source identity is superseded for these two files.",
+  "remainingGates": "Guided Hub wiring, native/visual/package/database/key recovery, guest/Lenovo and live/provider/account/audio acceptance remain separate. Both FreeAI mutation gates remain unchanged.",
+  "operations": "Reviewer edited only this evidence file. No source/gate/other-document edit, full49-test rerun, Docker/VM/host-service operation, build, credential lookup or provider request."
+}

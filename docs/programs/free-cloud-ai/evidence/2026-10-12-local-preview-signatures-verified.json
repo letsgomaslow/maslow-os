@@ -1,0 +1,20 @@
+{
+  "schema": 1,
+  "status": "four-operator-local-preview-signatures-independently-verified",
+  "outputDirectory": "/home/maslow/Maslow-ai-os/free-ai-build/hub-bundle-prep/local-preview-signatures-2976jqh1",
+  "rootVerification": "/home/maslow/Maslow-ai-os/free-ai-build/hub-bundle-prep/root-local-signatures-verification.json",
+  "verifiedAgainst": "Unchanged enrolled staging public key1c0134a2171832127b6f6f607f8e5b18fc8d4bec51b4afe0e995d4859e74bb3f; SPKI DER daacaa5aac138710a3950097b29a05abd3f69c9a8efad512321c45f3103d1ee4",
+  "signatures": {
+    "manifest.json.sig": "126d2a23ed862f97d9abe15a8bf79f39d3868d765457e6d2e4389c8f0a736afb",
+    "maslow-free-ai-0.1.0-2-x86_64.pkg.tar.zst.sig": "4f2a4edd3469d96cf7388d888731987eca53219488e09380a1410434c583f67a",
+    "maslow-voice-0.1.5-41-x86_64.pkg.tar.zst.sig": "ad47ebbf098946f55eb1f7402fe3549bc7e263fc7286630af5731f5fdd13d8ef",
+    "maslow-hub-0.3.6-1-any.pkg.tar.zst.sig": "394107a962eed9ec11a763598479c11b4b3b37555cf1b122e5241ad36c45b101"
+  },
+  "checks": "Operator completed local OpenSSL prompts; Root separately streamed/rechecked exact4approved input hashes and signature hashes,verified each with enrolled key and before/after named identities. No private key/passphrase retrieved into chat or diagnostics. First0-byte failure remains unadmitted; diagnosed retry succeeds.",
+  "publicBundle": "/home/maslow/Maslow-ai-os/free-ai-build/hub-bundle-prep/qa-pair-staging-1/bundle",
+  "bundleScope": "Exact6public files; separate copied public PEM. Same8c5 manifest/sourcec2/backend2 SHA68af/Voice41 SHA2c5,only detached signatures changed. No key directory,private state or signing parent copied/mounted.",
+  "nativeChanges": false,
+  "published": false,
+  "nextAction": "Independent public-scope/build-context review,then one bounded finalQA3 Hub build with correctly enrolled pair signatures. Independently prepare normal signed previousHub retention,state/key preservation and quiescence before actual native installation.",
+  "previewComplete": false
+}

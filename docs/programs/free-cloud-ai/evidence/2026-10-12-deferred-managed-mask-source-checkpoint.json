@@ -1,0 +1,35 @@
+{
+  "schema": 1,
+  "status": "independently-reviewed-source-unit-owning-checks-accepted-preview-incomplete",
+  "hubCommit": "690285be868fef835ec424905a03b94df44302cb",
+  "implemented": "Supported managed V1 uses canonical prepare/check, durable authenticated receipt, exact mask publication, stop/reload/seal; recovery retains originalmask-reserved across absent-public retry windows. Legacyfresh unchanged.",
+  "owning": {
+    "tests": 534,
+    "seconds": 85.216,
+    "skipped": 0,
+    "uiPassed": true,
+    "logSha256": "4349b9304751456ac5d96d90562070bf43c431f737347f2c996fa5d5059439c6"
+  },
+  "independentRetakeSha256": "507f371eb76c6876550dd632b90ceb94b4a7b1d53eeaac15b4c25a7320037e63",
+  "sourceHashes": {
+    "helper/free_ai_delivery.py": "63145cf90204b884580b38d4bd8d23bedbeb584eabd46774188b3842496c4631",
+    "helper/free_ai_recovery.py": "2825cf456c5c952a718dc9686c4f263e022e64228c3410d8fff32a9e65d7cb39",
+    "tests/test_free_ai_voice_epoch_integration.py": "0dde2659630fa729ffad1efc3f6643289b7b192ee48692804ea6cf215bc81893",
+    "tests/test_free_ai_fixed_recovery.py": "34368103e7df8404446d1084d8baa5e07e2afaf534a2e124142c7de661cc8609"
+  },
+  "retainedFailures": [
+    "Originalphasepromotion retries strandedpublicabsence",
+    "InitialPMfixturecallback missingPID/start",
+    "Missinginode denial originallyrawFileNotFoundError",
+    "Rootrepeat teststaticnested-block limit"
+  ],
+  "requiredNext": "No-cache fixed FreeAI launchprefix prerequisite, then authenticated forwarding/witness/decision-onlycleanup. RemainingWAL/staging/damagedDB/reboot/native/installed/livegates remainopen.",
+  "unchangedArtifacts": [
+    "FreeAI2",
+    "Voice41",
+    "Connect8"
+  ],
+  "installedAccepted": false,
+  "publicGatesOpened": false,
+  "previewComplete": false
+}

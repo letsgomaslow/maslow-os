@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "status": "first-recovery-completed-next-native-failure-under-observed-recovery",
+  "firstRecovery": "Root observed actual product stagecomplete,public ticket absent and installer-created home mask absent. Backend absent,Voice37 unchanged. Desktop automatically restarted Voice37; pure watch showed disabled/not speaking/previewidle,all task history active0. Recovery closed the unchanged transaction; no install success inferred.",
+  "compatibleFreshPreparation": {
+    "review": "Independent boundary_review gpt-6-astra/high confirmed preexisting exact HOME mask is supported only for backend-absent legacy-fresh delivery/provenance; managed existing-backend preparation rejects it. No runtime mask recreated and no source guards weakened.",
+    "actual": "Home mask absent before normal user systemctl mask --now. Exact user-owned /dev/null inode recorded privately in root-home-mask-receipt.json; Voice inactive/PID0 and actual canonical_service_profile passes. Preserve it until durable completion/cleanup; then remove only exact external owned inode.",
+    "receipt": "/home/maslow/Maslow-ai-os/free-ai-build/hub-bundle-prep/native-preview-prep/root-home-mask-receipt.json"
+  },
+  "nextFailure": "Real Hub fresh install again reached interrupted progress,backendabsent/Voice37 and publicpendingticket present. Do not infer fingerprint is the sole cause: Root reached ticket publication. Actual installed read_ticket+fresh_check subsequently passed all user-side stopped/profile/task/keyring/absent-state checks. Exact Root installer error still required; pending state preserved.",
+  "diagnostics": {
+    "observer": "/home/maslow/Maslow-ai-os/free-ai-build/hub-bundle-prep/native-preview-prep/observe-component-terminal.py",
+    "sha256": "6d2c61158a0c8c5a244e38b1cb623458ed51a076e3d38b63216f28f41c7ef62b",
+    "review": "Independent source retake accepts exact installed hubctl action-run child/inherited stdinstdoutTTY,immediate stderr forwarding,only bounded static Root-owned installer literal messages or unknown message hashes,exact-child reaping and interruption flags. No password input,nonce,raw env or stderr persisted; no Root operation replacement.",
+    "launcherCorrection": "First callback wrongly used subprocess.run while installed Setup.launch held its user locks. Root interrupted only exact owned user launcherPID2236157/start10568915 to release them; no Root/package process signaled. Corrected callback uses actual installed helper.hubctl.launch nonblocking Popen and validates the real6argument recover handoff. Prior attempt preserved; no forged nonce or progress record.",
+    "actualCurrent": "Owning actionrecover reserved/launched through actual installed API and now stagerunning/userhelperPID2250883,Maslow OS terminalPID2250699/workspace1. Observer child active; outcomes under unique component-diagnostic-* directories. User password/fingerprint participation pending.",
+    "slot": "Shared heavy-slot observer session23758; no simultaneous build/VM."
+  },
+  "authentication": "Both installed sudo and polkit PAM include fingerprint then normal password fallback. No system auth/PAM change or bypass. User instructed to wait for normal sudo password prompt and enter laptop login password only locally; no command copying.",
+  "next": "Read exact observed Root recovery result; reconcile authoritative cleanup and prior package/user/key state. Diagnose current Root failure before any revised install. Preserve externally owned home mask while pending; remove only exact inode after proven terminal cleanup. Hub source/artifact/trust proof valid; unchanged backend/Voice/Connect artifacts retained.",
+  "previewComplete": false,
+  "publication": false,
+  "craft": "paused"
+}

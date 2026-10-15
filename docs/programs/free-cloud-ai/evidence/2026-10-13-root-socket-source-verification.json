@@ -1,0 +1,35 @@
+{
+  "schema": 1,
+  "status": "socket-source-kernel-proof-passed-owing-test-fixtures-correction-pending",
+  "source": {
+    "base": "b222265142b585fe50743ac5a705c8da39ac2b27",
+    "diffSha256": "b98e0c2744ed7be087402805314220de80c16582d04597a6cee3d7630795f387",
+    "sourceFreezeReport": "/home/maslow/Maslow-ai-os/free-ai-build/hub-bundle-prep/initial-root-socket-source-checkpoint.json",
+    "sourceFreezeSha256": "30ae0600512ea0714ebfd7b90373c22352da2b62e23082334cc875f0461ea93a",
+    "focused": "103tests/0fail/0skip/19.898s; compile/diff checks passed. ProductgatesFalse and schemas unchanged."
+  },
+  "realKernelProof": {
+    "exit": 0,
+    "seconds": 19.875,
+    "logSha256": "8ac4c2b67b0985ce50ff9765ee4f37336af6514f478cdb3f298ae12db6ab9b90",
+    "path": "/home/maslow/Maslow-ai-os/free-ai-build/hub-bundle-prep/initial-root-socket-real-probe",
+    "checked": "Install/remove/reinstall Rootcreated GO socket authenticates real UID0 parent to UID1000 child while child cannot read Root/proc/exe. Exact fixedbootstrap/action and guard run in existing isolated namespace fixture; no package/provider/grant operation.",
+    "resources": "CPU1/nice10/AS2GiB/900s/sharedheavylock",
+    "limit": "RealLinux security boundary proof only; synthetic installedlayout is not installed-system feature acceptance."
+  },
+  "owningRun": {
+    "tests": 687,
+    "seconds": 263.595,
+    "errors": 2,
+    "uiExit": 0,
+    "logSha256": "03766fb2ac25516ad9fb408f9110a5ae22cb8b7419e9eef71c8ea09754781ae2",
+    "uiLogSha256": "e0e5cf01d4ef65427327110295ca9842fc13c33da8ae59bcff8de359e6bb38dd",
+    "failures": "Only old test_free_ai_python_launch.py131 V2 remove/reinstall positive fixtures still expect parent-exe inspection without socketpeer; preserve original failure and update assertions to new boundary,includingwrongexe inRootselfcheck. Not an owning-pass claim."
+  },
+  "independentTimingDiagnostic": "Astra unchanged5s derivedEOF fixture twice timedout; private20s observation shows EOF reject6.270s,malformedNO reject6.399s,wrongparent reject6.748s. Faulthandler2/4s traces identify Python/source import compilation,notGO/selecthang. Narrow teststartup15s proposed withallsecurity/assertions/producttimeouts unchanged; not accepted by simply increasingtimeout.",
+  "current": "Sol corrects focused tests only; no implementation changes toacceptedfreeze. Astra source/security review is disjoint. Newmetadata0.3.10/QAcontext proposal prepared but notapplied. GUIowningrecovery1431completed0/publicticketabsent,currentHOME mask retained. No newbuild/install yet; unchanged signedbackend/Voice/Connect artifacts retained.",
+  "next": "Review correctedtestdelta/run exact affectedtargets,finish independent source review and owning gate. Then acceptedclean source metadata0.3.10,QA fourgate derivative,onlyaffectedHub boundedbuild/sign/nativeupdate before fresh install retake. No installer/rootpermission/protocolguard relaxation.",
+  "previewComplete": false,
+  "publication": false,
+  "craft": "paused"
+}

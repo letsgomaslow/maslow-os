@@ -1,0 +1,103 @@
+{
+  "schema": 1,
+  "date": "2026-10-11",
+  "status": "inventory-passed-with-runner-baseline-hash-unresolved",
+  "scope": "Read-only exact-input and context-pin inventory for the c2b03842 native package plan. No build, host, provider, keyring, container, VM, or shared-slot operation.",
+  "contextProofs": {
+    "nativePath": "/home/maslow/Maslow-ai-os/free-ai-build/native-2-39/build-context-proof-c2b03842.json",
+    "connectCopyPath": "/home/maslow/Maslow-ai-os/free-ai-build/connect-package-prep/native/build-context-proof-c2b03842.json",
+    "nativeSha256": "08bca127d23a3cdd7e193d0a05dbc5a4a09d4d6213faa2e227155b600a3aea65",
+    "connectCopySha256": "08bca127d23a3cdd7e193d0a05dbc5a4a09d4d6213faa2e227155b600a3aea65",
+    "expectedSha256": "08bca127d23a3cdd7e193d0a05dbc5a4a09d4d6213faa2e227155b600a3aea65",
+    "copiesByteIdentical": true,
+    "all27InputFilesMatch": true,
+    "inputSummary": {
+      "declaredCount": 27,
+      "currentDigestMatches": 27,
+      "currentDigestMismatches": [],
+      "trackedRecipeBlobsExactRecordedCommits": 24,
+      "checksumPinnedArchives": 3,
+      "exactRecipeRevisions": {
+        "freeAIAndVoice": "333f4f83ddcba6651687a7723c6778f68023cc5b",
+        "connect": "f4df4dad2da480ce95c7e53a3fc263b79a87c5c0"
+      }
+    },
+    "recipeCommits": {
+      "freeAIAndVoice": "333f4f83ddcba6651687a7723c6778f68023cc5b",
+      "connect": "f4df4dad2da480ce95c7e53a3fc263b79a87c5c0"
+    },
+    "runtimeSourceCommit": "c2b03842a81645998a79cbca525c03ddf67813b4",
+    "runtimeArchiveSha256": "c7dd7013a33f264a9f9523af70e4ae82e982490644d37494ad416d2bf5562bc1",
+    "connectSourceCommit": "97ac20eed146a8c6b37e33c2c29901a00f3045ff",
+    "connectArchiveSha256": "8a9929b9d9652bd38bc36b8426df6cc2783fadc9c5246ccbfa26599d74351906",
+    "connectLockSha256": "79a99838174e1ea36662534d370f778ff121835a5bf0a9c5b4515abc4194d5cf"
+  },
+  "runner": {
+    "currentPath": "/home/maslow/Maslow-ai-os/free-ai-build/native-2-39/sequential-build.py",
+    "currentSha256": "2ea8455f98fa3fbdf2216fd9565d6bed55b55c35641504a8cbe3e870cac60c4f",
+    "currentHoldRetained": true,
+    "preserved6dbRunnerPath": "/home/maslow/Maslow-ai-os/free-ai-build/native-2-39/superseded-6db/sequential-build.py",
+    "preserved6dbRunnerSha256": "5e2e7707f83188d80d18a42ed73f02effef5ebc1acd1ec5b8f9db61996109381",
+    "reviewedHeldRunnerSha256": "621ce057b29c8809309cbe428a391b563360be14710a240c31162662e98a9b3a",
+    "reviewedHeldRunnerFoundInPreservedSequentialBuildFiles": false,
+    "normalizedAstEqualAgainstPreserved6dbRunnerAfterOnlyProofShaNameAndRuntimeArchivePathNormalization": true,
+    "byteDiffAgainstPreserved6dbRunner": "Only PROOF_SHA, PROOF_NAME, and runtime archive source path literals differ; SOURCE_HOLD is byte-identical.",
+    "runnerTests": {
+      "currentSha256": "1f8b5c2db9d7a026c095448d39520deb5ab311a3b90fdc04ea56d0cedcdc2c04",
+      "preserved6dbSha256": "1f8b5c2db9d7a026c095448d39520deb5ab311a3b90fdc04ea56d0cedcdc2c04",
+      "byteIdentical": true
+    }
+  },
+  "buildPlans": {
+    "orderedPackages": [
+      "maslow-free-ai 0.1.0-2",
+      "maslow-voice 0.1.5-39",
+      "maslow-connect 0.1.0-6"
+    ],
+    "allThreeUseExpectedImageIds": true,
+    "builder": "builder",
+    "cpusPerPlan": 2,
+    "memoryBytesPerPlan": 4294967296,
+    "memoryAndSwapBytesPerPlan": 6442450944,
+    "makeflags": "-j2",
+    "runtimeReadonlyMountsOnlyUpdatedForFreeAIAndVoice": true,
+    "connectPlanUnchanged": true,
+    "plansRan": false,
+    "slotGranted": false
+  },
+  "staleReferences": [
+    {
+      "path": "/home/maslow/Maslow-ai-os/free-ai-runtime/docs/programs/free-cloud-ai/evidence/2026-10-11-final-native-context-review.json",
+      "finding": "Historical review still identifies 6db proof/runtime/runner pins; it is not evidence for current c2 proof."
+    },
+    {
+      "path": "/home/maslow/Maslow-ai-os/free-ai-build/native-2-39/owning-and-artifact-commands-6db3622d.md",
+      "finding": "Guide still names 6db source archive and old context; do not use as current c2 instructions."
+    }
+  ],
+  "unchangedRelevantReferences": [
+    {
+      "path": "/home/maslow/Maslow-ai-os/free-ai-build/native-2-39/CURRENT_INPUTS.md",
+      "finding": "Names current c2 proof/source/archive and retained source hold."
+    },
+    {
+      "path": "/home/maslow/Maslow-ai-os/free-ai-build/native-2-39/POSTBUILD_REQUIRED.md",
+      "finding": "Names c2 source/archive/recipe pins and states preparation only; build requires coordinator GO."
+    },
+    {
+      "path": "/home/maslow/Maslow-ai-os/free-ai-build/native-2-39/context-refresh-c2b03842-proof.json",
+      "sha256": "87e83f64a1f68f135beb5eba75f67b14e114656e43058ac994e0964654c81445",
+      "finding": "Records current proof hash, runner hash, retained hold and all 27 input hashes."
+    },
+    {
+      "path": "/home/maslow/Maslow-ai-os/free-ai-build/native-2-39/coupled-artifact-c2-preparation-proof.json",
+      "finding": "Pins same proof and runner; tooling prepared but not run."
+    }
+  ],
+  "remainingLimits": [
+    "Reviewed held-runner digest 621ce057b29c8809309cbe428a391b563360be14710a240c31162662e98a9b3a was not found among preserved sequential-build.py copies; the closest preserved 6db file hashes to 5e2e7707f83188d80d18a42ed73f02effef5ebc1acd1ec5b8f9db61996109381. Current runner differs from that preserved file only by proof SHA/name and source archive path, with normalized AST equal and source-hold literal unchanged. The specific reviewed digest baseline remains unreconciled.",
+    "The 24 tracked recipe blob comparisons and runtime archive manifest/capsule validations are inherited from the existing c2 package repin review rather than rerun in this bounded check.",
+    "No native build, installed/live acceptance, workload check or coordinator slot admission was performed."
+  ],
+  "operations": "Wrote this inventory only. No code, package recipe, proof, source, or build-context file was modified."
+}

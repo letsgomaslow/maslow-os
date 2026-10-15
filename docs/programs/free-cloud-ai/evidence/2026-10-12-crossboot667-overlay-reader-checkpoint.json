@@ -1,0 +1,30 @@
+{
+  "schema": 1,
+  "status": "source-accepted-preview-incomplete",
+  "hubSource": "3577c663429420ffa9c981c3c9140069397d7c48",
+  "owning": {
+    "tests": 667,
+    "skips": 0,
+    "pythonSeconds": 195.62,
+    "resultPath": "/home/maslow/Maslow-ai-os/free-ai-build/hub-bundle-prep/offline-crossboot/root-owning/result.json",
+    "pythonLogSha256": "bf28b39b2c7b1e1c76634fd1288f62685d2f7e5b376e1f037cc74dbfb549366e",
+    "uiExit": 0,
+    "shellExit": 0,
+    "diffExit": 0
+  },
+  "crossbootReviewSha256": "9007473034893c32626ce35125df131a69e6464bb550c4e4f7942421be6cff18",
+  "overlay": {
+    "status": "no-GO-A3-fix-active",
+    "review": "/home/maslow/Maslow-ai-os/free-ai-build/hub-bundle-prep/overlay-acceptance-prep/independent-admission-retake2.json",
+    "reviewSha256": "4e6afad9f932da12ec2f4773b224dcab7391a48c1bae2264b37a597119f6dd8b",
+    "resolved": [
+      "A1 final input recheck",
+      "A2 held-dirfd evidence writes"
+    ],
+    "blocker": "A3 real FIFO blocks before regular-file check; unbounded read allocation. Narrow nonblocking bounded reader fix underway."
+  },
+  "qaHub": "Separate unpublished candidate preparation authorized only four literal gate deltas; independent exact-source/build review required before GO. Product gates remain false.",
+  "preserved": "Backend2, Voice41, Connect8, QA signed pair and pristine pre-update installed guest remain unchanged. Craft paused; no further ISO cycle.",
+  "nextAction": "Fix/independently retake A3, collect read-only guest facts, review/build exact matched QA Hub and then actual installed tests.",
+  "previewComplete": false
+}

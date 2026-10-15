@@ -1,0 +1,58 @@
+{
+  "schema": 1,
+  "status": "source-milestone-checkpoint-preview-incomplete",
+  "date": "2026-10-12",
+  "sources": {
+    "voice": "89a7478dad7617faccc78b16e8880d3092cca7ba",
+    "backendUnchanged": "c2b03842a81645998a79cbca525c03ddf67813b4",
+    "hub": "b6fffd1ac3fb7af0e26a18eaf37b21fddef7881a",
+    "connectBase": "97ac20eed146a8c6b37e33c2c29901a00f3045ff"
+  },
+  "evidence": [
+    {
+      "path": "/home/maslow/Projects/Maslow/free-ai-hub-current/docs/evidence/2026-10-12-managed-lifecycle-contract.json",
+      "sha256": "84e2e80529ad3db913a7917fd9710c32525b726cb4ffc79f03404430a1f02116"
+    },
+    {
+      "path": "/home/maslow/Projects/Maslow/free-ai-hub-current/docs/evidence/2026-10-12-managed-lifecycle-milestone-source.json",
+      "sha256": "1e8111541bca71ada1145f30f00d2032e894c4e1da19e86c2275d5aaf70bb24d"
+    },
+    {
+      "path": "/home/maslow/Projects/Maslow/free-ai-hub-current/docs/evidence/2026-10-12-managed-lifecycle-milestone-review.json",
+      "sha256": "80f28901ed7d0f0b5b8f4dd00c1efd64efb57332ede8c3c087f168fd67f1c416"
+    },
+    {
+      "path": "/home/maslow/Projects/Maslow/free-ai-connect-current/docs/evidence/2026-10-12-dependency-remediation-review.json",
+      "sha256": "c53883e16fc5e8f6ed9debc4e3514b52adbbbec29c29d61c815f952dd687a3a9"
+    },
+    {
+      "path": "/home/maslow/Maslow-ai-os/free-ai-build/native-2-39/connect-remediation-qa3-preparation.json",
+      "sha256": "38280e98f69cbbe92706b9d75775e7947b3e591aeb13cad0f828c0e66d0f08c1"
+    },
+    {
+      "path": "/home/maslow/Maslow-ai-os/free-ai-build/native-2-39/connect-remediation-source-qa3.py",
+      "sha256": "fb105b60fc67eab40b8b18afd8bf913b45a8fccdbaf4ea98a24d69f23237e1ef"
+    }
+  ],
+  "implemented": [
+    "Strict separate V2 ticket/checkpoint codecs",
+    "Private Voice quiescence/check without absent-backend initialization",
+    "Five minimal Connect dependency resolution replacements (uncommitted)"
+  ],
+  "verified": [
+    "35 focused source checks, independently repeated: Hub8/newVoice10/unchangedV117; V1/backend/daemon invariants retained",
+    "Connect exact minimal lock delta/source controls reviewed; full owning QA remains unverified",
+    "Four VM path controls plus five independent path cases pass, no media or VM acceptance"
+  ],
+  "blocked": [
+    "Connect native6 advisories block installation; namespace-compatible full owning QA and replacement archive still required",
+    "Voice installed-file capability does not prove loaded code; root must enforce/test fresh artifact-bound daemon launch provenance before public/native lifecycle wiring",
+    "Managed current-state/key seal and new checkpoint production under implementation; root removal/reinstall/recovery wiring incomplete",
+    "New capable Voice archive, matched Hub, actual signed installation/recovery, clean installed guest/liveGroq/account/revocation/Voice/Lenovo acceptance open"
+  ],
+  "preservation": "Backend2 and Voice39 exact checked archives remain unchanged; new managed Voice capability requires its own new build. Bundle schema1/backend sourceCommit can remain; actual Voice source is independently artifact/marker-bound. Craft stays paused; no production publication/product merges.",
+  "heavyWork": "Current baseline session996567349ef6439bbfcff197aecc7dda may finish its single healthy bounded attempt. No additional ISO prerequisite or cycles; next slot reserved for Connect QA/replacement before further heavy work.",
+  "nextAction": "After current ISO releases the shared slot, verify idle/resources/exact prepared inputs and run reviewed Connect QA3 smoke, unchanged late-pipe regression, then full owning check. Stop and diagnose any failure; do not waive it. In parallel complete managed state sealing and root lifecycle integration with the open launch-provenance condition.",
+  "acceptedCapabilities": [],
+  "previewAccepted": false
+}

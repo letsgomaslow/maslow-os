@@ -1,0 +1,36 @@
+{
+  "schema": 1,
+  "status": "source-milestones-accepted-preview-incomplete",
+  "hubCommits": {
+    "initialRejection": "ccf2ea4981f76270407295f14f012c217c2c489a",
+    "walNoCopy": "c53d4e5db8de7b8d2957e5cccffba0b0f3020da7"
+  },
+  "evidence": {
+    "/home/maslow/Projects/Maslow/free-ai-hub-current/docs/evidence/2026-10-12-rejection-wal-combined-owning.json": "e6e19e953f6fcd0e30c2cbcf0e5d1d8783b7b4f17b1af53ad18817ce113b9497",
+    "/home/maslow/Projects/Maslow/free-ai-hub-current/docs/evidence/2026-10-12-v1-initial-rejection-forwarding-retake-2.json": "3640c0cf0e1790de4eb0ec72d8d6aad89ec87a03bbd7c089a68937420073727a",
+    "/home/maslow/Projects/Maslow/free-ai-hub-current/docs/evidence/2026-10-12-managed-recovery-wal-no-copy-retake.json": "aaa4be2f788a6ef1bd91cc933c3130215ace6d0fa30eacbc517bd2a8cb29ddb3"
+  },
+  "checks": {
+    "owningTests": 560,
+    "skips": 0,
+    "seconds": 115.613,
+    "uiContract": "pass",
+    "diff": "pass",
+    "oneCpu": true,
+    "sharedHeavyLock": true
+  },
+  "implemented": [
+    "Authenticated managed V1 initial rejection context, helper exit and Root witness; no cleanup authority yet.",
+    "Verified logical current WAL/SHM recovery preserves physical data and rejects late unknown stages."
+  ],
+  "verified": [
+    "Independent focused review/retakes and combined source owning/UI checks."
+  ],
+  "blocked": [
+    "Guarded no-preparation cleanup is next; V2 removal/reinstall dispatcher remains unfinished.",
+    "Durable recovery progress/reply loss, staged replacement, missing/corrupt DB freshness and reboot authority remain required.",
+    "Matched Hub package/signature/actual installation and live Groq/accounts/Voice/Lenovo/final review remain open."
+  ],
+  "previewComplete": false,
+  "nextAction": "Complete V1 decision-only cleanup with independent review; implement the reviewed WAL no-copy reply-loss progress slice in disjoint ownership. Preserve the installed baseline and unchanged backend2/Voice41/Connect8 artifacts."
+}

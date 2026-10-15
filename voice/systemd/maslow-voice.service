@@ -5,9 +5,8 @@ PartOf=graphical-session.target
 
 [Service]
 Type=simple
-ExecStart=/usr/lib/maslow-voice/venv/bin/python -m maslow_voice.daemon
-Environment=PYTHONPATH=/usr/lib/maslow-voice
-Environment=PYTHONDONTWRITEBYTECODE=1
+ExecStart=/usr/lib/maslow-voice/venv/bin/python -I -S -B -X pycache_prefix=/dev/null /usr/lib/maslow-voice/bootstrap.py daemon
+UnsetEnvironment=PYTHONPATH PYTHONHOME PYTHONSTARTUP PYTHONUSERBASE PYTHONPYCACHEPREFIX LD_PRELOAD LD_LIBRARY_PATH LD_AUDIT
 Environment=HF_HUB_OFFLINE=1
 Environment=TRANSFORMERS_OFFLINE=1
 UMask=0077

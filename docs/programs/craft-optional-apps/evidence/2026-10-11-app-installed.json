@@ -1,0 +1,40 @@
+{
+  "level": "disposable-container-installed-packages",
+  "image": "sha256:cfd891bf262d24bac53aa489af912484a08545e38001624a94640de4e43b840f",
+  "network": "none",
+  "packages": {
+    "pdfcraft": "0.6.0-1",
+    "photocraft": "0.7.0-1"
+  },
+  "checks": [
+    {
+      "check": "normal pacman -U exact artifacts with existing local signature policy",
+      "result": "pass"
+    },
+    {
+      "check": "registered versions, executable ownership and pacman -Qkk mtree metadata",
+      "result": "pass"
+    },
+    {
+      "check": "offline unprivileged CLI versions",
+      "result": "pass"
+    },
+    {
+      "check": "fixed pacman -R without dependency sweeping and reinstall",
+      "result": "pass"
+    },
+    {
+      "check": "synthetic document and per-app preference preservation hashes across removal/reinstall",
+      "result": "pass"
+    }
+  ],
+  "log": "/home/maslow/Maslow-ai-os/craft-build/connect/app-installed-check.log",
+  "log_sha256": "199226c5aa97c902109b38998ed9503e542f528000c9f0013a2129aa153c88c6",
+  "not_established": [
+    "fresh Maslow install before first OS update",
+    "GUI rendering or fidelity",
+    "upgrade to different package version",
+    "confined native MCP or actual consumer agents",
+    "Voice/Lenovo/ISO"
+  ]
+}

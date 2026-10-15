@@ -1,0 +1,36 @@
+{
+  "schema": 1,
+  "status": "actual-fixed-nine-collection-complete-not-media-or-guest-acceptance",
+  "run": "/home/maslow/Maslow-ai-os/free-ai-build/guest-baseline-prep/media-inspection/artifact-evidence/b188386d79584cb1bc62a58ce54d9fb1",
+  "stateSha256": "eb6857f5288b3950e794ae569f6902060cad9797946dec527e5861fcfa741478",
+  "collectorSha256": "fdee77c75e37cfd84be01d07b65f8c7a9948620d7a8ec7c0384e2accc65ad5a2",
+  "manifestSha256": "f0bdedaa979d40961495da280340bba18104f8749cf25bcae6e96381fbe68839",
+  "originalPreparationReviewSha256": "7363b6a7d22a6de7700aca9afced4df25479e438dc585ed2a968284a1855d781",
+  "preparationRetakeSha256": "fe4c6a4b269eccf92d7c9b64652e26cd985e25a242984ce1c6e7eb6bb0bb20ef",
+  "independentMetadataResultReviewSha256": "413c94143f0ecd5fcf5d39929bfe4a4077f967331d9d6cef1b1ef3ddb3e5c896",
+  "resourceFinding": "Original per-stage budget omitted retained stderr and metadata. Fixed cap uses all existing owned files before launch; 14 inert controls and independent retake pass. Original bytes/review preserved externally.",
+  "actualExitCode": 0,
+  "checkedOwnedStages": 40,
+  "nonemptyStageErrorFiles": 0,
+  "archiveCount": 9,
+  "totalArchiveBytes": 609072286,
+  "offlineDatabaseSha256": "fb7a3003e3a33aac7f6f20c0cdcced0b7730016b53a150a07c90f4fcbcfc3c80",
+  "actualFacts": [
+    "Literal offline.db alias points only to relative offline.db.tar.gz.",
+    "Collected actual nine package bytes and SHA-256, PKGINFO, BUILDINFO and selected target desc; each database filename/version/hash matches its archive.",
+    "Six BUILDINFO recipe hashes match frozen recipes literally. Runtime and Hub hashes match only makepkg pkgver updates. Settings matches pkgver update and pkgrel reset2 to1, consistent with the actual baseline build log.",
+    "All work used the shared heavy lock and reviewed owned-process cleanup, two CPUs, 4GiB address space and bounded disk/output limits. Parent exited successfully after stage retirement."
+  ],
+  "recipeNormalizedHashes": {
+    "omarchy-dev": "7c11cc2f5546876ddfd5239a2cf8fd7702630984ac3d8c5fd85b34c9a8a446b5",
+    "maslow-hub": "e8a4027688911c205b048c7b6531a4bf016f00ecd3531383b6d8b59bceec33d2",
+    "omarchy-settings-dev": "26243f652315524653433ddc3e5d37c86caf944a21724cc7490602119b3e2d3b"
+  },
+  "limits": "Source/build provenance needs payload and MTREE reconciliation. Nine historical precomputed final archive hashes were absent and remain null; no fabricated byte-match claim. No package was executed or installed.",
+  "remaining": ["Exact package payload/source and MTREE reconciliation", "Optional components and test trust absence", "Complete six-fact media receipt", "Clean installed guest before OS update", "FreeAI Hub installation and all live/private/Voice/Lenovo/recovery gates"],
+  "newIsoBuildOrRepair": false,
+  "mediaVerified": false,
+  "vmStarted": false,
+  "guestVerified": false,
+  "previewComplete": false
+}

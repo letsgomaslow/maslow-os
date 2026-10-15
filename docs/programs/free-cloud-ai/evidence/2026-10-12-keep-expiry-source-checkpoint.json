@@ -1,0 +1,45 @@
+{
+  "schema": 1,
+  "status": "keep-expiry-source-accepted-preview-incomplete",
+  "hubSource": "ceba096b7ea8d36e6124ffbf121b1eef192ecc75",
+  "commits": {
+    "standaloneKeep": "2e6e55437bb410df1a4969f7cc628713656bfe67",
+    "v2ExpiredReview": "015e9f426931b200c7945739f3b5adb913b3bef3",
+    "pairedV1Guard": "ceba096b7ea8d36e6124ffbf121b1eef192ecc75"
+  },
+  "checks": {
+    "owningTests": 657,
+    "skips": 0,
+    "seconds": 183.075,
+    "uiContract": "pass",
+    "shellSyntax": "pass",
+    "diff": "pass",
+    "oneCpu": true,
+    "sharedHeavyLock": true
+  },
+  "evidence": {
+    "/home/maslow/Projects/Maslow/free-ai-hub-current/docs/evidence/2026-10-12-combined-keep-expiry-owning.json": "38fcd831a0faf8f06ad88d31fe1b2abca34bc4a4758e67bba04064f97d2b8662",
+    "/home/maslow/Projects/Maslow/free-ai-hub-current/docs/evidence/2026-10-12-standalone-preservation-source-review.json": "b8d1a85a6870acedd3c988e08a11ca002aa0157241c964a2cf47b0784ca03b3e",
+    "/home/maslow/Projects/Maslow/free-ai-hub-current/docs/evidence/2026-10-12-review-renewal-clock-retake.json": "3c89b4914c15a7d6790f0b2055c1aba3e458a7fc58103ff911a46b7d586f3927"
+  },
+  "implemented": [
+    "Supported standalone current-data recovery preserves byte/inode identity without Root copy fallback; exact already-disabled settings stay unchanged.",
+    "Expired V2 negative review and paired V1/V2 replacement-time expiry recheck; original evidence preserved."
+  ],
+  "limits": [
+    "Current data must still match original checkpoint logically/physically; damaged/newer data and unknown stages remain denied.",
+    "Dormant private direct copy method is outside supported Root-run acceptance.",
+    "Rebooted V2 current-operation recovery and actual paired ALPM/database/key tests remain open.",
+    "Matched Hub build and actual installed/live/Groq/account/audio/Lenovo/final review remain open."
+  ],
+  "nativeNextSlot": {
+    "path": "/home/maslow/Maslow-ai-os/free-ai-build/hub-bundle-prep/installed-acceptance-next-slot.json",
+    "sha256": "1539cc64e2a93f2cd11ed39f5e173d57c2190171c978d99f96622f9636363595"
+  },
+  "recoveryReconciliation": {
+    "path": "/home/maslow/Maslow-ai-os/free-ai-build/hub-bundle-prep/recovery-gate-reconciliation.json",
+    "sha256": "638870b4939d625064f3a28fa319335c3488a10975432c308be65e9f493bb49d"
+  },
+  "previewComplete": false,
+  "nextAction": "Prepare and independently review overlay-only guest admission for read-only dependency/policy/desktop facts. In parallel scope offline crossboot recovery and a concrete gated native-acceptance path; no VM GO, ISO build or gate bypass."
+}

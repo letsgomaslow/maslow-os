@@ -5,25 +5,26 @@ import QtQuick.Layouts
 import Quickshell
 import Quickshell.Wayland
 import qs.Commons
+import qs.Commons as Theme
 
 Item {
   id: root
   // Live shell roles preserve theme and user surface overrides on every update.
-  readonly property color surfaceColor: Qt.rgba(Color.popups.background.r, Color.popups.background.g, Color.popups.background.b, 1)
-  readonly property color textColor: readableColor(Color.popups.text, controlColor)
+  readonly property color surfaceColor: Qt.rgba(Theme.Color.popups.background.r, Theme.Color.popups.background.g, Theme.Color.popups.background.b, 1)
+  readonly property color textColor: readableColor(Theme.Color.popups.text, controlColor)
   readonly property color secondaryTextColor: readableColor(mixColor(textColor, surfaceColor, 0.72), controlColor)
-  readonly property color controlColor: mixColor(Color.popups.text, surfaceColor, 0.07)
-  readonly property color popupBorderColor: Color.popups.border
+  readonly property color controlColor: mixColor(Theme.Color.popups.text, surfaceColor, 0.07)
+  readonly property color popupBorderColor: Theme.Color.popups.border
   readonly property color borderColor: mixColor(textColor, surfaceColor, 0.4)
-  readonly property color accentTextColor: readableColor(Color.accent, controlColor)
-  readonly property color alertTextColor: readableColor(Color.urgent, controlColor)
-  readonly property color selectionTextColor: contrastingText(Color.accent)
+  readonly property color accentTextColor: readableColor(Theme.Color.accent, controlColor)
+  readonly property color alertTextColor: readableColor(Theme.Color.urgent, controlColor)
+  readonly property color selectionTextColor: contrastingText(Theme.Color.accent)
   // The orb's labels float over windows that share the theme background, so
   // they carry an accent outline and a soft shadow: dark on light themes, an
   // accent glow on dark ones, where a dark shadow would be invisible.
   readonly property color chromeBorderColor: accentTextColor
   readonly property color chromeShadowColor: luminance(surfaceColor) < 0.18
-    ? Qt.rgba(Color.accent.r, Color.accent.g, Color.accent.b, 0.55) : Qt.rgba(0, 0, 0, 0.4)
+    ? Qt.rgba(Theme.Color.accent.r, Theme.Color.accent.g, Theme.Color.accent.b, 0.55) : Qt.rgba(0, 0, 0, 0.4)
 
   function mixColor(first, second, amount) {
     return Qt.rgba(first.r * amount + second.r * (1 - amount), first.g * amount + second.g * (1 - amount), first.b * amount + second.b * (1 - amount), 1)
@@ -61,6 +62,22 @@ Item {
   property bool settingsOpen: false
   readonly property string defaultGeminiPrompt: "You are Maslow's concise voice assistant. Answer conversation directly."
   property string draft: ""
+  property string assistantDraft: ""
+  property string assistantDocuments: ""
+  property string assistantNote: ""
+  property bool assistantSaveNote: false
+  property bool assistantSubmitting: false
+  property string assistantRequestId: ""
+  property string assistantRequestFingerprint: ""
+  property var assistantAccounts: []
+  property var assistantSelectedAccounts: []
+  property bool assistantAccountsAvailable: false
+  property bool assistantAccountsLoaded: false
+  property bool assistantAccountsLoading: false
+  property string assistantAccountsRequestId: ""
+  property string assistantAccountsError: ""
+  property bool assistantAccountConsent: false
+  readonly property bool freeCloudSelected: String(settings.execution_connection || "existing") === "free-cloud"
   property string selectedProject: ""
   property string explicitContext: ""
   property string feedback: ""
@@ -237,10 +254,15 @@ Item {
   function fixtureGeometry() {
     if (!uiTestInstrumentation) return ({})
     return { width: panelWindow.width, height: panelWindow.height,
+      work: { y: tasksScroll.contentItem.contentY, contentHeight: tasksScroll.contentHeight, itemHeight: tasksScroll.contentItem.contentHeight, viewport: tasksScroll.availableHeight, contentWidth: tasksScroll.contentWidth },
       card: { x: card.x, y: card.y, width: card.width, height: card.height },
       orb: { x: orbButton.x, y: orbButton.y, width: orbButton.width, height: orbButton.height },
       status: { x: statusButton.x, y: statusButton.y, width: statusButton.width, height: statusButton.height },
       badge: { x: taskBadgeButton.x, y: taskBadgeButton.y, width: taskBadgeButton.width, height: taskBadgeButton.height, visible: taskBadgeButton.visible } }
+  }
+  function fixtureWorkScrollEnd() {
+    if (!uiTestInstrumentation) return
+    tasksScroll.contentItem.contentY = Math.max(0, tasksScroll.contentHeight - tasksScroll.availableHeight)
   }
   function openDetails() {
     open(JSON.stringify({ page: "type" }))
@@ -382,6 +404,81 @@ Item {
     if (text === "") return
     send("submit_text", { text: text, project: selectedProject, context: explicitContext })
     draft = ""
+  }
+  function submitAssistant() {
+    if (assistantSubmitting || assistantDraft.trim() === "" || selectedProject.trim() === "") return
+    if (freeCloudSelected && assistantSelectedAccounts.length > 0 && (assistantAccountsLoading || !assistantAccountsAvailable || !assistantAccountConsent)) {
+      feedback = "Refresh supported accounts and confirm sending information from the selected accounts to Groq."
+      return
+    }
+    var documents = assistantDocuments.split("\n").map(function(path) { return path.trim() }).filter(function(path) { return path !== "" })
+    var payload = { text: assistantDraft, project: selectedProject, execution_connection: String(settings.execution_connection || "existing"),
+      capabilities: freeCloudSelected ? { documents: documents, note: assistantSaveNote ? assistantNote.trim() : null, accounts: assistantSelectedAccounts.slice().sort() } : {} }
+    if (freeCloudSelected && assistantSelectedAccounts.length > 0)
+      payload.capabilities.send_to_groq_confirmed = true
+    var fingerprint = JSON.stringify(payload)
+    if (fingerprint !== assistantRequestFingerprint) {
+      assistantRequestId = "typed-" + Date.now().toString(36) + "-" + Math.random().toString(36).slice(2)
+      assistantRequestFingerprint = fingerprint
+    }
+    payload.request_id = assistantRequestId
+    assistantSubmitting = true
+    send("task_submit", payload)
+  }
+  function refreshAssistantAccounts() {
+    if (assistantAccountsLoading || assistantSubmitting) return
+    assistantAccountsRequestId = "accounts-" + Date.now().toString(36) + "-" + Math.random().toString(36).slice(2)
+    assistantAccountsLoading = true
+    assistantAccountsError = ""
+    send("assistant_accounts", { account_request_id: assistantAccountsRequestId })
+  }
+  function selectAssistantAccount(identity, selected) {
+    if (assistantSubmitting || assistantAccountsLoading) return
+    var current = assistantSelectedAccounts.slice()
+    var index = current.indexOf(identity)
+    if (selected) {
+      if (!assistantAccountsAvailable || current.length >= 4 || index >= 0 || !assistantAccounts.some(function(account) { return account.id === identity })) return
+      current.push(identity)
+    } else {
+      if (index < 0) return
+      current.splice(index, 1)
+    }
+    assistantSelectedAccounts = current.sort()
+    assistantAccountConsent = false
+  }
+  function handleAssistantAccounts(response) {
+    if (!assistantAccountsLoading || String(response.account_request_id || "") !== assistantAccountsRequestId) return
+    assistantAccountsLoading = false
+    if (response.ok !== true || typeof response.available !== "boolean" || !Array.isArray(response.accounts) || response.accounts.length > 64) {
+      assistantAccountsAvailable = false
+      assistantAccountsError = "Supported accounts could not be refreshed. Try again; your request is kept."
+      return
+    }
+    var accounts = [], seen = []
+    for (var i = 0; i < response.accounts.length; i++) {
+      var account = response.accounts[i]
+      if (!account || typeof account.id !== "string" || !/^[A-Za-z0-9_-]{1,128}$/.test(account.id) || seen.indexOf(account.id) >= 0 || typeof account.label !== "string" || account.label.trim() === "" || account.label.length > 160 || /[\u0000-\u001f\u007f]/.test(account.label)) {
+        assistantAccountsAvailable = false
+        assistantAccountsError = "Supported accounts could not be refreshed. Try again; your request is kept."
+        return
+      }
+      seen.push(account.id)
+      accounts.push({ id: account.id, label: account.label })
+    }
+    if (response.available === false && accounts.length > 0) {
+      assistantAccountsAvailable = false
+      assistantAccountsError = "Supported accounts could not be refreshed. Try again; your request is kept."
+      return
+    }
+    accounts.sort(function(left, right) { return left.id < right.id ? -1 : left.id > right.id ? 1 : 0 })
+    var selected = assistantSelectedAccounts.filter(function(identity) { return accounts.some(function(account) { return account.id === identity }) }).sort()
+    if (JSON.stringify(accounts) !== JSON.stringify(assistantAccounts) || JSON.stringify(selected) !== JSON.stringify(assistantSelectedAccounts))
+      assistantAccountConsent = false
+    assistantAccounts = accounts
+    assistantSelectedAccounts = selected
+    assistantAccountsAvailable = response.available
+    assistantAccountsLoaded = true
+    assistantAccountsError = ""
   }
   function taskAction(task, operation, text) {
     var request = operation === "start"
@@ -594,6 +691,20 @@ Item {
     return voice.microphone === true ? "Microphone on" : "Microphone off"
   }
   function handleControlResponse(response) {
+    if (response.assistant_accounts_reply === true) {
+      handleAssistantAccounts(response)
+      return
+    }
+    if (assistantRequestId !== "" && response.submitted_request_id === assistantRequestId && response.ok === true) {
+      assistantSubmitting = false
+      assistantDraft = ""
+      assistantRequestId = ""
+      assistantRequestFingerprint = ""
+      feedback = "Request accepted. Progress and the result appear in Work."
+    } else if (assistantSubmitting && response.ok === false) {
+      assistantSubmitting = false
+      feedback = String((response.error || {}).message || "The assistant request could not be submitted.")
+    }
     if (voiceStartPending && response.ok === false) {
       voiceStartPending = false
       feedback = String((response.error || {}).message || "Connection lost · click to retry")
@@ -630,6 +741,15 @@ Item {
   }
   function handleTransportError(message) {
     var safeMessage = String(message || "Voice control needs attention.")
+    if (assistantAccountsLoading) {
+      assistantAccountsLoading = false
+      assistantAccountsAvailable = false
+      assistantAccountsError = "Supported accounts could not be refreshed. Try again; your request is kept."
+    }
+    if (assistantSubmitting) {
+      assistantSubmitting = false
+      feedback = safeMessage + " Retry this request when the connection returns."
+    }
     if (voiceStartPending) {
       voiceStartPending = false
       feedback = safeMessage
@@ -671,6 +791,7 @@ Item {
     fixtureMode: root.nativePreviewFixtureMode
     onResponseReceived: function(response) { root.handleControlResponse(response) }
     onTransportErrorChanged: if (transportError !== "") root.handleTransportError(transportError)
+    onConnectionLostChanged: if (connectionLost) root.handleTransportError(transportError || "Assistant connection lost.")
   }
   Component.onCompleted: Qt.callLater(function() { controller.start() })
 
@@ -678,7 +799,7 @@ Item {
     implicitHeight: 44
     color: root.textColor
     placeholderTextColor: root.secondaryTextColor
-    selectionColor: Color.accent
+    selectionColor: Theme.Color.accent
     selectedTextColor: root.selectionTextColor
     font.family: "Manrope"
     font.pixelSize: 14
@@ -692,7 +813,7 @@ Item {
     Keys.onBacktabPressed: function(event) { nextItemInFocusChain(false).forceActiveFocus(Qt.BacktabFocusReason); event.accepted = true }
     color: root.textColor
     placeholderTextColor: root.secondaryTextColor
-    selectionColor: Color.accent
+    selectionColor: Theme.Color.accent
     selectedTextColor: root.selectionTextColor
     font.family: "Manrope"
     font.pixelSize: 14
@@ -712,7 +833,7 @@ Item {
     palette.text: root.textColor
     palette.buttonText: root.textColor
     palette.highlightedText: root.selectionTextColor
-    palette.highlight: Color.accent
+    palette.highlight: Theme.Color.accent
     background: Rectangle {
       radius: 8
       color: root.controlColor
@@ -750,7 +871,7 @@ Item {
       }
       background: Rectangle {
         radius: 6
-        color: option.highlighted ? Color.accent : root.controlColor
+        color: option.highlighted ? Theme.Color.accent : root.controlColor
         border.width: option.activeFocus ? 2 : 0
         border.color: root.textColor
       }
@@ -777,17 +898,22 @@ Item {
     palette.text: root.textColor
     palette.button: root.controlColor
     palette.buttonText: root.textColor
-    palette.highlight: Color.accent
+    palette.highlight: Theme.Color.accent
     palette.highlightedText: root.selectionTextColor
     implicitHeight: 44
     onActiveFocusChanged: if (activeFocus) { root.clearPendingTaskInputRestore(); root.clearTaskActionFocus() }
     contentItem: Text { text: parent.text; leftPadding: parent.indicator.width + parent.spacing; color: root.textColor; font.family: "Manrope"; verticalAlignment: Text.AlignVCenter }
     background: Rectangle { color: "transparent"; radius: 6; border.width: parent.activeFocus ? 2 : 0; border.color: root.accentTextColor }
   }
+  component VoiceAccountCheck: VoiceCheck {
+    implicitWidth: 44
+    implicitHeight: Math.max(44, contentItem.implicitHeight + 12)
+    contentItem: Text { text: parent.text; textFormat: Text.PlainText; wrapMode: Text.WordWrap; leftPadding: parent.indicator.width + parent.spacing; color: root.textColor; font.family: "Manrope"; verticalAlignment: Text.AlignVCenter }
+  }
 
   component VoiceButton: Button {
     id: action
-    readonly property color fillColor: down ? root.mixColor(Color.accent, root.surfaceColor, 0.8) : (hovered ? root.mixColor(Color.accent, root.textColor, 0.8) : Color.accent)
+    readonly property color fillColor: down ? root.mixColor(Theme.Color.accent, root.surfaceColor, 0.8) : (hovered ? root.mixColor(Theme.Color.accent, root.textColor, 0.8) : Theme.Color.accent)
     focusPolicy: Qt.StrongFocus
     onActiveFocusChanged: if (activeFocus) { root.clearPendingTaskInputRestore(); root.clearTaskActionFocus() }
     implicitHeight: 44
@@ -852,14 +978,14 @@ Item {
         z: -1
         anchors.centerIn: parent
         width: (orbButton.width - 16) * 0.6; height: width; radius: width / 2
-        color: Color.accent
+        color: Theme.Color.accent
         layer.enabled: true
         layer.effect: MultiEffect { shadowEnabled: true; shadowColor: root.chromeShadowColor; shadowBlur: 1.0; shadowScale: 1.3; shadowVerticalOffset: 1 }
       }
       contentItem: VoiceOrb {
         width: orbButton.width - 16; height: width
-        accentColor: Color.accent
-        backgroundColor: Color.background
+        accentColor: Theme.Color.accent
+        backgroundColor: Theme.Color.background
         voiceState: root.orbState
         audioLevel: root.voice.input_level || root.voice.level || 0
         playbackLevel: root.voice.playback_level || 0
@@ -1118,12 +1244,46 @@ Item {
             }
             ScrollView {
               id: tasksScroll
+              contentWidth: availableWidth
               clip: true
               ScrollBar.vertical.policy: ScrollBar.AlwaysOn
               ColumnLayout {
                 width: tasksScroll.availableWidth - 14
                 spacing: 12
                 Text { text: "Coordinated tasks"; color: root.textColor; font.family: "Manrope"; font.pixelSize: 22; Accessible.role: Accessible.Heading }
+                Text { text: "Ask or draft"; color: root.textColor; font.family: "Manrope"; font.pixelSize: 18; Accessible.role: Accessible.Heading }
+                VoiceSelect {
+                  Layout.fillWidth: true
+                  model: [{ name: "Existing agent", value: "existing" }, { name: "Free cloud AI", value: "free-cloud" }]
+                  textRole: "name"; valueRole: "value"
+                  currentIndex: root.freeCloudSelected ? 1 : 0
+                  Accessible.name: "Assistant connection for new requests"
+                  onActivated: root.send("configure", { settings: { execution_connection: currentValue } })
+                }
+                Text { visible: root.freeCloudSelected; text: controller.assistant.ready === true && controller.assistant.enabled === true ? "Free cloud AI is connected. Selected text goes to Groq; generated facts may need checking." : "Finish Free cloud AI setup in Hub before sending a request."; color: root.secondaryTextColor; font.family: "Manrope"; wrapMode: Text.WordWrap; Layout.fillWidth: true }
+                VoiceField { Layout.fillWidth: true; placeholderText: "Workspace folder"; text: root.selectedProject; onTextEdited: root.selectedProject = text; Accessible.name: "Assistant workspace folder"; enabled: !root.assistantSubmitting }
+                VoiceArea { Layout.fillWidth: true; placeholderText: "Ask a question or describe a draft"; text: root.assistantDraft; onTextChanged: root.assistantDraft = text; Accessible.name: "Everyday assistant request"; implicitHeight: 90; wrapMode: TextEdit.Wrap; enabled: !root.assistantSubmitting }
+                VoiceArea { visible: root.freeCloudSelected; Layout.fillWidth: true; placeholderText: "Selected .md or .txt paths, one per line (optional)"; text: root.assistantDocuments; onTextChanged: root.assistantDocuments = text; Accessible.name: "Documents selected for this request"; implicitHeight: 64; wrapMode: TextEdit.Wrap; enabled: !root.assistantSubmitting }
+                VoiceCheck { visible: root.freeCloudSelected; text: "Save this request as a new Markdown note"; checked: root.assistantSaveNote; onToggled: root.assistantSaveNote = checked; enabled: !root.assistantSubmitting }
+                VoiceField { visible: root.freeCloudSelected && root.assistantSaveNote; Layout.fillWidth: true; placeholderText: "New note path, for example meeting.md"; text: root.assistantNote; onTextEdited: root.assistantNote = text; Accessible.name: "Explicitly requested new note path"; enabled: !root.assistantSubmitting }
+                Text { visible: root.freeCloudSelected; textFormat: Text.PlainText; text: "Calendar accounts (optional)"; color: root.textColor; font.family: "Manrope"; font.pixelSize: 16; Accessible.role: Accessible.Heading; Layout.fillWidth: true }
+                VoiceButton { visible: root.freeCloudSelected; text: root.assistantAccountsLoading ? "Refreshing supported accounts…" : "Refresh supported accounts"; enabled: !root.assistantAccountsLoading && !root.assistantSubmitting; onClicked: root.refreshAssistantAccounts() }
+                Text { visible: root.freeCloudSelected; textFormat: Text.PlainText; text: root.assistantAccountsError || (root.assistantAccountsLoading ? "Checking the supported account list. This does not grant account access." : !root.assistantAccountsLoaded ? "Refresh to choose supported read-only Calendar accounts. Nothing is selected automatically." : !root.assistantAccountsAvailable ? "Supported Calendar accounts are unavailable on this system. Ask or save a note without them." : root.assistantAccounts.length === 0 ? "No supported Calendar accounts were returned. Ask or save a note without them." : "Select up to four accounts for this request. Refreshing grants no access."); color: root.secondaryTextColor; font.family: "Manrope"; wrapMode: Text.WordWrap; Layout.fillWidth: true }
+                Repeater {
+                  model: root.freeCloudSelected ? root.assistantAccounts : []
+                  delegate: VoiceAccountCheck {
+                    required property var modelData
+                    Layout.fillWidth: true
+                    text: modelData.label
+                    Accessible.name: "Read-only Calendar account: " + modelData.label
+                    checked: root.assistantSelectedAccounts.indexOf(modelData.id) >= 0
+                    enabled: !root.assistantSubmitting && !root.assistantAccountsLoading && (checked || (root.assistantAccountsAvailable && root.assistantSelectedAccounts.length < 4))
+                    onToggled: root.selectAssistantAccount(modelData.id, checked)
+                  }
+                }
+                VoiceAccountCheck { visible: root.freeCloudSelected && root.assistantSelectedAccounts.length > 0; Layout.fillWidth: true; text: "Send information from these selected accounts to Groq"; checked: root.assistantAccountConsent; onToggled: root.assistantAccountConsent = checked; enabled: !root.assistantSubmitting && !root.assistantAccountsLoading }
+                Text { visible: root.freeCloudSelected; textFormat: Text.PlainText; text: "Only selected documents and explicitly confirmed accounts can be read. Existing files are never overwritten. Private results stay in Work; Voice reports when ready."; color: root.secondaryTextColor; font.family: "Manrope"; wrapMode: Text.WordWrap; Layout.fillWidth: true }
+                VoiceButton { text: root.assistantSubmitting ? "Submitting…" : "Send assistant request"; enabled: !root.assistantSubmitting && root.assistantDraft.trim() !== "" && root.selectedProject.trim() !== "" && (!root.freeCloudSelected || (controller.assistant.ready === true && controller.assistant.enabled === true && (!root.assistantSaveNote || root.assistantNote.trim() !== "") && (root.assistantSelectedAccounts.length === 0 || (!root.assistantAccountsLoading && root.assistantAccountsAvailable && root.assistantAccountConsent)))); onClicked: root.submitAssistant() }
                 Text { visible: root.tasks.length === 0; text: "No tasks are being coordinated yet."; color: root.secondaryTextColor; font.family: "Manrope" }
                 Text { visible: root.tasks.length > 0; text: "Finished work stays here for review until you dismiss it."; color: root.secondaryTextColor; font.family: "Manrope"; wrapMode: Text.Wrap; Layout.fillWidth: true }
                 Repeater {

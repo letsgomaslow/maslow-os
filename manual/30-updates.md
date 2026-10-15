@@ -1,6 +1,6 @@
 # Updates
 
-Maslow OS and your packages are kept up to date through _Maslow OS Update_ in the Maslow OS menu (`Super + Space`) or the compatible `omarchy update` command.
+Maslow OS and your packages are kept up to date through _Maslow OS Update_ in the Maslow OS menu (`Super + Space`) or the `maslow update` command (the compatible `omarchy update` does the same). If a package mirror stalls on a download, the update retries once without the stall cutoff and keeps what already downloaded; if the mirror is still stuck, nothing is changed and you can simply try again later.
 
 Maslow OS uses the Omarchy engine and preserves its update ordering. One update can include Maslow presentation changes, [Omarchy engine releases](https://github.com/basecamp/omarchy/releases), migrations, Arch system packages from the [Omarchy Arch Mirror](https://github.com/omacom-io/omarchy-mirror), and [AUR](https://aur.archlinux.org/) packages. [Maslow OS release notes](https://github.com/letsgomaslow/maslow-os/releases) and engine notes are labeled separately before the update starts.
 
@@ -26,7 +26,7 @@ Your packages aren't the only thing that goes stale. Many laptops and peripheral
 
 ### Warning about direct pacman/yay updates
 
-If you're already familiar with Arch, you might be tempted to just run `pacman -Syu` or `yay -Syu` yourself, but if you do that, you'll miss the snapshot, engine migrations, Maslow branding repair, and configuration updates that run together with new packages. That's why Maslow OS stops a direct system upgrade and points you to `omarchy update` instead. (If you really know what you're doing, the guard will tell you how to bypass it for a single transaction.)
+If you're already familiar with Arch, you might be tempted to just run `pacman -Syu` or `yay -Syu` yourself, but if you do that, you'll miss the snapshot, engine migrations, Maslow branding repair, and configuration updates that run together with new packages. That's why Maslow OS stops a direct system upgrade and points you to `maslow update` instead. (If you really know what you're doing, the guard will tell you how to bypass it for a single transaction.)
 
 ### Rolling back bad updates
 

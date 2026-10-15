@@ -1,0 +1,5 @@
+#!/bin/bash
+# omarchy:hidden=true
+# omarchy:summary=Control optional Free cloud AI without exposing account keys
+# Ignore caller Python paths and project modules before the private key prompt.
+exec /usr/bin/python -I -c 'import sys; sys.path.insert(0, "/usr/lib/maslow-free-ai"); from maslow_free_ai.control import main; main()' "$@"

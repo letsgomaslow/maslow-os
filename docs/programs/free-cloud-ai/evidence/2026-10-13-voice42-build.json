@@ -1,0 +1,27 @@
+{
+  "schema": 1,
+  "status": "built-actual-archive-audit-pending-not-installed",
+  "source": "21e7a467e388b6bb9143b2f6f8e7ab00121edd6f",
+  "implementationCommit": "c28eceeb624fb0fe4f773b847e27b3d151e9e723",
+  "sourceClarification": "21e7a467 removes one redundant final newline in an unshipped test; AST identical. Runtime code is unchanged from the independently reviewed and fully tested c28 source.",
+  "recipe": "0f9cb467a60d6dfb30a1fdd0bc946eafd57493cf",
+  "owning": {"tests": 538, "failures": 0, "skips": 2, "uiAndOrbChecks": "passed", "seconds": 97.751, "logSha256": "1b596b7962c64265323f8cf3e93f057ff6d302bebe11e1af7d7054516f8c89da", "limits": "CPU1/nice10/AS3GiB/1200s/shared heavy lock"},
+  "review": {"sourceSha256": "de725392306d9b74614f30d06c8f12e500cac6bdbd3911a6d0b118af665b29c7", "preparationSha256": "eeda9c1c09d629e649ff0122d420fb0663f6746e644a29a81123fab0a0faab4b", "finalManifestSha256": "4e9ec83af78d46dbbd88cec3c706ac4945b091d6c248617083e0813fe31a9fb8"},
+  "build": {
+    "run": "03f5395fc42b4934833ed6528bf11c9a",
+    "approvedManifestSha256": "5c758564efc4a7266863f3f5d2c33da76fb8aa44ffac0aa7455ccffafe0327fd",
+    "archive": "/home/maslow/Maslow-ai-os/free-ai-build/voice42-prep/recipe/maslow-voice-0.1.5-42-x86_64.pkg.tar.zst",
+    "sha256": "4a49caa9f1b524ffce6dc34bf57b54f95afebc8fbcbd6b294ad8e06809833951",
+    "bytes": 286149272,
+    "stateSha256": "f1c24ed0edd50341410c05ec8cb6fce0a5ece7db8475565577d477f356694669",
+    "logSha256": "094cdbdc31622e50d86ff44e824729e2e131f6a5eb11dd9b870ae69c097fc0f1",
+    "exit": 0,
+    "launchGroupRetired": true,
+    "containerGone": true,
+    "limits": "CPU2/nice10/RAM4GiB/total6GiB/1200s/shared heavy lock",
+    "network": "Existing bridge mode for normal hash-pinned dependency resolution; no provider requests authorized"
+  },
+  "nextAction": "Independently review the narrow actual Voice42 archive verifier, then run one bounded archive audit. Prepare signed matched Hub delivery before installation or live retry.",
+  "preservation": "Installed Voice41/backend2/Hub0.3.10 and existing user data remain intact. Backend2 and Connect8 were not rebuilt. Nine logged Groq calls; live requests held. Craft paused; no publication or product merge.",
+  "limitations": "Build/source tests are not installed quota/Stop-Continue/notes, connected account, recovery, physical audio, clean guest or final preview acceptance."
+}

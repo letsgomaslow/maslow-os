@@ -1,0 +1,28 @@
+{
+  "schema": 1,
+  "status": "QA-source-accepted-build-not-admitted",
+  "productHub": "3577c663429420ffa9c981c3c9140069397d7c48",
+  "qaHub": "f37947b8a623d323d19635904d8ac1b64275ac2a",
+  "qaSourceReviewSha256": "c13362b80f9e00a4d516e5f73d598def009e1da5494ee6d39177a20fa57e4eb6",
+  "qaSourceScope": "Only four literal gates; 183 remaining tracked files/entrypoints/guards/tests unchanged. Product clean and false.",
+  "build": {
+    "freezeSha256": "2bc19f2df43dabe97f51dd712dd20905fa449953aa0f995f9e7cf6bf45b4fea8",
+    "manifestSha256": "d3a88ca74f53e8e450b27f31cc2b97b62b991a5d7385f982d3a07cf3b98ac528",
+    "reviewSha256": "969147b5c559c2c3671fe89278718083a36301c9f0399b7ab505194110ff0a72",
+    "finding": "QA-HUB-BUILD-GIT-01: git status executes unpinned local fsmonitor hook before tracked-file denial. Replace worktree-sensitive commands with committed tree/blob plus actual complete byte/mode scan; no native GO.",
+    "resources": "CPU2/RAM4GiB/total6GiB/sharedlock/networknone; public-only mounts and unchanged recipe8709933."
+  },
+  "postboot": "Bounded seven-module private daemonClock proof implementation authorized by Root after reviewing proposal853f1689. Default/legacy checks and public Voice41 wire stay unchanged. Exact source review and Root owning checks are required before final QA repin/build.",
+  "postbootCharter": {
+    "path": "/home/maslow/Maslow-ai-os/free-ai-build/hub-bundle-prep/postboot-operation-charter.json",
+    "sha256": "d25bf131466556976c92cc3a9f6dd376d5121e37cfc939800f61af18750ebf8d"
+  },
+  "buildGitRetake": {
+    "reviewSha256": "97c537f78888f49f6490ab8aa205f359f794b4b20f75063261bb58c09f418782",
+    "manifestSha256": "fb19101d7050d622ba1c587ae0d7b8edcc049580dae25f51141602cd38fe90ae",
+    "status": "accepted-control-source-only-no-build-GO"
+  },
+  "guest": "Overlay controls and actual CID compatibility accepted; unchanged8GiB available-memory admission unmet. User participation request pending for unused apps/tabs.",
+  "nextAction": "Finish/freeze bounded postboot private proof, independently review and run owning checks, then repin the QA derivative/matched build. Prepare actual Hub package checks in parallel; no obsolete build or further ISO.",
+  "previewComplete": false
+}

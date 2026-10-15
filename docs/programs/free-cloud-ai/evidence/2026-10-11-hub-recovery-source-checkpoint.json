@@ -1,0 +1,63 @@
+{
+  "schema": 1,
+  "date": "2026-10-11",
+  "scope": "Guarded Hub recovery source and disposable component verification only; no installed native or full preview acceptance",
+  "source_revision": "2a8c6eda15d92078fdd8656a879b1e93dd786a1d",
+  "worktree_preserved": "/home/maslow/Projects/Maslow/free-ai-hub",
+  "implementation": {
+    "model": "gpt-6.1-sol",
+    "reasoning": "high",
+    "worker": "current_recovery"
+  },
+  "review": {
+    "model": "gpt-6-astra",
+    "reasoning": "high",
+    "worker": "boundary_review",
+    "status": "passed-no-confirmed-scoped-finding"
+  },
+  "source_report": {
+    "path": "/home/maslow/Projects/Maslow/free-ai-hub/docs/evidence/2026-10-11-free-ai-fixed-recovery-source.json",
+    "sha256": "11be2b502e87d0ccacf491f1573ecc86554c0abfb8571ef8eefec153b0dc2f19"
+  },
+  "review_report": {
+    "path": "/home/maslow/Projects/Maslow/free-ai-hub/docs/evidence/2026-10-11-free-ai-fixed-recovery-review.json",
+    "sha256": "8048489657e188384b9ea70c69f36196240ea660493adb9106959fa2366cefe6"
+  },
+  "checks": {
+    "owning_tests": 230,
+    "focused_tests": 77,
+    "ui_contract": "pass",
+    "compile_and_diff": "pass",
+    "original_namespace_cases": 22,
+    "recovery_namespace_cases": 30
+  },
+  "logs": {
+    "original": {
+      "path": "/home/maslow/Maslow-ai-os/free-ai-build/hub-fixed-recovery-final-2026-10-11/original-namespace.jsonl",
+      "sha256": "dc40593827dc588f87533365c301fc105ddb179753472e2794a2ebc3f7a6bbf2"
+    },
+    "recovery": {
+      "path": "/home/maslow/Maslow-ai-os/free-ai-build/hub-fixed-recovery-final-2026-10-11/recovery-namespace.jsonl",
+      "sha256": "cd8558a5e79dea76dfafe43a875658e5addc4cefed83811671a0d39a0befa9d5"
+    },
+    "owning_completion": {
+      "path": "/home/maslow/Maslow-ai-os/free-ai-build/hub-fixed-recovery-final-2026-10-11/unittest-completion.log",
+      "sha256": "9a433cbcddb846535249c1ec111e8450391ba1be6e5926e475458c2a7d594980",
+      "limit": "Completion chunk only; startup diagnostics not retained"
+    }
+  },
+  "coordinator_checks": [
+    "Nine independently reviewed frozen source hashes match committed files",
+    "Both namespace log hashes and record counts match; original22/recovery30",
+    "Explicit staged scope and diff check before commit",
+    "No native build admitted while unrelated Craft container upbeat_bell runs"
+  ],
+  "limits": [
+    "Namespace tests use inert packages and synthetic Voice/systemd/keyring adapters with actual kernel UID/pacman/Node/SQLite mechanisms",
+    "Older interrupted20-case run remains explicitly unconfirmed",
+    "Historical FreeAI1 cannot provide the supported recovery verifier",
+    "Preserved user state with FreeAI package absent remains an unresolved reinstall gate",
+    "Both install/recovery public gates remain false"
+  ],
+  "next_action": "Reconcile accepted Craft Hub266 with this source in separate free-ai-hub-current; preserve native5 recognition, then matched native6 and visual/installed checks after serialized builds"
+}

@@ -5,10 +5,33 @@ import tempfile
 import unittest
 from pathlib import Path
 
+from maslow_voice.errors import VoiceError
 from maslow_voice.ipc import ControlServer, MAX_RESPONSE
 
 
 class ControlServerTests(unittest.IsolatedAsyncioTestCase):
+    async def test_account_reply_is_correlated_on_success_and_error(self):
+        async def dispatch(request):
+            if request['account_request_id'] == 'failed':
+                raise VoiceError('MANAGED_ACCOUNT_UNAVAILABLE', 'Unavailable')
+            return {'available':True, 'accounts':[]}
+        with tempfile.TemporaryDirectory() as temporary:
+            control = ControlServer(Path(temporary) / 'control.sock', dispatch, lambda: {})
+            await control.start()
+            reader, writer = await asyncio.open_unix_connection(str(control.path))
+            try:
+                for identity in ('success', 'failed'):
+                    writer.write(json.dumps({'action':'assistant_accounts', 'account_request_id':identity}).encode() + b'\n')
+                    await writer.drain()
+                    response = json.loads(await asyncio.wait_for(reader.readline(), 2))
+                    self.assertEqual(response['account_request_id'], identity)
+                    self.assertTrue(response['assistant_accounts_reply'])
+                    self.assertEqual(response['ok'], identity == 'success')
+            finally:
+                writer.close()
+                await writer.wait_closed()
+                await control.close()
+
     async def test_slow_watcher_gets_latest_snapshot_without_blocking_publish_or_fast_watcher(self):
         with tempfile.TemporaryDirectory() as temporary:
             socket_path = Path(temporary) / "control.sock"

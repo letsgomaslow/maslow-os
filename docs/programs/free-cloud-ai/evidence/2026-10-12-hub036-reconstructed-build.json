@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "status": "reconstructed-rollback-candidate-built-full-payload-audit-pending",
+  "classification": "New reconstruction of installed Hub0.3.6-1, not the original compressed archive",
+  "source": "33940d2e8740b172b953cc3e091cbae1ba1cd303",
+  "recipe": "5e423aeddea4b5b42d7fbfbe5bd7f85391c10db4",
+  "independentContextReviewSha256": "10cc9a457fddc8aa703d3e721f161b2d9773cbd6f0a5492d7c92f94a988cb439",
+  "buildManifestSha256": "a1f763888f7934c624c5ad722e7cedb0c391f0e36260bf00aeab9f8ff1995187",
+  "session": "1b8176bae49046d5b60b728204186425",
+  "stateSha256": "f5201792aa5cf882417e2faf6d176443a315b3e642d0efed7fa00ee69e96cd42",
+  "candidate": {
+    "path": "/home/maslow/Maslow-ai-os/free-ai-build/hub-bundle-prep/hub036-rebuild-prep/evidence/1b8176bae49046d5b60b728204186425/work/maslow-hub-0.3.6-1-any.pkg.tar.zst",
+    "sha256": "987ae012f1cad9502a60a6715d7736138c4e7fb485b7ee8dda016f8b611c5294",
+    "bytes": 474644171,
+    "artifactAccepted": false,
+    "signed": false
+  },
+  "execution": "Normal makepkg exit0 and completed state, owned group retired and Docker container gone. CPU2/RAM4GiB/total6GiB/networknone,900s deadline, shared heavy lock. Subsequent streaming FD-bound candidate hash completed separately on one CPU. No native package/service/trust/state change.",
+  "inputs": "All26 installed source-mapped files and member set matched recorded source, and all3 historical opaque package hashes matched existing manifest before build. Complete new archive versus installed payload/metadata/records remains a separate required audit.",
+  "parallelSource": "Four-file missing-standalone recovery slice frozen for independent review (freeze0c1f73a81df293fb6d14a9a74ec5a0b674eebdbcabdd6cd4af0070984167b43c). First150affected tests had5same finish-only inheritance errors; targeted14 retake and1pretty-noop test pass after fix. Original failure retained; no full owning or native success yet.",
+  "nextAction": "Freeze/review reconstructed archive checker, run actual single locked installed-payload audit, then prepare concrete Mac staging signing handoff. Independently review recovery diff and run required owning checks once after acceptance. Keep clean guest only for required fresh/destructive gates.",
+  "previewComplete": false
+}

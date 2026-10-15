@@ -1,0 +1,93 @@
+{
+  "schema_version": 1,
+  "status": "Voice43-built-audited-and-pair-signed-Hub-context-review-pending",
+  "source_commit": "1093cf71601f6b566c86754ffc314d8a9d9f6549",
+  "recipe_commit": "0a8ee756988e5318d37781f7b91d549479770b39",
+  "source_freeze": {
+    "baseCommit": "8b94fe25",
+    "files": {
+      "voice/maslow_voice/daemon.py": "c1e87ad9c7e68ab366bebfc9069ac4c96f7334cc65afe2daf2ad7a2e5e87cf8d",
+      "voice/maslow_voice/store.py": "efba486d8a69a7e3b2fab11e643e68b7b39690cc92a8719f2c4ccb73153ce874",
+      "voice/maslow_voice/providers/gemini_tools.py": "20aa865d26bd4450f0677791a8e2827aca2c4d08d8688c0dfbc9b52add9dd6b2",
+      "voice/tests/test_mvp_service.py": "eca2d1533bca4d8dd0ee31769494cc6eee806376ca8d8e568da42dfdb958842c",
+      "voice/tests/test_gemini_live.py": "49fecad9b740ed605a7152da110b9ea649dabc9c9cd77382b89d59e548b67d3d"
+    },
+    "independentReview": "voice_continuity_review gpt-6-astra/high accepted retake",
+    "focusedTests": 91,
+    "focusedSeconds": 48.61,
+    "installed": false
+  },
+  "owning": {
+    "exit": 0,
+    "seconds": 90.371,
+    "logSha256": "dd88f81f66f15fc3c9dcc724a0abcaa856309569ba0280ea35e178a28d6da592",
+    "sourceUnchanged": true,
+    "limits": "CPU1/nice10/AS3GiB/1200s/shared heavylock",
+    "providerRequestsAuthorized": false
+  },
+  "owning_test_count": 545,
+  "owning_skipped": 2,
+  "ui_and_orb_checks": "passed",
+  "independent_source_review": "gpt-6-astra/high accepted corrected time-window and selected-task lookup; original cutoff findings preserved in investor-demo-priority.json",
+  "hub_qa_source": "23eabfbf060371300b108f33d28330e0fcd0816f",
+  "hub_qa_scope": "Only two 0.3.10 to 0.3.11 version changes from accepted QA4; four accepted local QA flags unchanged; no pending Connect integration",
+  "hub_qa_review": "independent gpt-6-astra/high verified195filemap6d799bf5d5dd4d32434aa05d3de7c54172e9a7397dab98300e8daf340af7fb69",
+  "build_manifest_sha256": "ff406ecd732d95503f6b0e1737dabf6a32d253fd86fe469d0b0fb1a811112e34",
+  "build_admission": "independent gpt-6-astra/high passed manifest/controller/152source/recipe/unchanged controls; Root exact GO followed idle Voice check",
+  "installed_voice": "0.1.5-41",
+  "installed_hub": "0.3.10-1",
+  "free_ai_preview_complete": false,
+  "next_action": "Finish independent Hub build-context admission; build Hub0.3.11 once, audit and sign it, then normal native update and live continuity retest.",
+  "build_session": "fe635e4c209d441d9bce7e0da5164ff7",
+  "actual_build": {
+    "exit": 0,
+    "session": "fe635e4c209d441d9bce7e0da5164ff7",
+    "archive": "/home/maslow/Maslow-ai-os/free-ai-build/voice43-prep/recipe/maslow-voice-0.1.5-43-x86_64.pkg.tar.zst",
+    "archiveSha256": "8a5386f18be249a4051b55530c723607bc2d19a635db601ce40e13ecd248a0aa",
+    "bytes": 286122171,
+    "launchGroupRetired": true,
+    "containerGone": true,
+    "buildLogSha256": "6d06b8bf9a466dbabd1bc75d79fe406636ff6f765a36e9f37ba498d6d58321b9",
+    "stateSha256": "8f69b0d662317f0ec1db154c008b8a79f5fcf6fbdadd78f82fe1cf197001c873",
+    "artifactAccepted": false,
+    "build_warning": "libfakeroot payload warnings observed; complete ownership verification required in actual archive audit",
+    "containerGoneProof": "successful docker ps -a --no-trunc inventory excludes exact recorded CID"
+  },
+  "actual_audit": {
+    "exit": 0,
+    "seconds": 83.049,
+    "verifierSha256": "f0c4cb69c9d12877369401bbedbe3654199fdbb68c95469160245dc4c98b00a7",
+    "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "limits": "CPU1/nice10/AS2GiB/300s/shared heavylock"
+  },
+  "archive_audit": {
+    "schema": 1,
+    "status": "static-pass-coordinator-review-required",
+    "archiveSha256": "8a5386f18be249a4051b55530c723607bc2d19a635db601ce40e13ecd248a0aa",
+    "sourceCommit": "1093cf71601f6b566c86754ffc314d8a9d9f6549",
+    "mappedSourceFiles": 63,
+    "members": 9141,
+    "privateDependenciesAndRemainingPayloadMatchVerifiedVoice42": true,
+    "rootOwnershipPathsModesLinksVerified": true,
+    "sourceAndMarkerVerified": true,
+    "runtimeVerified": false,
+    "installedVerified": false,
+    "liveVerified": false
+  },
+  "coordinator_artifact_review": "Accepted for local signing after root ownership, mapped source, marker and unchanged dependency/payload audit",
+  "pair_signing": {
+    "manifest_sha256": "91c4a3551a1665acdf8e924f0ad8f72d9f5a0c5d6585bddfcd7a3d46be668cb3",
+    "signer_sha256": "6eafbc29a2594a392a9cce8b9a431f841ba30d1659b8d260992ef9627c0957a9",
+    "independent_review": "accepted constants-only change",
+    "root_check_only": "passed",
+    "output": "/home/maslow/Maslow-ai-os/free-ai-build/hub-bundle-prep/local-preview-signatures-1eza4c2b",
+    "state": "signed-and-independently-verified",
+    "window": "Maslow OS, mapped on workspace1",
+    "focus_attempt": "Withheld because desktop is locked; terminal preserved, no lock bypass",
+    "root_verification": "/home/maslow/Maslow-ai-os/free-ai-build/hub-bundle-prep/qa-pair-staging-2/root-signature-verification.json",
+    "signature_sha256": {
+      "manifest.json.sig": "98a025195703e70489b6ca26bacdfd89ed596b8348f25cfdebdf9814b0173883",
+      "maslow-voice-0.1.5-43-x86_64.pkg.tar.zst.sig": "0094dc58dadcfcf7ce710a521dfe2928485439dceff18afe0247cb0f37d10716"
+    }
+  }
+}

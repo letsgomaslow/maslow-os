@@ -1,0 +1,30 @@
+{
+  "schema": 1,
+  "status": "hub0310-installed-payload-verified-component-install-pending",
+  "archiveSha256": "d71e572fe1a5f483a6726741d047424d02c53b852d3a504adeb4583df16a8bd9",
+  "qaSource": "266c6073344db5d0064d0a74f70bafc196bc1d96",
+  "productSource": "2bf25ef6315b85cdabdb4941e2c97900641a579a",
+  "nativeApply": {
+    "directory": "/home/maslow/Maslow-ai-os/free-ai-build/hub-bundle-prep/native-preview-prep/0310/gui-apply-dqon6jms",
+    "independentReviewSha256": "ee36dea92c70c0e0196dd190ea1be48597c7c8ecd2d7eb52f7d6eae2387330e7",
+    "exit": 0,
+    "seconds": 29.407,
+    "newAuthenticationPromptNeeded": false,
+    "passwordInputCaptured": false,
+    "resources": "CPU1/nice10/AS2GiB/shared heavy and user Hub update locks; genuine graphical pkexec, no authentication or testing override"
+  },
+  "installedPayload": {
+    "independentVerifierReviewSha256": "1e6fd9740b7aef589dffda9f99900b9c7d78d6aaa7476d4fb7a952ed9db54d1d",
+    "verifierSha256": "a546d1246599057a1815363d371f3b81de04ebd97765de981b7f20c9ca8f6330",
+    "installedVersion": "0.3.10-1",
+    "committedFilesMatched": 43,
+    "generatedManifestMatched": true,
+    "packageIntegrity": "73 files, 0 altered",
+    "ownershipAndModesMatched": true
+  },
+  "publicReplay": {"sequence": 11, "manifestSha256": "ba3fdabd4e2adf328533415960e1187acdfda391102353899c9aacd14bbe7ff7"},
+  "visibleHub": "Real Quickshell screenshot screenshot-2026-10-12_23-02-04.png shows current0.3.10 after normal reopen. Earlier0.3.9 frame was captured before the status command completed. Source byte map and actual native rendering are separate evidence.",
+  "preserved": "Backend absent, Voice0.1.5-37 stopped under exact recorded HOME mask, Hermes PID1025 retained. Prior artifacts, trust, backups and Craft work preserved.",
+  "nextAction": "Review/run the frozen read-only protected post-update checker for cleared ordinary transaction, exact rollback record, V1/V2 absence and trust. Then execute actual installed fixed free-ai-install through graphical authorization and verify its outcome.",
+  "limitations": "Protected post-update record confirmation pending. No installed FreeAI/Voice41/Connect8 or live provider/account/audio/recovery/clean-guest acceptance. Local replay pause remains disclosed and preserved; no publication or product merge."
+}

@@ -1,0 +1,98 @@
+{
+  "schema": 1,
+  "recorded_at": "2026-10-11T15:56:05.839365+00:00",
+  "source_commit": "e7b8831a4fc81f6fdf0a1b8369dcc748274d9112",
+  "artifacts": [
+    {
+      "path": "/home/maslow/Maslow-ai-os/free-ai-build/native/maslow-free-ai-0.1.0-1-x86_64.pkg.tar.zst",
+      "name": "maslow-free-ai",
+      "version": "0.1.0-1",
+      "sha256": "5b2d989d58451ac9744f9c0e8c2c3dcde5f99657d1fef931d2c4a348fb5e4143",
+      "bytes": 46673889,
+      "source_commit": "e7b8831a4fc81f6fdf0a1b8369dcc748274d9112",
+      "signed": false,
+      "installed_acceptance": false
+    },
+    {
+      "path": "/home/maslow/Maslow-ai-os/free-ai-build/voice38/maslow-voice-0.1.5-38-x86_64.pkg.tar.zst",
+      "name": "maslow-voice",
+      "version": "0.1.5-38",
+      "sha256": "3593c33d16574fae8667da41617c3d7facfda29b3dbaa8672f03f3a7da53f0f2",
+      "bytes": 286120480,
+      "source_commit": "e7b8831a4fc81f6fdf0a1b8369dcc748274d9112",
+      "signed": false,
+      "installed_acceptance": false
+    }
+  ],
+  "external_evidence": [
+    {
+      "path": "/home/maslow/Maslow-ai-os/free-ai-build/native/artifact-audit-final.json",
+      "sha256": "1b24f11760e135c8555384073b5b5e875721864a0e1f7ad8f3d5fdf22c320572"
+    },
+    {
+      "path": "/home/maslow/Maslow-ai-os/free-ai-build/native/packaged-runtime-proof-final.json",
+      "sha256": "cc623de11d1b612664fb73c1fcef45bb8f2a7319a35cbe14236682898df659b4"
+    },
+    {
+      "path": "/home/maslow/Maslow-ai-os/free-ai-build/native/packaged-chat-proof-final.json",
+      "sha256": "e8ee7c1108464f1deaf3882bd0be0a1d347335b23f36daa1055f0d7b81d454a1"
+    },
+    {
+      "path": "/home/maslow/Maslow-ai-os/free-ai-build/native/production-advisories-final.json",
+      "sha256": "e3f1977046e4f54c9c93d634fca34b851b52bde131687c5900bec1eeca5ae459"
+    },
+    {
+      "path": "/home/maslow/Maslow-ai-os/free-ai-build/voice38/artifact-proof.json",
+      "sha256": "ae99bc5f04d92b1faa8c334084d6e69f9ae18dcde6431d83b2f517a6c0deff22"
+    },
+    {
+      "path": "/home/maslow/Maslow-ai-os/free-ai-build/work-qa/work-interaction.json",
+      "sha256": "e2fe03502d64266683736ffd71358df42a35b6a16bd97d859f7f15b089c24b59"
+    },
+    {
+      "path": "/home/maslow/Maslow-ai-os/free-ai-build/work-qa/native-qa-notes.txt",
+      "sha256": "63df516b67077c4b111967c68beb80757d8603401d71034659f6d9fb80412d38"
+    },
+    {
+      "path": "/home/maslow/Maslow-ai-os/free-ai-build/work-qa/native-source.sha256",
+      "sha256": "c69201f26d18e968bcc8a1c6b35f6fa15a8037dace05d1aca48bb7a3034646a9"
+    },
+    {
+      "path": "/home/maslow/Maslow-ai-os/free-ai-build/work-qa/native-screenshots.sha256",
+      "sha256": "b6f42dfeec433e887aa032188d9003e6f381450ff9038f8cae1fbfdfb20a275a"
+    }
+  ],
+  "checks": {
+    "owning_voice_tests": {
+      "passed": 455,
+      "environment_skips": 5,
+      "reason": "2 bubblewrap, 2 Mac sandbox, 1 Codex app server unavailable in clean builder"
+    },
+    "router_upstream_boundary_tests": 18,
+    "router_compiled_bootstrap_tests": 1,
+    "runtime_tests": 13,
+    "assistant_tests": 15,
+    "program_manager_tests": 11,
+    "hub_owning_tests": 160,
+    "native_work_visual": "7 screenshots + actual fixture interactions; Qt6.11.2/Sway container",
+    "native_hub_visual": "host Qt6.12 Quickshell + owned Weston; ready and unavailable card checked",
+    "actual_hermes_runs": "network-isolated local synthetic inference; 3 managed tools; receipt and terminal denial verified"
+  },
+  "dependency_reconciliation": {
+    "historical_production_advisories": 8,
+    "candidate_reported_advisories": 0,
+    "original_upstream_source_lock_changed": false,
+    "production_lock_sha256": "843dcda1e14f77c8fea99598d1f16b4846b9a3c0d95bdaccc9539f8f3c63946e",
+    "changes": "Compatible production-only pins and removal of unused media/proxy dependencies; names/versions match archive; no missing notices."
+  },
+  "limitations": [
+    "No real Groq inference or user setup",
+    "No actual Secret Service/keyring acceptance",
+    "No exact-account live Connect acceptance",
+    "No signed installation/update/database-key recovery",
+    "No clean installed guest, Lenovo resource or physical audio acceptance",
+    "FreeAI native glibc minimum2.44 must match guest; no silent OS upgrade",
+    "Source changes after this commit invalidate affected candidate package acceptance"
+  ],
+  "provider_requests_live": 0
+}

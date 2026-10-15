@@ -1,0 +1,71 @@
+{
+  "schema": 1,
+  "date": "2026-10-12",
+  "scope": "Independent bounded owning-test environment retake only; package/source/test inputs unchanged.",
+  "root": "/home/maslow/Maslow-ai-os/free-ai-build/voice40-prep",
+  "reviewedSha256": {
+    "run-owning-checks.py": "5b65b9f4575729bad32aaed3bca6776706b99ce98bd8b55638a41e8870dfa79f",
+    "owning-manifest.json": "bea82ad87adccf48105e83c3bf42f70aabd828e9bc0960cce090a722ce32b068"
+  },
+  "preservedFailure": {
+    "session": "92f35025275a413a98b2a60711fff14f",
+    "log": "owning-evidence/92f35025275a413a98b2a60711fff14f/build.log",
+    "logSha256": "5d6c161c73a23794878eb7de82d442017aa5d9b47a75b2b744e94a9c426295e5",
+    "testsRun": 507,
+    "seconds": 130.22,
+    "errors": 1,
+    "skipped": 5,
+    "reason": "Global outer PYTHONPYCACHEPREFIX relocated importlib.cache_from_source into a nested temporary prefix. Startup regression intentionally mkdir'd its adjacent cache parent and failed before the intended stale-cache assertion.",
+    "oldWrapperSha256": "fe2430efe8b27c05cfa30f6046fee81b381e4f2bc793dcf2ccfdf4d8d6cdbcb6",
+    "oldManifestSha256": "a89a4b1e6a147e94a32f09553092a43a1da74a68ffe452a2b646ac7f6e17aa28",
+    "historicalCopies": [
+      "run-owning-checks-before-cache-environment-fix.py",
+      "owning-manifest-before-cache-environment-fix.json"
+    ]
+  },
+  "change": [
+    "Unset only outer PYTHONPYCACHEPREFIX for the owning command and remove the outer temporary prefix lifecycle; preserve PYTHONDONTWRITEBYTECODE=1.",
+    "Before candidate execution, reject any __pycache__ entry or .pyc/.pyo path anywhere under check source. Do not clean, ignore or accept it.",
+    "Keep exact extracted usr-tree hash/type/mode/link/single-link seal and source/package read-only mounts. Reviewed source-helper source-only loading remains unchanged.",
+    "Manifest differs only in wrapper hash; source0ad, actual Voice40 archive407b, recipe488d, pinned image/Node, source manifest/static receipt, CPU2/RAM4GiB/total6GiB/network-none and shared cleanup controls remain unchanged."
+  ],
+  "tests": [
+    {
+      "scope": "Actual cache guard AST against scratch source",
+      "positive": 1,
+      "negative": 5,
+      "cases": [
+        "Root __pycache__ directory",
+        "Nested voice/tests/__pycache__ directory",
+        "voice/stale.pyc",
+        "free_ai/stale.pyo",
+        "Hidden-directory .pyc"
+      ],
+      "result": "All denied while preserving the offending entry; clean source passes."
+    },
+    {
+      "scope": "Unchanged source test_startup",
+      "command": "nice -n10 python3 -I -B; one CPU, outer sys.pycache_prefix=None, explicit exact source Voice/tests paths; unittest test_startup",
+      "passed": 8,
+      "seconds": 4.781,
+      "result": "Includes vulnerable -I -S -B adjacent-cache positive control and fixed bootstrap /dev/null-prefix rejection, hostile cwd/PYTHONPATH/site hooks, control selector and flags."
+    },
+    {
+      "scope": "Manifest/diff identity",
+      "result": "Current wrapper/manifest hashes match; parsed manifest comparison differs only in wrapper hash; no product/test/package modifications."
+    }
+  ],
+  "result": "Corrected environment is suitable for a coordinator-owned full owning rerun. No product rebuild or test waiver follows from this fixture-environment correction.",
+  "limits": [
+    "Focused tests used actual host Python and inert temporary startup fixtures, not installed Voice or the pinned-container full owning run.",
+    "The failed507 run remains a failed historical result; this report does not infer the revised full suite passed.",
+    "No archive scan, Docker, native package operation, host service, keyring, network/provider/account/audio execution by reviewer.",
+    "Actual installed bootstrap/systemd/root lifecycle and preview acceptance remain separate gates."
+  ],
+  "claims": {
+    "fullOwningRetakeRunByReviewer": false,
+    "packageRebuildRequiredForThisChange": false,
+    "installedAccepted": false,
+    "previewAccepted": false
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "schema": 1,
+  "status": "final-two-local-signatures-root-verified-native-preview-incomplete",
+  "priorFourSignatures": "Root independently verified all four earlier signatures against unchanged enrolled release key; no re-signing unchanged backend, Voice or reconstructed rollback Hub.",
+  "manifest": {
+    "path": "/home/maslow/Maslow-ai-os/free-ai-build/hub-bundle-prep/native-preview-prep/manifest.unsigned.json",
+    "sha256": "dbce1a5b65b14a3380a083865c4e17fe19f99b30470c93fb52cb89c9972ecefb",
+    "bytes": 10041,
+    "sequence": 10,
+    "expiresAt": "2026-10-13T22:16:16Z",
+    "proposalSha256": "ff98ce42ad34c0baf3da27a46eca39df0068a34859d1adaa6808b3798aa3f5e5"
+  },
+  "signing": {
+    "wrapper": "/home/maslow/Maslow-ai-os/free-ai-build/hub-bundle-prep/sign-final-hub-preview.py",
+    "sha256": "13273e2d2314d545ee3ef2ae27a08583deba47d7585ba05ae1204004ea29a141",
+    "delta": "Accepted prior wrapper unchanged except fixed input directory, two filename/hash pins and two-prompt explanation. Original batch preserved.",
+    "checkOnly": "Root fixed isolated/no-site/no-cache Python check passed; exact copied files, committed tools and encrypted-key metadata verified. No signing or network verification invoked.",
+    "independentManifestReviewSha256": "769ebe2b711e95d25b1b82cacdc59a429d4c09d9e9bb8f838c957125fe236cd5",
+    "independentLiteralDeltaReviewSha256": "edcafa7cb602ccc50a10dc73022d13fb63efbcdd8d10afd6d36c89838aa25ba8",
+    "terminal": "Mapped Maslow OS PID1701604; new local-preview-signatures-y9g0y5i4/status.json reports awaiting-local-signing-passphrase. Exact signer invoked through existing launcher with CPU1/nice10/shared lock. Actual receipt and enrolled-key verification remain required.",
+    "resources": "Public archive copy/hash/readback and check serialized under existing heavy lock, CPU1/nice10. No build or VM."
+  },
+  "actualSignatures": {
+    "result": "/home/maslow/Maslow-ai-os/free-ai-build/hub-bundle-prep/root-final-signatures-verification.json",
+    "manifestSignatureSha256": "94b0548ff90286e4a8983710cf32ee0dc6864880072ac6cf960c3bdf98c1324b",
+    "hubSignatureSha256": "4a60de2d24849575c1c304df4b238d517e13775b59632fc51c56a769d85eab78",
+    "verification": "Successful operator receipt plus independent Root streamed hash/receipt binding/OpenSSL verification against held enrolled public-key FD; input/signature/key identities rechecked before closing. CPU1/shared lock. No private-key or passphrase access."
+  },
+  "operatorDecision": "User explicitly chose Proceed with the local laptop preview and temporary Hub update pause. Local install advances replay floor10; normal public9 and a different future10 reject even after Hub rollback. No publication or replay reset authorized. Signing alone changes neither floor.",
+  "remaining": "Consistent private backups, protected previous Voice37 and owning native preflight; actual native/live/account/audio/recovery and mandatory clean/fault guest gates.",
+  "published": false,
+  "nativeChanges": false,
+  "previewComplete": false
+}

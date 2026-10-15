@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "status": "reconstruction-inputs-verified-build-admission-pending",
+  "why": "Normal Lenovo Hub upgrade requires a trusted same-version rollback seed. No original0.3.6-1 archive returned by scoped local/Mac search or current signed staging manifest. User authorizes Lenovo-first acceptance after diligence; do not waive seed requirement.",
+  "source": "33940d2e8740b172b953cc3e091cbae1ba1cd303",
+  "recipe": "5e423aeddea4b5b42d7fbfbe5bd7f85391c10db4",
+  "independentFeasibilitySha256": "784552bcfbc8f79905112afee543f30dd3b69e90a481fba7e6c365185b78ce68",
+  "actualSmallInstalledMatch": "All26 source-mapped regular files byte/mode/owner/link matched; complete53-member installed set, directory modes and timer symlink matched. Sole channel backup bytes match source and local backupMD5; no exception used.",
+  "actualOpaqueMatch": {
+    "manifestSha256": "84d171095023312fa66b10915a466e76e9eba647dbe85216a937d23c3bba4a25",
+    "archives": {
+      "hermes-agent-0.21.0-3-x86_64.pkg.tar.zst": "2102449c67c188e4a1ebb9771173ebd0ad2688116f458664344f686afb217ab4",
+      "maslow-voice-0.1.4-9-x86_64.pkg.tar.zst": "4b465a4cff46e4da6a5bf549d9fefcabd0f70fa312dedd76a1219a29136228ab",
+      "maslow-voice-local-0.1.0-2-x86_64.pkg.tar.zst": "a17d7613b43c040b88cded635a7e3116a22d5813cc35376771c3d259b00d77c8"
+    },
+    "result": "All3 actual installed root-owned opaque archive hashes/sizes/modes/single-link and before/after FD/named identities match the existing manifest;5.817s streaming, CPU1/256MiB/120s/shared lock.",
+    "externalEvidence": "/home/maslow/Maslow-ai-os/free-ai-build/hub-bundle-prep/hub036-opaque-input-check.json"
+  },
+  "rules": "Reconstruct using exact historical source, recipe and bundle through existing package tooling. Keep new compressed archive SHA/BUILDINFO/MTREE distinct from lost original; no FreeAI payload or new trust in this old package. Existing installer requires new authenticated manifest/signature and retained SHA, not the unknown original compression identity. Independently audit every installed payload byte/member before signing/admission.",
+  "activeWork": "Boundary worker prepares a minimal fixed normal-build context reusing accepted ownership/lock/container controls. Recovery author independently implements the bounded missing-standalone slice. No build, VM or native install running.",
+  "nextAction": "Independently review exact reconstruction context, run one limited makepkg build, audit reconstructed archive against unchanged installed Hub and local records. Then prepare Mac-operated preview signing with enrolled staging key for exact rollback and final target/pair; no production publication or trust replacement.",
+  "limits": "Input feasibility and hashes only, not an accepted reconstructed archive, usable signature, actual restoration, host installation or verified preview.",
+  "previewComplete": false
+}

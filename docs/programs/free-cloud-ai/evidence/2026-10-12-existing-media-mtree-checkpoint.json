@@ -1,0 +1,20 @@
+{
+  "schema": 1,
+  "status": "full-recorded-mtree-reconciliation-accepted-trust-and-media-gates-open",
+  "staticRun": "/home/maslow/Maslow-ai-os/free-ai-build/guest-baseline-prep/media-inspection/static-evidence/97af10fd95514c2aa6b1c601849e9fa3",
+  "helperSha256": "9976bb0de101e7c792d92fc94ad8c1e6d2c2ae23a3f5de0a8d04bb5937a50f60",
+  "inputManifestSha256": "c058cbab93ea6356761ab9cd68de5f073c9811008e20e03df0d8b7d763ca91d8",
+  "resultSha256": "58ca0ed9b7c5609d26342fa4c4e4731373dd6e385e46565da6c31ac6a1c4f9f6",
+  "independentReportSha256": "bd4471122705579a71c8d84fe5fea327abeea9e795f88d69592f5c2055c529ae",
+  "nativeLibarchiveSha256": "85d1563f07527a7489597c64e20647616e6157783418f4f5fe04dd480b947601",
+  "checks": {"packages": 9, "entries": 25498, "regularHashesAndSizes": 20100, "symlinkTargets": 1516, "criticalSourceMatches": 12, "inertNativeControlsPassed": 5},
+  "facts": "Exact recorded MTREE type/mode/uid/gid, regular sizes/hashes and symlink targets match all nine inventories. Each compressed MTREE stream separately matches its archive member hash/size. Pinned native libarchive parses metadata with checkfs disabled in an empty directory; no archive-data API, payload rescan or filesystem extraction is used.",
+  "absenceScope": "Six canonical optional package names are absent from live/offline database inventories and thirteen payload roots are absent from the inspected usr scopes. Top-level live pacman configuration contains only options/offline and no Include. This is scoped inventory evidence, not arbitrary filesystem-wide absence or installed guest proof.",
+  "remaining": ["Collect the six fixed public keyring files identified in the actual share listing", "Conditionally inspect only a positively proved public pubring.gpg leaf", "Complete/review public test-trust comparison", "Bind the complete independent six-fact media receipt", "Run actual clean installed guest before OS update"],
+  "limits": "Link targets are compared as metadata, not certified as a general installation confinement policy. Original final-nine precomputed hashes remain absent/null; source/build provenance remains the documented narrow basis. Missing digest initially returned a zero-filled native buffer; explicit refusal was added and tested.",
+  "newIsoBuildOrRepair": false,
+  "testTrustAbsent": false,
+  "mediaVerified": false,
+  "guestVerified": false,
+  "previewComplete": false
+}

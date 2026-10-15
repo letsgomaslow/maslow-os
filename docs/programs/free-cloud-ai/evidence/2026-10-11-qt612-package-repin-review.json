@@ -1,0 +1,47 @@
+{
+  "schema": 1,
+  "date": "2026-10-11",
+  "status": "scoped-identity-review-passed-not-built",
+  "scope": "Six frozen FreeAI/Voice recipe, README and manifest files repinned after the independently reviewed Voice Qt qualification. No implementation, dependency or package-version change.",
+  "recipeBaseCommit": "f4df4dad2da480ce95c7e53a3fc263b79a87c5c0",
+  "runtimeSourceCommit": "6db3622d04a4e06bfc01b65f86e99ff91d6e1ab9",
+  "runtimeArchiveSha256": "c5b1eb635c061a8e50114bfea844744ca1bacc9c14a8e411c3d50d79780e52b7",
+  "externalProof": {
+    "path": "/home/maslow/Maslow-ai-os/free-ai-build/recipe-prep-2-39/qt612-repin-proof.json",
+    "sha256": "b6eb6df011091674c8037fa4b10aef75ef4ae50d0d15200cb2f4becfd07b33aa"
+  },
+  "filesSha256": {
+    "pkgbuilds/maslow-free-ai/PKGBUILD": "69a0c715c3a854a49d33bd0c5e23dd9ef4a21768e5d8206e849f60e3beec54fe",
+    "pkgbuilds/maslow-free-ai/README.md": "087f7def531e58f51c34cc6e52c6bd3cd39fcfe2067995d7657a289165ffee95",
+    "pkgbuilds/maslow-free-ai/source-integrity.json": "f2e960dc7b1f3749a887da20c1a786b183144742dda8d5479cede1dd9cba8210",
+    "pkgbuilds/maslow-voice/PKGBUILD": "d6f49c953022b2feff7d95f0a71ca76d818f8fe8c692f6194195e468249c2a67",
+    "pkgbuilds/maslow-voice/README.md": "49e2b5509869a0882adcb13220e04646815fe547c3dc78d19eef0d1b95308c7d",
+    "pkgbuilds/maslow-voice/source-integrity.json": "342c7f1f357bda7c0bbf1104c40b626ddf4407addc21a80c61f29cc6c8ce2ed2"
+  },
+  "independentVerification": [
+    "Exactly the six declared package files are changed; all frozen hashes and external proof hash match.",
+    "Both PKGBUILDs equal their previous bytes after substituting only the archive and source-manifest digests. Dependency/version/helper/build behavior is unchanged.",
+    "Saved runtime archive matches an independently generated git archive of the exact commit; its PAX comment is the complete6db3622d source revision.",
+    "All16 FreeAI manifest inputs are unchanged and match both archive and extracted source bytes.",
+    "All147 Voice manifest inputs match archive and extracted source; exactly the three reviewed Qt files changed and the other144 inputs are unchanged.",
+    "The capsule's five Python members match reviewed exact lengths/hashes in the new runtime archive. The sixth member, Node22.23.3, matches its exact length/hash when read from the retained checksum-verified Node archive; no binary was executed.",
+    "FreeAI package-tools.py, Voice source-tools.py and production-lock.json retain their accepted hashes. README changes accurately identify the new coherent archive and unbuilt status.",
+    "git diff --check passed."
+  ],
+  "unchangedInputs": {
+    "freeAIPackageToolsSha256": "e78226bde7cbd59a60c1cadc079831c7bf594a42238fe372ca51e6dc15cda9cd",
+    "voiceSourceToolsSha256": "454cd09bf35e95eae879cada87961ec18f17c56a19979e48b90bc06ad1fc0932",
+    "productionLockSha256": "843dcda1e14f77c8fea99598d1f16b4846b9a3c0d95bdaccc9539f8f3c63946e",
+    "nodeArchiveSha256": "df450af89261115ef9f9e3830c3eeb2cc9213b63c720b1af623cb5dcbe2e02de",
+    "nodeExecutableSha256": "fde6a4bf8d0562f7751d1a2d6cb9b417c4cfe107bbcb0aa3e9a24e125e348f48"
+  },
+  "coordinatorChecksNotRepeated": {
+    "reported": "Nine FreeAI helper tests, six Voice helper tests, eight archive guards, syntax, packaging invariants and source verification pass.",
+    "preservedTestCorrection": "Initial Voice helper run with -B failed the deliberate generated-bytecode assertion. Normal Python rerun passed all6; tests were unchanged. This invocation correction is recorded rather than treated as an independent reviewer pass.",
+    "reason": "Helpers and guards did not change; the independent retake checks exact identities and the six-file delta instead of duplicating full helper/Node/namespace suites."
+  },
+  "remainingConfirmedScopedFindings": [],
+  "nextRequired": "Root commits the six files, then refreshes copied build contexts, both context proofs and runner pins/source hold. The coordinator owns final workload/slot admission. This review does not enable GO or establish an artifact.",
+  "remainingGates": "Native builds, actual archive/ABI/capsule/dependency/notice/overlap checks, real Quickshell, installed recovery and live/provider/account/audio acceptance.",
+  "operations": "Reviewer edited only this evidence file. No recipe/source edit, commit, native build, Docker/VM, host install, shared lock acquisition, credential access or live request. Superseded7d artifacts remain preserved."
+}

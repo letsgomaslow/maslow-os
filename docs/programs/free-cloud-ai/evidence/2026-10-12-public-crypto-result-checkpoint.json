@@ -1,0 +1,22 @@
+{
+  "schema": 1,
+  "status": "two-public-keyring-package-signatures-and-selected-certificates-accepted-scoped",
+  "run": "/home/maslow/Maslow-ai-os/free-ai-build/guest-baseline-prep/media-inspection/crypto-prep/evidence/169474de564c4a4584acad323b3ba53e",
+  "stateSha256": "697b3958ee74b89e1fb19394a4cf4733b8abde89d4e9c24819cd4e2018c9d92c",
+  "manifestSha256": "8e73c8a203c0f3c60710d36c315734dbb9a05c8fb037ccb21c53232b3fe204fa",
+  "independentReviewPath": "/home/maslow/Maslow-ai-os/free-ai-build/guest-baseline-prep/media-inspection/crypto-prep/independent-result-review.json",
+  "independentReviewSha256": "2468adeada4c87cbba365d8483eb16f3cd1ae0c108a77a1db1842cf13357509c",
+  "stages": 17,
+  "arch": "Actual exactHesseactiveUID/subkey/currentselfbinding withfiveapprovedmastercerts ononeUID; rawVALIDSIG ties signed20260909-1 archive toprimary02FD/sub042989.",
+  "omarchy": "RawVALIDSIG byapproved40DF producerprimary ties20251027-1 archive toexactpublicproducerbytes.",
+  "scope": "Onlyisolatedlocalpublicstores; nohostkeyring/privateaccount mutation. Retainedmaterial/currenttimestamps checked; noonline revocationquery.",
+  "failedRunsPreserved": [
+    "76db54b6926b4bf49ca10dda9086a340 localeDiagnostic UTF8",
+    "08703e9d24ff42289683a1a2c9572edb implicitglobaltrustdb expiry notices"
+  ],
+  "corrected": "Rawdiagnostics/strictmachineASCII; import/globaltrustdb historicalexpiry notices nonauthorizing; selectedcertificate/package expiry checksunchanged.",
+  "testTrustAbsent": false,
+  "mediaVerified": false,
+  "guestVerified": false,
+  "nextAction": "Closeactualproducerallowlist andtrust-consumer facts, reconcile six-factmediareceipt independently, thencleaninstalledguest."
+}

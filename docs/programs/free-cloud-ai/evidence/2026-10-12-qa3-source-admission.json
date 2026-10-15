@@ -1,0 +1,16 @@
+{
+  "schema": 1,
+  "status": "QA3-source-admitted-no-build-or-native-acceptance",
+  "productCommit": "b222265142b585fe50743ac5a705c8da39ac2b27",
+  "qaCommit": "e0ebb476764fee5a7cabff3d0b786cbeba09838c",
+  "qaTree": "6581f4604269f56df910d98cf9e8fb78a5ea8711",
+  "sourceMapSha256": "1d38ddaa90d82c2b2d06e21178512c2844cf43ae2407e30c03a13ebe604203a9",
+  "sourceCheckpointSha256": "61363e664b87dfddbbdf8e3020c73eee2db7e4329b03daed816ae367b29a6a75",
+  "independentAdmissionSha256": "258dbea4f9255afa4f0095342e3bf280a055f66bfa5068be7916d3270639605b",
+  "checked": "193 tracked files/modes,189 unchanged,exact four literal False-to-True gates and exact parent. Independent raw committed-blob and working-file validation,ownGitobjects/noalternates/hardlinks/extras. Product remainsFalse; QA1/QA2 unchanged.",
+  "sourceQualification": "Exact product parent passed684 owning tests,UI,diff after independent missing-standalone R1/R2 retake. No unchanged suites rerun for derivative.",
+  "nextAction": "Validate operator-returned staging signatures for public input folder,prepare final QA3 matchedHub build using enrolled public trust without substituting systemtrust. No final Hub build until correctly trusted pair is available.",
+  "blocked": "Waiting user transfer/signing on existing release Mac. No private key/passphrase or provider/account credentials requested in chat.",
+  "workers": "All current workers stopped after scoped reports; no heavy job,VM or ISO.",
+  "previewComplete": false
+}

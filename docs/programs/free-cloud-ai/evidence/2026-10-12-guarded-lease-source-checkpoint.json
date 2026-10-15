@@ -1,0 +1,36 @@
+{
+  "schema": 1,
+  "status": "source-primitive-accepted-preview-incomplete",
+  "hubImplementation": "e372d7c9ac05a359d267912862ae7fdd932f3eb4",
+  "leaseSourceSha256": "04565dd97bfbcc4b4b8cbccb8ac6aa36f59d5c31ebf754a304c08a06fdecd6e5",
+  "leaseTestSha256": "05cf40fd150d18fa817a5005f7e4fd7c073a36206bea802a924d97ea9099b0c9",
+  "finalReviewSha256": "30ab1d450f84b60084b372649f8bb03742549dc1bbd3d2d0a9affad106beae0f",
+  "owning": {
+    "tests": 474,
+    "result": "OK",
+    "seconds": 74.756,
+    "skips": 0,
+    "warnings": 0,
+    "logSha256": "e44190399d36fd491f4876a6be0b21b6a61b5f09a58e9f1fac950350639902af",
+    "ui": "pass"
+  },
+  "fixed": [
+    "current quota overwrite through async checks",
+    "authority expiry before key/data mutation dispatch",
+    "foreign staging deletion by frozen helper cleanup"
+  ],
+  "preservation": "Original3b4/b65 exact-hash reconstruction verified; later3636/1e25 and04565/05cf exact copied bytes and failed logs retained externally. No c2 pin changes.",
+  "executorContractSha256": "5914a5e8760974cadcdc9407eee07c314b1d627a453b6f1a53af69ad22cf073e",
+  "nextAction": "Implement/review private Root executor+authenticatedserver and separate finish-only decision/marker flow under existing global lock; no public gate opening.",
+  "requiredStillUnsupported": [
+    "WAL/SHM restore or proven journal settlement",
+    "unknown/partial staging cleanup and retry",
+    "missing/corrupt current database handling",
+    "Secret Service/filesystem concurrency limits",
+    "initial busy/no-preparation safe cleanup",
+    "crossboot launch authority",
+    "actual privileged/installed before/after recovery and final Hub package/live/account/audio/Lenovo gates"
+  ],
+  "installedVerified": false,
+  "previewComplete": false
+}

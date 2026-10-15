@@ -34,10 +34,12 @@ class TaskStore:
             PRAGMA user_version=1;
         """)
 
-    def create(self, request_id, brief, project, mode, source):
+    def create(self, request_id, brief, project, mode, source, *, execution_contract=None):
         if not isinstance(request_id, str) or not 1 <= len(request_id) <= 128:
             raise VoiceError("INVALID_REQUEST", "The task request has no valid identity.")
         payload = {"brief": brief, "project": project, "mode": mode, "source": source}
+        if execution_contract is not None:
+            payload.update(execution_contract)
         fingerprint = hashlib.sha256(json.dumps(payload, sort_keys=True).encode()).hexdigest()
         self.db.execute("BEGIN IMMEDIATE")
         try:
@@ -50,6 +52,7 @@ class TaskStore:
             task_id = str(uuid.uuid4())
             now = time.time()
             data = dict(payload, id=task_id, request_id=request_id, title=brief["objective"][:160], summary=brief["summary"],
+                        execution_connection=payload.get("execution_connection", "existing"),
                         state="queued", run_id=None, session_id=None, owner="Maslow", children=[], result="", error=None,
                         approval=None, dismissed=False, acknowledged=False, selected_agent=None, routing_reason="",
                         created_at=now, updated_at=now, attempt=0)
@@ -75,8 +78,10 @@ class TaskStore:
         task = self.get(task_id)
         if "state" in changes and changes["state"] not in STATES:
             raise VoiceError("INVALID_TASK_STATE", "The executor returned an unsupported task state.")
-        if {"id", "request_id", "mode", "source", "project"} & changes.keys():
+        if {"id", "request_id", "mode", "source", "project", "execution_connection", "policy_revision", "granted_capabilities", "requested_capabilities"} & changes.keys():
             raise VoiceError("IMMUTABLE_TASK", "A task's identity and execution boundary cannot be changed.")
+        if "connect_session" in changes and task.get("connect_session") is not None:
+            raise VoiceError("IMMUTABLE_TASK", "The selected-account session cannot be replaced or renewed.")
         task.update(changes, updated_at=time.time())
         self.db.execute("BEGIN IMMEDIATE")
         try:
@@ -91,8 +96,20 @@ class TaskStore:
     def list(self, limit=100):
         return [json.loads(row[0]) for row in self.db.execute("SELECT data FROM tasks ORDER BY updated_at DESC LIMIT ?", (limit,))]
 
+    def recent(self, seconds=3600):
+        return [json.loads(row[0]) for row in self.db.execute(
+            "SELECT data FROM tasks WHERE updated_at>=? ORDER BY updated_at DESC", (time.time() - seconds,))]
+
+    def by_request(self, request_id):
+        row = self.db.execute("SELECT data FROM tasks WHERE request_id=?", (request_id,)).fetchone()
+        return json.loads(row[0]) if row else None
+
     def active(self):
-        return [task for task in self.list(10000) if task["state"] not in TERMINAL]
+        # Filter before loading history; an old unfinished task must not vanish
+        # behind thousands of newer completed records during admission/recovery.
+        placeholders = ",".join("?" for _ in TERMINAL)
+        return [json.loads(row[0]) for row in self.db.execute(
+            f"SELECT data FROM tasks WHERE state NOT IN ({placeholders}) ORDER BY updated_at DESC", tuple(sorted(TERMINAL)))]
 
     def events(self, task_id, after=0):
         self.get(task_id)

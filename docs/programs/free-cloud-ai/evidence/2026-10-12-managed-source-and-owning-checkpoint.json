@@ -1,0 +1,37 @@
+{
+  "schema": 1,
+  "status": "source-milestone-only-preview-incomplete",
+  "hubSource": "715ab5d4d426508271b7458354252d1cfb94fecf",
+  "newManagedModuleSha256": "eeb464a950beb144689720e2e8b1a9bdfbc453db3741e6d495a2eb0c2447bb78",
+  "newTestsSha256": "60868c1572f2837ad1f06febc8a428d5ef82c536b00c2f16b150dc84c2404bd2",
+  "originalReviewSha256": "06a1f4945317de5ee7e96f4bda206d72edbcfc42487bb46d790d76134f7edf5e",
+  "retakeSha256": "0a099f70d85e04b3fc7bdcb74dd37fc5a438aad0538705107740a99a57409091",
+  "owningTests": 409,
+  "owningResult": "OK",
+  "owningSeconds": 52.94,
+  "owningLogSha256": "7f3c6bf42e36676a72c87f672436af3e0ec7876a4fc8c7d09559155670b4aa24",
+  "uiResult": "pass",
+  "fixedFinding": "Exact currentTX consumed anchor accepted on live reinstall retry after phase-write ENOSPC; foreign seal/generation/TX denied.",
+  "remaining": [
+    "fixed public dispatch and bidirectional pending exclusion",
+    "authenticated initial busy/no-preparation cleanup",
+    "fresh current V2 recovery for lost/expired helpers",
+    "crossboot loaded authority",
+    "actual root/ALPM/SecretService/installed recovery"
+  ],
+  "voice40OwnFirstAttempt": {
+    "session": "92f35025275a413a98b2a60711fff14f",
+    "testsRun": 507,
+    "errors": 1,
+    "skipped": 5,
+    "seconds": 130.22,
+    "logSha256": "5d6c161c73a23794878eb7de82d442017aa5d9b47a75b2b744e94a9c426295e5",
+    "failure": "Outer test-wrapper cache prefix moved an intentional adjacent stale-bytecode fixture to a missing nested directory.",
+    "correction": "No product/test/package changes; require cache-free source and sealed cache-free package, mount both read-only, preserve bytecode-write disable, unset outer prefix.",
+    "reviewSha256": "3a6bd318834961ee9253bb097b04ef6eaba72e634c921d3620987f02a0e29abb",
+    "fullRevisedRun": "running; not accepted"
+  },
+  "publicGatesEnabled": false,
+  "installedVerified": false,
+  "previewComplete": false
+}

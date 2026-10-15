@@ -12,6 +12,7 @@ import signal
 import sys
 import time
 import uuid
+from functools import wraps
 from pathlib import Path
 from urllib.parse import urlsplit
 
@@ -35,6 +36,23 @@ from .store import TaskStore, TERMINAL
 from .tasks import TaskManager, text_field, validate_brief
 
 
+def external_work(method):
+    @wraps(method)
+    async def tracked(self, *args, **kwargs):
+        self.delivery.admit_tasks()
+        current = asyncio.current_task()
+        self.action_work[current] = self.action_work.get(current, 0) + 1
+        try:
+            return await method(self, *args, **kwargs)
+        finally:
+            remaining = self.action_work.get(current, 1) - 1
+            if remaining:
+                self.action_work[current] = remaining
+            else:
+                self.action_work.pop(current, None)
+    return tracked
+
+
 TASK_NOTICE_SECONDS = 30
 # Gemini Live waits silently for every tool result, so a slow action stops the
 # person's conversation mid-sentence. Actions answer within this time and
@@ -56,6 +74,8 @@ PAUSABLE_MODES = frozenset({"gemini_live", "livekit", "openai"})
 class VoiceService:
     def __init__(self, directory=None, runtime=None, *, provider_factory=create_provider, credentials=None, executor_factory=None,
                  audio_transport_factory=PortAudioTransport, live_planner=None):
+        from .free_ai_delivery import startup_check
+        startup_check()
         self.settings = Settings(directory)
         self.directory = self.settings.directory
         self.audit = SessionAudit(self.directory)
@@ -104,6 +124,7 @@ class VoiceService:
         self.voice_toggle_lock = asyncio.Lock()
         self.lifecycle_lock = asyncio.Lock()
         self.configuration_lock = asyncio.Lock()
+        self.hub_configuring = False
         self.turn_lock = asyncio.Lock()
         self.conversation_requests = set()
         self.startup_task = None
@@ -128,6 +149,17 @@ class VoiceService:
         self.tasks = TaskManager(self.store, executor_factory or self.executor_client, self.publish)
         self.control = ControlServer(self.runtime / "control.sock", self.dispatch, self.snapshot)
         self.tool_server = None
+        self.free_ai_router = None
+        self.assistant_runtime = None
+        self.tasks.assistant_factory = self.assistant_client
+        self.tasks.assistant_admission = self.assistant_admission
+        from .assistant_accounts import AccountBridge
+        self.tasks.account_bridge = AccountBridge()
+        from .free_ai_delivery import DeliveryCoordinator
+        self.control_requests = set()
+        self.action_work = {}
+        self.delivery = DeliveryCoordinator(self)
+        self.tasks.admission = self.delivery.admit_tasks
 
     def snapshot(self):
         tasks = []
@@ -142,6 +174,9 @@ class VoiceService:
                     "tasks": tasks, "session": session, "readiness": self.readiness,
                     "task_view_request": dict(self.task_view_request), "task_attention": dict(self.task_attention),
                     "voice_preview": dict(self.voice_preview)}
+        snapshot["assistant"] = self.free_ai_router.status() if self.free_ai_router else {"installed": False, "ready": False, "enabled": False}
+        if self.delivery.closed:
+            snapshot["assistant"] = dict(snapshot["assistant"], ready=False, state="maintenance")
         # Keep a busy task history within the IPC frame. Full results remain in
         # the store; approval details are never shortened for an approval decision.
         while len(tasks) > 1 and len(json.dumps(snapshot).encode()) > 3 * 1024 * 1024:
@@ -267,6 +302,7 @@ class VoiceService:
                                             "context": self.context, "session_id": self.session["id"],
                                             "preferred_coder": self.settings.value["default_coder"],
                                             "task_policy": self.settings.value["task_policy"],
+                                            "execution_connection": self.settings.value["execution_connection"],
                                             "task_id": task_id, "task_error": task_error}
                     if len(self.turns) > 100:
                         self.turns.pop(next(iter(self.turns)))
@@ -313,8 +349,12 @@ class VoiceService:
             transcript, context=context, preferred_coder=preferred_coder, active_tasks=active), 5)
         if plan["action"] == "new":
             request_id = live_request_id(session_id, delegation_id, plan["source"])
-            task = await self.tasks.submit(request_id, plan["brief"], project, "gpt_live", plan["source"], preferred_coder,
-                                           policy=self.settings.value["task_policy"])
+            if self.settings.value["execution_connection"] == "free-cloud":
+                task = await self.tasks.submit_assistant(request_id, plan["source"], project, {}, mode="gpt_live", brief=plan["brief"],
+                    policy=self.settings.value["task_policy"])
+            else:
+                task = await self.tasks.submit(request_id, plan["brief"], project, "gpt_live", plan["source"], preferred_coder,
+                                               policy=self.settings.value["task_policy"])
         else:
             task = await self.tasks.action(plan["task_id"], plan["action"], plan.get("text", ""))
         self.voice.pop("task_error", None)
@@ -361,12 +401,12 @@ class VoiceService:
                 elif state == "waiting_input":
                     await self._append_live_context(provider, epoch, "commentary", "The task needs more information. Review it in Voice to continue.", delegation_id)
                 elif state == "completed":
-                    result = live_update_text(task.get("result") or "The task completed with no result summary.", 400)
+                    result = "The private result is available in Work." if self.private_assistant(task) else live_update_text(task.get("result") or "The task completed with no result summary.", 400)
                     await self._append_live_context(provider, epoch, "commentary", "The task completed. " + result, delegation_id)
                     return
                 elif state in {"failed", "interrupted"}:
                     error = task.get("error") or {}
-                    message = live_update_text(error.get("message") or "The task stopped before a verified result.", 400)
+                    message = "The private task needs attention in Work." if self.private_assistant(task) else live_update_text(error.get("message") or "The task stopped before a verified result.", 400)
                     await self._append_live_context(provider, epoch, "commentary", message, delegation_id)
                     return
                 elif state == "cancelled":
@@ -390,23 +430,45 @@ class VoiceService:
         await self.publish()
 
     def current_task(self):
-        active = self.store.active()
+        active = [task for task in self.store.active() if self.conversation_task_visible(task)
+                  and (not self.project or task["project"] == self.project or task["id"] == self.current_task_id)]
         if self.current_task_id:
             task = self.store.get(self.current_task_id)
-            if task in active or time.time() - float(task.get("updated_at") or 0) < 3600:
+            if self.conversation_task_visible(task) and (task["state"] not in TERMINAL or time.time() - float(task.get("updated_at") or 0) < 3600):
                 return task
         if len(active) == 1:
             return active[0]
         if len(active) > 1:
             raise VoiceError("TASK_AMBIGUOUS", "Choose the task in Voice before changing it.")
-        recent = self.store.list(1)
+        recent = [task for task in self.store.recent() if self.conversation_task_visible(task)
+                  and (not self.project or task["project"] == self.project)
+                  and time.time() - float(task.get("updated_at") or 0) < 3600]
         # A finished job from hours ago is not "the task" the person means now.
-        if recent and time.time() - float(recent[0].get("updated_at") or 0) < 3600:
+        if len(recent) == 1:
             return recent[0]
+        if len(recent) > 1:
+            raise VoiceError("TASK_AMBIGUOUS", "Choose the task in Voice before changing it.")
         raise VoiceError("TASK_NOT_FOUND", "There is no recent delegated job. Web tasks are checked with agent_status.")
+
+    def conversation_task_visible(self, task):
+        return not task.get("dismissed") and (self.settings.value["mode"] == "offline" or task.get("mode") != "offline")
+
+    @staticmethod
+    def private_assistant(task):
+        grant = task.get("granted_capabilities") or {}
+        return task.get("execution_connection") == "free-cloud" and bool(grant.get("documents") or grant.get("accounts"))
 
     @staticmethod
     def task_summary(task):
+        # Consumer speech connections are unchanged. Selected private material
+        # and its derived output stay in local Work rather than entering an
+        # unreviewed speech provider through task status/notifications.
+        if VoiceService.private_assistant(task):
+            return {"id": task.get("id"), "state": task.get("state"), "selected_agent": "hermes",
+                "capabilities": task.get("capabilities"), "title": "Private assistant request",
+                "result": "Review this request and its private result in Work.", "activity": [], "artifacts": [],
+                "error": {"code": "PRIVATE_TASK_ATTENTION", "message": "Review the private task in Work."} if task.get("error") else None,
+                "verification": "Private content is available in local Work."}
         return {key: task.get(key) for key in ("id", "title", "state", "project", "selected_agent", "capabilities", "artifacts")} | {
             "result": str(task.get("result") or "")[:2000],
             "activity": task.get("activity", [])[-5:],
@@ -491,6 +553,7 @@ class VoiceService:
         del self.jobs[oldest["id"]]
         return oldest["id"]
 
+    @external_work
     async def agent_action(self, intent, turn):
         """Route words to a new web task, an explicitly named job, or an interactive agent."""
         kind = intent.get("kind", "instruction")
@@ -529,6 +592,7 @@ class VoiceService:
             result = await self.resume_pending(seat, reply, result)
         return result
 
+    @external_work
     async def resume_pending(self, seat, reply, receipt):
         """Send a job's held instruction once its startup question is answered."""
         job = self.jobs[seat]
@@ -562,6 +626,7 @@ class VoiceService:
             lines = list(self.last_conversation.get("transcript", [])) + lines
         return lines
 
+    @external_work
     async def note_action(self, intent):
         """Start a background agent that turns the conversation into Obsidian notes."""
         request = " ".join(str(intent.get("request", "")).split())
@@ -633,10 +698,36 @@ class VoiceService:
             minutes = int((time.time() - job["started"]) // 60)
             label = "Obsidian note" if job.get("kind") == "note" else "Web task"
             lines.append(f"- {label} {job['id']} \"{job['title']}\": {job['state']}, started {minutes} min ago.")
-        for task in self.store.active():
-            lines.append(f"- Delegated job \"{task.get('title', '')[:60]}\": {task['state']}.")
-        if not self.jobs and not self.store.active():
-            lines.append("- No tasks are running.")
+        active = [task for task in self.store.active() if self.conversation_task_visible(task)
+                  and (not self.project or task["project"] == self.project or task["id"] == self.current_task_id)]
+        for task in active:
+            title = "Private assistant request" if self.private_assistant(task) else task.get("title", "")[:60]
+            lines.append(f"- Delegated job \"{title}\": {task['state']}.")
+        # Completed jobs survive the conversation and daemon, but are absent
+        # from active(). Brief only a selected or unambiguous recent job.
+        recent = [task for task in self.store.recent()
+                  if self.conversation_task_visible(task) and task["state"] in TERMINAL
+                  and time.time() - float(task.get("updated_at") or 0) < 3600]
+        selected = None
+        if self.current_task_id:
+            try:
+                candidate = self.store.get(self.current_task_id)
+            except VoiceError:
+                pass
+            else:
+                if (self.conversation_task_visible(candidate) and candidate["state"] in TERMINAL
+                        and time.time() - float(candidate.get("updated_at") or 0) < 3600):
+                    selected = candidate
+        related = [task for task in recent if not self.project or task["project"] == self.project]
+        if not selected and not active and len(related) == 1:
+            selected = related[0]
+        if selected:
+            title = "Private assistant request" if self.private_assistant(selected) else selected.get("title", "")[:60]
+            lines.append(f"- Recent delegated job \"{title}\": {selected['state']}. Check its saved result with task_control status.")
+        elif not active and len(related) > 1:
+            lines.append("- Several recent delegated jobs are in Work. Ask which one the person means before reporting a result.")
+        if not self.jobs and not active:
+            lines.append("- No jobs are running now. Completed jobs above retain their saved results in Work.")
         if self.reconnecting and self.session["transcript"]:
             lines.append("The connection to the voice service dropped a moment ago and has been restored. Continue this same conversation "
                          "naturally from where it left off: do not greet the person or mention the reconnection unless they ask. "
@@ -645,7 +736,7 @@ class VoiceService:
         elif time.time() - self.last_conversation["ended"] < 30 * 60:
             lines.append("The previous conversation ended a few minutes ago. Its last lines were:")
             lines += [f"  {line.get('role', '')}: {str(line.get('text', ''))[:200]}" for line in self.last_conversation["lines"]]
-        lines.append("When the user asks about 'the task' or progress, they mean the tasks above; check them with agent_status.")
+        lines.append("For a delegated job, use task_control status to check its saved state and result. Use agent_status for web and visible terminal jobs.")
         return "\n".join(lines)
 
     def watch_agent(self, agent, limit=30 * 60):
@@ -756,7 +847,15 @@ class VoiceService:
         continues in the background; only its failure or waiting question is
         told to the conversation, so the person's conversation never stalls.
         """
+        try:
+            self.delivery.admit_tasks()
+        except VoiceError:
+            if hasattr(coroutine, "close"):
+                coroutine.close()
+            raise
         task = self.background(coroutine)
+        self.action_work[task] = self.action_work.get(task, 0) + 1
+        task.add_done_callback(lambda finished: self.action_work.pop(finished, None))
         done, _ = await asyncio.wait({task}, timeout=ACTION_ANSWER_SECONDS)
         if done:
             return task.result()
@@ -889,6 +988,8 @@ class VoiceService:
                       "submit": {"operation", "brief", "project_name", "new_project"}}
             if operation not in fields or set(intent) - fields[operation]:
                 raise VoiceError("INVALID_REQUEST", "The Voice action contains unsupported fields.")
+            if turn.get("execution_connection", "existing") == "free-cloud" and operation in {"agent", "note"}:
+                raise VoiceError("ASSISTANT_SCOPE_REQUIRED", "For Free cloud AI, submit an everyday request. Use Work to explicitly select documents or permit saving a note.")
             key = turn_id + ":" + hashlib.sha256(json.dumps(intent, sort_keys=True).encode()).hexdigest()
             # Status is a fresh read; all mutating tool retries reuse their receipt.
             cacheable = not (operation == "task" and intent.get("action") == "status") and operation != "agent_status"
@@ -992,12 +1093,24 @@ class VoiceService:
         finally:
             self.task_relays.discard(key)
 
+    @external_work
     async def submit_intent(self, intent, turn_id=None, *, project_name="", new_project=False):
         brief = validate_brief(intent)
         turn = self._captured_turn(turn_id)
         fingerprint = hashlib.sha256(json.dumps(brief, sort_keys=True).encode()).hexdigest()[:24]
         request_id = turn["session_id"] + ":" + turn_id + ":" + fingerprint
         project = turn["project"]
+        if turn.get("execution_connection", "existing") == "free-cloud":
+            # Spoken intent can never invent selected files/accounts or a save
+            # grant. The Work composer is the explicit grant surface in v1.
+            original = turn["source"] + ("\nExplicit user context:\n" + turn["context"] if turn["context"] else "")
+            request_id = hashlib.sha256((turn["session_id"] + ":" + turn_id).encode()).hexdigest()
+            task = await self.tasks.submit_assistant(request_id, original, project, {}, mode=turn["mode"], brief=brief,
+                policy=turn.get("task_policy", "lab_auto"))
+            turn.update(task_id=task["id"], task_error=None)
+            await self.request_task_view(task["id"], explicit=False)
+            self.watch_gemini_task(task["id"])
+            return self.task_summary(task)
         if turn["mode"] == "gemini_live":
             # One explicit work request per captured turn. Tool retries cannot
             # allocate a second folder or a second job after paraphrasing a brief.
@@ -1089,8 +1202,84 @@ class VoiceService:
                 return self.offline_clients[task["project"]]
         return await self.hermes.ensure(task)
 
+    def assistant_admission(self):
+        if self.free_ai_router is None and Path("/usr/lib/maslow-free-ai/maslow_free_ai").is_dir():
+            self._free_ai()
+        if self.free_ai_router and (not self.free_ai_router.admission or self.free_ai_router.recovery.pending()):
+            raise VoiceError("ASSISTANT_MAINTENANCE", "Free cloud AI is preparing or recovering its package state. Finish that operation before new requests.")
+
+    def _free_ai(self):
+        if self.free_ai_router is None:
+            if "/usr/lib/maslow-free-ai" not in sys.path:
+                sys.path.append("/usr/lib/maslow-free-ai")
+            try:
+                from maslow_free_ai.runtime import RouterRuntime
+            except ImportError:
+                raise VoiceError("FREE_AI_NOT_INSTALLED", "Install the reviewed Free cloud AI components through Hub first.") from None
+            self.free_ai_router = RouterRuntime()
+        return self.free_ai_router
+
+    async def assistant_client(self, task):
+        from .assistant_runtime import AssistantRuntime
+        router = self._free_ai()
+        if self.assistant_runtime is None:
+            self.assistant_runtime = AssistantRuntime(self.directory, self.tool_socket, self.tool_token, router)
+        return await self.assistant_runtime.ensure(task)
+
+    async def free_ai_probe(self, route):
+        from .http import request_json
+        verified = []
+        for model in ("openai/gpt-oss-120b", "openai/gpt-oss-20b"):
+            # One bounded request per route checks both text and a harmless
+            # function call. No filesystem/account capability is available.
+            payload = {"model": model, "messages": [{"role": "user", "content": "Call maslow_ready with value READY. This is a harmless connection test."}],
+                "max_tokens": 128, "stream": False,
+                "tools": [{"type": "function", "function": {"name": "maslow_ready", "description": "A harmless local connection test.",
+                    "parameters": {"type": "object", "properties": {"value": {"type": "string", "enum": ["READY"]}}, "required": ["value"], "additionalProperties": False}}}],
+                "tool_choice": {"type": "function", "function": {"name": "maslow_ready"}}}
+            response = await request_json(route["endpoint"] + "/chat/completions", "POST", payload, route["token"], timeout=45)
+            if response.get("model") != model:
+                raise VoiceError("FREE_AI_ROUTE_SUBSTITUTED", "The connection check used another route. The requested route was not verified.")
+            try:
+                message = response["choices"][0]["message"]
+                call = message["tool_calls"][0]["function"]
+                if call["name"] != "maslow_ready" or json.loads(call["arguments"]) != {"value": "READY"}:
+                    raise ValueError()
+            except (KeyError, IndexError, TypeError, ValueError):
+                raise VoiceError("FREE_AI_TOOL_TEST_FAILED", "An approved route did not pass its harmless function test. It was not enabled.") from None
+            verified.append(model)
+        return verified
+
+    async def free_ai_operation(self, request):
+        operation = request.get("operation")
+        if operation not in {"status", "setup", "test", "enable", "disable"}:
+            raise VoiceError("INVALID_REQUEST", "That Free cloud AI operation is unavailable.")
+        if operation != "setup" and set(request) != {"action", "operation"}:
+            raise VoiceError("INVALID_REQUEST", "This operation does not accept account information.")
+        if operation in {"setup", "test"} and any(task.get("execution_connection") == "free-cloud" for task in self.store.active()):
+            raise VoiceError("TASKS_ACTIVE", "Finish or stop assistant requests before changing or testing their connection.")
+        from maslow_free_ai.errors import FreeAIError
+        try:
+            router = self._free_ai()
+            if operation == "setup":
+                status = await router.setup(request.get("key"), request.get("free_plan_confirmed"), self.free_ai_probe)
+            elif operation == "test":
+                status = await router.test(self.free_ai_probe)
+            elif operation in {"enable", "disable"}:
+                status = await router.enable(operation == "enable")
+                # This affects new everyday tasks only, preserving current
+                # agent selections and every speech-provider setting.
+                self.settings.update({"execution_connection": "free-cloud" if operation == "enable" else "existing"})
+            else:
+                status = router.status()
+        except FreeAIError as error:
+            raise VoiceError(error.code, error.message) from None
+        await self.publish()
+        return {"status": status}
+
     async def start_voice(self, *, audio=True, project="", context=""):
         """Start a conversation, retrying a momentary connection failure quietly."""
+        self.delivery.admit_tasks()
         caption = "" if self.reconnecting else "Connecting…"
         try:
             for attempt, delay in enumerate((*RECONNECT_DELAYS[1:], None), start=1):
@@ -1129,7 +1318,9 @@ class VoiceService:
             return False
 
     async def _start_voice_attempt(self, *, audio=True, project="", context=""):
+        self.delivery.admit_tasks()
         async with self.lifecycle_lock:
+            self.delivery.admit_tasks()
             self.startup_task = asyncio.current_task()
             epoch = None
             try:
@@ -1470,6 +1661,47 @@ class VoiceService:
                 await self.publish()
 
     async def dispatch(self, request):
+        if request.get("action") == "hub_status":
+            if set(request) != {"action"}:
+                raise VoiceError("INVALID_REQUEST", "Hub status does not accept additional fields.")
+            from .hub import snapshot
+            return {"hub": snapshot(self)}
+        if request.get("action") == "free_ai_delivery":
+            return await self.delivery.handle(request)
+        self.delivery.admit_control(request)
+        current = asyncio.current_task()
+        tracked = request.get("action") != "status"
+        if tracked:
+            self.control_requests.add(current)
+        try:
+            return await self._dispatch_admitted(request)
+        finally:
+            if tracked:
+                self.control_requests.discard(current)
+
+    async def _dispatch_admitted(self, request):
+        if request.get("action") == "hub_configure":
+            if set(request) != {"action", "request"}:
+                raise VoiceError("INVALID_REQUEST", "Send one supported Voice settings request.")
+            from .hub import configuration, snapshot
+            changes = configuration(request.get("request"))
+            async with self.configuration_lock:
+                status = snapshot(self)
+                if status["sessionActive"]:
+                    raise VoiceError("SESSION_ACTIVE", "End the current Voice conversation or preview before changing settings.")
+                if status["tasksActive"]:
+                    raise VoiceError("TASKS_ACTIVE", "Finish or stop current tasks before changing settings.")
+                if not status["canConfigure"]:
+                    raise VoiceError("SETTINGS_BUSY", "A Voice action is still finishing. Try again after it ends.")
+                self.hub_configuring = True
+                try:
+                    if changes["action"] != "credential" or changes["value"].strip():
+                        await self._dispatch(changes)
+                finally:
+                    self.hub_configuring = False
+            return {"saved": True}
+        if self.hub_configuring and request.get("action") in {"start_voice", "submit_text", "toggle_voice", "pause_voice", "preview_gemini_voice", "task_submit", "task_action"}:
+            raise VoiceError("SETTINGS_BUSY", "Voice settings are being saved. Try again after they finish.")
         if self.preview_task is not None and request.get("action") not in {"status", "stop_gemini_voice_preview", "end_voice", "silence", "mute", "pause_voice", "test", "models"}:
             raise VoiceError("PREVIEW_ACTIVE", "Stop the voice preview before starting a conversation or changing settings.")
         if request.get("action") in {"configure", "configure_livekit", "configure_gemini_live", "credential"}:
@@ -1502,6 +1734,9 @@ class VoiceService:
             "configure_gemini_live": {"url", "api_key", "api_secret", "google_api_key"},
             "download_speech": set(), "start_voice": {"project", "context"}, "end_voice": set(), "mute": {"muted"},
             "silence": set(), "desktop_action": {"application"}, "submit_text": {"text", "project", "context"},
+            "task_submit": {"request_id", "text", "project", "execution_connection", "capabilities"},
+            "free_ai": {"operation", "key", "free_plan_confirmed"},
+            "assistant_accounts": {"account_request_id"},
             "task_action": {"id", "task_id", "operation", "text", "approval_id", "child_id", "review_id", "paths"},
         }
         if action not in allowed or set(request) - allowed[action] - {"action"}:
@@ -1513,16 +1748,42 @@ class VoiceService:
             await self.stop_preview()
             return {}
         if action == "status":
-            if not self.readiness.get("checks") and self.settings.value["mode"] in {"gemini_live", "gpt_live", "livekit", "openai"}:
+            if Path("/usr/lib/maslow-free-ai/maslow_free_ai").is_dir():
+                self._free_ai()
+            if not self.delivery.closed and not self.readiness.get("checks") and self.settings.value["mode"] in {"gemini_live", "gpt_live", "livekit", "openai"}:
                 await self.check_readiness()
             return {"snapshot": self.snapshot()}
+        if action == "free_ai":
+            self._free_ai()  # Import only after this explicit optional action.
+            return await self.free_ai_operation(request)
+        if action == "assistant_accounts":
+            identity = request.get("account_request_id", "")
+            if not isinstance(identity, str) or not re.fullmatch(r"[A-Za-z0-9_-]{1,128}", identity):
+                raise VoiceError("INVALID_REQUEST", "The account-list request needs a valid identity.")
+            return await self.tasks.account_bridge.list()
+        if action == "task_submit":
+            connection = request.get("execution_connection", self.settings.value["execution_connection"])
+            if connection == "free-cloud":
+                task = await self.tasks.submit_assistant(request.get("request_id"), request.get("text"), request.get("project"),
+                    request.get("capabilities", {}), policy=self.settings.value["task_policy"])
+            elif connection == "existing":
+                if request.get("capabilities"):
+                    raise VoiceError("INVALID_CAPABILITIES", "Selected-file permissions belong to the managed everyday assistant.")
+                text = text_field(request.get("text"), "original request", 12000, True)
+                task = await self.tasks.submit(request.get("request_id"), {"objective": text[:1000], "summary": text},
+                    request.get("project"), self.settings.value["mode"], text, self.settings.value["default_coder"],
+                    policy=self.settings.value["task_policy"])
+            else:
+                raise VoiceError("INVALID_SETTINGS", "Choose an existing agent or Free cloud AI for this request.")
+            await self.request_task_view(task["id"], explicit=False)
+            return {"task": self.task_summary(task), "submitted_request_id": request.get("request_id")}
         if action in {"configure_livekit", "configure_gemini_live"}:
             return await self.configure_livekit(request, gemini=action == "configure_gemini_live")
         if action == "configure":
             changes = request.get("settings", {})
             if not isinstance(changes, dict):
                 raise VoiceError("INVALID_SETTINGS", "Settings must be an object.")
-            connection = set(changes) - {"reduced_motion", "fixed_position", "orb_position", "display", "retention_days", "idle_seconds"}
+            connection = set(changes) - {"reduced_motion", "fixed_position", "orb_position", "display", "retention_days", "idle_seconds", "execution_connection"}
             if connection and self.store.active():
                 raise VoiceError("TASKS_ACTIVE", "Finish or stop current tasks before changing their execution connection.")
             if connection:
@@ -1532,8 +1793,9 @@ class VoiceService:
                     self.offline = None
                     self.offline_clients.clear()
             self.settings.update(changes)
-            self.readiness = {"ready": False, "checks": [], "models": []}
-            if self.settings.value["mode"] in {"gemini_live", "gpt_live", "livekit", "openai"}:
+            if connection:
+                self.readiness = {"ready": False, "checks": [], "models": []}
+            if connection and self.settings.value["mode"] in {"gemini_live", "gpt_live", "livekit", "openai"}:
                 await self.check_readiness()
         elif action == "credential":
             await self.credentials.set(request.get("name"), request.get("value"))
@@ -1746,6 +2008,15 @@ class VoiceService:
         if task["state"] in TERMINAL or task["state"] in {"stopping", "queued"}:
             raise VoiceError("TASK_NOT_RUNNING", "The owning task is not running.")
         operation = request.get("operation")
+        if task.get("execution_connection") == "free-cloud":
+            if operation == "read_calendar":
+                result = await self.tasks.account_bridge.read(task, request.get("params", {}))
+                current = self.store.get(task["id"])
+                if current["state"] in TERMINAL | {"stopping", "queued"} or current.get("attempt") != task.get("attempt") or current.get("connect_session") != task.get("connect_session"):
+                    raise VoiceError("TASK_NOT_RUNNING", "The owning request stopped or changed while the account was being read. Its contents were withheld.")
+                return result
+            from .assistant import WorkspaceTools
+            return await WorkspaceTools(self.store).handle(task, operation, request.get("params", {}))
         if operation not in {"delegate_coding", "open_application", "open_website"}:
             raise VoiceError("INVALID_TOOL", "That coordinator tool is not available.")
         return await self.execution.handle(task, operation, request.get("params", {}))
@@ -1808,6 +2079,8 @@ class VoiceService:
             pass  # The session start reports any real import problem.
 
     async def run(self):
+        from .free_ai_delivery import startup_check
+        startup_check()
         from .execution import ExecutionManager
         from .routing import AgentRouter
         self.execution = ExecutionManager(self.store, self.publish, settings=self.settings, credentials=self.credentials,
@@ -1837,6 +2110,8 @@ class VoiceService:
         finally:
             await self.end_voice()
             await self.tasks.close()
+            if self.free_ai_router:
+                await self.free_ai_router.close()
             for task in tuple(self.work):
                 task.cancel()
             await asyncio.gather(*self.work, return_exceptions=True)

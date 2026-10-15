@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-11",
+  "status": "documentation-rechecked-not-live-acceptance",
+  "live_provider_requests": 0,
+  "approved_routes": [
+    "openai/gpt-oss-120b",
+    "openai/gpt-oss-20b"
+  ],
+  "sources": [
+    {
+      "url": "https://console.groq.com/docs/models",
+      "finding": "Both approved IDs remain listed; an authenticated tool probe is still required per route."
+    },
+    {
+      "url": "https://console.groq.com/docs/rate-limits",
+      "finding": "Published Free limits for both:30 RPM,1000 RPD,8000 TPM,200000 TPD. Organization-scoped; account-specific limits can differ. Provider429/Retry-After remains authoritative."
+    },
+    {
+      "url": "https://console.groq.com/docs/billing-faqs",
+      "finding": "Upgrade from Free to Developer requires a payment method. Maslow records user confirmation, not independent billing verification."
+    },
+    {
+      "url": "https://console.groq.com/docs/your-data",
+      "finding": "Reliability/abuse retention can be up to30 days unless legal requirements extend it. Organizations can enable Zero Data Retention. Setup links these controls; Maslow does not verify the setting."
+    }
+  ],
+  "limits": [
+    "Public documentation and model listing do not establish useful inference, live account authorization or free-plan/retention state.",
+    "No paid tier, provider substitution, built-in browser/code/media tool or extra route enabled."
+  ]
+}

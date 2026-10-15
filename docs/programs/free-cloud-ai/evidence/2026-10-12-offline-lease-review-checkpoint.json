@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "status": "source-review-blocked-awaiting-scoped-fix",
+  "hubBase": "b60120b1e55e9c8e863642fd2782c9ca3f87da51",
+  "sourceSha256": "3b4a41c1a35266c665919e64e856fd3d92bc58451efbd9071268bec2c2e1e35d",
+  "testsSha256": "b65f27943645c704813d106ce5f8ed25653c2bcfee15a0a16ffcc5fae32e04e9",
+  "historicalFocusedPassed": 25,
+  "historicalOwningPassed": 459,
+  "owningLogSha256": "a541b9f05091a716ab4e72498b3af889a1243820e4ccedd1c630abac27b930ed",
+  "logDirectory": "/home/maslow/Maslow-ai-os/free-ai-build/hub-managed-recovery-lease",
+  "independentReviewSha256": "b2e26a64b4df3476c39345a06b6b08bf685df9b8bfd135dd98a78f572589ffd5",
+  "blockingReproductions": [
+    "Current quota25\u219226 during final async copied-key verification can be accepted and overwritten back to25.",
+    "Current quota25\u219226 inside frozen delegated restore after outer check can be overwritten back to25.",
+    "Expiry during inner verification creates missing active key/replacesDB before late settings denial."
+  ],
+  "fixInProgress": "Separate guarded staging/restore using unchanged c2 primitives, synchronous current/copy/fresh-authority checks after final async verification and before mutation dispatch; no unchecked restore_prepared delegation.",
+  "temporarySourceLimit": "Restore refuses current WAL/SHM rather than unlinking journals; required installed consistent-WAL recovery/settlement remains a later gate, not waived.",
+  "originalCapsuleChanged": false,
+  "publicGateEnabled": false,
+  "installedVerified": false,
+  "previewComplete": false
+}

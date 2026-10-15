@@ -1,0 +1,31 @@
+{
+  "schema": 1,
+  "status": "Hub0310-source-accepted-QA-build-preparing-preview-incomplete",
+  "productCommit": "2bf25ef6315b85cdabdb4941e2c97900641a579a",
+  "sourceDiffSha256BeforeCommit": "da162e43f82bdcab89dcf69823dbdcbc184becab049ccf9ee5e385b5358e8d6a",
+  "version": "0.3.10",
+  "interface": 2,
+  "productGates": "All four False; no product merge/publication or installed-source patch.",
+  "finalOwning": {
+    "tests": 687,
+    "failures": 0,
+    "skips": 0,
+    "seconds": 231.583,
+    "wrapperSeconds": 232.875,
+    "logSha256": "16b705d84f1c480af531218c8a3535753f033f987117e53e14872de225c83c12",
+    "uiExit": 0,
+    "uiLogSha256": "e0e5cf01d4ef65427327110295ca9842fc13c33da8ae59bcff8de359e6bb38dd",
+    "resources": "CPU1/nice10/AS2GiB/sharedheavylock/900spercheck",
+    "sourceIdentity": "Before/aftertracked diff freeze unchanged; actual clean commit2bf after exact scoped staging."
+  },
+  "independentReview": {
+    "initialSourceSha256": "250368bcd2fd7fdc2b6cf2f7e6359b3362d98b1ba9d9c3daf1ef1e5ebcd84db0",
+    "testVersionRetakeSha256": "89a8be3e96bfe104ea00b63b570d33b5d704324e755c3d80de12fa5f3c00f0c4",
+    "scope": "KernelRootpeer/Rootselfexe/argv/UID/start/record-beforeGO/EOF/nonce/context unchanged; V1/V2 bothfixed,schemas unchanged,four productgatesFalse. Testnegativespreserved; EOF observationbudget15s basedon measured6.27s imports,product10sGOdeadline unchanged."
+  },
+  "actualKernel": "All3 install/remove/reinstall realUID0to1000 namespacepeer tests passed withRootexeReadDeniedtrue,19.875s/log8ac4c2b67b0985ce50ff9765ee4f37336af6514f478cdb3f298ae12db6ab9b90. Fixture-only,no package/live acceptance.",
+  "preservedFailures": "Original687run2oldV2fixtures and independent5sEOFtimeouts retained withdiagnosis,not erased orcalledpass.",
+  "nativeState": "InstalledHub0.3.9 verified; backendabsent/Voice37. Latestfailedcomponentop closedwithactualGUIowningrecover1431exit0/publicticketabsent; externallyownedfreshHOME maskretained. Normal graphicalpasswordauthorizationverified; no PAM/rootdumpability/permissionweakening.",
+  "next": "SolpreparesfreshQA4 nohardlinkclone/exact4gate derivative thenliteral-onlybuild4context; Astradisjointreview. RootalonebuildsaffectedHubunderlimitsafteradmission,actualartifactaudit,previewsigningandnormalnativeupdate. Reuse signedbackend2/Voice41/Connect8; no newISO or rejectedpackages.",
+  "remaining": "Installedcorrectedtransport/freshcomponents,Groq/account/Voice/Lenovovisual-resource,recovery/clean-faultguest and finalreview gates remainrequired. Candidate staysnotready."
+}

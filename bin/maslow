@@ -1,0 +1,35 @@
+#!/bin/bash
+
+# Maslow OS command center: the same commands and routes as `omarchy`, under the
+# product name. `maslow update`, `maslow theme set …` and every other command run
+# the Omarchy-compatible router unchanged, so `omarchy …` keeps working too.
+#
+# Only help and human command listings are re-labelled. Everything else is handed
+# over directly: updates prompt on stderr and draw progress on a terminal, and
+# rewriting either stream would break them. JSON output is left as is so tools
+# that read routes keep working.
+
+set -o pipefail
+
+router="$(dirname -- "$(readlink -f -- "${BASH_SOURCE[0]}")")/omarchy"
+[[ -x $router ]] || router=omarchy
+
+wants_help() {
+  (( $# == 0 )) && return 0
+  case "$1" in
+    help | -h | --help) return 0 ;;
+    commands)
+      [[ " $* " == *" --json "* ]] && return 1
+      return 0
+      ;;
+  esac
+  [[ ${!#} == --help || ${!#} == -h ]]
+}
+
+if wants_help "$@"; then
+  # Present the product name in help text; routing is unaffected.
+  "$router" "$@" 2>&1 | sed -E 's/(^|[^-[:alnum:]_/.])omarchy ([[:alpha:]<\[]|$)/\1maslow \2/g'
+  exit "${PIPESTATUS[0]}"
+fi
+
+exec "$router" "$@"

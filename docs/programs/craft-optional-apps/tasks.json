@@ -1,0 +1,3088 @@
+{
+  "schema_version": 1,
+  "program": "craft-optional-apps",
+  "current_phase": 1,
+  "latest_handoff": "docs/handoffs/2026-10-11-craft-optional-apps.md",
+  "session": "2026-10-11-craft-root",
+  "models": {
+    "coordinator": "not exposed by execution surface",
+    "workers": [
+      {
+        "task": "CRAFT-P0-INVENTORY",
+        "model": "gpt-6-luna",
+        "reasoning": "medium"
+      },
+      {
+        "task": "CRAFT-P0-HELPER",
+        "model": "gpt-6.1-sol",
+        "reasoning": "medium"
+      },
+      {
+        "task": "CRAFT-CORE-SANDBOX",
+        "model": "gpt-6.1-sol",
+        "reasoning": "high"
+      },
+      {
+        "task": "CRAFT-PDF-PACKAGE/CRAFT-PHOTO-PACKAGE",
+        "model": "gpt-6.1-sol",
+        "reasoning": "medium"
+      },
+      {
+        "task": "CRAFT-CORE-BOUNDARY-REPAIR",
+        "model": "gpt-6-astra",
+        "reasoning": "high"
+      },
+      {
+        "task": "CRAFT-PDF-GUI-CLI/CRAFT-PHOTO-GUI-CLI",
+        "model": "gpt-6.1-sol",
+        "reasoning": "medium"
+      }
+    ]
+  },
+  "repositories": {
+    "runtime": {
+      "path": "/home/maslow/Maslow-ai-os/maslow-os",
+      "base_revision": "098948e42fa7ac0c3769402ae83a7bdc7d37cf05",
+      "branch": "codex/craft-optional-apps",
+      "preserved_status": [
+        "MM docs/maslow-development.md",
+        " M docs/programs/craft-optional-apps/tasks.json",
+        " M docs/programs/craft-optional-apps/tasks/CRAFT-P0-INVENTORY.md",
+        "?? docs/handoffs/2026-10-11-craft-optional-apps.md",
+        "?? docs/handoffs/2026-10-11-freellmapi-review.md",
+        "?? docs/handoffs/2026-10-11-storytold-app-review.md"
+      ]
+    },
+    "connect": {
+      "path": "/home/maslow/Projects/Maslow/maslow-connect",
+      "base_revision": "0c6f7b98a062870e36503f55512d04e0b8576a69",
+      "branch": "codex/local-connect",
+      "preserved_status": [],
+      "candidate_worktree": "/home/maslow/Projects/Maslow/craft-connect"
+    },
+    "hub": {
+      "path": "/home/maslow/Projects/Maslow/maslow-hub",
+      "base_revision": "33940d2e8740b172b953cc3e091cbae1ba1cd303",
+      "branch": "codex/hub-0.3.6-health",
+      "preserved_status": []
+    },
+    "packages": {
+      "path": "/home/maslow/Projects/Maslow/maslow-os-pkgs",
+      "base_revision": "448856485e710caedfc24f544a027aea8652dd33",
+      "branch": "maslow",
+      "preserved_status": [],
+      "candidate_worktree": "/home/maslow/Projects/Maslow/craft-packages"
+    },
+    "iso": {
+      "path": "/home/maslow/Projects/Maslow/maslow-os-iso",
+      "base_revision": "d96a3ee563df5a1eb76a711c7b408c0d1d0137cb",
+      "branch": "codex/maslow-hub",
+      "preserved_status": []
+    },
+    "releases": {
+      "path": "/home/maslow/Projects/Maslow/maslow-releases",
+      "base_revision": "140e023baf4fccb651ca944a866af36b81b651b2",
+      "branch": "codex/local-release-workstation",
+      "preserved_status": []
+    }
+  },
+  "tasks": [
+    {
+      "id": "CRAFT-P0-RECORDS",
+      "objective": "Persist approved plan, ledger, all app records and task charters",
+      "repository": "runtime",
+      "permitted_files": [
+        "docs/programs/craft-optional-apps/**"
+      ],
+      "dependencies": [],
+      "acceptance": "All 12 apps/six gates represented; recovery procedure and no release claims; scoped commit",
+      "phase": 0,
+      "status": "integrated",
+      "owner": "coordinator",
+      "session": "2026-10-11-craft-root",
+      "worker": null,
+      "actual_model": null,
+      "attempt": 1,
+      "last_checkpoint": "2026-10-11",
+      "base_revision": "969f2960",
+      "branch": "codex/craft-optional-apps",
+      "worktree": "/home/maslow/Maslow-ai-os/maslow-os",
+      "implementation_commits": [
+        "098948e4"
+      ],
+      "integration_commits": [
+        "098948e4"
+      ],
+      "tests": [
+        {
+          "check": "git diff --check",
+          "result": "pass"
+        }
+      ],
+      "evidence": [
+        "docs/programs/craft-optional-apps/README.md"
+      ],
+      "artifact_hashes": {},
+      "blocker": null,
+      "next_action": "Validate with helper and inventory"
+    },
+    {
+      "id": "CRAFT-P0-INVENTORY",
+      "objective": "Reconcile repository baselines and find or obtain ISO harness",
+      "repository": "runtime",
+      "permitted_files": [
+        "docs/programs/craft-optional-apps/tasks/CRAFT-P0-INVENTORY.md"
+      ],
+      "dependencies": [
+        "CRAFT-P0-RECORDS"
+      ],
+      "acceptance": "Exact revisions/status/worktrees, preserved changes, tool/platform inventory, ISO checkout or access blocker",
+      "phase": 0,
+      "status": "integrated",
+      "owner": "inventory",
+      "session": "2026-10-11-craft-root",
+      "worker": "/root/inventory",
+      "actual_model": "gpt-6-luna",
+      "attempt": 1,
+      "last_checkpoint": "2026-10-11",
+      "base_revision": "098948e4",
+      "branch": "codex/craft-optional-apps",
+      "worktree": "/home/maslow/Maslow-ai-os/maslow-os",
+      "implementation_commits": [],
+      "integration_commits": [
+        "815a4a40"
+      ],
+      "tests": [
+        {
+          "check": "repository/platform/harness inventory",
+          "result": "pass"
+        },
+        {
+          "check": "git diff --check",
+          "result": "pass"
+        }
+      ],
+      "evidence": [
+        "docs/programs/craft-optional-apps/tasks/CRAFT-P0-INVENTORY.md"
+      ],
+      "artifact_hashes": {},
+      "blocker": null,
+      "next_action": "Proceed to P0 gate after helper verification"
+    },
+    {
+      "id": "CRAFT-P0-HELPER",
+      "objective": "Implement standard-library ledger validation, serialized claims, status and resume packets",
+      "repository": "runtime",
+      "permitted_files": [
+        "docs/programs/craft-optional-apps/manage.py",
+        "docs/programs/craft-optional-apps/test_manage.py",
+        "docs/programs/craft-optional-apps/tasks/CRAFT-P0-HELPER.md"
+      ],
+      "dependencies": [
+        "CRAFT-P0-RECORDS"
+      ],
+      "acceptance": "Duplicate/missing/cyclic graph, ownership, missing evidence and interrupted recovery regressions pass",
+      "phase": 0,
+      "status": "integrated",
+      "owner": "records_helper",
+      "session": "2026-10-11-craft-root",
+      "worker": "/root/records_helper",
+      "actual_model": "gpt-6.1-sol",
+      "attempt": 1,
+      "last_checkpoint": "2026-10-11",
+      "base_revision": "098948e4",
+      "branch": "codex/craft-records-helper",
+      "worktree": "/home/maslow/Projects/Maslow/craft-records-worker",
+      "implementation_commits": [
+        "ae3a35e5"
+      ],
+      "integration_commits": [
+        "68f1818d"
+      ],
+      "tests": [
+        {
+          "result": "pass",
+          "tests": 11,
+          "check": "python3 -m unittest discover -s docs/programs/craft-optional-apps -p test_manage.py"
+        },
+        {
+          "result": "pass",
+          "check": "manage.py --ledger central --repo-root runtime validate"
+        },
+        {
+          "result": "pass",
+          "check": "git diff --check"
+        }
+      ],
+      "evidence": [
+        "docs/programs/craft-optional-apps/tasks/CRAFT-P0-HELPER.md",
+        "docs/programs/craft-optional-apps/manage.py",
+        "docs/programs/craft-optional-apps/test_manage.py"
+      ],
+      "artifact_hashes": {},
+      "blocker": null,
+      "next_action": "Use helper for explicit claims and resume; no automatic scheduler"
+    },
+    {
+      "id": "CRAFT-P0-GATE",
+      "objective": "Review foundation and reconcile fresh-session resume",
+      "repository": "runtime",
+      "permitted_files": [
+        "docs/programs/craft-optional-apps/**",
+        "docs/handoffs/2026-10-11-craft-optional-apps.md"
+      ],
+      "dependencies": [
+        "CRAFT-P0-RECORDS",
+        "CRAFT-P0-INVENTORY",
+        "CRAFT-P0-HELPER"
+      ],
+      "acceptance": "All phase 0 records reviewed, validated and committed",
+      "phase": 0,
+      "status": "integrated",
+      "owner": "coordinator",
+      "session": "2026-10-11-craft-root",
+      "worker": null,
+      "actual_model": "not-exposed",
+      "attempt": 1,
+      "last_checkpoint": "2026-10-11",
+      "base_revision": "098948e4",
+      "branch": "codex/craft-optional-apps",
+      "worktree": "/home/maslow/Maslow-ai-os/maslow-os",
+      "implementation_commits": [],
+      "integration_commits": [],
+      "tests": [
+        {
+          "check": "all 88 unique task IDs; six gates per app; central graph validation; scoped baselines and worktrees",
+          "result": "pass"
+        }
+      ],
+      "evidence": [
+        "docs/programs/craft-optional-apps/tasks/CRAFT-P0-INVENTORY.md",
+        "docs/programs/craft-optional-apps/tasks/CRAFT-P0-HELPER.md"
+      ],
+      "artifact_hashes": {},
+      "blocker": null,
+      "next_action": "Claim phase1 Connect and pilot package tasks"
+    },
+    {
+      "id": "CRAFT-CORE-PACKAGE",
+      "objective": "Package native optional Connect independently of development paths",
+      "repository": "packages",
+      "permitted_files": [
+        "pkgbuilds/maslow-connect/**",
+        "test/craft-connect-package"
+      ],
+      "dependencies": [
+        "CRAFT-P0-GATE"
+      ],
+      "acceptance": "Clean native package build, notices/deps/contents and packaged launch; no base payload change",
+      "phase": 1,
+      "status": "active",
+      "owner": "coordinator",
+      "session": "2026-10-11-craft-root",
+      "worker": null,
+      "actual_model": "not-exposed",
+      "attempt": 1,
+      "last_checkpoint": "2026-10-11T11:56:05.272093+00:00",
+      "base_revision": "4488564",
+      "branch": "codex/craft-packages",
+      "worktree": "/home/maslow/Projects/Maslow/craft-packages",
+      "implementation_commits": [
+        "494f045",
+        "57337fb",
+        "cf4748f",
+        "72bb828",
+        "4487785",
+        "5a3f49a"
+      ],
+      "integration_commits": [],
+      "tests": [
+        {
+          "check": "pinned source/tool/checksums; frozen dependency/deployment integrity; containment; no private build shims; clean makepkg",
+          "result": "pass"
+        },
+        {
+          "check": "disposable offline registered version/ownership/mtree, catalog and disconnected status; no development source mount",
+          "result": "pass"
+        },
+        {
+          "check": "three draft package file ownership overlap",
+          "result": "pass"
+        }
+      ],
+      "evidence": [
+        "docs/programs/craft-optional-apps/tasks/CRAFT-CORE-PACKAGE.md"
+      ],
+      "artifact_hashes": {
+        "/home/maslow/Maslow-ai-os/craft-build/connect/recipe/maslow-connect-0.1.0-1-x86_64.pkg.tar.zst": "35db43440f3e9bbfe4a289f1bdef73a7bd9f0cffa9be608d88ac1044d4f7f04a"
+      },
+      "blocker": null,
+      "next_action": "After boundary repair/review, bump pkgrel2, pin exact new source and rebuild; old draft not accepted for Craft"
+    },
+    {
+      "id": "CRAFT-CORE-SANDBOX",
+      "objective": "Implement fixed project profiles and fail-closed sandbox launcher",
+      "repository": "connect",
+      "permitted_files": [
+        "packages/bridge/src/**",
+        "packages/bridge/test/**",
+        "docs/craft-isolation.md"
+      ],
+      "dependencies": [
+        "CRAFT-P0-GATE"
+      ],
+      "acceptance": "Explicit roots/agents; namespaces/environment/FD/mount/path attacks denied; legitimate saved exports pass",
+      "phase": 1,
+      "status": "active",
+      "owner": "connect-worker",
+      "session": "2026-10-11-craft-root",
+      "worker": "/root/craft_connect",
+      "actual_model": "gpt-6.1-sol",
+      "attempt": 2,
+      "last_checkpoint": "2026-10-11T13:31:23.845475+00:00",
+      "base_revision": "21fdf8ae46de11cfc8b0a634d4489cf6abd0e937",
+      "branch": "codex/craft-connect",
+      "worktree": "/home/maslow/Projects/Maslow/craft-connect",
+      "implementation_commits": [
+        "21fdf8ae46de11cfc8b0a634d4489cf6abd0e937",
+        "eb7012f338b3e7c3d8e29df27a33a363298c3426"
+      ],
+      "integration_commits": [],
+      "tests": [
+        {
+          "check": "workspace pnpm check (source worker): contracts9; gateway67/9skip; portal25; bridge132/1skip",
+          "result": "pass"
+        },
+        {
+          "check": "final bridge typecheck/build +133 passing tests/1skip; true registry-save failure injection targeted test",
+          "result": "pass"
+        },
+        {
+          "check": "coordinator actual launcher startup with 1442 host-user threads",
+          "result": "fail"
+        },
+        {
+          "check": "same sandbox mount/seccomp plan with synthetic preexisting output hardlinks (raw fixture process omits failing outer nproc), outside and RO original contents changed",
+          "result": "fail"
+        }
+      ],
+      "evidence": [
+        "docs/programs/craft-optional-apps/tasks/CRAFT-CORE-SANDBOX.md",
+        "docs/programs/craft-optional-apps/evidence/2026-10-11-boundary-failures.json"
+      ],
+      "artifact_hashes": {},
+      "blocker": {
+        "type": "implementation",
+        "summary": "Outer RLIMIT_NPROC=256 counts existing host-user threads (1442 here), preventing namespace start; preexisting output hardlinks permit write to outside/original inode"
+      },
+      "next_action": "Frozen repair eb7012f under independent review; finish focused/full checks and accurate docs"
+    },
+    {
+      "id": "CRAFT-CORE-LIFECYCLE",
+      "objective": "Serialize registry and verified wiring/unwiring with durable recovery",
+      "repository": "connect",
+      "permitted_files": [
+        "packages/bridge/src/servers.ts",
+        "packages/bridge/src/server-wiring.ts",
+        "packages/bridge/src/servers-cli.ts",
+        "packages/bridge/src/cli.ts",
+        "packages/bridge/test/server*.test.ts"
+      ],
+      "dependencies": [
+        "CRAFT-CORE-SANDBOX"
+      ],
+      "acceptance": "Save/partial wiring recovery, selected agents, session lock, five-second group cleanup and tests pass",
+      "phase": 1,
+      "status": "queued",
+      "owner": null,
+      "session": null,
+      "worker": null,
+      "actual_model": null,
+      "attempt": 0,
+      "last_checkpoint": null,
+      "base_revision": null,
+      "branch": null,
+      "worktree": null,
+      "implementation_commits": [],
+      "integration_commits": [],
+      "tests": [],
+      "evidence": [],
+      "artifact_hashes": {},
+      "blocker": null,
+      "next_action": "Serialize registry and verified wiring/unwiring with durable recovery"
+    },
+    {
+      "id": "CRAFT-CORE-REVIEW",
+      "objective": "Independently review confinement and lifecycle",
+      "repository": "connect",
+      "permitted_files": [
+        "docs/programs/craft-optional-apps/tasks/CRAFT-CORE-REVIEW.md"
+      ],
+      "dependencies": [
+        "CRAFT-CORE-PACKAGE",
+        "CRAFT-CORE-SANDBOX",
+        "CRAFT-CORE-LIFECYCLE"
+      ],
+      "acceptance": "Independent security report; findings addressed and exact revisions retested",
+      "phase": 1,
+      "status": "queued",
+      "owner": null,
+      "session": null,
+      "worker": null,
+      "actual_model": null,
+      "attempt": 0,
+      "last_checkpoint": null,
+      "base_revision": null,
+      "branch": null,
+      "worktree": null,
+      "implementation_commits": [],
+      "integration_commits": [],
+      "tests": [],
+      "evidence": [],
+      "artifact_hashes": {},
+      "blocker": null,
+      "next_action": "Independently review confinement and lifecycle"
+    },
+    {
+      "id": "CRAFT-P1-GATE",
+      "objective": "Review packaged shared foundation and pilot packages",
+      "repository": "runtime",
+      "permitted_files": [
+        "docs/programs/craft-optional-apps/**"
+      ],
+      "dependencies": [
+        "CRAFT-CORE-REVIEW",
+        "CRAFT-PDF-PACKAGE",
+        "CRAFT-PHOTO-PACKAGE"
+      ],
+      "acceptance": "Connect/PDF/Photo builds, ownership and sandbox tests pass independent of dev paths",
+      "phase": 1,
+      "status": "queued",
+      "owner": null,
+      "session": null,
+      "worker": null,
+      "actual_model": null,
+      "attempt": 0,
+      "last_checkpoint": null,
+      "base_revision": null,
+      "branch": null,
+      "worktree": null,
+      "implementation_commits": [],
+      "integration_commits": [],
+      "tests": [],
+      "evidence": [],
+      "artifact_hashes": {},
+      "blocker": null,
+      "next_action": "Review packaged shared foundation and pilot packages"
+    },
+    {
+      "id": "CRAFT-HUB-ACTIONS",
+      "objective": "Implement bounded local app actions and durable operation lifecycle",
+      "repository": "hub",
+      "permitted_files": [
+        "helper/**",
+        "ui/**",
+        "tests/**",
+        "docs/helper-contract.md"
+      ],
+      "dependencies": [
+        "CRAFT-P1-GATE"
+      ],
+      "acceptance": "Existing envelope/catalog unchanged; honest staged state, explicit selection, duplicate/interruption/removal tests, accessible real UI",
+      "phase": 2,
+      "status": "queued",
+      "owner": null,
+      "session": null,
+      "worker": null,
+      "actual_model": null,
+      "attempt": 0,
+      "last_checkpoint": null,
+      "base_revision": null,
+      "branch": null,
+      "worktree": null,
+      "implementation_commits": [],
+      "integration_commits": [],
+      "tests": [],
+      "evidence": [],
+      "artifact_hashes": {},
+      "blocker": null,
+      "next_action": "Implement bounded local app actions and durable operation lifecycle"
+    },
+    {
+      "id": "CRAFT-HUB-REVIEW",
+      "objective": "Review Hub operation contracts and real Quickshell experience",
+      "repository": "hub",
+      "permitted_files": [
+        "docs/programs/craft-optional-apps/tasks/CRAFT-HUB-REVIEW.md"
+      ],
+      "dependencies": [
+        "CRAFT-HUB-ACTIONS"
+      ],
+      "acceptance": "Python/UI contracts and inspected real renderer pass; terminal failure/reopen/repeat covered",
+      "phase": 2,
+      "status": "queued",
+      "owner": null,
+      "session": null,
+      "worker": null,
+      "actual_model": null,
+      "attempt": 0,
+      "last_checkpoint": null,
+      "base_revision": null,
+      "branch": null,
+      "worktree": null,
+      "implementation_commits": [],
+      "integration_commits": [],
+      "tests": [],
+      "evidence": [],
+      "artifact_hashes": {},
+      "blocker": null,
+      "next_action": "Review Hub operation contracts and real Quickshell experience"
+    },
+    {
+      "id": "CRAFT-P3-PILOT",
+      "objective": "Compose and verify complete two-app pilot",
+      "repository": "runtime",
+      "permitted_files": [
+        "docs/programs/craft-optional-apps/**"
+      ],
+      "dependencies": [
+        "CRAFT-PDF-DISPOSITION",
+        "CRAFT-PHOTO-DISPOSITION",
+        "CRAFT-HUB-REVIEW"
+      ],
+      "acceptance": "Fresh installed GUI, confined MCP, three agents, actual Voice, lifecycle and fidelity all pass; no production actions",
+      "phase": 3,
+      "status": "queued",
+      "owner": null,
+      "session": null,
+      "worker": null,
+      "actual_model": null,
+      "attempt": 0,
+      "last_checkpoint": null,
+      "base_revision": null,
+      "branch": null,
+      "worktree": null,
+      "implementation_commits": [],
+      "integration_commits": [],
+      "tests": [],
+      "evidence": [],
+      "artifact_hashes": {},
+      "blocker": null,
+      "next_action": "Compose and verify complete two-app pilot"
+    },
+    {
+      "id": "CRAFT-PDF-PACKAGE",
+      "objective": "Evaluate pinned pdfcraft 0.6.0 release archive, ABI, notices and native package",
+      "repository": "packages",
+      "permitted_files": [
+        "pkgbuilds/pdfcraft/**"
+      ],
+      "dependencies": [
+        "CRAFT-P0-GATE"
+      ],
+      "acceptance": "Reviewed archive hash/source tag, clean build/contents/deps/ownership; same-tag locked fallback or evidenced deferral",
+      "phase": 1,
+      "status": "integrated",
+      "owner": "packages-worker",
+      "session": "2026-10-11-craft-root",
+      "worker": "/root/craft_packages",
+      "actual_model": "gpt-6.1-sol",
+      "attempt": 1,
+      "last_checkpoint": "2026-10-11T11:55:15.199507+00:00",
+      "base_revision": "4488564",
+      "branch": "codex/craft-packages",
+      "worktree": "/home/maslow/Projects/Maslow/craft-packages",
+      "implementation_commits": [
+        "7d8dfd1",
+        "f211378f416f50d63d4352b2049758a7aaa0996e"
+      ],
+      "integration_commits": [
+        "f211378f416f50d63d4352b2049758a7aaa0996e"
+      ],
+      "tests": [
+        {
+          "check": "clean disposable Docker makepkg, checksums/notices/archive safety, desktop syntax, ELF deps/ABI, CLI version/help, offline MCP init/list, original file manifests",
+          "result": "pass"
+        },
+        {
+          "check": "final PDF/Photo package ownership overlap, coordinator",
+          "result": "pass"
+        },
+        {
+          "check": "./test/maslow-packaging; bash -n; git diff --check",
+          "result": "pass"
+        },
+        {
+          "check": "coordinator exact-artifact installed version/ownership/mtree, offline unprivileged CLI and remove/reinstall with preservation, disposable container",
+          "result": "pass"
+        }
+      ],
+      "evidence": [
+        "docs/programs/craft-optional-apps/tasks/CRAFT-PDF-PACKAGE.md",
+        "docs/programs/craft-optional-apps/evidence/2026-10-11-app-installed.json"
+      ],
+      "artifact_hashes": {
+        "/home/maslow/Maslow-ai-os/craft-build/pdf/pdfcraft-0.6.0-1-x86_64.pkg.tar.zst": "afa9eb1146696fd1feb0840fdbd8a6b3dc5cec6751dd86d6198b07a826f445c2"
+      },
+      "blocker": null,
+      "next_action": "Coordinator installed package verification; GUI/fidelity/confinement/agents/Voice separate"
+    },
+    {
+      "id": "CRAFT-PDF-GUI-CLI",
+      "objective": "Verify packaged pdfcraft GUI/CLI and file fidelity",
+      "repository": "packages",
+      "permitted_files": [
+        "docs/programs/craft-optional-apps/tasks/CRAFT-PDF-GUI-CLI.md"
+      ],
+      "dependencies": [
+        "CRAFT-PDF-PACKAGE"
+      ],
+      "acceptance": "Fresh optional install before OS update, offline GUI/CLI, upgrade/remove/reinstall, app-specific save/reopen fidelity, VM/Lenovo evidence",
+      "phase": 1,
+      "status": "blocked",
+      "owner": "gui-worker",
+      "session": "2026-10-11-craft-root",
+      "worker": "/root/pilot_gui",
+      "actual_model": "gpt-6.1-sol",
+      "attempt": 1,
+      "last_checkpoint": "2026-10-11T12:39:31.930942+00:00",
+      "base_revision": "f211378",
+      "branch": "codex/craft-packages",
+      "worktree": "/home/maslow/Projects/Maslow/craft-packages",
+      "implementation_commits": [],
+      "integration_commits": [],
+      "tests": [
+        {
+          "check": "offline installed CLI/GUI known-file save/reopen and independent fidelity assertions; inspected X11/Wayland software-rendered screenshots",
+          "result": "pass"
+        },
+        {
+          "check": "exact fresh Maslow/Hyprland/portal/clipboard/scaling/Lenovo and complex corpus",
+          "result": "unavailable"
+        }
+      ],
+      "evidence": [
+        "docs/programs/craft-optional-apps/tasks/CRAFT-PDF-GUI-CLI.md"
+      ],
+      "artifact_hashes": {},
+      "blocker": {
+        "type": "environment",
+        "summary": "Fresh exact Maslow VM and Lenovo/native portal/clipboard/scaling/representative corpus gates not exercised by bounded disposable container tests"
+      },
+      "next_action": "Run exact installed VM/Lenovo gates after shared foundation; retain bounded fixture evidence",
+      "worker_status": "finished-partial"
+    },
+    {
+      "id": "CRAFT-PDF-CONFINEMENT",
+      "objective": "Verify pdfcraft project isolation",
+      "repository": "connect",
+      "permitted_files": [
+        "packages/bridge/src/craft-pdfcraft.ts",
+        "packages/bridge/test/craft-pdfcraft.test.ts"
+      ],
+      "dependencies": [
+        "CRAFT-PDF-PACKAGE",
+        "CRAFT-CORE-REVIEW"
+      ],
+      "acceptance": "Authorized reads/exports and all negative isolation/lifecycle tests on exact installed package",
+      "phase": 1,
+      "status": "queued",
+      "owner": null,
+      "session": null,
+      "worker": null,
+      "actual_model": null,
+      "attempt": 0,
+      "last_checkpoint": null,
+      "base_revision": null,
+      "branch": null,
+      "worktree": null,
+      "implementation_commits": [],
+      "integration_commits": [],
+      "tests": [],
+      "evidence": [],
+      "artifact_hashes": {},
+      "blocker": null,
+      "next_action": "Verify pdfcraft project isolation"
+    },
+    {
+      "id": "CRAFT-PDF-MCP",
+      "objective": "Verify pdfcraft saved-artifact workflows in selected agents",
+      "repository": "connect",
+      "permitted_files": [
+        "docs/programs/craft-optional-apps/tasks/CRAFT-PDF-MCP.md"
+      ],
+      "dependencies": [
+        "CRAFT-PDF-GUI-CLI",
+        "CRAFT-PDF-CONFINEMENT"
+      ],
+      "acceptance": "Real packaged handshake and checked output/content in Codex, Claude Code, Hermes; other adapters configuration tests",
+      "phase": 1,
+      "status": "queued",
+      "owner": null,
+      "session": null,
+      "worker": null,
+      "actual_model": null,
+      "attempt": 0,
+      "last_checkpoint": null,
+      "base_revision": null,
+      "branch": null,
+      "worktree": null,
+      "implementation_commits": [],
+      "integration_commits": [],
+      "tests": [],
+      "evidence": [],
+      "artifact_hashes": {},
+      "blocker": null,
+      "next_action": "Verify pdfcraft saved-artifact workflows in selected agents"
+    },
+    {
+      "id": "CRAFT-PDF-VOICE",
+      "objective": "Verify actual Voice to Codex to confined pdfcraft saved output",
+      "repository": "runtime",
+      "permitted_files": [
+        "docs/programs/craft-optional-apps/tasks/CRAFT-PDF-VOICE.md"
+      ],
+      "dependencies": [
+        "CRAFT-PDF-MCP",
+        "CRAFT-HUB-REVIEW"
+      ],
+      "acceptance": "Observed speech/intent/route, cancellation, denied-action recovery, audible completion only after artifact checks",
+      "phase": 1,
+      "status": "queued",
+      "owner": null,
+      "session": null,
+      "worker": null,
+      "actual_model": null,
+      "attempt": 0,
+      "last_checkpoint": null,
+      "base_revision": null,
+      "branch": null,
+      "worktree": null,
+      "implementation_commits": [],
+      "integration_commits": [],
+      "tests": [],
+      "evidence": [],
+      "artifact_hashes": {},
+      "blocker": null,
+      "next_action": "Verify actual Voice to Codex to confined pdfcraft saved output"
+    },
+    {
+      "id": "CRAFT-PDF-DISPOSITION",
+      "objective": "Record final pdfcraft candidate or evidenced deferral/exclusion",
+      "repository": "runtime",
+      "permitted_files": [
+        "docs/programs/craft-optional-apps/apps/pdfcraft.md",
+        "docs/programs/craft-optional-apps/tasks/CRAFT-PDF-DISPOSITION.md"
+      ],
+      "dependencies": [
+        "CRAFT-PDF-VOICE"
+      ],
+      "acceptance": "Candidate passes every gate; otherwise concrete evidence and reconsideration condition; coordinator may record deferral with blocked predecessor evidence",
+      "phase": 1,
+      "status": "queued",
+      "owner": null,
+      "session": null,
+      "worker": null,
+      "actual_model": null,
+      "attempt": 0,
+      "last_checkpoint": null,
+      "base_revision": null,
+      "branch": null,
+      "worktree": null,
+      "implementation_commits": [],
+      "integration_commits": [],
+      "tests": [],
+      "evidence": [],
+      "artifact_hashes": {},
+      "blocker": null,
+      "next_action": "Record final pdfcraft candidate or evidenced deferral/exclusion"
+    },
+    {
+      "id": "CRAFT-PHOTO-PACKAGE",
+      "objective": "Evaluate pinned photocraft 0.7.0 release archive, ABI, notices and native package",
+      "repository": "packages",
+      "permitted_files": [
+        "pkgbuilds/photocraft/**"
+      ],
+      "dependencies": [
+        "CRAFT-P0-GATE"
+      ],
+      "acceptance": "Reviewed archive hash/source tag, clean build/contents/deps/ownership; same-tag locked fallback or evidenced deferral",
+      "phase": 1,
+      "status": "integrated",
+      "owner": "packages-worker",
+      "session": "2026-10-11-craft-root",
+      "worker": "/root/craft_packages",
+      "actual_model": "gpt-6.1-sol",
+      "attempt": 1,
+      "last_checkpoint": "2026-10-11T11:55:15.578808+00:00",
+      "base_revision": "4488564",
+      "branch": "codex/craft-packages",
+      "worktree": "/home/maslow/Projects/Maslow/craft-packages",
+      "implementation_commits": [
+        "7d8dfd1",
+        "f211378f416f50d63d4352b2049758a7aaa0996e"
+      ],
+      "integration_commits": [
+        "f211378f416f50d63d4352b2049758a7aaa0996e"
+      ],
+      "tests": [
+        {
+          "check": "clean disposable Docker makepkg, checksums/notices/archive safety, desktop syntax, ELF deps/ABI, CLI version/help, offline MCP init/list, original file manifests",
+          "result": "pass"
+        },
+        {
+          "check": "final PDF/Photo package ownership overlap, coordinator",
+          "result": "pass"
+        },
+        {
+          "check": "./test/maslow-packaging; bash -n; git diff --check",
+          "result": "pass"
+        },
+        {
+          "check": "coordinator exact-artifact installed version/ownership/mtree, offline unprivileged CLI and remove/reinstall with preservation, disposable container",
+          "result": "pass"
+        }
+      ],
+      "evidence": [
+        "docs/programs/craft-optional-apps/tasks/CRAFT-PHOTO-PACKAGE.md",
+        "docs/programs/craft-optional-apps/evidence/2026-10-11-app-installed.json"
+      ],
+      "artifact_hashes": {
+        "/home/maslow/Maslow-ai-os/craft-build/photo/photocraft-0.7.0-1-x86_64.pkg.tar.zst": "22c553446baae55603c202a4090340961044cd779d3084c2a687eb0b9a5a92c5"
+      },
+      "blocker": null,
+      "next_action": "Coordinator installed package verification; GUI/fidelity/confinement/agents/Voice separate"
+    },
+    {
+      "id": "CRAFT-PHOTO-GUI-CLI",
+      "objective": "Verify packaged photocraft GUI/CLI and file fidelity",
+      "repository": "packages",
+      "permitted_files": [
+        "docs/programs/craft-optional-apps/tasks/CRAFT-PHOTO-GUI-CLI.md"
+      ],
+      "dependencies": [
+        "CRAFT-PHOTO-PACKAGE"
+      ],
+      "acceptance": "Fresh optional install before OS update, offline GUI/CLI, upgrade/remove/reinstall, app-specific save/reopen fidelity, VM/Lenovo evidence",
+      "phase": 1,
+      "status": "blocked",
+      "owner": "gui-worker",
+      "session": "2026-10-11-craft-root",
+      "worker": "/root/pilot_gui",
+      "actual_model": "gpt-6.1-sol",
+      "attempt": 1,
+      "last_checkpoint": "2026-10-11T12:39:35.726180+00:00",
+      "base_revision": "f211378",
+      "branch": "codex/craft-packages",
+      "worktree": "/home/maslow/Projects/Maslow/craft-packages",
+      "implementation_commits": [],
+      "integration_commits": [],
+      "tests": [
+        {
+          "check": "offline installed CLI/GUI known-file save/reopen and independent fidelity assertions; inspected X11/Wayland software-rendered screenshots",
+          "result": "pass"
+        },
+        {
+          "check": "exact fresh Maslow/Hyprland/portal/clipboard/scaling/Lenovo and complex corpus",
+          "result": "unavailable"
+        }
+      ],
+      "evidence": [
+        "docs/programs/craft-optional-apps/tasks/CRAFT-PHOTO-GUI-CLI.md"
+      ],
+      "artifact_hashes": {},
+      "blocker": {
+        "type": "environment",
+        "summary": "Fresh exact Maslow VM and Lenovo/native portal/clipboard/scaling/representative corpus gates not exercised by bounded disposable container tests"
+      },
+      "next_action": "Run exact installed VM/Lenovo gates after shared foundation; retain bounded fixture evidence",
+      "worker_status": "finished-partial"
+    },
+    {
+      "id": "CRAFT-PHOTO-CONFINEMENT",
+      "objective": "Verify photocraft project isolation",
+      "repository": "connect",
+      "permitted_files": [
+        "packages/bridge/src/craft-photocraft.ts",
+        "packages/bridge/test/craft-photocraft.test.ts"
+      ],
+      "dependencies": [
+        "CRAFT-PHOTO-PACKAGE",
+        "CRAFT-CORE-REVIEW"
+      ],
+      "acceptance": "Authorized reads/exports and all negative isolation/lifecycle tests on exact installed package",
+      "phase": 1,
+      "status": "queued",
+      "owner": null,
+      "session": null,
+      "worker": null,
+      "actual_model": null,
+      "attempt": 0,
+      "last_checkpoint": null,
+      "base_revision": null,
+      "branch": null,
+      "worktree": null,
+      "implementation_commits": [],
+      "integration_commits": [],
+      "tests": [],
+      "evidence": [],
+      "artifact_hashes": {},
+      "blocker": null,
+      "next_action": "Verify photocraft project isolation"
+    },
+    {
+      "id": "CRAFT-PHOTO-MCP",
+      "objective": "Verify photocraft saved-artifact workflows in selected agents",
+      "repository": "connect",
+      "permitted_files": [
+        "docs/programs/craft-optional-apps/tasks/CRAFT-PHOTO-MCP.md"
+      ],
+      "dependencies": [
+        "CRAFT-PHOTO-GUI-CLI",
+        "CRAFT-PHOTO-CONFINEMENT"
+      ],
+      "acceptance": "Real packaged handshake and checked output/content in Codex, Claude Code, Hermes; other adapters configuration tests",
+      "phase": 1,
+      "status": "queued",
+      "owner": null,
+      "session": null,
+      "worker": null,
+      "actual_model": null,
+      "attempt": 0,
+      "last_checkpoint": null,
+      "base_revision": null,
+      "branch": null,
+      "worktree": null,
+      "implementation_commits": [],
+      "integration_commits": [],
+      "tests": [],
+      "evidence": [],
+      "artifact_hashes": {},
+      "blocker": null,
+      "next_action": "Verify photocraft saved-artifact workflows in selected agents"
+    },
+    {
+      "id": "CRAFT-PHOTO-VOICE",
+      "objective": "Verify actual Voice to Codex to confined photocraft saved output",
+      "repository": "runtime",
+      "permitted_files": [
+        "docs/programs/craft-optional-apps/tasks/CRAFT-PHOTO-VOICE.md"
+      ],
+      "dependencies": [
+        "CRAFT-PHOTO-MCP",
+        "CRAFT-HUB-REVIEW"
+      ],
+      "acceptance": "Observed speech/intent/route, cancellation, denied-action recovery, audible completion only after artifact checks",
+      "phase": 1,
+      "status": "queued",
+      "owner": null,
+      "session": null,
+      "worker": null,
+      "actual_model": null,
+      "attempt": 0,
+      "last_checkpoint": null,
+      "base_revision": null,
+      "branch": null,
+      "worktree": null,
+      "implementation_commits": [],
+      "integration_commits": [],
+      "tests": [],
+      "evidence": [],
+      "artifact_hashes": {},
+      "blocker": null,
+      "next_action": "Verify actual Voice to Codex to confined photocraft saved output"
+    },
+    {
+      "id": "CRAFT-PHOTO-DISPOSITION",
+      "objective": "Record final photocraft candidate or evidenced deferral/exclusion",
+      "repository": "runtime",
+      "permitted_files": [
+        "docs/programs/craft-optional-apps/apps/photocraft.md",
+        "docs/programs/craft-optional-apps/tasks/CRAFT-PHOTO-DISPOSITION.md"
+      ],
+      "dependencies": [
+        "CRAFT-PHOTO-VOICE"
+      ],
+      "acceptance": "Candidate passes every gate; otherwise concrete evidence and reconsideration condition; coordinator may record deferral with blocked predecessor evidence",
+      "phase": 1,
+      "status": "queued",
+      "owner": null,
+      "session": null,
+      "worker": null,
+      "actual_model": null,
+      "attempt": 0,
+      "last_checkpoint": null,
+      "base_revision": null,
+      "branch": null,
+      "worktree": null,
+      "implementation_commits": [],
+      "integration_commits": [],
+      "tests": [],
+      "evidence": [],
+      "artifact_hashes": {},
+      "blocker": null,
+      "next_action": "Record final photocraft candidate or evidenced deferral/exclusion"
+    },
+    {
+      "id": "CRAFT-VECTOR-PACKAGE",
+      "objective": "Evaluate pinned vectorcraft 0.9.0 release archive, ABI, notices and native package",
+      "repository": "packages",
+      "permitted_files": [
+        "pkgbuilds/vectorcraft/**"
+      ],
+      "dependencies": [
+        "CRAFT-P3-PILOT"
+      ],
+      "acceptance": "Reviewed archive hash/source tag, clean build/contents/deps/ownership; same-tag locked fallback or evidenced deferral",
+      "phase": 4,
+      "status": "queued",
+      "owner": null,
+      "session": null,
+      "worker": null,
+      "actual_model": null,
+      "attempt": 0,
+      "last_checkpoint": null,
+      "base_revision": null,
+      "branch": null,
+      "worktree": null,
+      "implementation_commits": [],
+      "integration_commits": [],
+      "tests": [],
+      "evidence": [],
+      "artifact_hashes": {},
+      "blocker": null,
+      "next_action": "Evaluate pinned vectorcraft 0.9.0 release archive, ABI, notices and native package"
+    },
+    {
+      "id": "CRAFT-VECTOR-GUI-CLI",
+      "objective": "Verify packaged vectorcraft GUI/CLI and file fidelity",
+      "repository": "packages",
+      "permitted_files": [
+        "docs/programs/craft-optional-apps/tasks/CRAFT-VECTOR-GUI-CLI.md"
+      ],
+      "dependencies": [
+        "CRAFT-VECTOR-PACKAGE"
+      ],
+      "acceptance": "Fresh optional install before OS update, offline GUI/CLI, upgrade/remove/reinstall, app-specific save/reopen fidelity, VM/Lenovo evidence",
+      "phase": 4,
+      "status": "queued",
+      "owner": null,
+      "session": null,
+      "worker": null,
+      "actual_model": null,
+      "attempt": 0,
+      "last_checkpoint": null,
+      "base_revision": null,
+      "branch": null,
+      "worktree": null,
+      "implementation_commits": [],
+      "integration_commits": [],
+      "tests": [],
+      "evidence": [],
+      "artifact_hashes": {},
+      "blocker": null,
+      "next_action": "Verify packaged vectorcraft GUI/CLI and file fidelity"
+    },
+    {
+      "id": "CRAFT-VECTOR-CONFINEMENT",
+      "objective": "Verify vectorcraft project isolation",
+      "repository": "connect",
+      "permitted_files": [
+        "packages/bridge/src/craft-vectorcraft.ts",
+        "packages/bridge/test/craft-vectorcraft.test.ts"
+      ],
+      "dependencies": [
+        "CRAFT-VECTOR-PACKAGE",
+        "CRAFT-CORE-REVIEW"
+      ],
+      "acceptance": "Authorized reads/exports and all negative isolation/lifecycle tests on exact installed package",
+      "phase": 4,
+      "status": "queued",
+      "owner": null,
+      "session": null,
+      "worker": null,
+      "actual_model": null,
+      "attempt": 0,
+      "last_checkpoint": null,
+      "base_revision": null,
+      "branch": null,
+      "worktree": null,
+      "implementation_commits": [],
+      "integration_commits": [],
+      "tests": [],
+      "evidence": [],
+      "artifact_hashes": {},
+      "blocker": null,
+      "next_action": "Verify vectorcraft project isolation"
+    },
+    {
+      "id": "CRAFT-VECTOR-MCP",
+      "objective": "Verify vectorcraft saved-artifact workflows in selected agents",
+      "repository": "connect",
+      "permitted_files": [
+        "docs/programs/craft-optional-apps/tasks/CRAFT-VECTOR-MCP.md"
+      ],
+      "dependencies": [
+        "CRAFT-VECTOR-GUI-CLI",
+        "CRAFT-VECTOR-CONFINEMENT"
+      ],
+      "acceptance": "Real packaged handshake and checked output/content in Codex, Claude Code, Hermes; other adapters configuration tests",
+      "phase": 4,
+      "status": "queued",
+      "owner": null,
+      "session": null,
+      "worker": null,
+      "actual_model": null,
+      "attempt": 0,
+      "last_checkpoint": null,
+      "base_revision": null,
+      "branch": null,
+      "worktree": null,
+      "implementation_commits": [],
+      "integration_commits": [],
+      "tests": [],
+      "evidence": [],
+      "artifact_hashes": {},
+      "blocker": null,
+      "next_action": "Verify vectorcraft saved-artifact workflows in selected agents"
+    },
+    {
+      "id": "CRAFT-VECTOR-VOICE",
+      "objective": "Verify actual Voice to Codex to confined vectorcraft saved output",
+      "repository": "runtime",
+      "permitted_files": [
+        "docs/programs/craft-optional-apps/tasks/CRAFT-VECTOR-VOICE.md"
+      ],
+      "dependencies": [
+        "CRAFT-VECTOR-MCP",
+        "CRAFT-HUB-REVIEW"
+      ],
+      "acceptance": "Observed speech/intent/route, cancellation, denied-action recovery, audible completion only after artifact checks",
+      "phase": 4,
+      "status": "queued",
+      "owner": null,
+      "session": null,
+      "worker": null,
+      "actual_model": null,
+      "attempt": 0,
+      "last_checkpoint": null,
+      "base_revision": null,
+      "branch": null,
+      "worktree": null,
+      "implementation_commits": [],
+      "integration_commits": [],
+      "tests": [],
+      "evidence": [],
+      "artifact_hashes": {},
+      "blocker": null,
+      "next_action": "Verify actual Voice to Codex to confined vectorcraft saved output"
+    },
+    {
+      "id": "CRAFT-VECTOR-DISPOSITION",
+      "objective": "Record final vectorcraft candidate or evidenced deferral/exclusion",
+      "repository": "runtime",
+      "permitted_files": [
+        "docs/programs/craft-optional-apps/apps/vectorcraft.md",
+        "docs/programs/craft-optional-apps/tasks/CRAFT-VECTOR-DISPOSITION.md"
+      ],
+      "dependencies": [
+        "CRAFT-VECTOR-VOICE"
+      ],
+      "acceptance": "Candidate passes every gate; otherwise concrete evidence and reconsideration condition; coordinator may record deferral with blocked predecessor evidence",
+      "phase": 4,
+      "status": "queued",
+      "owner": null,
+      "session": null,
+      "worker": null,
+      "actual_model": null,
+      "attempt": 0,
+      "last_checkpoint": null,
+      "base_revision": null,
+      "branch": null,
+      "worktree": null,
+      "implementation_commits": [],
+      "integration_commits": [],
+      "tests": [],
+      "evidence": [],
+      "artifact_hashes": {},
+      "blocker": null,
+      "next_action": "Record final vectorcraft candidate or evidenced deferral/exclusion"
+    },
+    {
+      "id": "CRAFT-WORD-PACKAGE",
+      "objective": "Evaluate pinned wordcraft 0.5.0 release archive, ABI, notices and native package",
+      "repository": "packages",
+      "permitted_files": [
+        "pkgbuilds/wordcraft/**"
+      ],
+      "dependencies": [
+        "CRAFT-VECTOR-DISPOSITION"
+      ],
+      "acceptance": "Reviewed archive hash/source tag, clean build/contents/deps/ownership; same-tag locked fallback or evidenced deferral",
+      "phase": 4,
+      "status": "queued",
+      "owner": null,
+      "session": null,
+      "worker": null,
+      "actual_model": null,
+      "attempt": 0,
+      "last_checkpoint": null,
+      "base_revision": null,
+      "branch": null,
+      "worktree": null,
+      "implementation_commits": [],
+      "integration_commits": [],
+      "tests": [],
+      "evidence": [],
+      "artifact_hashes": {},
+      "blocker": null,
+      "next_action": "Evaluate pinned wordcraft 0.5.0 release archive, ABI, notices and native package"
+    },
+    {
+      "id": "CRAFT-WORD-GUI-CLI",
+      "objective": "Verify packaged wordcraft GUI/CLI and file fidelity",
+      "repository": "packages",
+      "permitted_files": [
+        "docs/programs/craft-optional-apps/tasks/CRAFT-WORD-GUI-CLI.md"
+      ],
+      "dependencies": [
+        "CRAFT-WORD-PACKAGE"
+      ],
+      "acceptance": "Fresh optional install before OS update, offline GUI/CLI, upgrade/remove/reinstall, app-specific save/reopen fidelity, VM/Lenovo evidence",
+      "phase": 4,
+      "status": "queued",
+      "owner": null,
+      "session": null,
+      "worker": null,
+      "actual_model": null,
+      "attempt": 0,
+      "last_checkpoint": null,
+      "base_revision": null,
+      "branch": null,
+      "worktree": null,
+      "implementation_commits": [],
+      "integration_commits": [],
+      "tests": [],
+      "evidence": [],
+      "artifact_hashes": {},
+      "blocker": null,
+      "next_action": "Verify packaged wordcraft GUI/CLI and file fidelity"
+    },
+    {
+      "id": "CRAFT-WORD-CONFINEMENT",
+      "objective": "Verify wordcraft project isolation",
+      "repository": "connect",
+      "permitted_files": [
+        "packages/bridge/src/craft-wordcraft.ts",
+        "packages/bridge/test/craft-wordcraft.test.ts"
+      ],
+      "dependencies": [
+        "CRAFT-WORD-PACKAGE",
+        "CRAFT-CORE-REVIEW"
+      ],
+      "acceptance": "Authorized reads/exports and all negative isolation/lifecycle tests on exact installed package",
+      "phase": 4,
+      "status": "queued",
+      "owner": null,
+      "session": null,
+      "worker": null,
+      "actual_model": null,
+      "attempt": 0,
+      "last_checkpoint": null,
+      "base_revision": null,
+      "branch": null,
+      "worktree": null,
+      "implementation_commits": [],
+      "integration_commits": [],
+      "tests": [],
+      "evidence": [],
+      "artifact_hashes": {},
+      "blocker": null,
+      "next_action": "Verify wordcraft project isolation"
+    },
+    {
+      "id": "CRAFT-WORD-MCP",
+      "objective": "Verify wordcraft saved-artifact workflows in selected agents",
+      "repository": "connect",
+      "permitted_files": [
+        "docs/programs/craft-optional-apps/tasks/CRAFT-WORD-MCP.md"
+      ],
+      "dependencies": [
+        "CRAFT-WORD-GUI-CLI",
+        "CRAFT-WORD-CONFINEMENT"
+      ],
+      "acceptance": "Real packaged handshake and checked output/content in Codex, Claude Code, Hermes; other adapters configuration tests",
+      "phase": 4,
+      "status": "queued",
+      "owner": null,
+      "session": null,
+      "worker": null,
+      "actual_model": null,
+      "attempt": 0,
+      "last_checkpoint": null,
+      "base_revision": null,
+      "branch": null,
+      "worktree": null,
+      "implementation_commits": [],
+      "integration_commits": [],
+      "tests": [],
+      "evidence": [],
+      "artifact_hashes": {},
+      "blocker": null,
+      "next_action": "Verify wordcraft saved-artifact workflows in selected agents"
+    },
+    {
+      "id": "CRAFT-WORD-VOICE",
+      "objective": "Verify actual Voice to Codex to confined wordcraft saved output",
+      "repository": "runtime",
+      "permitted_files": [
+        "docs/programs/craft-optional-apps/tasks/CRAFT-WORD-VOICE.md"
+      ],
+      "dependencies": [
+        "CRAFT-WORD-MCP",
+        "CRAFT-HUB-REVIEW"
+      ],
+      "acceptance": "Observed speech/intent/route, cancellation, denied-action recovery, audible completion only after artifact checks",
+      "phase": 4,
+      "status": "queued",
+      "owner": null,
+      "session": null,
+      "worker": null,
+      "actual_model": null,
+      "attempt": 0,
+      "last_checkpoint": null,
+      "base_revision": null,
+      "branch": null,
+      "worktree": null,
+      "implementation_commits": [],
+      "integration_commits": [],
+      "tests": [],
+      "evidence": [],
+      "artifact_hashes": {},
+      "blocker": null,
+      "next_action": "Verify actual Voice to Codex to confined wordcraft saved output"
+    },
+    {
+      "id": "CRAFT-WORD-DISPOSITION",
+      "objective": "Record final wordcraft candidate or evidenced deferral/exclusion",
+      "repository": "runtime",
+      "permitted_files": [
+        "docs/programs/craft-optional-apps/apps/wordcraft.md",
+        "docs/programs/craft-optional-apps/tasks/CRAFT-WORD-DISPOSITION.md"
+      ],
+      "dependencies": [
+        "CRAFT-WORD-VOICE"
+      ],
+      "acceptance": "Candidate passes every gate; otherwise concrete evidence and reconsideration condition; coordinator may record deferral with blocked predecessor evidence",
+      "phase": 4,
+      "status": "queued",
+      "owner": null,
+      "session": null,
+      "worker": null,
+      "actual_model": null,
+      "attempt": 0,
+      "last_checkpoint": null,
+      "base_revision": null,
+      "branch": null,
+      "worktree": null,
+      "implementation_commits": [],
+      "integration_commits": [],
+      "tests": [],
+      "evidence": [],
+      "artifact_hashes": {},
+      "blocker": null,
+      "next_action": "Record final wordcraft candidate or evidenced deferral/exclusion"
+    },
+    {
+      "id": "CRAFT-GRID-PACKAGE",
+      "objective": "Evaluate pinned gridcraft 0.5.0 release archive, ABI, notices and native package",
+      "repository": "packages",
+      "permitted_files": [
+        "pkgbuilds/gridcraft/**"
+      ],
+      "dependencies": [
+        "CRAFT-WORD-DISPOSITION"
+      ],
+      "acceptance": "Reviewed archive hash/source tag, clean build/contents/deps/ownership; same-tag locked fallback or evidenced deferral",
+      "phase": 4,
+      "status": "queued",
+      "owner": null,
+      "session": null,
+      "worker": null,
+      "actual_model": null,
+      "attempt": 0,
+      "last_checkpoint": null,
+      "base_revision": null,
+      "branch": null,
+      "worktree": null,
+      "implementation_commits": [],
+      "integration_commits": [],
+      "tests": [],
+      "evidence": [],
+      "artifact_hashes": {},
+      "blocker": null,
+      "next_action": "Evaluate pinned gridcraft 0.5.0 release archive, ABI, notices and native package"
+    },
+    {
+      "id": "CRAFT-GRID-GUI-CLI",
+      "objective": "Verify packaged gridcraft GUI/CLI and file fidelity",
+      "repository": "packages",
+      "permitted_files": [
+        "docs/programs/craft-optional-apps/tasks/CRAFT-GRID-GUI-CLI.md"
+      ],
+      "dependencies": [
+        "CRAFT-GRID-PACKAGE"
+      ],
+      "acceptance": "Fresh optional install before OS update, offline GUI/CLI, upgrade/remove/reinstall, app-specific save/reopen fidelity, VM/Lenovo evidence",
+      "phase": 4,
+      "status": "queued",
+      "owner": null,
+      "session": null,
+      "worker": null,
+      "actual_model": null,
+      "attempt": 0,
+      "last_checkpoint": null,
+      "base_revision": null,
+      "branch": null,
+      "worktree": null,
+      "implementation_commits": [],
+      "integration_commits": [],
+      "tests": [],
+      "evidence": [],
+      "artifact_hashes": {},
+      "blocker": null,
+      "next_action": "Verify packaged gridcraft GUI/CLI and file fidelity"
+    },
+    {
+      "id": "CRAFT-GRID-CONFINEMENT",
+      "objective": "Verify gridcraft project isolation",
+      "repository": "connect",
+      "permitted_files": [
+        "packages/bridge/src/craft-gridcraft.ts",
+        "packages/bridge/test/craft-gridcraft.test.ts"
+      ],
+      "dependencies": [
+        "CRAFT-GRID-PACKAGE",
+        "CRAFT-CORE-REVIEW"
+      ],
+      "acceptance": "Authorized reads/exports and all negative isolation/lifecycle tests on exact installed package",
+      "phase": 4,
+      "status": "queued",
+      "owner": null,
+      "session": null,
+      "worker": null,
+      "actual_model": null,
+      "attempt": 0,
+      "last_checkpoint": null,
+      "base_revision": null,
+      "branch": null,
+      "worktree": null,
+      "implementation_commits": [],
+      "integration_commits": [],
+      "tests": [],
+      "evidence": [],
+      "artifact_hashes": {},
+      "blocker": null,
+      "next_action": "Verify gridcraft project isolation"
+    },
+    {
+      "id": "CRAFT-GRID-MCP",
+      "objective": "Verify gridcraft saved-artifact workflows in selected agents",
+      "repository": "connect",
+      "permitted_files": [
+        "docs/programs/craft-optional-apps/tasks/CRAFT-GRID-MCP.md"
+      ],
+      "dependencies": [
+        "CRAFT-GRID-GUI-CLI",
+        "CRAFT-GRID-CONFINEMENT"
+      ],
+      "acceptance": "Real packaged handshake and checked output/content in Codex, Claude Code, Hermes; other adapters configuration tests",
+      "phase": 4,
+      "status": "queued",
+      "owner": null,
+      "session": null,
+      "worker": null,
+      "actual_model": null,
+      "attempt": 0,
+      "last_checkpoint": null,
+      "base_revision": null,
+      "branch": null,
+      "worktree": null,
+      "implementation_commits": [],
+      "integration_commits": [],
+      "tests": [],
+      "evidence": [],
+      "artifact_hashes": {},
+      "blocker": null,
+      "next_action": "Verify gridcraft saved-artifact workflows in selected agents"
+    },
+    {
+      "id": "CRAFT-GRID-VOICE",
+      "objective": "Verify actual Voice to Codex to confined gridcraft saved output",
+      "repository": "runtime",
+      "permitted_files": [
+        "docs/programs/craft-optional-apps/tasks/CRAFT-GRID-VOICE.md"
+      ],
+      "dependencies": [
+        "CRAFT-GRID-MCP",
+        "CRAFT-HUB-REVIEW"
+      ],
+      "acceptance": "Observed speech/intent/route, cancellation, denied-action recovery, audible completion only after artifact checks",
+      "phase": 4,
+      "status": "queued",
+      "owner": null,
+      "session": null,
+      "worker": null,
+      "actual_model": null,
+      "attempt": 0,
+      "last_checkpoint": null,
+      "base_revision": null,
+      "branch": null,
+      "worktree": null,
+      "implementation_commits": [],
+      "integration_commits": [],
+      "tests": [],
+      "evidence": [],
+      "artifact_hashes": {},
+      "blocker": null,
+      "next_action": "Verify actual Voice to Codex to confined gridcraft saved output"
+    },
+    {
+      "id": "CRAFT-GRID-DISPOSITION",
+      "objective": "Record final gridcraft candidate or evidenced deferral/exclusion",
+      "repository": "runtime",
+      "permitted_files": [
+        "docs/programs/craft-optional-apps/apps/gridcraft.md",
+        "docs/programs/craft-optional-apps/tasks/CRAFT-GRID-DISPOSITION.md"
+      ],
+      "dependencies": [
+        "CRAFT-GRID-VOICE"
+      ],
+      "acceptance": "Candidate passes every gate; otherwise concrete evidence and reconsideration condition; coordinator may record deferral with blocked predecessor evidence",
+      "phase": 4,
+      "status": "queued",
+      "owner": null,
+      "session": null,
+      "worker": null,
+      "actual_model": null,
+      "attempt": 0,
+      "last_checkpoint": null,
+      "base_revision": null,
+      "branch": null,
+      "worktree": null,
+      "implementation_commits": [],
+      "integration_commits": [],
+      "tests": [],
+      "evidence": [],
+      "artifact_hashes": {},
+      "blocker": null,
+      "next_action": "Record final gridcraft candidate or evidenced deferral/exclusion"
+    },
+    {
+      "id": "CRAFT-DECK-PACKAGE",
+      "objective": "Evaluate pinned deckcraft 0.5.0 release archive, ABI, notices and native package",
+      "repository": "packages",
+      "permitted_files": [
+        "pkgbuilds/deckcraft/**"
+      ],
+      "dependencies": [
+        "CRAFT-GRID-DISPOSITION"
+      ],
+      "acceptance": "Reviewed archive hash/source tag, clean build/contents/deps/ownership; same-tag locked fallback or evidenced deferral",
+      "phase": 4,
+      "status": "queued",
+      "owner": null,
+      "session": null,
+      "worker": null,
+      "actual_model": null,
+      "attempt": 0,
+      "last_checkpoint": null,
+      "base_revision": null,
+      "branch": null,
+      "worktree": null,
+      "implementation_commits": [],
+      "integration_commits": [],
+      "tests": [],
+      "evidence": [],
+      "artifact_hashes": {},
+      "blocker": null,
+      "next_action": "Evaluate pinned deckcraft 0.5.0 release archive, ABI, notices and native package"
+    },
+    {
+      "id": "CRAFT-DECK-GUI-CLI",
+      "objective": "Verify packaged deckcraft GUI/CLI and file fidelity",
+      "repository": "packages",
+      "permitted_files": [
+        "docs/programs/craft-optional-apps/tasks/CRAFT-DECK-GUI-CLI.md"
+      ],
+      "dependencies": [
+        "CRAFT-DECK-PACKAGE"
+      ],
+      "acceptance": "Fresh optional install before OS update, offline GUI/CLI, upgrade/remove/reinstall, app-specific save/reopen fidelity, VM/Lenovo evidence",
+      "phase": 4,
+      "status": "queued",
+      "owner": null,
+      "session": null,
+      "worker": null,
+      "actual_model": null,
+      "attempt": 0,
+      "last_checkpoint": null,
+      "base_revision": null,
+      "branch": null,
+      "worktree": null,
+      "implementation_commits": [],
+      "integration_commits": [],
+      "tests": [],
+      "evidence": [],
+      "artifact_hashes": {},
+      "blocker": null,
+      "next_action": "Verify packaged deckcraft GUI/CLI and file fidelity"
+    },
+    {
+      "id": "CRAFT-DECK-CONFINEMENT",
+      "objective": "Verify deckcraft project isolation",
+      "repository": "connect",
+      "permitted_files": [
+        "packages/bridge/src/craft-deckcraft.ts",
+        "packages/bridge/test/craft-deckcraft.test.ts"
+      ],
+      "dependencies": [
+        "CRAFT-DECK-PACKAGE",
+        "CRAFT-CORE-REVIEW"
+      ],
+      "acceptance": "Authorized reads/exports and all negative isolation/lifecycle tests on exact installed package",
+      "phase": 4,
+      "status": "queued",
+      "owner": null,
+      "session": null,
+      "worker": null,
+      "actual_model": null,
+      "attempt": 0,
+      "last_checkpoint": null,
+      "base_revision": null,
+      "branch": null,
+      "worktree": null,
+      "implementation_commits": [],
+      "integration_commits": [],
+      "tests": [],
+      "evidence": [],
+      "artifact_hashes": {},
+      "blocker": null,
+      "next_action": "Verify deckcraft project isolation"
+    },
+    {
+      "id": "CRAFT-DECK-MCP",
+      "objective": "Verify deckcraft saved-artifact workflows in selected agents",
+      "repository": "connect",
+      "permitted_files": [
+        "docs/programs/craft-optional-apps/tasks/CRAFT-DECK-MCP.md"
+      ],
+      "dependencies": [
+        "CRAFT-DECK-GUI-CLI",
+        "CRAFT-DECK-CONFINEMENT"
+      ],
+      "acceptance": "Real packaged handshake and checked output/content in Codex, Claude Code, Hermes; other adapters configuration tests",
+      "phase": 4,
+      "status": "queued",
+      "owner": null,
+      "session": null,
+      "worker": null,
+      "actual_model": null,
+      "attempt": 0,
+      "last_checkpoint": null,
+      "base_revision": null,
+      "branch": null,
+      "worktree": null,
+      "implementation_commits": [],
+      "integration_commits": [],
+      "tests": [],
+      "evidence": [],
+      "artifact_hashes": {},
+      "blocker": null,
+      "next_action": "Verify deckcraft saved-artifact workflows in selected agents"
+    },
+    {
+      "id": "CRAFT-DECK-VOICE",
+      "objective": "Verify actual Voice to Codex to confined deckcraft saved output",
+      "repository": "runtime",
+      "permitted_files": [
+        "docs/programs/craft-optional-apps/tasks/CRAFT-DECK-VOICE.md"
+      ],
+      "dependencies": [
+        "CRAFT-DECK-MCP",
+        "CRAFT-HUB-REVIEW"
+      ],
+      "acceptance": "Observed speech/intent/route, cancellation, denied-action recovery, audible completion only after artifact checks",
+      "phase": 4,
+      "status": "queued",
+      "owner": null,
+      "session": null,
+      "worker": null,
+      "actual_model": null,
+      "attempt": 0,
+      "last_checkpoint": null,
+      "base_revision": null,
+      "branch": null,
+      "worktree": null,
+      "implementation_commits": [],
+      "integration_commits": [],
+      "tests": [],
+      "evidence": [],
+      "artifact_hashes": {},
+      "blocker": null,
+      "next_action": "Verify actual Voice to Codex to confined deckcraft saved output"
+    },
+    {
+      "id": "CRAFT-DECK-DISPOSITION",
+      "objective": "Record final deckcraft candidate or evidenced deferral/exclusion",
+      "repository": "runtime",
+      "permitted_files": [
+        "docs/programs/craft-optional-apps/apps/deckcraft.md",
+        "docs/programs/craft-optional-apps/tasks/CRAFT-DECK-DISPOSITION.md"
+      ],
+      "dependencies": [
+        "CRAFT-DECK-VOICE"
+      ],
+      "acceptance": "Candidate passes every gate; otherwise concrete evidence and reconsideration condition; coordinator may record deferral with blocked predecessor evidence",
+      "phase": 4,
+      "status": "queued",
+      "owner": null,
+      "session": null,
+      "worker": null,
+      "actual_model": null,
+      "attempt": 0,
+      "last_checkpoint": null,
+      "base_revision": null,
+      "branch": null,
+      "worktree": null,
+      "implementation_commits": [],
+      "integration_commits": [],
+      "tests": [],
+      "evidence": [],
+      "artifact_hashes": {},
+      "blocker": null,
+      "next_action": "Record final deckcraft candidate or evidenced deferral/exclusion"
+    },
+    {
+      "id": "CRAFT-LIGHT-PACKAGE",
+      "objective": "Evaluate pinned lightcraft 0.6.0 release archive, ABI, notices and native package",
+      "repository": "packages",
+      "permitted_files": [
+        "pkgbuilds/lightcraft/**"
+      ],
+      "dependencies": [
+        "CRAFT-DECK-DISPOSITION"
+      ],
+      "acceptance": "Reviewed archive hash/source tag, clean build/contents/deps/ownership; same-tag locked fallback or evidenced deferral",
+      "phase": 5,
+      "status": "queued",
+      "owner": null,
+      "session": null,
+      "worker": null,
+      "actual_model": null,
+      "attempt": 0,
+      "last_checkpoint": null,
+      "base_revision": null,
+      "branch": null,
+      "worktree": null,
+      "implementation_commits": [],
+      "integration_commits": [],
+      "tests": [],
+      "evidence": [],
+      "artifact_hashes": {},
+      "blocker": null,
+      "next_action": "Evaluate pinned lightcraft 0.6.0 release archive, ABI, notices and native package"
+    },
+    {
+      "id": "CRAFT-LIGHT-GUI-CLI",
+      "objective": "Verify packaged lightcraft GUI/CLI and file fidelity",
+      "repository": "packages",
+      "permitted_files": [
+        "docs/programs/craft-optional-apps/tasks/CRAFT-LIGHT-GUI-CLI.md"
+      ],
+      "dependencies": [
+        "CRAFT-LIGHT-PACKAGE"
+      ],
+      "acceptance": "Fresh optional install before OS update, offline GUI/CLI, upgrade/remove/reinstall, app-specific save/reopen fidelity, VM/Lenovo evidence",
+      "phase": 5,
+      "status": "queued",
+      "owner": null,
+      "session": null,
+      "worker": null,
+      "actual_model": null,
+      "attempt": 0,
+      "last_checkpoint": null,
+      "base_revision": null,
+      "branch": null,
+      "worktree": null,
+      "implementation_commits": [],
+      "integration_commits": [],
+      "tests": [],
+      "evidence": [],
+      "artifact_hashes": {},
+      "blocker": null,
+      "next_action": "Verify packaged lightcraft GUI/CLI and file fidelity"
+    },
+    {
+      "id": "CRAFT-LIGHT-CONFINEMENT",
+      "objective": "Verify lightcraft project isolation",
+      "repository": "connect",
+      "permitted_files": [
+        "packages/bridge/src/craft-lightcraft.ts",
+        "packages/bridge/test/craft-lightcraft.test.ts"
+      ],
+      "dependencies": [
+        "CRAFT-LIGHT-PACKAGE",
+        "CRAFT-CORE-REVIEW"
+      ],
+      "acceptance": "Authorized reads/exports and all negative isolation/lifecycle tests on exact installed package",
+      "phase": 5,
+      "status": "queued",
+      "owner": null,
+      "session": null,
+      "worker": null,
+      "actual_model": null,
+      "attempt": 0,
+      "last_checkpoint": null,
+      "base_revision": null,
+      "branch": null,
+      "worktree": null,
+      "implementation_commits": [],
+      "integration_commits": [],
+      "tests": [],
+      "evidence": [],
+      "artifact_hashes": {},
+      "blocker": null,
+      "next_action": "Verify lightcraft project isolation"
+    },
+    {
+      "id": "CRAFT-LIGHT-MCP",
+      "objective": "Verify lightcraft saved-artifact workflows in selected agents",
+      "repository": "connect",
+      "permitted_files": [
+        "docs/programs/craft-optional-apps/tasks/CRAFT-LIGHT-MCP.md"
+      ],
+      "dependencies": [
+        "CRAFT-LIGHT-GUI-CLI",
+        "CRAFT-LIGHT-CONFINEMENT"
+      ],
+      "acceptance": "Real packaged handshake and checked output/content in Codex, Claude Code, Hermes; other adapters configuration tests",
+      "phase": 5,
+      "status": "queued",
+      "owner": null,
+      "session": null,
+      "worker": null,
+      "actual_model": null,
+      "attempt": 0,
+      "last_checkpoint": null,
+      "base_revision": null,
+      "branch": null,
+      "worktree": null,
+      "implementation_commits": [],
+      "integration_commits": [],
+      "tests": [],
+      "evidence": [],
+      "artifact_hashes": {},
+      "blocker": null,
+      "next_action": "Verify lightcraft saved-artifact workflows in selected agents"
+    },
+    {
+      "id": "CRAFT-LIGHT-VOICE",
+      "objective": "Verify actual Voice to Codex to confined lightcraft saved output",
+      "repository": "runtime",
+      "permitted_files": [
+        "docs/programs/craft-optional-apps/tasks/CRAFT-LIGHT-VOICE.md"
+      ],
+      "dependencies": [
+        "CRAFT-LIGHT-MCP",
+        "CRAFT-HUB-REVIEW"
+      ],
+      "acceptance": "Observed speech/intent/route, cancellation, denied-action recovery, audible completion only after artifact checks",
+      "phase": 5,
+      "status": "queued",
+      "owner": null,
+      "session": null,
+      "worker": null,
+      "actual_model": null,
+      "attempt": 0,
+      "last_checkpoint": null,
+      "base_revision": null,
+      "branch": null,
+      "worktree": null,
+      "implementation_commits": [],
+      "integration_commits": [],
+      "tests": [],
+      "evidence": [],
+      "artifact_hashes": {},
+      "blocker": null,
+      "next_action": "Verify actual Voice to Codex to confined lightcraft saved output"
+    },
+    {
+      "id": "CRAFT-LIGHT-DISPOSITION",
+      "objective": "Record final lightcraft candidate or evidenced deferral/exclusion",
+      "repository": "runtime",
+      "permitted_files": [
+        "docs/programs/craft-optional-apps/apps/lightcraft.md",
+        "docs/programs/craft-optional-apps/tasks/CRAFT-LIGHT-DISPOSITION.md"
+      ],
+      "dependencies": [
+        "CRAFT-LIGHT-VOICE"
+      ],
+      "acceptance": "Candidate passes every gate; otherwise concrete evidence and reconsideration condition; coordinator may record deferral with blocked predecessor evidence",
+      "phase": 5,
+      "status": "queued",
+      "owner": null,
+      "session": null,
+      "worker": null,
+      "actual_model": null,
+      "attempt": 0,
+      "last_checkpoint": null,
+      "base_revision": null,
+      "branch": null,
+      "worktree": null,
+      "implementation_commits": [],
+      "integration_commits": [],
+      "tests": [],
+      "evidence": [],
+      "artifact_hashes": {},
+      "blocker": null,
+      "next_action": "Record final lightcraft candidate or evidenced deferral/exclusion"
+    },
+    {
+      "id": "CRAFT-EFFECT-PACKAGE",
+      "objective": "Evaluate pinned effectcraft 0.8.0 release archive, ABI, notices and native package",
+      "repository": "packages",
+      "permitted_files": [
+        "pkgbuilds/effectcraft/**"
+      ],
+      "dependencies": [
+        "CRAFT-LIGHT-DISPOSITION"
+      ],
+      "acceptance": "Reviewed archive hash/source tag, clean build/contents/deps/ownership; same-tag locked fallback or evidenced deferral",
+      "phase": 5,
+      "status": "queued",
+      "owner": null,
+      "session": null,
+      "worker": null,
+      "actual_model": null,
+      "attempt": 0,
+      "last_checkpoint": null,
+      "base_revision": null,
+      "branch": null,
+      "worktree": null,
+      "implementation_commits": [],
+      "integration_commits": [],
+      "tests": [],
+      "evidence": [],
+      "artifact_hashes": {},
+      "blocker": null,
+      "next_action": "Evaluate pinned effectcraft 0.8.0 release archive, ABI, notices and native package"
+    },
+    {
+      "id": "CRAFT-EFFECT-GUI-CLI",
+      "objective": "Verify packaged effectcraft GUI/CLI and file fidelity",
+      "repository": "packages",
+      "permitted_files": [
+        "docs/programs/craft-optional-apps/tasks/CRAFT-EFFECT-GUI-CLI.md"
+      ],
+      "dependencies": [
+        "CRAFT-EFFECT-PACKAGE"
+      ],
+      "acceptance": "Fresh optional install before OS update, offline GUI/CLI, upgrade/remove/reinstall, app-specific save/reopen fidelity, VM/Lenovo evidence",
+      "phase": 5,
+      "status": "queued",
+      "owner": null,
+      "session": null,
+      "worker": null,
+      "actual_model": null,
+      "attempt": 0,
+      "last_checkpoint": null,
+      "base_revision": null,
+      "branch": null,
+      "worktree": null,
+      "implementation_commits": [],
+      "integration_commits": [],
+      "tests": [],
+      "evidence": [],
+      "artifact_hashes": {},
+      "blocker": null,
+      "next_action": "Verify packaged effectcraft GUI/CLI and file fidelity"
+    },
+    {
+      "id": "CRAFT-EFFECT-CONFINEMENT",
+      "objective": "Verify effectcraft project isolation",
+      "repository": "connect",
+      "permitted_files": [
+        "packages/bridge/src/craft-effectcraft.ts",
+        "packages/bridge/test/craft-effectcraft.test.ts"
+      ],
+      "dependencies": [
+        "CRAFT-EFFECT-PACKAGE",
+        "CRAFT-CORE-REVIEW"
+      ],
+      "acceptance": "Authorized reads/exports and all negative isolation/lifecycle tests on exact installed package",
+      "phase": 5,
+      "status": "queued",
+      "owner": null,
+      "session": null,
+      "worker": null,
+      "actual_model": null,
+      "attempt": 0,
+      "last_checkpoint": null,
+      "base_revision": null,
+      "branch": null,
+      "worktree": null,
+      "implementation_commits": [],
+      "integration_commits": [],
+      "tests": [],
+      "evidence": [],
+      "artifact_hashes": {},
+      "blocker": null,
+      "next_action": "Verify effectcraft project isolation"
+    },
+    {
+      "id": "CRAFT-EFFECT-MCP",
+      "objective": "Verify effectcraft saved-artifact workflows in selected agents",
+      "repository": "connect",
+      "permitted_files": [
+        "docs/programs/craft-optional-apps/tasks/CRAFT-EFFECT-MCP.md"
+      ],
+      "dependencies": [
+        "CRAFT-EFFECT-GUI-CLI",
+        "CRAFT-EFFECT-CONFINEMENT"
+      ],
+      "acceptance": "Real packaged handshake and checked output/content in Codex, Claude Code, Hermes; other adapters configuration tests",
+      "phase": 5,
+      "status": "queued",
+      "owner": null,
+      "session": null,
+      "worker": null,
+      "actual_model": null,
+      "attempt": 0,
+      "last_checkpoint": null,
+      "base_revision": null,
+      "branch": null,
+      "worktree": null,
+      "implementation_commits": [],
+      "integration_commits": [],
+      "tests": [],
+      "evidence": [],
+      "artifact_hashes": {},
+      "blocker": null,
+      "next_action": "Verify effectcraft saved-artifact workflows in selected agents"
+    },
+    {
+      "id": "CRAFT-EFFECT-VOICE",
+      "objective": "Verify actual Voice to Codex to confined effectcraft saved output",
+      "repository": "runtime",
+      "permitted_files": [
+        "docs/programs/craft-optional-apps/tasks/CRAFT-EFFECT-VOICE.md"
+      ],
+      "dependencies": [
+        "CRAFT-EFFECT-MCP",
+        "CRAFT-HUB-REVIEW"
+      ],
+      "acceptance": "Observed speech/intent/route, cancellation, denied-action recovery, audible completion only after artifact checks",
+      "phase": 5,
+      "status": "queued",
+      "owner": null,
+      "session": null,
+      "worker": null,
+      "actual_model": null,
+      "attempt": 0,
+      "last_checkpoint": null,
+      "base_revision": null,
+      "branch": null,
+      "worktree": null,
+      "implementation_commits": [],
+      "integration_commits": [],
+      "tests": [],
+      "evidence": [],
+      "artifact_hashes": {},
+      "blocker": null,
+      "next_action": "Verify actual Voice to Codex to confined effectcraft saved output"
+    },
+    {
+      "id": "CRAFT-EFFECT-DISPOSITION",
+      "objective": "Record final effectcraft candidate or evidenced deferral/exclusion",
+      "repository": "runtime",
+      "permitted_files": [
+        "docs/programs/craft-optional-apps/apps/effectcraft.md",
+        "docs/programs/craft-optional-apps/tasks/CRAFT-EFFECT-DISPOSITION.md"
+      ],
+      "dependencies": [
+        "CRAFT-EFFECT-VOICE"
+      ],
+      "acceptance": "Candidate passes every gate; otherwise concrete evidence and reconsideration condition; coordinator may record deferral with blocked predecessor evidence",
+      "phase": 5,
+      "status": "queued",
+      "owner": null,
+      "session": null,
+      "worker": null,
+      "actual_model": null,
+      "attempt": 0,
+      "last_checkpoint": null,
+      "base_revision": null,
+      "branch": null,
+      "worktree": null,
+      "implementation_commits": [],
+      "integration_commits": [],
+      "tests": [],
+      "evidence": [],
+      "artifact_hashes": {},
+      "blocker": null,
+      "next_action": "Record final effectcraft candidate or evidenced deferral/exclusion"
+    },
+    {
+      "id": "CRAFT-FILM-PACKAGE",
+      "objective": "Evaluate pinned filmcraft 0.6.0 release archive, ABI, notices and native package",
+      "repository": "packages",
+      "permitted_files": [
+        "pkgbuilds/filmcraft/**"
+      ],
+      "dependencies": [
+        "CRAFT-EFFECT-DISPOSITION"
+      ],
+      "acceptance": "Reviewed archive hash/source tag, clean build/contents/deps/ownership; same-tag locked fallback or evidenced deferral",
+      "phase": 5,
+      "status": "queued",
+      "owner": null,
+      "session": null,
+      "worker": null,
+      "actual_model": null,
+      "attempt": 0,
+      "last_checkpoint": null,
+      "base_revision": null,
+      "branch": null,
+      "worktree": null,
+      "implementation_commits": [],
+      "integration_commits": [],
+      "tests": [],
+      "evidence": [],
+      "artifact_hashes": {},
+      "blocker": null,
+      "next_action": "Evaluate pinned filmcraft 0.6.0 release archive, ABI, notices and native package"
+    },
+    {
+      "id": "CRAFT-FILM-GUI-CLI",
+      "objective": "Verify packaged filmcraft GUI/CLI and file fidelity",
+      "repository": "packages",
+      "permitted_files": [
+        "docs/programs/craft-optional-apps/tasks/CRAFT-FILM-GUI-CLI.md"
+      ],
+      "dependencies": [
+        "CRAFT-FILM-PACKAGE"
+      ],
+      "acceptance": "Fresh optional install before OS update, offline GUI/CLI, upgrade/remove/reinstall, app-specific save/reopen fidelity, VM/Lenovo evidence",
+      "phase": 5,
+      "status": "queued",
+      "owner": null,
+      "session": null,
+      "worker": null,
+      "actual_model": null,
+      "attempt": 0,
+      "last_checkpoint": null,
+      "base_revision": null,
+      "branch": null,
+      "worktree": null,
+      "implementation_commits": [],
+      "integration_commits": [],
+      "tests": [],
+      "evidence": [],
+      "artifact_hashes": {},
+      "blocker": null,
+      "next_action": "Verify packaged filmcraft GUI/CLI and file fidelity"
+    },
+    {
+      "id": "CRAFT-FILM-CONFINEMENT",
+      "objective": "Verify filmcraft project isolation",
+      "repository": "connect",
+      "permitted_files": [
+        "packages/bridge/src/craft-filmcraft.ts",
+        "packages/bridge/test/craft-filmcraft.test.ts"
+      ],
+      "dependencies": [
+        "CRAFT-FILM-PACKAGE",
+        "CRAFT-CORE-REVIEW"
+      ],
+      "acceptance": "Authorized reads/exports and all negative isolation/lifecycle tests on exact installed package",
+      "phase": 5,
+      "status": "queued",
+      "owner": null,
+      "session": null,
+      "worker": null,
+      "actual_model": null,
+      "attempt": 0,
+      "last_checkpoint": null,
+      "base_revision": null,
+      "branch": null,
+      "worktree": null,
+      "implementation_commits": [],
+      "integration_commits": [],
+      "tests": [],
+      "evidence": [],
+      "artifact_hashes": {},
+      "blocker": null,
+      "next_action": "Verify filmcraft project isolation"
+    },
+    {
+      "id": "CRAFT-FILM-MCP",
+      "objective": "Verify filmcraft saved-artifact workflows in selected agents",
+      "repository": "connect",
+      "permitted_files": [
+        "docs/programs/craft-optional-apps/tasks/CRAFT-FILM-MCP.md"
+      ],
+      "dependencies": [
+        "CRAFT-FILM-GUI-CLI",
+        "CRAFT-FILM-CONFINEMENT"
+      ],
+      "acceptance": "Real packaged handshake and checked output/content in Codex, Claude Code, Hermes; other adapters configuration tests",
+      "phase": 5,
+      "status": "queued",
+      "owner": null,
+      "session": null,
+      "worker": null,
+      "actual_model": null,
+      "attempt": 0,
+      "last_checkpoint": null,
+      "base_revision": null,
+      "branch": null,
+      "worktree": null,
+      "implementation_commits": [],
+      "integration_commits": [],
+      "tests": [],
+      "evidence": [],
+      "artifact_hashes": {},
+      "blocker": null,
+      "next_action": "Verify filmcraft saved-artifact workflows in selected agents"
+    },
+    {
+      "id": "CRAFT-FILM-VOICE",
+      "objective": "Verify actual Voice to Codex to confined filmcraft saved output",
+      "repository": "runtime",
+      "permitted_files": [
+        "docs/programs/craft-optional-apps/tasks/CRAFT-FILM-VOICE.md"
+      ],
+      "dependencies": [
+        "CRAFT-FILM-MCP",
+        "CRAFT-HUB-REVIEW"
+      ],
+      "acceptance": "Observed speech/intent/route, cancellation, denied-action recovery, audible completion only after artifact checks",
+      "phase": 5,
+      "status": "queued",
+      "owner": null,
+      "session": null,
+      "worker": null,
+      "actual_model": null,
+      "attempt": 0,
+      "last_checkpoint": null,
+      "base_revision": null,
+      "branch": null,
+      "worktree": null,
+      "implementation_commits": [],
+      "integration_commits": [],
+      "tests": [],
+      "evidence": [],
+      "artifact_hashes": {},
+      "blocker": null,
+      "next_action": "Verify actual Voice to Codex to confined filmcraft saved output"
+    },
+    {
+      "id": "CRAFT-FILM-DISPOSITION",
+      "objective": "Record final filmcraft candidate or evidenced deferral/exclusion",
+      "repository": "runtime",
+      "permitted_files": [
+        "docs/programs/craft-optional-apps/apps/filmcraft.md",
+        "docs/programs/craft-optional-apps/tasks/CRAFT-FILM-DISPOSITION.md"
+      ],
+      "dependencies": [
+        "CRAFT-FILM-VOICE"
+      ],
+      "acceptance": "Candidate passes every gate; otherwise concrete evidence and reconsideration condition; coordinator may record deferral with blocked predecessor evidence",
+      "phase": 5,
+      "status": "queued",
+      "owner": null,
+      "session": null,
+      "worker": null,
+      "actual_model": null,
+      "attempt": 0,
+      "last_checkpoint": null,
+      "base_revision": null,
+      "branch": null,
+      "worktree": null,
+      "implementation_commits": [],
+      "integration_commits": [],
+      "tests": [],
+      "evidence": [],
+      "artifact_hashes": {},
+      "blocker": null,
+      "next_action": "Record final filmcraft candidate or evidenced deferral/exclusion"
+    },
+    {
+      "id": "CRAFT-DESIGN-PACKAGE",
+      "objective": "Evaluate pinned designcraft 0.6.0 release archive, ABI, notices and native package",
+      "repository": "packages",
+      "permitted_files": [
+        "pkgbuilds/designcraft/**"
+      ],
+      "dependencies": [
+        "CRAFT-FILM-DISPOSITION"
+      ],
+      "acceptance": "Reviewed archive hash/source tag, clean build/contents/deps/ownership; same-tag locked fallback or evidenced deferral",
+      "phase": 5,
+      "status": "queued",
+      "owner": null,
+      "session": null,
+      "worker": null,
+      "actual_model": null,
+      "attempt": 0,
+      "last_checkpoint": null,
+      "base_revision": null,
+      "branch": null,
+      "worktree": null,
+      "implementation_commits": [],
+      "integration_commits": [],
+      "tests": [],
+      "evidence": [],
+      "artifact_hashes": {},
+      "blocker": null,
+      "next_action": "Evaluate pinned designcraft 0.6.0 release archive, ABI, notices and native package"
+    },
+    {
+      "id": "CRAFT-DESIGN-GUI-CLI",
+      "objective": "Verify packaged designcraft GUI/CLI and file fidelity",
+      "repository": "packages",
+      "permitted_files": [
+        "docs/programs/craft-optional-apps/tasks/CRAFT-DESIGN-GUI-CLI.md"
+      ],
+      "dependencies": [
+        "CRAFT-DESIGN-PACKAGE"
+      ],
+      "acceptance": "Fresh optional install before OS update, offline GUI/CLI, upgrade/remove/reinstall, app-specific save/reopen fidelity, VM/Lenovo evidence",
+      "phase": 5,
+      "status": "queued",
+      "owner": null,
+      "session": null,
+      "worker": null,
+      "actual_model": null,
+      "attempt": 0,
+      "last_checkpoint": null,
+      "base_revision": null,
+      "branch": null,
+      "worktree": null,
+      "implementation_commits": [],
+      "integration_commits": [],
+      "tests": [],
+      "evidence": [],
+      "artifact_hashes": {},
+      "blocker": null,
+      "next_action": "Verify packaged designcraft GUI/CLI and file fidelity"
+    },
+    {
+      "id": "CRAFT-DESIGN-CONFINEMENT",
+      "objective": "Verify designcraft project isolation",
+      "repository": "connect",
+      "permitted_files": [
+        "packages/bridge/src/craft-designcraft.ts",
+        "packages/bridge/test/craft-designcraft.test.ts"
+      ],
+      "dependencies": [
+        "CRAFT-DESIGN-PACKAGE",
+        "CRAFT-CORE-REVIEW"
+      ],
+      "acceptance": "Authorized reads/exports and all negative isolation/lifecycle tests on exact installed package",
+      "phase": 5,
+      "status": "queued",
+      "owner": null,
+      "session": null,
+      "worker": null,
+      "actual_model": null,
+      "attempt": 0,
+      "last_checkpoint": null,
+      "base_revision": null,
+      "branch": null,
+      "worktree": null,
+      "implementation_commits": [],
+      "integration_commits": [],
+      "tests": [],
+      "evidence": [],
+      "artifact_hashes": {},
+      "blocker": null,
+      "next_action": "Verify designcraft project isolation"
+    },
+    {
+      "id": "CRAFT-DESIGN-MCP",
+      "objective": "Verify designcraft saved-artifact workflows in selected agents",
+      "repository": "connect",
+      "permitted_files": [
+        "docs/programs/craft-optional-apps/tasks/CRAFT-DESIGN-MCP.md"
+      ],
+      "dependencies": [
+        "CRAFT-DESIGN-GUI-CLI",
+        "CRAFT-DESIGN-CONFINEMENT"
+      ],
+      "acceptance": "Real packaged handshake and checked output/content in Codex, Claude Code, Hermes; other adapters configuration tests",
+      "phase": 5,
+      "status": "queued",
+      "owner": null,
+      "session": null,
+      "worker": null,
+      "actual_model": null,
+      "attempt": 0,
+      "last_checkpoint": null,
+      "base_revision": null,
+      "branch": null,
+      "worktree": null,
+      "implementation_commits": [],
+      "integration_commits": [],
+      "tests": [],
+      "evidence": [],
+      "artifact_hashes": {},
+      "blocker": null,
+      "next_action": "Verify designcraft saved-artifact workflows in selected agents"
+    },
+    {
+      "id": "CRAFT-DESIGN-VOICE",
+      "objective": "Verify actual Voice to Codex to confined designcraft saved output",
+      "repository": "runtime",
+      "permitted_files": [
+        "docs/programs/craft-optional-apps/tasks/CRAFT-DESIGN-VOICE.md"
+      ],
+      "dependencies": [
+        "CRAFT-DESIGN-MCP",
+        "CRAFT-HUB-REVIEW"
+      ],
+      "acceptance": "Observed speech/intent/route, cancellation, denied-action recovery, audible completion only after artifact checks",
+      "phase": 5,
+      "status": "queued",
+      "owner": null,
+      "session": null,
+      "worker": null,
+      "actual_model": null,
+      "attempt": 0,
+      "last_checkpoint": null,
+      "base_revision": null,
+      "branch": null,
+      "worktree": null,
+      "implementation_commits": [],
+      "integration_commits": [],
+      "tests": [],
+      "evidence": [],
+      "artifact_hashes": {},
+      "blocker": null,
+      "next_action": "Verify actual Voice to Codex to confined designcraft saved output"
+    },
+    {
+      "id": "CRAFT-DESIGN-DISPOSITION",
+      "objective": "Record final designcraft candidate or evidenced deferral/exclusion",
+      "repository": "runtime",
+      "permitted_files": [
+        "docs/programs/craft-optional-apps/apps/designcraft.md",
+        "docs/programs/craft-optional-apps/tasks/CRAFT-DESIGN-DISPOSITION.md"
+      ],
+      "dependencies": [
+        "CRAFT-DESIGN-VOICE"
+      ],
+      "acceptance": "Candidate passes every gate; otherwise concrete evidence and reconsideration condition; coordinator may record deferral with blocked predecessor evidence",
+      "phase": 5,
+      "status": "queued",
+      "owner": null,
+      "session": null,
+      "worker": null,
+      "actual_model": null,
+      "attempt": 0,
+      "last_checkpoint": null,
+      "base_revision": null,
+      "branch": null,
+      "worktree": null,
+      "implementation_commits": [],
+      "integration_commits": [],
+      "tests": [],
+      "evidence": [],
+      "artifact_hashes": {},
+      "blocker": null,
+      "next_action": "Record final designcraft candidate or evidenced deferral/exclusion"
+    },
+    {
+      "id": "CRAFT-CAD-PACKAGE",
+      "objective": "Evaluate pinned cadcraft 0.5.0 release archive, ABI, notices and native package",
+      "repository": "packages",
+      "permitted_files": [
+        "pkgbuilds/cadcraft/**"
+      ],
+      "dependencies": [
+        "CRAFT-DESIGN-DISPOSITION"
+      ],
+      "acceptance": "Reviewed archive hash/source tag, clean build/contents/deps/ownership; same-tag locked fallback or evidenced deferral",
+      "phase": 5,
+      "status": "queued",
+      "owner": null,
+      "session": null,
+      "worker": null,
+      "actual_model": null,
+      "attempt": 0,
+      "last_checkpoint": null,
+      "base_revision": null,
+      "branch": null,
+      "worktree": null,
+      "implementation_commits": [],
+      "integration_commits": [],
+      "tests": [],
+      "evidence": [],
+      "artifact_hashes": {},
+      "blocker": null,
+      "next_action": "Evaluate pinned cadcraft 0.5.0 release archive, ABI, notices and native package"
+    },
+    {
+      "id": "CRAFT-CAD-GUI-CLI",
+      "objective": "Verify packaged cadcraft GUI/CLI and file fidelity",
+      "repository": "packages",
+      "permitted_files": [
+        "docs/programs/craft-optional-apps/tasks/CRAFT-CAD-GUI-CLI.md"
+      ],
+      "dependencies": [
+        "CRAFT-CAD-PACKAGE"
+      ],
+      "acceptance": "Fresh optional install before OS update, offline GUI/CLI, upgrade/remove/reinstall, app-specific save/reopen fidelity, VM/Lenovo evidence",
+      "phase": 5,
+      "status": "queued",
+      "owner": null,
+      "session": null,
+      "worker": null,
+      "actual_model": null,
+      "attempt": 0,
+      "last_checkpoint": null,
+      "base_revision": null,
+      "branch": null,
+      "worktree": null,
+      "implementation_commits": [],
+      "integration_commits": [],
+      "tests": [],
+      "evidence": [],
+      "artifact_hashes": {},
+      "blocker": null,
+      "next_action": "Verify packaged cadcraft GUI/CLI and file fidelity"
+    },
+    {
+      "id": "CRAFT-CAD-CONFINEMENT",
+      "objective": "Verify cadcraft project isolation",
+      "repository": "connect",
+      "permitted_files": [
+        "packages/bridge/src/craft-cadcraft.ts",
+        "packages/bridge/test/craft-cadcraft.test.ts"
+      ],
+      "dependencies": [
+        "CRAFT-CAD-PACKAGE",
+        "CRAFT-CORE-REVIEW"
+      ],
+      "acceptance": "Authorized reads/exports and all negative isolation/lifecycle tests on exact installed package",
+      "phase": 5,
+      "status": "queued",
+      "owner": null,
+      "session": null,
+      "worker": null,
+      "actual_model": null,
+      "attempt": 0,
+      "last_checkpoint": null,
+      "base_revision": null,
+      "branch": null,
+      "worktree": null,
+      "implementation_commits": [],
+      "integration_commits": [],
+      "tests": [],
+      "evidence": [],
+      "artifact_hashes": {},
+      "blocker": null,
+      "next_action": "Verify cadcraft project isolation"
+    },
+    {
+      "id": "CRAFT-CAD-MCP",
+      "objective": "Verify cadcraft saved-artifact workflows in selected agents",
+      "repository": "connect",
+      "permitted_files": [
+        "docs/programs/craft-optional-apps/tasks/CRAFT-CAD-MCP.md"
+      ],
+      "dependencies": [
+        "CRAFT-CAD-GUI-CLI",
+        "CRAFT-CAD-CONFINEMENT"
+      ],
+      "acceptance": "Real packaged handshake and checked output/content in Codex, Claude Code, Hermes; other adapters configuration tests",
+      "phase": 5,
+      "status": "queued",
+      "owner": null,
+      "session": null,
+      "worker": null,
+      "actual_model": null,
+      "attempt": 0,
+      "last_checkpoint": null,
+      "base_revision": null,
+      "branch": null,
+      "worktree": null,
+      "implementation_commits": [],
+      "integration_commits": [],
+      "tests": [],
+      "evidence": [],
+      "artifact_hashes": {},
+      "blocker": null,
+      "next_action": "Verify cadcraft saved-artifact workflows in selected agents"
+    },
+    {
+      "id": "CRAFT-CAD-VOICE",
+      "objective": "Verify actual Voice to Codex to confined cadcraft saved output",
+      "repository": "runtime",
+      "permitted_files": [
+        "docs/programs/craft-optional-apps/tasks/CRAFT-CAD-VOICE.md"
+      ],
+      "dependencies": [
+        "CRAFT-CAD-MCP",
+        "CRAFT-HUB-REVIEW"
+      ],
+      "acceptance": "Observed speech/intent/route, cancellation, denied-action recovery, audible completion only after artifact checks",
+      "phase": 5,
+      "status": "queued",
+      "owner": null,
+      "session": null,
+      "worker": null,
+      "actual_model": null,
+      "attempt": 0,
+      "last_checkpoint": null,
+      "base_revision": null,
+      "branch": null,
+      "worktree": null,
+      "implementation_commits": [],
+      "integration_commits": [],
+      "tests": [],
+      "evidence": [],
+      "artifact_hashes": {},
+      "blocker": null,
+      "next_action": "Verify actual Voice to Codex to confined cadcraft saved output"
+    },
+    {
+      "id": "CRAFT-CAD-DISPOSITION",
+      "objective": "Record final cadcraft candidate or evidenced deferral/exclusion",
+      "repository": "runtime",
+      "permitted_files": [
+        "docs/programs/craft-optional-apps/apps/cadcraft.md",
+        "docs/programs/craft-optional-apps/tasks/CRAFT-CAD-DISPOSITION.md"
+      ],
+      "dependencies": [
+        "CRAFT-CAD-VOICE"
+      ],
+      "acceptance": "Candidate passes every gate; otherwise concrete evidence and reconsideration condition; coordinator may record deferral with blocked predecessor evidence",
+      "phase": 5,
+      "status": "queued",
+      "owner": null,
+      "session": null,
+      "worker": null,
+      "actual_model": null,
+      "attempt": 0,
+      "last_checkpoint": null,
+      "base_revision": null,
+      "branch": null,
+      "worktree": null,
+      "implementation_commits": [],
+      "integration_commits": [],
+      "tests": [],
+      "evidence": [],
+      "artifact_hashes": {},
+      "blocker": null,
+      "next_action": "Record final cadcraft candidate or evidenced deferral/exclusion"
+    },
+    {
+      "id": "CRAFT-SOUND-PACKAGE",
+      "objective": "Evaluate pinned soundcraft 0.5.0 release archive, ABI, notices and native package",
+      "repository": "packages",
+      "permitted_files": [
+        "pkgbuilds/soundcraft/**"
+      ],
+      "dependencies": [
+        "CRAFT-CAD-DISPOSITION"
+      ],
+      "acceptance": "Reviewed archive hash/source tag, clean build/contents/deps/ownership; same-tag locked fallback or evidenced deferral",
+      "phase": 5,
+      "status": "queued",
+      "owner": null,
+      "session": null,
+      "worker": null,
+      "actual_model": null,
+      "attempt": 0,
+      "last_checkpoint": null,
+      "base_revision": null,
+      "branch": null,
+      "worktree": null,
+      "implementation_commits": [],
+      "integration_commits": [],
+      "tests": [],
+      "evidence": [],
+      "artifact_hashes": {},
+      "blocker": null,
+      "next_action": "Evaluate pinned soundcraft 0.5.0 release archive, ABI, notices and native package"
+    },
+    {
+      "id": "CRAFT-SOUND-GUI-CLI",
+      "objective": "Verify packaged soundcraft GUI/CLI and file fidelity",
+      "repository": "packages",
+      "permitted_files": [
+        "docs/programs/craft-optional-apps/tasks/CRAFT-SOUND-GUI-CLI.md"
+      ],
+      "dependencies": [
+        "CRAFT-SOUND-PACKAGE"
+      ],
+      "acceptance": "Fresh optional install before OS update, offline GUI/CLI, upgrade/remove/reinstall, app-specific save/reopen fidelity, VM/Lenovo evidence",
+      "phase": 5,
+      "status": "queued",
+      "owner": null,
+      "session": null,
+      "worker": null,
+      "actual_model": null,
+      "attempt": 0,
+      "last_checkpoint": null,
+      "base_revision": null,
+      "branch": null,
+      "worktree": null,
+      "implementation_commits": [],
+      "integration_commits": [],
+      "tests": [],
+      "evidence": [],
+      "artifact_hashes": {},
+      "blocker": null,
+      "next_action": "Verify packaged soundcraft GUI/CLI and file fidelity"
+    },
+    {
+      "id": "CRAFT-SOUND-CONFINEMENT",
+      "objective": "Verify soundcraft project isolation",
+      "repository": "connect",
+      "permitted_files": [
+        "packages/bridge/src/craft-soundcraft.ts",
+        "packages/bridge/test/craft-soundcraft.test.ts"
+      ],
+      "dependencies": [
+        "CRAFT-SOUND-PACKAGE",
+        "CRAFT-CORE-REVIEW"
+      ],
+      "acceptance": "Authorized reads/exports and all negative isolation/lifecycle tests on exact installed package",
+      "phase": 5,
+      "status": "queued",
+      "owner": null,
+      "session": null,
+      "worker": null,
+      "actual_model": null,
+      "attempt": 0,
+      "last_checkpoint": null,
+      "base_revision": null,
+      "branch": null,
+      "worktree": null,
+      "implementation_commits": [],
+      "integration_commits": [],
+      "tests": [],
+      "evidence": [],
+      "artifact_hashes": {},
+      "blocker": null,
+      "next_action": "Verify soundcraft project isolation"
+    },
+    {
+      "id": "CRAFT-SOUND-MCP",
+      "objective": "Verify soundcraft saved-artifact workflows in selected agents",
+      "repository": "connect",
+      "permitted_files": [
+        "docs/programs/craft-optional-apps/tasks/CRAFT-SOUND-MCP.md"
+      ],
+      "dependencies": [
+        "CRAFT-SOUND-GUI-CLI",
+        "CRAFT-SOUND-CONFINEMENT"
+      ],
+      "acceptance": "Real packaged handshake and checked output/content in Codex, Claude Code, Hermes; other adapters configuration tests",
+      "phase": 5,
+      "status": "queued",
+      "owner": null,
+      "session": null,
+      "worker": null,
+      "actual_model": null,
+      "attempt": 0,
+      "last_checkpoint": null,
+      "base_revision": null,
+      "branch": null,
+      "worktree": null,
+      "implementation_commits": [],
+      "integration_commits": [],
+      "tests": [],
+      "evidence": [],
+      "artifact_hashes": {},
+      "blocker": null,
+      "next_action": "Verify soundcraft saved-artifact workflows in selected agents"
+    },
+    {
+      "id": "CRAFT-SOUND-VOICE",
+      "objective": "Verify actual Voice to Codex to confined soundcraft saved output",
+      "repository": "runtime",
+      "permitted_files": [
+        "docs/programs/craft-optional-apps/tasks/CRAFT-SOUND-VOICE.md"
+      ],
+      "dependencies": [
+        "CRAFT-SOUND-MCP",
+        "CRAFT-HUB-REVIEW"
+      ],
+      "acceptance": "Observed speech/intent/route, cancellation, denied-action recovery, audible completion only after artifact checks",
+      "phase": 5,
+      "status": "queued",
+      "owner": null,
+      "session": null,
+      "worker": null,
+      "actual_model": null,
+      "attempt": 0,
+      "last_checkpoint": null,
+      "base_revision": null,
+      "branch": null,
+      "worktree": null,
+      "implementation_commits": [],
+      "integration_commits": [],
+      "tests": [],
+      "evidence": [],
+      "artifact_hashes": {},
+      "blocker": null,
+      "next_action": "Verify actual Voice to Codex to confined soundcraft saved output"
+    },
+    {
+      "id": "CRAFT-SOUND-DISPOSITION",
+      "objective": "Record final soundcraft candidate or evidenced deferral/exclusion",
+      "repository": "runtime",
+      "permitted_files": [
+        "docs/programs/craft-optional-apps/apps/soundcraft.md",
+        "docs/programs/craft-optional-apps/tasks/CRAFT-SOUND-DISPOSITION.md"
+      ],
+      "dependencies": [
+        "CRAFT-SOUND-VOICE"
+      ],
+      "acceptance": "Candidate passes every gate; otherwise concrete evidence and reconsideration condition; coordinator may record deferral with blocked predecessor evidence",
+      "phase": 5,
+      "status": "queued",
+      "owner": null,
+      "session": null,
+      "worker": null,
+      "actual_model": null,
+      "attempt": 0,
+      "last_checkpoint": null,
+      "base_revision": null,
+      "branch": null,
+      "worktree": null,
+      "implementation_commits": [],
+      "integration_commits": [],
+      "tests": [],
+      "evidence": [],
+      "artifact_hashes": {},
+      "blocker": null,
+      "next_action": "Record final soundcraft candidate or evidenced deferral/exclusion"
+    },
+    {
+      "id": "CRAFT-P6-CONSOLIDATE",
+      "objective": "Assemble exact candidate manifest and operator release checklist",
+      "repository": "runtime",
+      "permitted_files": [
+        "docs/programs/craft-optional-apps/candidate.json",
+        "docs/programs/craft-optional-apps/release.md"
+      ],
+      "dependencies": [
+        "CRAFT-PDF-DISPOSITION",
+        "CRAFT-PHOTO-DISPOSITION",
+        "CRAFT-VECTOR-DISPOSITION",
+        "CRAFT-WORD-DISPOSITION",
+        "CRAFT-GRID-DISPOSITION",
+        "CRAFT-DECK-DISPOSITION",
+        "CRAFT-LIGHT-DISPOSITION",
+        "CRAFT-EFFECT-DISPOSITION",
+        "CRAFT-FILM-DISPOSITION",
+        "CRAFT-DESIGN-DISPOSITION",
+        "CRAFT-CAD-DISPOSITION",
+        "CRAFT-SOUND-DISPOSITION"
+      ],
+      "acceptance": "All 12 evaluated; candidate hashes/revisions/capabilities traceable; no unsupported claims",
+      "phase": 6,
+      "status": "queued",
+      "owner": null,
+      "session": null,
+      "worker": null,
+      "actual_model": null,
+      "attempt": 0,
+      "last_checkpoint": null,
+      "base_revision": null,
+      "branch": null,
+      "worktree": null,
+      "implementation_commits": [],
+      "integration_commits": [],
+      "tests": [],
+      "evidence": [],
+      "artifact_hashes": {},
+      "blocker": null,
+      "next_action": "Assemble exact candidate manifest and operator release checklist"
+    },
+    {
+      "id": "CRAFT-P6-REVIEW",
+      "objective": "Independently review final candidate scope/evidence",
+      "repository": "runtime",
+      "permitted_files": [
+        "docs/programs/craft-optional-apps/tasks/CRAFT-P6-REVIEW.md"
+      ],
+      "dependencies": [
+        "CRAFT-P6-CONSOLIDATE"
+      ],
+      "acceptance": "Independent final security/evidence review and findings resolved",
+      "phase": 6,
+      "status": "queued",
+      "owner": null,
+      "session": null,
+      "worker": null,
+      "actual_model": null,
+      "attempt": 0,
+      "last_checkpoint": null,
+      "base_revision": null,
+      "branch": null,
+      "worktree": null,
+      "implementation_commits": [],
+      "integration_commits": [],
+      "tests": [],
+      "evidence": [],
+      "artifact_hashes": {},
+      "blocker": null,
+      "next_action": "Independently review final candidate scope/evidence"
+    },
+    {
+      "id": "CRAFT-P6-ISO",
+      "objective": "Run exact-revision ISO/fresh-VM acceptance",
+      "repository": "iso",
+      "permitted_files": [
+        "docs/programs/craft-optional-apps/tasks/CRAFT-P6-ISO.md"
+      ],
+      "dependencies": [
+        "CRAFT-P6-REVIEW"
+      ],
+      "acceptance": "Owning required focused checks, overlap check, exact local-source ISO and fresh VM before OS update; Lenovo gates recorded",
+      "phase": 6,
+      "status": "queued",
+      "owner": null,
+      "session": null,
+      "worker": null,
+      "actual_model": null,
+      "attempt": 0,
+      "last_checkpoint": null,
+      "base_revision": null,
+      "branch": null,
+      "worktree": null,
+      "implementation_commits": [],
+      "integration_commits": [],
+      "tests": [],
+      "evidence": [],
+      "artifact_hashes": {},
+      "blocker": null,
+      "next_action": "Run exact-revision ISO/fresh-VM acceptance"
+    },
+    {
+      "id": "CRAFT-P6-RELEASE",
+      "objective": "Finalize verified experimental candidate and release instructions",
+      "repository": "runtime",
+      "permitted_files": [
+        "docs/programs/craft-optional-apps/**"
+      ],
+      "dependencies": [
+        "CRAFT-P6-ISO"
+      ],
+      "acceptance": "All candidate gates pass; signing/publication/product merges/promotion remain operator steps",
+      "phase": 6,
+      "status": "queued",
+      "owner": null,
+      "session": null,
+      "worker": null,
+      "actual_model": null,
+      "attempt": 0,
+      "last_checkpoint": null,
+      "base_revision": null,
+      "branch": null,
+      "worktree": null,
+      "implementation_commits": [],
+      "integration_commits": [],
+      "tests": [],
+      "evidence": [],
+      "artifact_hashes": {},
+      "blocker": null,
+      "next_action": "Finalize verified experimental candidate and release instructions"
+    },
+    {
+      "id": "CRAFT-CORE-BOUNDARY-REPAIR",
+      "objective": "Review concrete nproc startup and writable hardlink failures and define coherent repair",
+      "repository": "runtime",
+      "permitted_files": [
+        "docs/programs/craft-optional-apps/tasks/CRAFT-CORE-BOUNDARY-REPAIR.md"
+      ],
+      "dependencies": [
+        "CRAFT-P0-GATE"
+      ],
+      "acceptance": "Independent security analysis of reproduced failures; recommended minimal repair and testable trust-boundary limits; no changed implementation",
+      "phase": 1,
+      "status": "integrated",
+      "owner": "security-review",
+      "session": "2026-10-11-craft-root",
+      "worker": "/root/boundary_repair",
+      "actual_model": "gpt-6-astra",
+      "attempt": 1,
+      "last_checkpoint": "2026-10-11T12:32:06.278707+00:00",
+      "base_revision": "21fdf8a",
+      "branch": null,
+      "worktree": "/home/maslow/Projects/Maslow/craft-connect",
+      "implementation_commits": [],
+      "integration_commits": [],
+      "tests": [
+        {
+          "check": "independent controlled resource/private-state/post-pinning alias reproductions, design review, git diff --check",
+          "result": "pass"
+        }
+      ],
+      "evidence": [
+        "docs/programs/craft-optional-apps/tasks/CRAFT-CORE-BOUNDARY-REPAIR.md"
+      ],
+      "artifact_hashes": {},
+      "blocker": null,
+      "next_action": "Implement approved bounded scratch/publication repair; review repaired source independently"
+    },
+    {
+      "id": "CRAFT-CORE-REPAIR-REVIEW",
+      "objective": "Independently review frozen copied-storage, project-file, MCP relay and atomic-publication repair",
+      "repository": "runtime",
+      "permitted_files": [
+        "docs/programs/craft-optional-apps/tasks/CRAFT-CORE-REPAIR-REVIEW.md"
+      ],
+      "dependencies": [
+        "CRAFT-CORE-BOUNDARY-REPAIR"
+      ],
+      "acceptance": "Review exact repair revision; reproduce significant boundary defects or explain tested limits; findings resolved before source/package acceptance",
+      "phase": 1,
+      "status": "active",
+      "owner": "security-review",
+      "session": "2026-10-11-craft-root",
+      "worker": "/root/repair_code_review",
+      "actual_model": "gpt-6.1-sol",
+      "attempt": 2,
+      "last_checkpoint": "2026-10-11T13:33:46.991671+00:00",
+      "base_revision": "eb7012f338b3e7c3d8e29df27a33a363298c3426",
+      "branch": null,
+      "worktree": "/home/maslow/Projects/Maslow/craft-review",
+      "implementation_commits": [],
+      "integration_commits": [],
+      "tests": [],
+      "evidence": [
+        "docs/programs/craft-optional-apps/tasks/CRAFT-CORE-REPAIR-REVIEW.md"
+      ],
+      "artifact_hashes": {},
+      "blocker": null,
+      "next_action": "Independent high-reasoning Sol defensive source review fallback; bounded parser/publication/lifecycle correctness checks only",
+      "attempt_history": [
+        {
+          "attempt": 1,
+          "actual_model": "gpt-6-astra",
+          "worker": "/root/boundary_repair",
+          "outcome": "Interrupted by platform cybersecurity-content restriction; no completed review acceptance",
+          "revision": "eb7012f338b3e7c3d8e29df27a33a363298c3426"
+        }
+      ]
+    }
+  ]
+}

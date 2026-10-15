@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "status": "headers-only-not-verified-media-or-guest",
+  "iso": "/home/maslow/Maslow-ai-os/free-ai-build/guest-baseline-prep/snapshots/iso/release/hub-build.m4G5KIGT/maslow-os-2026.10.12-x86_64-local.iso",
+  "isoSha256Rechecked": "c6674db434e0a5992399091c5af16bd8e79f7a60fefc298784d311de0b247d8d",
+  "run": "/home/maslow/Maslow-ai-os/free-ai-build/guest-baseline-prep/media-evidence/9050eb7f60f94810a048dd58188854fd",
+  "headersLogSha256": "d770c57b1bf1a89ae3f2e6d4fb9bc7d9fb9f937908f2354f39e3cd81129a6183",
+  "stateSha256": "14a251613e2e4a88fb26964040e5e90245ae2a78d5c66ecfecacb6bc2dfc4faf",
+  "toolOrigin": "Existing read-only inspector files from craft-build/pilot-media/inspection-tools; all five file/library hashes matched the retained receipt before execution. No host tools installed.",
+  "toolVersionsObserved": {"xorriso": "1.5.8.pl02, exit0", "unsquashfs": "4.7.5 version output, exit1; no media work in version probe"},
+  "observed": {"volumeId": "MASLOW_OS_202610", "bootRecord": "El Torito, MBR isohybrid, GPT", "biosBootImage": "/boot/syslinux/isolinux.bin", "uefiBootImage": "Bootable UEFI entry, LBA3229065, load49152 sectors; appended EFI partition"},
+  "launchGroupRetired": true,
+  "inspectionExit": 0,
+  "limits": {"cpuAffinity": [0, 1], "addressSpaceGiB": 4, "nice": 10, "sharedHeavyWorkLock": true},
+  "mediaFactsStillRequired": ["shipped installer API bytes", "target rootfs/package versions and glibc/Qt compatibility", "exact local artifact identities", "optional packages absent", "test trust absent"],
+  "sourceRecipeClarification": "Hub recipe pkgver() reads selected release/version.json; initial0.1.0 is a placeholder. Actual media PKGINFO still required; no mismatch inferred from placeholder.",
+  "newIsoBuildOrRepair": false,
+  "verifiedMediaReceiptCreated": false,
+  "vmStarted": false,
+  "guestVerified": false,
+  "previewComplete": false,
+  "nextAction": "Continue targeted read-only inspection of this existing candidate when the shared slot is admitted; do not infer installed compatibility or start a new ISO cycle. Recovery source retake remains the delivery priority."
+}

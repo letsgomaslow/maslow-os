@@ -1,0 +1,25 @@
+{
+  "schema": 1,
+  "scope": "Read-only host inventory, not installed feature or performance acceptance",
+  "architecture": "x86_64",
+  "cpu": "Intel Core i7-10610U, 8 logical CPUs",
+  "memoryMiBAtRead": {"total": 15611, "available": 8829},
+  "installedPackages": {
+    "glibc": "2.44+r50+g1848099f063e-1",
+    "gcc-libs": "16.2.1+r23+gd564253eb6c8-1",
+    "python": "3.14.8-1",
+    "qt6-base": "6.12.0-2",
+    "quickshell": "0.3.2-1",
+    "nodejs": "26.11.1-1",
+    "maslow-hub": "0.3.6-1",
+    "maslow-voice": "0.1.5-37"
+  },
+  "maslowConnect": "pacman reported package not found; no native candidate is installed",
+  "sourceCandidatesInstalled": false,
+  "systemNodeChanged": false,
+  "settingsChanged": false,
+  "functionalOrAudioVerification": false,
+  "coldStartupOrMemoryBenchmark": false,
+  "olderHardwareSupportClaim": false,
+  "nextAction": "Use native accepted package candidates through matched Hub delivery after recovery wiring and required clean installed tests; developer Connect launcher cannot satisfy account acceptance."
+}

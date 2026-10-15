@@ -1,0 +1,53 @@
+{
+  "schema": 1,
+  "status": "protected-readonly-check-passed-native-hub-manual-command-ready",
+  "quiescence": {
+    "prior": "Voice37 disabled/not speaking, preview idle; complete SQLite task history contained cancelled1/completed2/failed1 and zero active tasks. Private Voice tmux socket absent.",
+    "stopAttempt": "Ordinary systemctl user stop was canceled and the service restarted with a new PID; old PID exited. Do not claim stopped from the first command.",
+    "runtimeMask": "/run/user/1000/systemd/user/maslow-voice.service",
+    "receipt": "/home/maslow/Maslow-ai-os/free-ai-build/hub-bundle-prep/lenovo-runtime-voice-quiescence.json",
+    "verified": "No preexisting runtime mask; supported systemctl mask --runtime --now completed. Exact new /dev/null symlink identity recorded. Voice inactive/dead with MainPID/ControlPID0 and absent cgroup, zero active tasks. Independent Hermes PID1025 remains alive.",
+    "cleanup": "Remove only the exact owned runtime mask after verified terminal outcome/recovery. Never manually remove the fixed installer persistent barrier or restore stale grants. No persistent service disable was made."
+  },
+  "backupAttempt": {
+    "scriptReviewedSha256": "6a347cfcef4b45b430a600a58814e892497c3e3ee76c05fd776aa3464cb9d417",
+    "result": "Exit1 VOICE37_BACKUP_REFUSED during snapshot verification; no package or original task-row mutation. Partial private backup retained and not admitted.",
+    "coordinationError": "Root began before worker froze its script; worker concurrent edits occurred. Do not infer which revision executed from the traceback. Require exact frozen bytes before a diagnosed retry.",
+    "diagnosis": "Worker reconstructed original bytes matching SHA6a347cf; exact failed predicate was main/WAL/SHM source fingerprint continuity. Partial snapshot is integrity-ok/version1 with the exact terminal state counts. SQLite context managers did not close connections; journal metadata changed during verification. Partial is not accepted as complete preservation.",
+    "next": "Freeze/review corrected explicit-close source and allow only legitimate SHM locking metadata handling; preserve strict main/WAL and data checks, then one diagnosed revised attempt."
+  },
+  "hubUserBackup": {
+    "result": "/home/maslow/Maslow-ai-os/free-ai-build/hub-bundle-prep/native-preview-prep/root-hub-user-backup.json",
+    "directory": "/home/maslow/.cache/maslow-hub/state-backups/20261012T223022Z-1725575",
+    "verified": "Existing installed Updater._backup_state under its own user update lock copied seven immediate files; all copied hashes equal pre-write originals, private directory700, lastStateBackup reference persisted and transaction remains null. User Hub config directory absent. No credential export."
+  },
+  "verifiedVoiceBackup": {
+    "directory": "/home/maslow/.local/state/maslow-hub/preinstall-preservation/20261012T223233Z-2571a5cb0555aba7",
+    "databaseSha256": "739272ae93c784d430db2950cb76c76bb6f6e46d4d3d3860caf79da545c18019",
+    "scriptSha256": "e93313ce606a279e6ead4c3b88950636c39deba0c9345301fd17127d54d2511d",
+    "verification": "Diagnosed retry closes connections and explicitly settles only the new destination to DELETE journaling. Root independently verified all4task/342event/1sequence rows equal the source, both integrity checks, saved DB hash, exact settings/workspace hashes,600 files and no destination sidecars. Successful complete receipt; both prior failed runs retained.",
+    "rootResultSha256": "78e2628dcebe394347e93efe5be06695b711f8ebbdaa2102acb1bb203acbdfe4"
+  },
+  "keyReferences": "Read-only Secret Service SearchItems/ReadAlias/Locked metadata:4 existingVoice references,0FreeAI items,default collection available/unlocked. Only reference hashes/counts saved privately; no credential values read/exported. Reference stability is not value stability or keyring storage-roundtrip proof.",
+  "untouchedPaths": "Private identity-only baseline for Voice notes,managed project directory and existingConnect state;336 entries,relative names hashed,no contents read. Not a backup/content-proof and no destructive authority against them.",
+  "rootPreflight": "User ran manual read-only command2; Root verified saved exit0/readOnlytrue, explicit Root transactionnull, private floor9/hash eefe4e25..., securitySHA63ceb5b9d5a83ef5117335701ec8a68ec4da231af59c4b6f0d56cf84344658e0 and no ALPM lock. Existing install lock absent; no lock acquired, snapshot limitation explicit. No package/replay mutation. Prior authentication timeouts retained; final installed-lock guard still rechecks at apply time.",
+  "pipeline": {
+    "script": "/home/maslow/Maslow-ai-os/free-ai-build/hub-bundle-prep/native-preview-prep/run-native-hub-install.py",
+    "sha256": "cf74ee77e858002b0f66e9b386927345a7743eabda2c29ca980b1311eacf6395",
+    "guardSha256": "280559154dfb7c16615b16c513fd65a036e4a3c82d44c52d1c8b6c47064641d8",
+    "independentRetakeSha256": "68206730d9c577f3f6a8c495801791de428f31022840687651670a7ba0a02c23",
+    "resolved": "Initial review caught preflight-to-apply race and unpinned mask record. Accepted retake pins/rechecks exact runtime mask and uses a one-off guard around installed Installer.execute/apply: strict protected transaction-null/floor check occurs inside actual owning install lock immediately before unchanged apply logic. No installed helper or package source modified.",
+    "execution": "Root opened exact SHA-checked isolated pipeline through existing native terminal launcher,CPU1/nice10; owns heavy/user update locks. User normal local administrator participation requested. Actual completed-step status,Root provenance and installed files must be inspected; terminal launch is not installation success.",
+    "outputs": "/home/maslow/Maslow-ai-os/free-ai-build/hub-bundle-prep/native-preview-prep/native-install-1",
+    "manualRetry": {
+      "script": "/home/maslow/Maslow-ai-os/free-ai-build/hub-bundle-prep/native-preview-prep/run-native-hub-install-2.py",
+      "sha256": "88a51bec11c245dd55fbb88c5bed015b700997ec15b1dd0d8a7bdbbcd7673f27",
+      "outputs": "/home/maslow/Maslow-ai-os/free-ai-build/hub-bundle-prep/native-preview-prep/native-install-2",
+      "verification": "Inverse byte comparison equals accepted cf74 pipeline exactly; sole delta is fresh output directory. Syntax passed, not executed. First native-install-1 stopped at preflight exit1/emptylog and never reached copy/apply; preserved. User runs manual command when present to avoid another expired auto-opened prompt."
+    },
+    "scope": "Protected readonly preflight, exact previousVoice37 cache copy, then normal installed Hub package API. Hub only; no FreeAI/Voice41/Connect upgrade,publication or replay reset."
+  },
+  "userChoice": "Proceed with local laptop preview and temporary Hub update pause; final two signatures independently verified. No publication or replay reset.",
+  "installed": false,
+  "previewComplete": false
+}

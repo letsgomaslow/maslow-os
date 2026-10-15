@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-11",
+  "candidate_ready": false,
+  "hub_revision": "7e14cbaf091e847db07b2726694f27fe5e7d1837",
+  "evidence": {
+    "path": "/home/maslow/Projects/Maslow/free-ai-hub/docs/evidence/2026-10-11-free-ai-recovery-stage1.json",
+    "sha256": "308c80b5a12434aa27c9c0317222272409af50647c9c15b49e15f6ec963d0f73"
+  },
+  "worker_checks": "212 full Hub +59 focused +22 namespace scenarios +UI checks pass",
+  "coordinator_review": {
+    "source": "Reviewed bound receipts, original-nonce validation, strict phase/ticket parsing, inode reservation/publication, recorded helper GO handshake and irreversible completion ordering. All10 report source hashes matched committed bytes.",
+    "independent_tests": "13 new contract tests passed in1.452s; unit ownership/read adapters patched, actual namespace identity/pacman proof remains separately scoped.",
+    "unresolved_in_stage1_scope": []
+  },
+  "runtime_integration_fix": {
+    "revision": "61b13cc175427abce79555dcc0e41e3d5999297f",
+    "report": "docs/programs/free-cloud-ai/evidence/2026-10-11-pending-status-review.json",
+    "check": "39 backend tests independently passed; avoids empty-state creation from Hub/CLI polling during pending fresh delivery."
+  },
+  "next_contract": {
+    "capsule": "Only exact supported previous artifact, pinned five Python modules plus private Node; no target fallback or general migrations in preview.",
+    "recovery": "Root-protected attempt, fresh recovery-only nonce, stopped canonical service, quiescent tasks, normal ALPM guards, exact retained packages, no-restore commitment before cleanup.",
+    "fresh_undo": "Separate exact -R optional backend/-U previous Voice stages; no recursive/dependency/signature/overwrite bypass.",
+    "unsupported": "Historical FreeAI1, unknown/mid-extraction bytes/ownership, invalid binding/key and package-absent preserved state remain blockers, never fresh or inferred recovery."
+  },
+  "remaining": [
+    "Current-operation package/database/key restore and fresh undo are being implemented; source gate remains false.",
+    "Exact rebuilt/signed/native bundles, managed Connect package/account binding/live revocation, guest/Lenovo/audio/resources and independent integrated acceptance."
+  ],
+  "next_action": "Review the guarded Hub recovery source/components after freeze, then prove exact native package/database/key restoration and fresh undo before enabling delivery."
+}

@@ -1,6 +1,7 @@
 """Idempotent task handoff and recovery independent of the microphone lifecycle."""
 
 import asyncio
+import os
 from pathlib import Path
 
 from .errors import VoiceError
@@ -8,6 +9,11 @@ from .hermes import normalized_status
 from .store import TERMINAL
 
 DEAD_COORDINATOR_ERRORS = {"OFFLINE_UNAVAILABLE", "OFFLINE_HERMES_EXITED"}
+
+
+def _same_execution(task, owner):
+    return task.get("attempt", 0) == owner.get("attempt", 0) and all(
+        task.get(key) == owner.get(key) for key in ("run_id", "session_id", "connect_session"))
 
 
 def _capabilities(agent, mode=None):
@@ -54,7 +60,12 @@ class TaskManager:
         self.project_locks = {}
         self.clients = {}
         self.closed = False
+        self.admission = None
         self.agent_selector = None
+        self.assistant_factory = None
+        self.assistant_admission = None
+        self.account_bridge = None
+        self.assistant_reservations = set()
 
     def _active_codex_task(self, task_id):
         return next((other for other in self.store.active()
@@ -70,6 +81,8 @@ class TaskManager:
         path = Path(project).expanduser()
         if not project or not path.is_absolute() or not path.is_dir():
             raise VoiceError("PROJECT_REQUIRED", "Choose an existing project folder before delegating work.")
+        if self.admission:
+            self.admission()
         task, created = self.store.create(request_id, brief, str(path.resolve()), mode, source)
         if not created:
             return task
@@ -134,6 +147,62 @@ class TaskManager:
         await self.publish()
         return task
 
+    async def submit_assistant(self, request_id, text, project, capabilities, *, mode="typed", brief=None, policy="lab_auto"):
+        from .assistant import POLICY_REVISION, grant_workspace, relative_document
+        text_field(text, "original request", 24000, True)
+        if policy not in {"lab_auto", "review"}:
+            raise VoiceError("INVALID_SETTINGS", "Choose a supported task policy.")
+        if not isinstance(capabilities, dict) or set(capabilities) - {"documents", "note", "accounts", "send_to_groq_confirmed"}:
+            raise VoiceError("INVALID_CAPABILITIES", "Choose the files and accounts for this request.")
+        documents = capabilities.get("documents", [])
+        if not isinstance(documents, list) or len(documents) > 32:
+            raise VoiceError("INVALID_CAPABILITIES", "Select at most 32 text documents.")
+        requested = {"documents": sorted(relative_document(name) for name in documents),
+                     "note": relative_document(capabilities["note"], note=True) if capabilities.get("note") is not None else None,
+                     "accounts": capabilities.get("accounts", [])}
+        if len(set(requested["documents"])) != len(documents) or not isinstance(requested["accounts"], list):
+            raise VoiceError("INVALID_CAPABILITIES", "Choose each permitted document only once.")
+        from .assistant_accounts import account_ids
+        requested["accounts"] = account_ids(requested["accounts"])
+        if requested["accounts"]:
+            requested["send_to_groq_confirmed"] = capabilities.get("send_to_groq_confirmed") is True
+        elif "send_to_groq_confirmed" in capabilities:
+            raise VoiceError("INVALID_CAPABILITIES", "Account consent belongs to an explicitly selected account.")
+        if not isinstance(project, str) or not project or "\x00" in project:
+            raise VoiceError("PROJECT_REQUIRED", "Choose an existing workspace folder.")
+        if not Path(os.path.expanduser(project)).is_absolute():
+            raise VoiceError("PROJECT_REQUIRED", "Choose an existing workspace using its full folder path.")
+        project = os.path.abspath(os.path.expanduser(project))
+        brief = validate_brief(brief or {"objective": text.strip()[:1000], "summary": text.strip(), "tool_preference": "hermes"})
+        old = self.store.by_request(request_id)
+        if old:
+            if (old.get("execution_connection"), old.get("policy_revision"), old.get("requested_capabilities"), old["source"], old["project"], old["mode"], old.get("task_policy")) != (
+                    "free-cloud", POLICY_REVISION, requested, text, project, mode, policy):
+                raise VoiceError("REQUEST_CONFLICT", "This request identity already has different instructions or permissions.")
+            return old
+        if self.assistant_reservations or any(task.get("execution_connection") == "free-cloud" for task in self.store.active()):
+            raise VoiceError("ASSISTANT_TASK_ACTIVE", "Finish or stop the active assistant request first.")
+        if self.admission:
+            self.admission()
+        if self.assistant_admission:
+            self.assistant_admission()
+        if requested["accounts"]:
+            if not self.account_bridge or not self.account_bridge.available():
+                raise VoiceError("MANAGED_ACCOUNTS_UNAVAILABLE", "Scoped account access needs the accepted Connect package. No account was accessed.")
+            if not requested["send_to_groq_confirmed"]:
+                raise VoiceError("ACCOUNT_PRIVACY_CONFIRMATION_REQUIRED", "Confirm that information from the selected account may be sent to Groq.")
+        project, granted = grant_workspace(project, {k:v for k,v in requested.items() if k != "send_to_groq_confirmed"}, accounts_verified=bool(requested["accounts"]))
+        contract = {"execution_connection": "free-cloud", "policy_revision": POLICY_REVISION,
+                    "granted_capabilities": granted, "requested_capabilities": requested}
+        task, _ = self.store.create(request_id, brief, project, mode, text, execution_contract=contract)
+        task = self.store.update(task["id"], state="proposed" if policy == "review" else "queued", task_policy=policy,
+            selected_agent="hermes", preferred_coder="hermes", owner="Maslow", routing_reason="Free cloud AI is selected for this everyday request.",
+            capabilities={"steer": False, "continue": True})
+        if policy == "lab_auto":
+            self._start(task)
+        await self.publish()
+        return task
+
     def _start(self, task):
         current = self.monitors.get(task["id"])
         if current and not current.done():
@@ -151,6 +220,8 @@ class TaskManager:
                 current.add_done_callback(restart)
             return
         if current is None or current.done():
+            if task.get("execution_connection") == "free-cloud":
+                self.assistant_reservations.add(task["id"])
             worker = asyncio.create_task(self._run(task["id"]))
             self.monitors[task["id"]] = worker
             def finished(done, identity=task["id"]):
@@ -161,6 +232,10 @@ class TaskManager:
     async def recover(self):
         for task in self.store.active():
             if task["state"] == "proposed":
+                continue
+            if task.get("execution_connection") == "free-cloud":
+                self.store.update(task["id"], state="interrupted", error={"code": "ASSISTANT_RESTARTED",
+                    "message": "The assistant service restarted. Review any saved note before continuing; no request was replayed."})
                 continue
             if task.get("selected_agent") in {"codex", "claude"}:
                 error = {"code": "DIRECT_RUN_LOST",
@@ -182,14 +257,34 @@ class TaskManager:
 
     async def _run(self, task_id):
         task = self.store.get(task_id)
+        owned_task = task
         lock = self.project_locks.setdefault(task["project"], asyncio.Lock())
         stream, client = None, None
+        cancel_after_release = False
         try:
             async with lock:
                 task = self.store.get(task_id)
+                owned_task = task
                 if task["state"] in TERMINAL | {"proposed"}:
                     return
-                client = await self.client_factory(task)
+                if self.admission:
+                    self.admission()
+                if task.get("execution_connection") == "free-cloud":
+                    if self.assistant_admission:
+                        self.assistant_admission()
+                    if not self.assistant_factory:
+                        raise VoiceError("FREE_AI_SETUP_REQUIRED", "The managed assistant is unavailable. No other agent was used.")
+                    if task["granted_capabilities"].get("accounts"):
+                        if not self.account_bridge:
+                            raise VoiceError("MANAGED_ACCOUNTS_UNAVAILABLE", "The accepted managed account bridge is unavailable.")
+                        task = await self.account_bridge.ensure(task, self.store)
+                        owned_task = task
+                        task = self.store.get(task_id)
+                        if task["state"] in TERMINAL | {"stopping"}:
+                            return
+                    client = await self.assistant_factory(task)
+                else:
+                    client = await self.client_factory(task)
                 self.clients[task_id] = client
                 task = self.store.get(task_id)
                 if task["state"] in TERMINAL or (task["state"] == "stopping" and not task.get("run_id")):
@@ -200,6 +295,7 @@ class TaskManager:
                     response = await client.submit(task)
                     stopped = self.store.get(task_id)["state"] == "stopping"
                     task = self.store.update(task_id, state="stopping" if stopped else "accepted", run_id=response["run_id"], session_id=task.get("session_id") or task_id)
+                    owned_task = task
                     if stopped:
                         await client.stop(task["run_id"])
                     await self.publish()
@@ -218,6 +314,13 @@ class TaskManager:
                         if not update.get("session_id"):
                             update.pop("session_id", None)
                         previous = self.store.get(task_id)
+                        if task.get("execution_connection") == "free-cloud" and update["state"] == "completed":
+                            from .assistant import WorkspaceTools
+                            try:
+                                WorkspaceTools(self.store).verify_requested_note(previous)
+                            except VoiceError:
+                                self.store.update(task_id, event="unverified_assistant_result", result=update["result"])
+                                raise
                         if (previous.get("approval") or {}).get("owner") == "child" and update["state"] not in TERMINAL:
                             update["approval"] = previous["approval"]
                             update["state"] = "awaiting_approval"
@@ -230,6 +333,10 @@ class TaskManager:
                             return
                         delay = 1
                     except VoiceError as exc:
+                        if task.get("execution_connection") == "free-cloud" and exc.code == "FREE_AI_QUOTA_PAUSED":
+                            raise
+                        if task.get("execution_connection") == "free-cloud" and exc.code in {"NOTE_NOT_CREATED", "NOTE_CHANGED", "WORKSPACE_CHANGED", "UNSAFE_DOCUMENT", "INVALID_DOCUMENT", "DOCUMENT_TOO_LARGE", "UNSAFE_WORKSPACE"}:
+                            raise
                         if exc.code == "NOT_FOUND":
                             if self.children:
                                 await self.children.cancel(task_id)
@@ -250,10 +357,21 @@ class TaskManager:
             if exc.code in DEAD_COORDINATOR_ERRORS:
                 await self._interrupt_dead_coordinator(task_id, client)
                 return
-            if self.children:
+            quota_pause = task.get("execution_connection") == "free-cloud" and exc.code == "FREE_AI_QUOTA_PAUSED"
+            if self.children and not quota_pause:
                 await self.children.cancel(task_id)
             task = self.store.get(task_id)
-            state = "interrupted" if task["state"] == "submitting" or task.get("run_id") else "failed"
+            if quota_pause:
+                if not _same_execution(task, owned_task):
+                    return
+                if task["state"] in TERMINAL:
+                    return
+                if task["state"] == "stopping":
+                    # Stop may have completed while the status request was in
+                    # flight. Finish that intent only after owned cleanup.
+                    cancel_after_release = True
+                    return
+            state = "waiting_input" if task.get("execution_connection") == "free-cloud" and exc.code == "FREE_AI_QUOTA_PAUSED" else "interrupted" if task["state"] == "submitting" or task.get("run_id") else "failed"
             self.store.update(task_id, state=state, error=exc.as_dict())
             await self.publish()
         except Exception:
@@ -265,6 +383,28 @@ class TaskManager:
             if stream:
                 stream.cancel()
                 await asyncio.gather(stream, return_exceptions=True)
+            release = getattr(client, "release", None)
+            if task.get("execution_connection") == "free-cloud":
+                if callable(release):
+                    await release()
+                    current = self.store.get(task_id)
+                    if cancel_after_release and _same_execution(current, owned_task) and current["state"] == "stopping":
+                        self.store.update(task_id, state="cancelled", error=None)
+                        await self.publish()
+                if client is None or self.clients.get(task_id) is client:
+                    self.assistant_reservations.discard(task_id)
+                current = self.store.get(task_id)
+                if _same_execution(current, owned_task):
+                    await self._revoke_finished_accounts(current)
+
+    async def _revoke_finished_accounts(self, task):
+        if task["state"] in {"completed", "cancelled", "stopping"} and task.get("connect_session") and self.account_bridge and _same_execution(self.store.get(task["id"]), task):
+            try:
+                await self.account_bridge.revoke(task)
+            except VoiceError:
+                if _same_execution(self.store.get(task["id"]), task):
+                    self.store.update(task["id"], event="account_cleanup_needed", account_cleanup_needed=True)
+                    await self.publish()
 
     async def _interrupt_dead_coordinator(self, task_id, client):
         record_exit = getattr(client, "record_process_exit", None)
@@ -279,12 +419,21 @@ class TaskManager:
         await self.publish()
 
     async def _events(self, task_id, client, run_id):
+        aliases = {"tool.started": "tool_start", "tool.completed": "tool_complete"}
         try:
             async for event in client.events(run_id):
                 # Persist progress facts, not arbitrary raw provider logs or reasoning.
-                kind = str(event.get("type", ""))
+                # Current Hermes Runs uses event/tool; older adapters use
+                # type/tool_name. Keep the persisted progress shape stable.
+                kind = event.get("type", event.get("event", ""))
+                if not isinstance(kind, str):
+                    continue
+                if kind in aliases:
+                    event = {"type": aliases[kind], "tool_name": event.get("tool"), "status": event.get("status")}
+                    kind = aliases[kind]
                 if kind in {"tool_start", "tool_complete", "tool_progress", "run.started", "run.completed", "approval.required"}:
                     safe = {key: event[key] for key in ("type", "tool_name", "status") if isinstance(event.get(key), str)}
+                    safe["type"] = kind
                     self.store._event(task_id, "progress", safe)
                     await self.publish()
         except (Exception, asyncio.CancelledError):
@@ -292,13 +441,16 @@ class TaskManager:
             return
 
     async def action(self, task_id, operation, text="", approval_id=None):
+        if operation in {"start", "continue", "steer", "approve", "deny"} and self.admission:
+            self.admission()
         task = self.store.get(task_id)
+        action_task = task
         if operation == "start" and task["state"] == "proposed":
             if task.get("selected_agent") == "codex" and self._active_codex_task(task_id):
                 raise VoiceError("CODEX_TASK_ACTIVE", "Codex is already working on another task. Finish or stop it before starting this task.")
             expected_attempt = task.get("attempt", 0)
             try:
-                if self.agent_selector:
+                if self.agent_selector and task.get("execution_connection") != "free-cloud":
                     await self.agent_selector(task, task["selected_agent"])
             except Exception:
                 current = self.store.get(task_id)
@@ -328,6 +480,8 @@ class TaskManager:
             if task["state"] not in TERMINAL | {"waiting_input"}:
                 raise VoiceError("TASK_ACTIVE", "Use Redirect while this task is running.")
             answer = text_field(text, "continuation", required=True)
+            if task.get("execution_connection") == "free-cloud" and (self.assistant_reservations - {task_id} or any(other["id"] != task_id and other.get("execution_connection") == "free-cloud" for other in self.store.active())):
+                raise VoiceError("ASSISTANT_TASK_ACTIVE", "Finish or stop the active assistant request first.")
             if task.get("selected_agent") == "codex" and self._active_codex_task(task_id):
                 raise VoiceError("CODEX_TASK_ACTIVE", "Codex is already working on another task. Finish or stop it before continuing this task.")
             client = self.clients.get(task_id)
@@ -335,6 +489,8 @@ class TaskManager:
             if discard and discard():
                 self.clients.pop(task_id, None)
             brief = dict(task["brief"], summary=task["brief"]["summary"] + "\nUser continuation: " + answer)
+            if len(brief["summary"]) > 24000:
+                raise VoiceError("INVALID_BRIEF", "The task history is too long. Start a new request.")
             resume_thread_id = None
             if task.get("selected_agent") == "codex" and task.get("mode") != "offline":
                 resume_thread_id = _last_codex_thread(task)
@@ -344,6 +500,10 @@ class TaskManager:
                                        error=None, dismissed=False, acknowledged=False, resume_thread_id=resume_thread_id,
                                        resume_required=bool(resume_thread_id))
             self._start(result)
+        elif operation == "cancel" and task.get("execution_connection") == "free-cloud" and task["state"] == "waiting_input":
+            # Quota pauses have already released their process, possibly before
+            # any run existed. Stop locally without contacting a stale client.
+            result = self.store.update(task_id, state="cancelled")
         elif operation == "cancel" and task["state"] in {"queued", "proposed"}:
             result = self.store.update(task_id, state="cancelled")
         elif operation == "cancel" and not task.get("run_id") and task["state"] == "submitting":
@@ -353,15 +513,27 @@ class TaskManager:
         else:
             if task["state"] in TERMINAL or not task.get("run_id"):
                 raise VoiceError("TASK_NOT_RUNNING", "This task has no active execution to change.")
-            client = self.clients.get(task_id) or await self.client_factory(task)
+            if task.get("execution_connection") == "free-cloud":
+                if operation == "cancel":
+                    task = self.store.update(task_id, state="stopping")
+                    await self._revoke_finished_accounts(task)
+                client = self.clients.get(task_id)
+                if client is None:
+                    raise VoiceError("ASSISTANT_NOT_RUNNING", "The owned assistant connection is unavailable. Review the stopped task; no other agent was started.")
+            else:
+                client = self.clients.get(task_id) or await self.client_factory(task)
             if operation == "cancel":
                 try:
                     await client.stop(task["run_id"])
                 finally:
-                    if self.children:
+                    if self.children and _same_execution(self.store.get(task_id), action_task):
                         await self.children.cancel(task_id)
-                result = self.store.update(task_id, state="stopping")
+                result = self.store.get(task_id)
+                if _same_execution(result, action_task) and result["state"] not in TERMINAL:
+                    result = self.store.update(task_id, state="stopping")
             elif operation == "steer":
+                if task.get("execution_connection") == "free-cloud":
+                    raise VoiceError("INVALID_TASK_ACTION", "Stop or continue this assistant request; its granted permissions stay fixed.")
                 await client.steer(task["run_id"], text_field(text, "redirect", required=True))
                 result = self.store.update(task_id, event="steer_queued", pending_steer=text)
             elif operation in {"approve", "deny"}:
@@ -373,6 +545,8 @@ class TaskManager:
                 result = self.store.update(task_id, event="approval_answered", approval=None)
             else:
                 raise VoiceError("INVALID_TASK_ACTION", "That task action is not supported.")
+        if operation == "cancel" and _same_execution(result, action_task):
+            await self._revoke_finished_accounts(result)
         await self.publish()
         return result
 

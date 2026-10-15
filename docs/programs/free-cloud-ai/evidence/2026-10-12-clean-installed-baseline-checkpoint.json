@@ -1,0 +1,52 @@
+{
+  "schema": 1,
+  "status": "clean-installed-pre-update-baseline-collected-preview-incomplete",
+  "session": "2de17375e2dd42ecb99bf594bd1afb19",
+  "source": "Existing single-attempt image c6674db4 and static receipt 88001221; no new ISO.",
+  "stateSha256": "79c9420e1e5a0b475e94f36fba35b4babd863550c5384126dbd6a0afe9b4d098",
+  "logSha256": "88e4d72e7739b2c449bc00b37ad4b308a0d6700a48f817dbb5ab457eb76ffc25",
+  "driverExit": 0,
+  "launchGroupRetired": true,
+  "containerId": "77c2a9ebea56946bb8983f602b3e5d9055a5fe4de4a7df8bf9b8533a36c014ab",
+  "exactContainerGone": true,
+  "realInstalledFacts": [
+    "Linux7.2.9-arch1-1",
+    "glibc2.44+r50",
+    "Qt6.12.0-2",
+    "Quickshell0.3.2-1",
+    "Hub0.3.8-1"
+  ],
+  "repos": [
+    "core",
+    "extra",
+    "multilib",
+    "omarchy"
+  ],
+  "policy": [
+    "PackageRequired",
+    "PackageTrustedOnly",
+    "DatabaseOptional",
+    "DatabaseTrustedOnly"
+  ],
+  "optionalFreeAiAndConnectAbsent": true,
+  "evidence": {
+    "pre-update-compatibility.txt": "/home/maslow/Maslow-ai-os/free-ai-build/guest-baseline-prep/vm-evidence/2de17375e2dd42ecb99bf594bd1afb19/test-runs/maslow-os-2026.10.12-x86_64-local-integration/runs/20261012-123108-free-ai-baseline/pre-update-compatibility.txt",
+    "optional-absence.txt": "/home/maslow/Maslow-ai-os/free-ai-build/guest-baseline-prep/vm-evidence/2de17375e2dd42ecb99bf594bd1afb19/test-runs/maslow-os-2026.10.12-x86_64-local-integration/runs/20261012-123108-free-ai-baseline/optional-absence.txt",
+    "pristine-base.sha256": "/home/maslow/Maslow-ai-os/free-ai-build/guest-baseline-prep/vm-evidence/2de17375e2dd42ecb99bf594bd1afb19/test-runs/maslow-os-2026.10.12-x86_64-local-integration/runs/20261012-123108-free-ai-baseline/pristine-base.sha256"
+  },
+  "evidenceSha256": {
+    "pre-update-compatibility.txt": "dc5aa9e97553ad7b7f402dc17b0c970847037a007991372fa0e5cc81789d0416",
+    "optional-absence.txt": "1dee2abfd6efffd57b4b1c0cb0ad63d13d07a2627bcb418cef1c851d40d39789",
+    "pristine-base.sha256": "5b9a613093b27fbced2a596672d7f5b49b36b5264bd693248681199d25a1aec2"
+  },
+  "pristineDisk": "/home/maslow/Maslow-ai-os/free-ai-build/guest-baseline-prep/vm-evidence/2de17375e2dd42ecb99bf594bd1afb19/test-runs/maslow-os-2026.10.12-x86_64-local-integration/base.qcow2",
+  "pristineDiskSha256": "f46ced1abe3b8f6a7cc7d84bdd38f822f952e831e95180b7d22b316a578d778e",
+  "pristineOvmfSha256": "71de0de327048c385eaed9744667b3d7556ee2c58673fd47b249ce9864e87bd8",
+  "preservePristineBase": true,
+  "optionalInstalledAccepted": false,
+  "liveAccepted": false,
+  "audioAccepted": false,
+  "lenovoAccepted": false,
+  "previewComplete": false,
+  "nextAction": "Use a separately owned overlay of this installed baseline for matched Hub/package/recovery acceptance when source and payload are ready; do not update the OS first."
+}

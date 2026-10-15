@@ -351,6 +351,7 @@ const livekitResponsesFunction = panel.match(/function handleControlResponse\(re
 const transportErrorFunction = panel.match(/function handleTransportError\(message\) \{[\s\S]*?\n  \}/)[0];
 const livekitSent = [];
 const livekitContext = { send: (action, body) => livekitSent.push({ action, ...body }), voiceStartPending: false, livekitSetupSaving: false, livekitSetupSucceeded: false, livekitSetupStatus: "", livekitApiKeyField: { text: "key" }, livekitApiSecretField: { text: "secret" }, geminiLiveSetupSaving: false, geminiLiveSetupSucceeded: false, geminiLiveSetupStatus: "", geminiLiveGoogleApiKeyField: { text: "google" }, geminiLiveApiKeyField: { text: "key" }, geminiLiveApiSecretField: { text: "secret" } };
+Object.assign(livekitContext, { assistantRequestId: "", assistantSubmitting: false });
 runInNewContext(`${livekitSubmitFunction}; submitLiveKitSetup("wss://project.livekit.cloud", "key", "secret");`, livekitContext);
 assert.deepEqual(livekitSent[0], { action: "configure_livekit", url: "wss://project.livekit.cloud", api_key: "key", api_secret: "secret" });
 assert.equal(livekitContext.livekitSetupSaving, true);
@@ -371,6 +372,7 @@ runInNewContext(`${livekitResponsesFunction}; handleControlResponse({ ok: false,
 assert.equal(livekitContext.livekitSetupSaving, false);
 assert.equal(livekitContext.livekitSetupSucceeded, false, "Failure text containing saved must still display an error");
 const startFailureContext = { voiceStartPending: true, openSettings: (message) => { startFailureContext.message = message; } };
+Object.assign(startFailureContext, { assistantRequestId: "", assistantSubmitting: false });
 runInNewContext(`${livekitResponsesFunction}; handleControlResponse({ ok: false, error: { message: "Google AI Studio API key is missing." } });`, startFailureContext);
 assert.equal(startFailureContext.feedback, "Google AI Studio API key is missing.");
 assert.equal(startFailureContext.message, undefined, "Failure must not open settings");
@@ -386,7 +388,7 @@ assert.deepEqual(geminiSent[1], { action: "configure_gemini_live", url: "", api_
 runInNewContext(`${geminiSubmitFunction}; submitGeminiLiveSetup("wss://project.livekit.cloud", "", "", "");`, geminiContext);
 assert.deepEqual(geminiSent[2], { action: "configure_gemini_live", url: "wss://project.livekit.cloud", api_key: "", api_secret: "", google_api_key: "" });
 assert.equal(geminiContext.geminiLiveSetupSaving, true, "A blank Google field retains a saved key through the backend");
-const transportContext = { voiceStartPending: true, livekitSetupSaving: true, livekitSetupSucceeded: true, livekitSetupStatus: "", geminiLiveSetupSaving: true, geminiLiveSetupSucceeded: true, geminiLiveSetupStatus: "", openSettings: (message) => { transportContext.startMessage = message; } };
+const transportContext = { assistantAccountsLoading: false, assistantSubmitting: false, voiceStartPending: true, livekitSetupSaving: true, livekitSetupSucceeded: true, livekitSetupStatus: "", geminiLiveSetupSaving: true, geminiLiveSetupSucceeded: true, geminiLiveSetupStatus: "", openSettings: (message) => { transportContext.startMessage = message; } };
 runInNewContext(`${transportErrorFunction}; handleTransportError("Voice control disconnected.");`, transportContext);
 assert.equal(transportContext.voiceStartPending, false);
 assert.equal(transportContext.livekitSetupSaving, false);
@@ -429,7 +431,7 @@ for (const id of ["statusButton", "taskBadgeButton", "badgeDismissButton"]) {
 }
 assert.match(panel, /width: \(orbButton\.width - 16\) \* 0\.6;[\s\S]*?layer\.effect: MultiEffect \{ shadowEnabled: true; shadowColor: root\.chromeShadowColor[\s\S]*?\n      \}\n      contentItem: VoiceOrb/, "The orb glows from a circle behind it");
 assert.doesNotMatch(panel.match(/contentItem: VoiceOrb \{[\s\S]*?\n      \}/)[0], /layer\./, "No layer over the orb shader");
-assert.match(panel, /chromeShadowColor: luminance\(surfaceColor\) < 0\.18\s*\n\s*\? Qt\.rgba\(Color\.accent\.r, Color\.accent\.g, Color\.accent\.b, 0\.55\) : Qt\.rgba\(0, 0, 0, 0\.4\)/, "Dark themes glow in the accent; light themes cast a dark shadow");
+assert.match(panel, /chromeShadowColor: luminance\(surfaceColor\) < 0\.18\s*\n\s*\? Qt\.rgba\(Theme\.Color\.accent\.r, Theme\.Color\.accent\.g, Theme\.Color\.accent\.b, 0\.55\) : Qt\.rgba\(0, 0, 0, 0\.4\)/, "Dark themes glow in the accent; light themes cast a dark shadow");
 assert.match(panel, /width: Math\.min\(280, panelWindow\.width - 32, statusLabel\.implicitWidth \+ 4\)/, "The status pill fits its words");
 assert.match(panel, /readonly property bool statusQuiet: stateText\(\) === "Ready · click to talk"/, "Only the idle ready label hides");
 assert.match(panel, /opacity: root\.statusQuiet && !root\.statusRevealed \? 0 : 1/);
@@ -535,14 +537,17 @@ assert.match(panel, /preview_gemini_voice", \{ voice: geminiVoice.currentText \}
 assert.match(panel, /Use this voice/);
 
 assert.match(panel, /import qs.Commons/);
-assert.match(panel, /surfaceColor: Qt\.rgba\(Color\.popups\.background\.r/);
-assert.match(panel, /textColor: readableColor\(Color\.popups\.text, controlColor\)/);
-assert.match(panel, /accentTextColor: readableColor\(Color\.accent, controlColor\)/);
-assert.match(panel, /alertTextColor: readableColor\(Color\.urgent, controlColor\)/);
-assert.match(panel, /popupBorderColor: Color\.popups\.border/);
-assert.match(panel, /accentColor: Color\.accent/);
-assert.match(panel, /backgroundColor: Color\.background/);
-assert.match(panel, /selectionColor: Color\.accent/);
+// Qt 6.12 ships its own QtQuick `Color` type that hides the shell theme when written bare.
+assert.match(panel, /^import qs\.Commons as Theme$/m);
+assert.doesNotMatch(panel, /(^|[^.\w])Color\.[a-z]/m, "Read the theme through Theme.Color");
+assert.match(panel, /surfaceColor: Qt\.rgba\(Theme\.Color\.popups\.background\.r/);
+assert.match(panel, /textColor: readableColor\(Theme\.Color\.popups\.text, controlColor\)/);
+assert.match(panel, /accentTextColor: readableColor\(Theme\.Color\.accent, controlColor\)/);
+assert.match(panel, /alertTextColor: readableColor\(Theme\.Color\.urgent, controlColor\)/);
+assert.match(panel, /popupBorderColor: Theme\.Color\.popups\.border/);
+assert.match(panel, /accentColor: Theme\.Color\.accent/);
+assert.match(panel, /backgroundColor: Theme\.Color\.background/);
+assert.match(panel, /selectionColor: Theme\.Color\.accent/);
 assert.match(panel, /selectedTextColor: root\.selectionTextColor/);
 assert.doesNotMatch(panel, /#[0-9a-fA-F]{6}/, "Voice surfaces must follow live shell colors");
 const colorFunctions = ["mixColor", "luminance", "contrastRatio", "contrastingText", "readableColor"]

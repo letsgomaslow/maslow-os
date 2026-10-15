@@ -1,0 +1,54 @@
+{
+  "schema": 1,
+  "status": "scoped-new-package-checks-in-progress",
+  "voice40": {
+    "archiveSha256": "407b4372e0d8a3de0652a59d28b0ddd38068447450abfa5309c91e431239db44",
+    "staticReportSha256": "f64d21091d797a2eada5850df793f896f265d2300c893a9a649af272a7986c28",
+    "sourceFilesChecked": 63,
+    "archiveMembers": 9141,
+    "retainedPrivateDependenciesAndRemainingPayloadMatchVoice39": true,
+    "owningSession": "6d88a3aa74d9471b9f001eb7b0c86560",
+    "owningManifestSha256": "bea82ad87adccf48105e83c3bf42f70aabd828e9bc0960cce090a722ce32b068",
+    "owningTestsRun": 507,
+    "passed": 502,
+    "skipped": 5,
+    "errors": 0,
+    "seconds": 122.607,
+    "logSha256": "813cc38c5d6bb7e4df937f53b2152b36d64bddef602f0ad03b5b8a2b7d248fc4",
+    "uiAndComposerChecks": "pass",
+    "skipNames": "Not emitted by this aggregate log; no exact names inferred. Installed/native/audio and unrelated optional integration checks remain separate.",
+    "launchGroupRetired": true,
+    "packageRebuiltForEnvironmentFix": false
+  },
+  "connect8": {
+    "archiveSha256": "3bbd8f3218af5556dbb5d989c7375b66292d62790a841c905dde72a1f6f34dca",
+    "inventorySha256": "f91ee6deba30a588ff771f9859570a3c6570141477260782b381086dc5415a89",
+    "approvalSha256": "76bc31f7d4b4d23bc9a5a8ca3245e1b785fa00834071844257e2e99611be8456",
+    "counts": {
+      "physicalPackageRoots": 106,
+      "externalNameVersionTuples": 105,
+      "regularFiles": 8789,
+      "compiledFiles": 99
+    },
+    "staticReportSha256": "e036ab4531ded57135445192c9b861c6ef1c2d1aa79a5c3e5a642c951357457c",
+    "staticResult": "pass",
+    "noticePackages": 105,
+    "exactSupplementalNoticesAndDeclarationsVerified": true,
+    "freshProductionAdvisorySha256": "73af8f27d19fb4f7840e414b9146b5711897e5d7d51f750ed0efecd3b212ae1a",
+    "capturedAtUtc": "2026-10-12T05:06:23.964669+00:00",
+    "httpStatus": 200,
+    "reportedAdvisoryCount": 0,
+    "deployedAndOverlap": "preparation in progress; not executed",
+    "initialInventoryOutputFailure": "Coordinator had not created evidence directory. Preserved receipt; directory created and unchanged inventory reran, no artifact/source modification."
+  },
+  "remaining": [
+    "Connect8 actual fixed-CLI deployed and package-overlap checks",
+    "independent exact artifact result review and matched Hub identity",
+    "current-operation recovery/public lifecycle completion",
+    "actual Hub installation/guest/Lenovo/live provider/account/audio/recovery",
+    "independent final preview review"
+  ],
+  "installedVerified": false,
+  "liveVerified": false,
+  "previewComplete": false
+}

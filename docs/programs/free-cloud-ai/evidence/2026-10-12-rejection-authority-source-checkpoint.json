@@ -1,0 +1,35 @@
+{
+  "schema": 1,
+  "status": "rejection-authority-source-accepted-preview-incomplete",
+  "hubSource": "4def9b7cc916c5a71ccce20059c50fcd5d754fdd",
+  "commits": {
+    "expiredV1Review": "c65c646722d6cf437f1b2159ff2d50400e8bfb18",
+    "v2InitialRejection": "4def9b7cc916c5a71ccce20059c50fcd5d754fdd"
+  },
+  "checks": {
+    "owningTests": 631,
+    "skips": 0,
+    "seconds": 153.322,
+    "uiContract": "pass",
+    "shellSyntax": "pass",
+    "diff": "pass",
+    "oneCpu": true,
+    "sharedHeavyLock": true
+  },
+  "evidence": {
+    "/home/maslow/Projects/Maslow/free-ai-hub-current/docs/evidence/2026-10-12-combined-rejection-authority-owning.json": "c0a624287a0236d8acba00f061a5747de993b0ada0808879c97756217c4cd0ea",
+    "/home/maslow/Projects/Maslow/free-ai-hub-current/docs/evidence/2026-10-12-expired-v1-review-source-retake.json": "9ca66e5e19b03521720b9bb85bd9f60090cd05fa1d62fcdfa772dd8a04abd7ba",
+    "/home/maslow/Projects/Maslow/free-ai-hub-current/docs/evidence/2026-10-12-v2-initial-rejection-source-review.json": "468b5cefb1bee909935f49d28c11e2fa7ba2e7af688e200638c647347f5f82e0"
+  },
+  "implemented": [
+    "Fresh private same-epoch V1 negative review leaves expired original evidence unchanged, with clock-rollback routing fixed.",
+    "V2 initial singleton typed negative, owned-child reap/witness and durable structural cleanup before ordinary recovery paths."
+  ],
+  "limits": [
+    "Expired V2 review remains unavailable.",
+    "Standalone preservation is coding; arbitrary damaged/newer data, unknown stages and reboot authority remain unverified.",
+    "Matched Hub build, installed recovery/real Groq/accounts/Voice/Lenovo/final acceptance remain open."
+  ],
+  "previewComplete": false,
+  "nextAction": "Implement reviewed standalone current-data preservation and independently review it. Design the small V2 expired-negative review in disjoint ownership. Preserve signed QA pair, accepted archives and pristine guest."
+}

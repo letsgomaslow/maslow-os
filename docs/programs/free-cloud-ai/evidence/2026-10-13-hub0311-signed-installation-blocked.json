@@ -1,0 +1,90 @@
+{
+  "schema_version": 1,
+  "status": "signed-and-audited-installation-blocked-by-session-permissions",
+  "hub_source": "23eabfbf060371300b108f33d28330e0fcd0816f",
+  "voice_source": "1093cf71601f6b566c86754ffc314d8a9d9f6549",
+  "voice_recipe": "0a8ee756988e5318d37781f7b91d549479770b39",
+  "actual_hub_build": {
+    "schema": 1,
+    "exit": 0,
+    "session": "6c19fb547acb44fb9f86c48e0d6a115d",
+    "archive": "/home/maslow/Maslow-ai-os/free-ai-build/hub-bundle-prep/qa-hub-build-5/evidence/6c19fb547acb44fb9f86c48e0d6a115d/work/maslow-hub-0.3.11-1-any.pkg.tar.zst",
+    "archiveSha256": "5e8b96447b7708c1cb732d0849722d7f5ed06908db28c32733f87afa1c7a7bc6",
+    "bytes": 332801985,
+    "launchGroupRetired": true,
+    "containerGone": true,
+    "containerGoneProof": "successful docker ps -a excludes exact recorded CID",
+    "stateSha256": "0952912bd62411c7ce530f086d4d0e662171d2b7d50a117d16a51eb80c3504a9",
+    "artifactAccepted": false
+  },
+  "actual_hub_audit": {
+    "exit": 0,
+    "seconds": 32.482,
+    "logSha256": "4cce121530b362d756bc768cc26f20510bd7fd2abfe1eca292291f7dc337721e",
+    "manifestSha256": "870e4c52aaaa3bf61abfc58ba5ce3962daa3846f08cd330151a248b25038b337",
+    "limits": "CPU1/nice10/AS2GiB/300s/shared heavylock"
+  },
+  "hub_audit_summary": {
+    "mapped_source_files": 44,
+    "members": 76,
+    "opaque_pair_files": 6,
+    "four_package_overlap_free": true
+  },
+  "hub_signatures": {
+    "schema": 1,
+    "signatures": [
+      {
+        "input": "manifest.json",
+        "inputSha256": "d4de701d79fceac853feed7493b0bea83112ccd8bb5adee05adc411fd6890d6d",
+        "signatureSha256": "af10e183f642525c3a6dbd292198c7671ac79d4ae1f6f91705972c026a6f06b0",
+        "verified": true
+      },
+      {
+        "input": "maslow-hub-0.3.11-1-any.pkg.tar.zst",
+        "inputSha256": "5e8b96447b7708c1cb732d0849722d7f5ed06908db28c32733f87afa1c7a7bc6",
+        "signatureSha256": "8b0d8b337aa044ebd2325acf8a58fe15b1883f8a1d57bed24f1e850501ac05c9",
+        "verified": true
+      }
+    ],
+    "publicKeySha256": "1c0134a2171832127b6f6f607f8e5b18fc8d4bec51b4afe0e995d4859e74bb3f",
+    "privateKeyAccessed": false,
+    "published": false,
+    "installed": false,
+    "installation_blocker": "Session changed to workspace-write with approval never; system installation unavailable."
+  },
+  "manifest": {
+    "sequence": 12,
+    "sha256": "d4de701d79fceac853feed7493b0bea83112ccd8bb5adee05adc411fd6890d6d",
+    "expires_at": "2026-10-15T15:14:23Z",
+    "published": false
+  },
+  "signed_apply_freeze": "/home/maslow/Maslow-ai-os/free-ai-build/hub-bundle-prep/native-preview-prep/0311/signed-apply-freeze.json",
+  "guard_sha256": "34060134a623ce074fd3ac59169b9026a5f6d86d7048315b14b93564f6f5c5cd",
+  "rollback": {
+    "version": "0.3.10",
+    "archiveSha256": "d71e572fe1a5f483a6726741d047424d02c53b852d3a504adeb4583df16a8bd9",
+    "signatureSha256": "8b2bbcb87874f7f493a7f6995e092a20d567be1056e079d371c9cd3d5b346998",
+    "signatureVerifiedAgainstEnrolledKey": true,
+    "scope": "Exact immediate Hub rollback input, not a performed rollback test"
+  },
+  "installed_read_only_check": {
+    "maslow-hub": "0.3.10-1",
+    "maslow-voice": "0.1.5-41",
+    "maslow-free-ai": "0.1.0-2"
+  },
+  "blocker": {
+    "source": "Session permissions changed to workspace-write; writable roots /home/maslow/Maslow-ai-os and /tmp; approval policy never",
+    "impact": "Cannot run a system package installation or bypass the sandbox through privilege/desktop helpers",
+    "required_change": "User restores an environment permitting the already-authorized system installation; a chat approval alone does not alter sandbox policy"
+  },
+  "preserved": "No system installation attempted in restricted mode; all signatures/artifacts retained; no publication, Craft resume or product merge",
+  "next_action": "After actual permission restoration, recheck idle/manifest validity and native admission, then execute the exact reviewed guarded Hub apply, followed by fixed managed Voice43 update. Verify installed state and repeat spoken continuity test; no rebuild/resign unless inputs or expiry change.",
+  "final_apply_review": {
+    "path": "/home/maslow/Maslow-ai-os/free-ai-build/hub-bundle-prep/native-preview-prep/0311/independent-final-apply-review.json",
+    "sha256": "2666c82c5542e63e10ff50697f97e91ad17f44e4b64b7257b2798fcd0b86fff2",
+    "model": "gpt-6.1-sol",
+    "reasoning": "medium",
+    "verdict": "accepted preparation; privileged preflight still required",
+    "prior_worker": "gpt-6-sol/medium review stalled without report and was interrupted"
+  }
+}

@@ -1,0 +1,179 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-11",
+  "reviewer": "independent boundary_review worker",
+  "status": "synthetic-real-hermes-runs-integration-passed",
+  "candidate_ready": false,
+  "scope": "Actual installed Hermes Runs API, actual managed profile/worker/plugin, actual Voice private Unix tool handler and TaskManager/TaskStore, with a synthetic loopback inference server and synthetic router lifetime facade. This does not use the production provider/router process or a live account.",
+  "installed_hermes_package": "hermes-agent 0.21.6-3",
+  "command": "PYTHONDONTWRITEBYTECODE=1 /usr/lib/maslow-voice/venv/bin/python free_ai/tests/hermes_runs_probe.py --node /tmp/maslow-freellmapi-tools/node-v22.23.3-linux-x64/bin/node --upstream /home/maslow/Maslow-ai-os/free-ai-build/upstream",
+  "isolation": {
+    "network": "Separate network namespace verified different from outer namespace; only lo interface present. Fake inference binds 127.0.0.1.",
+    "filesystem": "Host filesystem read-only; host /home, /tmp and /run/user hidden except read-only source checkout and one owned writable temporary directory.",
+    "credentials": "Only synthetic inference token and freshly generated temporary local IPC tokens. Credential lookup object throws on use; no real account/keyring values read.",
+    "audio": "Audio/conversation/consumer-executor factories throw if invoked; no Voice conversation or microphone started.",
+    "processes": "Real AssistantRuntime owns spawned Hermes process groups; each case verified released client, exited child, absent process group and empty synthetic router owners. Temporary profiles/workspaces removed on outer exit."
+  },
+  "cases": [
+    {
+      "case": "explicit-note-create",
+      "task_state": "completed",
+      "inference_requests": 3,
+      "streamed_managed_requests": 2,
+      "tool_less_auxiliary_requests": 1,
+      "advertised_tools": [
+        "maslow_create_note",
+        "maslow_list_documents",
+        "maslow_read_document"
+      ],
+      "created_relative_path": "proof.md",
+      "file_bytes": 53,
+      "file_sha256": "d193b682b5fa8ce9cca1996a015088d20b00c05f87612e7b297016bf970f8f00",
+      "receipt_verified": true,
+      "receipt_state": "created",
+      "actual_bridge_receipt_seen_in_next_model_request": true,
+      "client_released": true,
+      "process_exited": true,
+      "owned_process_group_absent": true
+    },
+    {
+      "case": "unadvertised-terminal-tool",
+      "task_state": "completed",
+      "inference_requests": 3,
+      "streamed_managed_requests": 2,
+      "tool_less_auxiliary_requests": 1,
+      "requested_tool": "terminal",
+      "command_scope": "Harmless write to one marker inside the owned temporary directory only; never authorized as a managed capability.",
+      "actual_rejection": "Tool 'terminal' does not exist. Available tools: maslow_create_note, maslow_list_documents, maslow_read_document",
+      "marker_absent": true,
+      "client_released": true,
+      "process_exited": true,
+      "owned_process_group_absent": true
+    }
+  ],
+  "router_facade_acquisitions_and_releases": 2,
+  "payload_compatibility": {
+    "result": "All six observed synthetic inference request bodies passed assertTextRequest imported from actual applied upstream policy.ts; source bytes matched reviewed free_ai/router/src/maslow/policy.ts.",
+    "node_version": "22.23.3",
+    "managed_fields": [
+      "max_tokens",
+      "messages",
+      "model",
+      "reasoning_effort",
+      "stream",
+      "stream_options",
+      "tools"
+    ],
+    "managed_max_tokens": 2048,
+    "managed_stream": true,
+    "auxiliary_fields": [
+      "messages",
+      "model",
+      "reasoning_effort",
+      "response_format"
+    ],
+    "auxiliary_output_limit_note": "Auxiliary request omitted max_tokens; production createMaslowApp supplies 2048 when both output limits are absent. This fixture checked request-body acceptance, not actual provider dispatch.",
+    "model": "openai/gpt-oss-120b"
+  },
+  "metadata_probes": {
+    "count": 18,
+    "unique_paths": [
+      "/api/v1/models",
+      "/api/tags",
+      "/v1/props",
+      "/props",
+      "/version",
+      "/v1/models",
+      "/models"
+    ],
+    "handling": "All returned local HTTP404. No alternate provider or external network was available. These are observed Hermes metadata probes, not inference requests or accepted provider catalog proof."
+  },
+  "helper_iteration_failures": [
+    "Initial negative assertion omitted the installed wording does not exist; exact captured rejection and source name gate showed a helper expectation error, not builtin execution.",
+    "Initial fixture treated metadata GETs and tool-less auxiliary inference as unexpected. Final fixture rejects metadata locally, gives tool-less auxiliary calls no capabilities, limits inference to six requests per case, and checks all payloads through real router request policy."
+  ],
+  "additional_validation": {
+    "assistant_unit_suite": "14 tests passed independently on updated source, including requested-note completion verification.",
+    "helper_syntax": "AST parse passed.",
+    "source_whitespace": "git diff --check passed for scoped helper."
+  },
+  "boundary_review_refresh": {
+    "prior_report": "docs/programs/free-cloud-ai/evidence/2026-10-11-boundary-review.json",
+    "prior_report_sha256": "f7cc35a6a249f017a970fb78ea2286f3c7a46d538834abfc289391751360b402",
+    "prior_report_unchanged": true,
+    "unchanged_frozen_boundary": "All previously recorded free_ai router, lifecycle, credential and control source/test hashes still match the prior report.",
+    "reviewed_changes": [
+      "execution_connection type guard rejects non-string inputs cleanly.",
+      "TaskStore records explicit existing execution connection for legacy/default tasks without changing request fingerprint construction.",
+      "Captured free-cloud Voice turn uses one stable request identity, preventing paraphrased briefs from creating extra tasks.",
+      "Assistant workspace selection requires absolute expanded paths.",
+      "Managed child environment removes host DBus/display/XDG session variables while retaining its absolute private tool socket.",
+      "Requested-note completion verifies persisted receipt identity, actual bytes, size and hash; failure retains model report and interrupts instead of claiming completion.",
+      "Artifacts label checked bytes and require review of generated facts."
+    ],
+    "changed_reviewed_source_hashes": {
+      "voice/maslow_voice/assistant.py": {
+        "previous_sha256": "998ab6b3f40a5e9123267ad9fa66b3399ff0752d9d75d9d77077d7ea714f4b86",
+        "current_sha256": "4d70815d6f2046da5242752db9f0f27f25d778144a160e8ad6381c37a9c68437"
+      },
+      "voice/maslow_voice/assistant_runtime.py": {
+        "previous_sha256": "5f541c45837ca00892b7d86f605cc6ab7fd045aa4fa761656d27cda2cb692bc1",
+        "current_sha256": "ec3e053c4e824580dfb13c02297a78b0e1ea4e35cd18c1c78a2cfd33b623d547"
+      },
+      "voice/maslow_voice/tasks.py": {
+        "previous_sha256": "7ffb1ea0dcba75c7cdfa64899dd40f20f52336b8b4a6a115b2ebbd4c8504fa3e",
+        "current_sha256": "ba9fac5b077eb7cebcccdf33cf321a5756279bcf76edadee3f752caee3d388bc"
+      },
+      "voice/maslow_voice/store.py": {
+        "previous_sha256": "d4498a4d29df2cbb496fa133a47c8cdbab70a9b6a4ea94e039acc61c943cec8b",
+        "current_sha256": "8c9d38b3c07efbff4ed8bab9f613fab0c24f52776c1948439ca9e058350b25d6"
+      },
+      "voice/maslow_voice/daemon.py": {
+        "previous_sha256": "e49826eb752ae88a63c5a4f850ec4dcfaf0fd555639f87340d2e5c0d9638f8c4",
+        "current_sha256": "f2c8cd81fe8750ff81ccf80eae834d2d395c1ce23efb0bfc401538608d5744db"
+      },
+      "voice/maslow_voice/config.py": {
+        "previous_sha256": "c354fceee68ab8cdc2ab033276dc399b6e26947e8521d8ea11644e8771beec96",
+        "current_sha256": "3cf5e84125de90cb6ad3d0104cfeca3dd73d663d3013740f5a9fb263a774b290"
+      },
+      "voice/tests/test_assistant.py": {
+        "previous_sha256": "335a22201efde214b5f774fef84b0caeaa8d8f808550c1e54397cbb86177a828",
+        "current_sha256": "11aa8e607f59b1d35871ac66f8566c173807ee5d6449b9a0fa38a4e5d03b94a8"
+      }
+    }
+  },
+  "source_sha256": {
+    "free_ai/tests/hermes_runs_probe.py": "eeb4ad63edf23e27bddfc47eacbbc16946c5743ed68ad8a0e14724d3bd919af6",
+    "voice/maslow_voice/assistant.py": "4d70815d6f2046da5242752db9f0f27f25d778144a160e8ad6381c37a9c68437",
+    "voice/maslow_voice/assistant_runtime.py": "ec3e053c4e824580dfb13c02297a78b0e1ea4e35cd18c1c78a2cfd33b623d547",
+    "voice/assistant_worker.py": "c76cc1b7076ef5259108f14ac4d69d90bdb9acf5828e0d568f12c54f567d59d5",
+    "voice/assistant_plugin/__init__.py": "6b1ad2050a0a97029fd0483291748f67612b6f51416dbdd4718560c99b36957f",
+    "voice/assistant_plugin/plugin.yaml": "f0e187771ecaa63b10f6646cd25d488f0d068b84333e11af2679cd4c21f38b3a",
+    "voice/maslow_voice/tasks.py": "ba9fac5b077eb7cebcccdf33cf321a5756279bcf76edadee3f752caee3d388bc",
+    "voice/maslow_voice/store.py": "8c9d38b3c07efbff4ed8bab9f613fab0c24f52776c1948439ca9e058350b25d6",
+    "voice/maslow_voice/daemon.py": "f2c8cd81fe8750ff81ccf80eae834d2d395c1ce23efb0bfc401538608d5744db",
+    "voice/maslow_voice/config.py": "3cf5e84125de90cb6ad3d0104cfeca3dd73d663d3013740f5a9fb263a774b290",
+    "voice/maslow_voice/hermes.py": "a387eceab298335dba5c267386a1b6dc55422445cecc08c8e7bf24a30a821255",
+    "voice/maslow_voice/http.py": "3b38fa3d9ef764924188b9f7ab511ba4942081e16c9e9abeffe1cf6b5bd39bec",
+    "voice/maslow_voice/ipc.py": "15cf8274afcb52cbd6e64c6d05d552c6e89da8f27693c977561fd70c0157389b",
+    "voice/maslow_voice/coordinator.py": "b511b2087ff0abf5be1a499540bf3309a55678c6dc630591c01bbefb631edf41",
+    "voice/tests/test_assistant.py": "11aa8e607f59b1d35871ac66f8566c173807ee5d6449b9a0fa38a4e5d03b94a8",
+    "free_ai/router/src/maslow/policy.ts": "d9cddb2baaa86d013869578908435f64ad8438c202f416ea8448c5e29b127c70",
+    "free_ai/router/src/maslow/app.ts": "78350406265c466ba1e7dac74f147e63e9469a30a248848fa335b58b5f5bac00"
+  },
+  "installed_hermes_source_sha256": {
+    "/opt/hermes-agent/run_agent.py": "73efa221f42be96a41a6b8a1ee144caf47041e06f5c7d32b3bbd898d8dc250b2",
+    "/opt/hermes-agent/agent/turn_tool_validation.py": "e15b186e4d2ec9b661a82f3b17dc031237492d72b1ad2d621d0c8dd736f2fe1c",
+    "/opt/hermes-agent/agent/turn_tool_round.py": "8afef412460a4a6a0d3df0ec219919a736ba376f4add81864fd49c0e758c531f",
+    "/opt/hermes-agent/agent/conversation_loop.py": "68bc9e852c962511991ffa74ed65d28732e530434e4fb442f8470265bafa441c",
+    "/opt/hermes-agent/gateway/platforms/api_server.py": "359c8be9d02e3bfb24272f829321dd5da3cefd31923cf7785d1bf36ea1f87420",
+    "/opt/hermes-agent/hermes_cli/plugins.py": "b0f09d0004890ff0b2c07d17ee7c5688709162da4fd43d404cabbe13f1d9f59d"
+  },
+  "remaining_gates": [
+    "Live Groq text/function behavior and free-plan account availability remain untested.",
+    "Synthetic answers do not establish model usefulness, factual accuracy, prompt-injection resistance for all inputs or every tool-call variant.",
+    "Production router/keyring/lifecycle package integration is separate; facade behavior is not evidence for that process.",
+    "No connected account/read-only scope/revocation, full recovery, signed delivery, clean guest, native setup, Lenovo, physical microphone/speaker or performance acceptance is claimed.",
+    "Exact changed inputs invalidate affected evidence and require targeted revalidation."
+  ]
+}

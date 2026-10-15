@@ -1,0 +1,49 @@
+{
+  "schema": 1,
+  "date": "2026-10-11",
+  "status": "final-context-identity-retake-passed-coordinator-admission-separate",
+  "scope": "Only refreshed context, mount/archive metadata and runner pin delta from the already reviewed cleanup implementation. No repeated control/helper suites or native operations.",
+  "identities": {
+    "runtimeSourceCommit": "6db3622d04a4e06bfc01b65f86e99ff91d6e1ab9",
+    "runtimeArchiveSha256": "c5b1eb635c061a8e50114bfea844744ca1bacc9c14a8e411c3d50d79780e52b7",
+    "freeAIAndVoiceRecipeCommit": "3b7004282c17b44cb44db8e08d600b248d221b1c",
+    "connectSourceCommit": "97ac20eed146a8c6b37e33c2c29901a00f3045ff",
+    "connectRecipeCommit": "f4df4dad2da480ce95c7e53a3fc263b79a87c5c0",
+    "connectArchiveSha256": "8a9929b9d9652bd38bc36b8426df6cc2783fadc9c5246ccbfa26599d74351906",
+    "connectLockSha256": "79a99838174e1ea36662534d370f778ff121835a5bf0a9c5b4515abc4194d5cf",
+    "contextProofFile": "build-context-proof-6db3622d.json",
+    "contextProofSha256": "6212ca2752c78a39bd1aa469647e4b37e94747c94d8045c88921fc7ed78af667",
+    "refreshProofSha256": "2f5dbdd244e9ab63b538faf0db0265ea49e5faf4176c3e54dd58dbf78299e12e",
+    "heldRunnerSha256": "621ce057b29c8809309cbe428a391b563360be14710a240c31162662e98a9b3a",
+    "reviewedCleanupBaseSha256": "91e5895c7b7826e86ecfdf44780e1462a015b7f398340abcab833c199af97e74",
+    "runnerTestsSha256": "27189f5989eb285000706eedfbc74e1747b4593249f512e8a1f856cfc4ec8c0a",
+    "owningGuideSha256": "f6b5286cd7d077260b27d9e828cd48e9d831e650cc81a090866ebf8822f50200",
+    "currentInputsGuideSha256": "4dc6d70fd5a214debc408601a0b111c6455203ae0b951c24731507f80cbd6807"
+  },
+  "independentChecks": [
+    "Native and Connect copies of the new context proof are byte-identical and match the frozen hash; refresh proof matches its frozen hash.",
+    "All27 declared inputs are regular non-symlink files with matching hashes. All24 Git-tracked copied inputs also equal the exact recorded recipe-commit blobs; the other3 are checksum-pinned upstream/Node/pnpm archives.",
+    "Exactly six copied input hashes changed from the old context: the independently reviewed two PKGBUILDs, two READMEs and two source manifests. Connect inputs remain unchanged.",
+    "The runtime archive digest and PAX comment identify exact6db3622d. All16 FreeAI and147 Voice manifest inputs match the archive and current read-only source extraction.",
+    "Connect source remains a clean independent Git clone at97ac20e, without alternates, hardlinked objects or node_modules. Its lock and preserved source archive match their exact pins.",
+    "Normalizing only proof name/hash, runtime archive path and hold wording restores the accepted91e5895c runner byte for byte. Cleanup, SIGTERM/ENOSPC handling, lock, log and failure propagation code are unchanged.",
+    "The runner test delta only renames the source-hold test and updates its expected message; no assertion or control was removed. The coordinator's recorded11-test result was inspected, not repeated.",
+    "Build plans equal the original reviewed plans after changing only the two runtime source/archive mount paths and matching command text. Connect plan, exact image IDs, builder user, CPU2/RAM4GiB/total-memory-and-swap6GiB and MAKEFLAGS=-j2 are unchanged.",
+    "Source/archive mounts remain read-only. Owning guide uses the new archive and retains fail-fast commands, private pinned Node and fresh Python cache isolation. Historical7d preparation is explicitly segregated as superseded."
+  ],
+  "remainingConfirmedScopedFindings": [],
+  "acceptance": {
+    "pinRetake": "passed",
+    "sourceHoldAtReview": true,
+    "coordinatorNextAction": "Root may record the reviewed pin result, clear only the deliberate hold, record the resulting runner hash, release its own advisory reservation and admit the already user-authorized sequential build after the runner's normal workload/image/input checks. This report itself neither clears the hold nor acquires the slot.",
+    "sequence": ["maslow-free-ai0.1.0-2", "maslow-voice0.1.5-39", "maslow-connect0.1.0-6"],
+    "craftScope": "Reconcile the completed active Craft ISO workload and current resources; do not wait for the entire Craft program. This reviewer sent no cross-chat peer message and claims no peer acknowledgment.",
+    "nativeArtifactOrLiveAcceptance": false
+  },
+  "limits": [
+    "No Docker/image inspection, real cleanup, native build, host process/container action or shared lock acquisition was performed by this reviewer.",
+    "Existing runner control review remains the evidence for cleanup behavior; this retake verifies that behavior did not change.",
+    "Actual builds must still pass owning/artifact/ABI/capsule/dependency/notice/overlap checks. Build success is not installed, visual, recovery, provider/account or physical-audio acceptance."
+  ],
+  "operations": "Reviewer edited only this report. Root owns records, hold clearance and GO. No code/recipe/context change, commit, credential access or live request."
+}

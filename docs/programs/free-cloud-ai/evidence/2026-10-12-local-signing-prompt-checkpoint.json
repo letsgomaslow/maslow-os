@@ -1,0 +1,22 @@
+{
+  "schema": 1,
+  "status": "local-operator-unlock-pending-no-accepted-signatures",
+  "correction": "No Mac transfer needed. Existing Lenovo release workstation handles files and verification; user only enters the release-key passphrase in the native terminal.",
+  "firstAttempt": {
+    "folder": "local-preview-signatures-_20kwn8d",
+    "observed": "incomplete-not-admitted; first manifest signature0bytes; no receipt or valid signature. User reported finishing but did not observe the error before closing. Cause unknown,not assumed wrong password.",
+    "preserved": true,
+    "installedOrPublished": false
+  },
+  "diagnosedRetry": {
+    "wrapperSha256": "7a893bed65f2aa234053344e37055e6be784cbccdafea34041f19cd0169500b2",
+    "independentReviewSha256": "1008087c3c74e42f26b24963aca36e7adbf5c006090cec1dfcd1280bdc5b9756",
+    "folder": "local-preview-signatures-2976jqh1",
+    "observed": "awaiting-local-signing-passphrase; mapped Maslow OS terminal confirmed.",
+    "change": "Existing signer receives inherited terminal input; stderr forwarded locally,only bounded errorcategory/returncode retained,no raw diagnostics or passwords persisted. Clear complete/incomplete terminal result replaces lengthy traceback. Original failure remains unadmitted.",
+    "launch": "CPU1/nice10,python3 -I -S -B -X pycache_prefix=/dev/null; fixed public4inputs and existing trusted release tools; no publication/config/trust/root mutation."
+  },
+  "newlyLocated": "Two unsigned local Hub0.3.6 candidates found under existing maslow-release/runs/20261010T190303Z-prepare and20261010T194714Z-prepare. Preserve; not yet audited. Already-audited reconstructed rollback input remains explicitly labelled and valid for this signing batch; no extra rebuild or substitution.",
+  "nextAction": "Read retry status and independently verify each returned signature against enrolled public key. If failed, diagnose recorded category before another action; never infer success from terminal close or user completion wording. On success continue exact final QA3 matchedHub build.",
+  "previewComplete": false
+}

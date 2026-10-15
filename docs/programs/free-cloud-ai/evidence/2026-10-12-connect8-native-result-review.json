@@ -1,0 +1,88 @@
+{
+  "schema": 1,
+  "date": "2026-10-12",
+  "scope": "Independent read-only reconciliation of coordinator-run Connect8 deployed probe and exact backend2/Voice40/Connect8 overlap. No rerun, candidate archive scan, Docker/VM/network/account operation by reviewer.",
+  "result": "Evidence supports a subsequent narrowly reviewed Hub identity-map addition for exact Connect0.1.0-8/sourcefd33682f3bcfdbce849a06304da0d74137b592f0. It does not itself change Hub admission or establish installed account/confinement/live/preview acceptance.",
+  "identity": {
+    "package": "maslow-connect",
+    "version": "0.1.0-8",
+    "sourceCommit": "fd33682f3bcfdbce849a06304da0d74137b592f0",
+    "recipeCommit": "42adaeca720dd8aced00d17bd4238225c15464cd",
+    "archiveSha256": "3bbd8f3218af5556dbb5d989c7375b66292d62790a841c905dde72a1f6f34dca",
+    "sourceArchiveSha256": "e8074082b5178f0b1f28843bca1ac96eec2436a374ae7f0de7732cb15eebba83",
+    "lockSha256": "e6d717577fc92a37a03e630eb2c4acfcf2225900d155e6e2c832655bedbe10e1"
+  },
+  "execution": {
+    "directory": "/home/maslow/Maslow-ai-os/free-ai-build/connect-package-8-prep/verification/deployed-evidence/e83f248075034477bb3923669b89c98e",
+    "session": "e83f248075034477bb3923669b89c98e",
+    "image": "sha256:cfd891bf262d24bac53aa489af912484a08545e38001624a94640de4e43b840f",
+    "manifestSha256": "a539217df72587ff86f3ac4e0f3858576cb2e9cc74dfc3427db030860181550f",
+    "controllerSha256": "b8b20560bdbf1b4724d58a1fcb94e9dc26ec4225f204401a38fe3c54278a934d",
+    "checkedOverlapSha256": "363b39ba2c82cc8931046a916c38d7c1c0a61556c47372a0c4287f443da4282f",
+    "reviewedRawSha256": {
+      "deployed.log": "2e13915a3df5ead716412ba948bcca9e3b964c6c1426e8ee5dc7aa891d7e3234",
+      "overlap.log": "1f23a49411cb5d2bdc31470bbfaddd5b8c1b13a27675518d58d2bf9c1d1217c1",
+      "state.json": "67ab6fb1d44ffa4a135d3af9a95eaa089ad3b43be09ca5d013dc3a0f506c9159",
+      "argv.json": "f3b59443c9eb518a13bc3f6238fa14452e8989721c0a6ee1bfb4e036588a2d11",
+      "overlap-argv.json": "ab91108cab5a3d9905307fb55f813838a2dc6999bdddff9b5717c168742ed895"
+    },
+    "status": "scoped-deployed-and-three-package-overlap-complete-review-required",
+    "containerId": "c8865d9c0df5b94c0fb1afc1d674711ba09f779f90cb04ad65ba14c662778901",
+    "launchGroupRetired": true,
+    "overlapLaunchGroupRetired": true,
+    "cleanupEvidence": "State and CID file agree; both owned launch groups recorded retired. Coordinator separately reports Docker inspection returned no such container. Reviewer did not independently call Docker.",
+    "controlsReconciled": "Saved Docker argv exactly equals the reviewed command generator for this session. Saved overlap argv exactly equals checked-copy plus the three fixed archives. All8 deployed-manifest file hashes and current controller/checker/manifest match; no archive rescans."
+  },
+  "deployedResults": {
+    "actualPackagedFixedLauncher": true,
+    "compiledManagedCapabilities": true,
+    "compiledCatalog": true,
+    "patchedProductionDependencies": true,
+    "compiledNativeProfileExports": true,
+    "canonicalNativeProfileRootChecks": true,
+    "scope": "Reviewed probe asserts actual8 identity and source/recipe/archive/lock/build metadata before importing compiled code. Fixed /usr/bin/maslow-connect supplies managed capabilities and5-entry catalog; patched SDK1.31.0/fast-uri3.1.8/ip-address10.7.1/proxy-addr2.0.8 and parser/address behavior checks pass. Compiled Craft profile exports and canonical project/output root and alias rejection pass.",
+    "environment": "Disposable retained-image builder context, network none, CPU2/RAM4GiB/total6GiB; temporary home/projects, read-only verified payload/CLI/metadata/licenses/probe/receipts.",
+    "grantsCreated": false,
+    "installedPackageAdmission": false,
+    "nativeConfinementVerified": false,
+    "liveAccountsVerified": false,
+    "legacyField": "Probe emits hubNative7AdmissionAccepted=false as a harmless historical label. Header/assertions and mounted identity bind version8. This field grants no7 or8 admission."
+  },
+  "overlap": {
+    "result": "pass",
+    "inputs": {
+      "maslow-free-ai-0.1.0-2": "68af1f9c764bcd3cc5b37c5318e23348ac2719ea0b829672ae40399c39341a07",
+      "maslow-voice-0.1.5-40": "407b4372e0d8a3de0652a59d28b0ddd38068447450abfa5309c91e431239db44",
+      "maslow-connect-0.1.0-8": "3bbd8f3218af5556dbb5d989c7375b66292d62790a841c905dde72a1f6f34dca"
+    },
+    "fullHubOverlapVerified": false,
+    "limit": "Exactly these three packages; no new Hub package exists in this check. Checked listings propagate failures; output confirms no conflicting file ownership."
+  },
+  "priorEvidence": {
+    "sourceOwning": "Accepted fd33682f source includes377 passing checks/11 skips; prior source review remains separate.",
+    "staticSha256": "e036ab4531ded57135445192c9b861c6ef1c2d1aa79a5c3e5a642c951357457c",
+    "inventorySha256": "f91ee6deba30a588ff771f9859570a3c6570141477260782b381086dc5415a89",
+    "approvalSha256": "76bc31f7d4b4d23bc9a5a8ca3245e1b785fa00834071844257e2e99611be8456",
+    "advisorySha256": "73af8f27d19fb4f7840e414b9146b5711897e5d7d51f750ed0efecd3b212ae1a",
+    "advisoryScope": "Fresh captured105-external-tuple npm Bulk HTTP200 empty response at2026-10-12T05:06:23.964669+00:00. Known-advisory snapshot, not pnpm CLI/full-workspace audit or universal vulnerability clearance.",
+    "staticScope": "106 physical package roots/105 external tuples, exact four patched production SRI packages, retained compiled/contracts/closure comparison and105 notice rows including two narrowly bound supplements.",
+    "originalFindingsReviewSha256": "8c8ddb791ee90b7dbc303e696a73c6ade4f9c600f7486ef0052c187258381cb6",
+    "fixedControlRetakeSha256": "14974a331d13fc9ec3ff56c34e2a7ed533e3230fff70c78acaf450b788422381",
+    "history": "Original wrapper/checker failures preserved; fixed owned overlap stage and checked listings were retested before this run. Old native5/6/7 artifacts and their distinct limitations are not relabeled or cleared by8."
+  },
+  "permittedNextScope": "Add only exact version8 -> fd33682f source identity to the existing matched Hub map, retaining root-owned regular-file/mode/pacman-owner checks and negative cross-pair/version/source tests. Review the code delta separately before accepting it.",
+  "remaining": [
+    "Matched Hub source integration and actual Hub package/full overlap.",
+    "Installed fixed launcher/package ownership, native confinement/root launcher and loaded-code proof.",
+    "Actual user-selected account grant/privacy/revocation and no consumer-speech disclosure.",
+    "V2/current-operation recovery/public flow completion and actual root/keyring/package proofs.",
+    "Guest/Lenovo/provider/audio and independent final preview acceptance."
+  ],
+  "claims": {
+    "reviewerExecutedCandidate": false,
+    "hubMapChanged": false,
+    "installedVerified": false,
+    "liveVerified": false,
+    "previewComplete": false
+  }
+}

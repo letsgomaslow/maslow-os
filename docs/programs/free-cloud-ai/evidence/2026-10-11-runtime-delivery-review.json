@@ -1,0 +1,320 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-11",
+  "reviewer": "independent runtime_delivery_review worker",
+  "status": "scoped-source-review-and-regressions-passed",
+  "candidate_ready": false,
+  "runtime_base_commit": "b192d59375e2e951b7611050e7ac4b06ffbedf80",
+  "source_snapshot": "Exact hash-based reviewed inputs across the admission, reserved-binding and private-probe checkpoints. Historical revisions and changed-byte evidence remain distinct; no built/installed package approval.",
+  "scope": [
+    "Root-ticket reader and prepare/check delivery coordinator",
+    "Voice control/task admission, pending conversation/reconnect/audio work and background external actions",
+    "Owned idle coordinator shutdown, startup barrier, canonical locations and framed replies"
+  ],
+  "findings": [
+    {
+      "id": "RD-1",
+      "priority": "P1",
+      "status": "fixed-and-independently-retested",
+      "issue": "Concurrent prepare and retries after a failed preparation could create another snapshot.",
+      "reproduction": "Deferred synthetic prepare_recovery received two awaits and both concurrent requests returned success.",
+      "coordinator_fix": "Reject closed or already-prepared coordinator before idle/router work.",
+      "independent_retest": "Deferred snapshot retest proved one await and concurrent FREE_AI_DELIVERY_PENDING; durable regression also covers retry after failed preparation."
+    },
+    {
+      "id": "RD-2",
+      "priority": "P1",
+      "status": "fixed-and-independently-retested",
+      "issue": "Pending automatic reconnect was omitted from initial idle checks and actual start_voice admission.",
+      "reproduction": "Synthetic reconnect task paused for one second; prepare returned success/closed while reconnect remained pending, then _start_voice_attempt was awaited after closure.",
+      "coordinator_fix": "Initial idle includes unfinished reconnect/provider cleanup; start_voice and each actual attempt enforce admission.",
+      "independent_retest": "Pending reconnect retest returned initial BUSY without closure/cancellation; closed start_voice never reached mocked attempt. Durable regression also covers provider cleanup/actual attempt."
+    },
+    {
+      "id": "RD-3",
+      "priority": "P1",
+      "status": "fixed-and-independently-retested",
+      "issue": "TaskStore.active filters the newest 10000 rows after LIMIT, hiding an older nonterminal task.",
+      "reproduction": "Actual temporary SQLite had one queued task plus 10000 newer completed rows; active() returned [], and preparation succeeded/closed.",
+      "coordinator_fix": "TaskStore.active uses WHERE state NOT IN terminal before loading, with no history LIMIT.",
+      "independent_retest": "Actual temporary SQLite retained one old queued task behind 10000 newer completed records; active() returned it and preparation returned initial BUSY/no snapshot."
+    },
+    {
+      "id": "RD-4",
+      "priority": "P1",
+      "status": "fixed-and-independently-retested",
+      "issue": "Background external agent launch can outlive conversation and register a working job after preparation.",
+      "reproduction": "Deferred synthetic desktop.tell in background agent_action: preparation succeeded with no registered job; resolving tell then registered one working job and its watcher after closure.",
+      "coordinator_fix": "External action decorator, action_work reservations and action-lock busy check cover agent/note/resume/submit-intent and deferred answer_quickly work.",
+      "independent_retest": "Deferred background agent launch returned initial BUSY without closure/cancellation; direct new launch rejected after closure. Durable regression and 48 owning MVP tests pass."
+    }
+  ],
+  "additional_source_observations": [
+    "Initial inherited-client/router-owner/tmux BUSY checks precede lazy router construction; an actual synthetic RouterRuntime constructor probe with inherited client returned BUSY/closed=false without creating state/recovery directories.",
+    "Passwd-derived home and /run/user/UID guard environment, Voice paths/symlink ancestors and router.state.directory. Custom environment is rejected before lazy state creation; durable custom state/router regression passes.",
+    "Startup ticket barrier runs before VoiceService constructor state creation and again at run; independent actual temporary ticket-presence test proved requested state/runtime paths stayed absent.",
+    "Fixed private tmux metadata check runs synchronously with two-second timeout before closure; synthetic exact no-server adapter passes while an existing session or unknown error returns BUSY. No actual host tmux query was performed.",
+    "Ticket UID must be non-root current UID, expiry is at most 900 seconds and previousArtifacts requires maslow-voice, aligned with fixed Hub helper. Strict field/identity/expiry/package tests pass."
+  ],
+  "independently_run_checks": [
+    {
+      "command": "PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=voice /usr/lib/maslow-voice/venv/bin/python -m unittest discover -s voice/tests -p 'test_free_ai_delivery.py' -q",
+      "result": "17 passed after final compatibility refresh in 1.396s; slow large-history test logging only",
+      "scope_stage": "admission review before reserved-snapshot binding; affected current checks in reserved_snapshot_binding_review"
+    },
+    {
+      "command": "PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=voice:free_ai /usr/lib/maslow-voice/venv/bin/python -m unittest discover -s voice/tests -p 'test_assistant*.py' -q",
+      "result": "30 passed on final frozen source",
+      "scope_stage": "admission review before reserved-snapshot binding; affected current checks in reserved_snapshot_binding_review"
+    },
+    {
+      "command": "PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=voice:free_ai /usr/lib/maslow-voice/venv/bin/python -m unittest discover -s voice/tests -p 'test_ipc.py' -q",
+      "result": "3 passed earlier; IPC source unchanged; actual final frozen-source socket framing retest passed",
+      "scope_stage": "admission review before reserved-snapshot binding; affected current checks in reserved_snapshot_binding_review"
+    },
+    {
+      "command": "PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=voice:free_ai /usr/lib/maslow-voice/venv/bin/python -m unittest discover -s voice/tests -p 'test_tasks.py' -q",
+      "result": "19 passed on final frozen source",
+      "scope_stage": "admission review before reserved-snapshot binding; affected current checks in reserved_snapshot_binding_review"
+    },
+    {
+      "command": "PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=voice:free_ai /usr/lib/maslow-voice/venv/bin/python -m unittest discover -s voice/tests -p 'test_mvp_service.py' -q",
+      "result": "48 passed on final frozen source in 35.826s; SDK deprecation/slow import logging only",
+      "scope_stage": "admission review before reserved-snapshot binding; affected current checks in reserved_snapshot_binding_review"
+    },
+    {
+      "command": "PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=free_ai /usr/lib/maslow-voice/venv/bin/python -m unittest discover -s free_ai/tests -p 'test_*.py' -q",
+      "result": "29 passed; FreeAI runtime/recovery inputs unchanged during final admission fixes",
+      "scope_stage": "admission review before reserved-snapshot binding; affected current checks in reserved_snapshot_binding_review"
+    },
+    {
+      "command": "Real temporary ControlServer Unix socket with same-UID SO_PEERCRED; synthetic root-ticket reader and recovery",
+      "result": "Repeated on final frozen source: actual same-UID SO_PEERCRED prepare/check both returned exact outer {ok:true,result:record}; request nonce/UID matched",
+      "scope_stage": "admission review before reserved-snapshot binding; affected current checks in reserved_snapshot_binding_review"
+    },
+    {
+      "command": "Actual owned synthetic Python child with start_new_session=True, inserted into Hermes process/client ownership maps",
+      "result": "Repeated through real final ControlServer: child terminated/reaped (-15), process group absent, ownership maps cleared, synthetic paired-recovery response returned",
+      "scope_stage": "admission review before reserved-snapshot binding; affected current checks in reserved_snapshot_binding_review"
+    },
+    {
+      "command": "git diff --check",
+      "result": "passed",
+      "scope_stage": "admission review before reserved-snapshot binding; affected current checks in reserved_snapshot_binding_review"
+    },
+    {
+      "command": "Four targeted independent deferred/synthetic reproductions repeated against revised source",
+      "result": "RD-1/RD-2/RD-3/RD-4 passed; no initial BUSY cancellation/admission closure",
+      "scope_stage": "admission review before reserved-snapshot binding; affected current checks in reserved_snapshot_binding_review"
+    },
+    {
+      "command": "Actual temporary ticket-presence constructor test; synthetic subprocess tmux metadata adapter",
+      "result": "No state/runtime creation under startup barrier; exact no-server only accepted, unknown error/session rejected, fixed environment and timeout verified",
+      "scope_stage": "admission review before reserved-snapshot binding; affected current checks in reserved_snapshot_binding_review"
+    }
+  ],
+  "evidence_distinctions": {
+    "unit_and_race_checks": "Actual service/manager/task store and real temporary SQLite; provider, ticket ownership, key-store/recovery and desktop inputs synthetic.",
+    "socket_and_process_checks": "Actual same-UID Unix peer credentials and owned synthetic OS child/group; no installed service binding or privileged transaction.",
+    "protected_ticket": "Existing tests show actual unprivileged file denial, plus patched root-ticket field validation. No real root-created ticket was placed on host.",
+    "final_guard": "Hub managed seal/check separately verifies full task history, private tmux sessions and canonical recovery; runtime findings do not independently prove pacman mutation.",
+    "private_secret_service": "Independently repeated final disposable probe: actual isolated Secret Service/SQLite/Node with synthetic keys; exact helper and external receipt hashes recorded separately. Personal host keyring untouched."
+  },
+  "remaining_gates": [
+    "Runtime reserved snapshot binding passed scoped source review; actual privileged root-crash adoption and completion/mask ordering require separate Hub review and installed acceptance.",
+    "Fixed privileged installer INSTALLATION_ACCEPTED remains false; no installer/release acceptance.",
+    "Fresh Voice37 must be explicitly user-stopped and pass fixed Hub helper; no older runtime or developer-launcher acceptance.",
+    "No host configuration/service/package changes or personal credential/keyring/provider operation, product merge or signing/publication was performed. Actual disposable Secret Service operations used only synthetic keys.",
+    "Native systemd, actual privileged root ticket, installed private runtime, paired package interruption/recovery, live provider/account, guest/Lenovo and physical audio remain unaccepted."
+  ],
+  "source_sha256": {
+    "voice/maslow_voice/free_ai_delivery.py": "63270f9249dafbd9ec257e19a7f57d38d63d6e729e39d092c023bc8546c9632a",
+    "voice/maslow_voice/daemon.py": "3726592299dbbc0e6d814e9e854ad73740f825368d6a047b4d509cc52d40c388",
+    "voice/maslow_voice/tasks.py": "225a8e8b3568bf28a9444798fa51848e6706463ed7c31188b1d051bf64209cbb",
+    "voice/maslow_voice/store.py": "f23ab1a1c04dc401ad52811394f413bd0cd6c90f029248165e2cdb0be71a1d64",
+    "voice/maslow_voice/ipc.py": "772acab5cdaad5d8ce7ac89587273eef81e01b7a775c4f77e8e07fc74f66376d",
+    "voice/tests/test_free_ai_delivery.py": "d553b9bc4a0ce87490bb4b78e703a96a4e0df957bd0cba69731bd238bc1cc164",
+    "free_ai/maslow_free_ai/runtime.py": "45d0a28708ca7896a05f7f938b607c53fc6c096d0a1837b82dbe3f5992b29a88",
+    "free_ai/maslow_free_ai/recovery.py": "f884789500354d2b09bb6bb913c285f79ea1895bc200aeb9e3318a93bd537e17",
+    "free_ai/tests/test_recovery.py": "0e57cf681b137924682ea25fbf94834a6bba80d88d1aec05e6a2a9d36c9e7187",
+    "free_ai/tests/test_runtime.py": "9e6a225aee2151931a9b532084c242a1e6840b838c42efbaa8089ad1a7622ed7",
+    "free_ai/tests/secret_service_probe.py": "13b8c4e0635be4cfa07300dd4b2369f809fcdf32667d5d2d9f86e3578a21c7ab"
+  },
+  "contract": {
+    "path": "/home/maslow/Projects/Maslow/free-ai-hub/docs/free-ai-preflight-contract.md",
+    "sha256": "33ffebf70de796ceccbdb4e810f0b1df1dd1f0fb60761265abfcccba9afe4e0c"
+  },
+  "unresolved_findings_in_reviewed_source_scope": [],
+  "final_compatibility_refresh": {
+    "changes": [
+      "Explicit canonical TMUX_TMPDIR=/tmp is accepted; custom locations still reject before preparation. Fixed tmux query retains cleared environment and /tmp socket expectation.",
+      "Delivery test imports optional backend from repository source only, so the existing owning wrapper PYTHONPATH=voice can run its synthetic fixtures. Production import paths unchanged."
+    ],
+    "verification": [
+      "17 delivery tests passed with PYTHONPATH=voice in 1.396s.",
+      "Canonical /tmp accepted and custom /tmp/custom rejected through both environment and no_agent_sessions guards using synthetic subprocess result.",
+      "All other previously reviewed source hashes unchanged; earlier affected and unchanged-input results remain scoped as recorded.",
+      "Coordinator reports first whole-wrapper run failed because optional module import was missing, then corrected focused tests passed; full owning wrapper rerun was ongoing at this review refresh. This reviewer does not claim a whole-wrapper result."
+    ],
+    "scope_stage": "historical admission review before b192d593 commit and reserved-snapshot binding"
+  },
+  "initial_runtime_base_commit": "4984501516f0eefc2952629c01e196442b239f1b",
+  "reserved_snapshot_binding_review": {
+    "scope": [
+      "Recovery.snapshot reserved_id/operation validation, exclusive directory creation and durable write ordering.",
+      "Private operation.json read validation and exact transaction/original nonce hash matching.",
+      "RouterRuntime prepare pass-through and delivery reserved receipt ID/check binding."
+    ],
+    "binding": {
+      "reserved_recovery_id": "root ticket transactionId",
+      "operation_fields": [
+        "schema",
+        "transactionId",
+        "nonce_sha256"
+      ],
+      "nonce_hash": "SHA-256 of ASCII bytes of the original 64-lowercase-hex root nonce",
+      "receipt": "Seven existing fields unchanged; id must equal reserved transactionId."
+    },
+    "findings_fixed": [
+      {
+        "id": "RB-1",
+        "priority": "P2",
+        "issue": "New snapshot directory entry was not explicitly synced in its recovery parent, so prepared marker durability did not independently guarantee directory-entry durability.",
+        "evidence": "Instrumented actual temporary SQLite/Node snapshot recorded only child-directory sync calls. This is a source/durability inference, not an observed power-loss failure.",
+        "primary_contract": "https://man.archlinux.org/man/fsync.2.en",
+        "fix": "sync_directory(self.root) inside snapshot guarded failure handling after exclusive mkdir and before operation/key/database work.",
+        "independent_retest": "Actual instrumented snapshot showed recovery parent synced first; first key access saw operation.json and preparing marker. Added parent-sync and failure tests pass."
+      },
+      {
+        "id": "RB-2",
+        "priority": "P2",
+        "issue": "Normal JSON parser plus equality accepted disk schema:true as schema:1 and normalized duplicate nonce hash keys.",
+        "evidence": "Actual operation.json rewritten with Boolean schema and duplicate wrong-then-correct nonce_sha256 keys was accepted.",
+        "fix": "Duplicate-object parser and validate_operation(identity, parsed_value) precede exact equality.",
+        "independent_retest": "Both malformed disk bindings now return RECOVERY_BINDING_INVALID; durable regression passes."
+      }
+    ],
+    "additional_verified_behavior": [
+      "Reserved snapshot and original nonce binding survive constructing a new verifier object and lost-reply fixture; wrong nonce rejects.",
+      "Existing reserved directory reuse after explicit abandon raises before key access, leaves old database bytes unchanged and retains preparing marker; no old-nonce adoption.",
+      "Static symlinked and hardlinked operation.json files reject.",
+      "Missing/malformed reserved binding rejects before snapshot marker creation.",
+      "Generic snapshots remain random and have no operation.json; intended root adoption requires reserved ID and exact operation binding.",
+      "Wrong returned receipt ID rejects before prepared record creation and retains admission closure.",
+      "Final real same-UID SO_PEERCRED prepare/check socket framing returns {ok:true,result:record} with receipt ID equal to transactionId; ticket/recovery remain synthetic adapters."
+    ],
+    "tests": [
+      {
+        "command": "PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=free_ai /usr/lib/maslow-voice/venv/bin/python -m unittest discover -s free_ai/tests -p 'test_*.py' -q",
+        "result": "34 passed in 8.233s on final binding bytes"
+      },
+      {
+        "command": "PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=voice /usr/lib/maslow-voice/venv/bin/python -m unittest discover -s voice/tests -p 'test_free_ai_delivery.py' -q",
+        "result": "17 passed in 1.355s on final binding bytes"
+      }
+    ],
+    "limitations": [
+      "Restart/lost reply is a verifier reconstruction and local fixture, not an actual privileged root crash or power-loss test.",
+      "Node AES-GCM, SQLite and file/sync calls are real; all active/recovery encryption-key records use synthetic keystore responses.",
+      "Exclusive existing-directory and static alias tests do not establish exhaustive concurrent hostile filesystem race resistance.",
+      "Hub privileged root receipt adoption, persistent mask ordering and completion crash recovery are owned by the separate boundary reviewer and are not accepted by this runtime review.",
+      "No installation gate enabled; no host service/config/package/keyring/provider/build/signing/merge/publication operation."
+    ],
+    "superseded_admission_review_sha256": {
+      "voice/maslow_voice/free_ai_delivery.py": "ace59bd6b5281a39fc361d05225ba6171a1dd6b0137d1bf6be278682b5bac6ae",
+      "voice/tests/test_free_ai_delivery.py": "e8f2f66148c6faeb9eff29a6247cbacf47a770a558eee9e8c463e8379f059b8f",
+      "free_ai/maslow_free_ai/runtime.py": "97a2a0b90c7d52d5e3e8f231bf5708ce314a49139f586e80f88460899a6ef0bb",
+      "free_ai/maslow_free_ai/recovery.py": "1fe6a65119427494f9bd1e0f307cb78337637e68f03dfb351ef0c69155b2081f"
+    }
+  },
+  "historical_pre_b192_test_checkpoint": {
+    "test_path": "voice/tests/test_free_ai_delivery.py",
+    "reviewed_before_commit_sha256": "e8f2f66148c6faeb9eff29a6247cbacf47a770a558eee9e8c463e8379f059b8f",
+    "committed_b192_sha256": "5312b8a36a27aa6032a33ad8ac609643a8174cd21ba1d5c71acfbfa4ae458778",
+    "difference": "One trailing space on router.state.directory fixture assignment was cleaned before b192d593. Reconstructing that trailing space from committed bytes exactly matches the historical recorded hash. Earlier 17-test result concerns pre-cleanup bytes; final binding tests concern current hashes.",
+    "behavioral_source_change_in_cleanup": false
+  },
+  "private_secret_service_recovery_probe_review": {
+    "status": "scoped-helper-isolation-and-disposable-recovery-probe-passed",
+    "review_base_commit": "9323890c7c80dc19441c182aedcf50c6c609251e",
+    "helper_path": "free_ai/tests/secret_service_probe.py",
+    "helper_sha256": "13b8c4e0635be4cfa07300dd4b2369f809fcdf32667d5d2d9f86e3578a21c7ab",
+    "coordinator_receipt": {
+      "path": "/home/maslow/Maslow-ai-os/free-ai-build/secret-service-recovery-probe-final.json",
+      "sha256": "1f2e16c37a06d84acc5511abe4d60d7b2ea656b6f7a2acf4b323d7f07cd73ecf",
+      "independent_repeat_receipt_matches": true
+    },
+    "independent_receipt": {
+      "schema": 1,
+      "backend": "real GNOME Keyring / private D-Bus",
+      "missing_key": true,
+      "private_stdin_store_roundtrip": true,
+      "recovery_secret_roundtrip": true,
+      "locked_active_and_recovery_keys_rejected": true,
+      "host_keyring_touched": false,
+      "live_provider_requests": 0,
+      "installed_product_verified": false,
+      "recovery": {
+        "wal_committed_quota_retained": true,
+        "root_operation_binding_rechecked_after_restart": true,
+        "wrong_nonce_rejected": true,
+        "corrupt_database_and_missing_active_key_restored": true,
+        "matching_ciphertext_and_secret_retained": true,
+        "admission_remained_closed": true,
+        "snapshot_permissions_and_plaintext_exclusion_checked": true,
+        "historical_restore_rejected": true,
+        "package_restore_verified": false
+      }
+    },
+    "isolation_verified": [
+      "Outer --recovery creates a fresh mode-0700 temporary HOME and exact separate XDG paths, clears caller environment and starts a private dbus-run-session in a newly owned process group.",
+      "Child refuses missing private marker/non-disposable HOME or custom XDG paths before subprocess launch; synthetic guard checks verified no subprocess call.",
+      "Before GNOME launch, helper checks actual DBus daemon UID and disposable HOME/runtime; it polls NameHasOwner without Secret Service autoactivation.",
+      "Actual Secret Service owner UID/HOME/bus are validated and retained by pidfd before any key read/create/clear.",
+      "Node reports exactly v22.23.3; provider ciphertext/key/artifact/transaction inputs are synthetic. No network inference or package operation is present."
+    ],
+    "helper_findings_fixed": [
+      {
+        "id": "PR-1",
+        "priority": "P2",
+        "issue": "Outer supervisor-only timeout and unbounded helper children could leave private processes; daemon stdin setup preceded cleanup finally.",
+        "fix": "Bounded communicate kills/reaps Node/gdbus/secret-tool on timeout/cancel; daemon stdin is guarded; SIGTERM cancels probe into validated owner pidfd cleanup; outer owned group receives bounded TERM/KILL cleanup.",
+        "independent_retest": "Owned synthetic child timeout and cancellation return -9 after reap. Accelerated outer timeout terminates/reaps a synthetic supervisor and its cooperative child; owned group absent."
+      },
+      {
+        "id": "PR-2",
+        "priority": "P2",
+        "issue": "Private child flags did not require an explicitly disposable context, and readiness key reads preceded Secret Service owner capture.",
+        "fix": "Exact disposable context and actual private DBus ownership preconditions; non-activating readiness/owner validation precedes key calls; Lock uses bounded cleanup helper.",
+        "independent_retest": "Bad child HOME/custom XDG reject before spawn; final actual disposable probe succeeds with the stricter private guards."
+      }
+    ],
+    "independently_run_checks": [
+      {
+        "command": "/usr/lib/maslow-voice/venv/bin/python free_ai/tests/secret_service_probe.py --recovery under an independently owned wrapper group",
+        "result": "Final helper succeeded in about 3.8 seconds, no stderr; private owned group absent after exit; deterministic sanitized receipt matched coordinator report."
+      },
+      {
+        "command": "Instrument validated pidfd cleanup in actual private dbus-run-session and disposable HOME using final helper probe()",
+        "result": "Exactly one validated owner captured; kernel process identity confirmed exited after pidfd cleanup; private group absent after session exit."
+      },
+      {
+        "command": "Synthetic child HOME/XDG rejection and bounded child/outer timeout-cancellation fixtures",
+        "result": "Private guard checks and corrected cleanup fixtures passed; no host bus/keyring used by negative fixtures."
+      }
+    ],
+    "test_harness_note": "An initial cleanup fixture used AsyncMock incorrectly and returned an unawaited coroutine; its result was discarded. Corrected accelerated wait_for fixture passed. An exact synthetic-child process scan found no remaining child from the invalid fixture. This was a reviewer harness error, not a helper failure.",
+    "evidence_distinctions": {
+      "actual": "Private GNOME Secret Service, D-Bus, active/recovery secret items, SQLite WAL/snapshot/restore and Node AES-GCM verification are actual local operations with synthetic keys and provider ciphertext.",
+      "restart": "New State/Recovery verifier objects simulate restart/lost reply; no actual root/service crash or power loss is induced.",
+      "closed_admission_field": "The helper asserts maintenance marker retained plus enabled=false and verified_routes=[]; it does not drive actual Voice TaskManager or live daemon admission.",
+      "cleanup": "Normal private group absence and validated owner exit directly observed; synthetic timeout/cancel paths exercised. SIGKILL escalation is source-reviewed but no stubborn real keyring/escaped-owner test or interruption-at-every-instruction proof is claimed.",
+      "host": "No personal desktop bus/keyring/credentials or provider account was accessed. No installed service/config/package/build/signing/publication/product merge operation."
+    },
+    "remaining_gates": [
+      "Privileged package pairing, root receipt adoption, installed service barriers and actual interrupted package recovery remain separate Hub/native gates.",
+      "Live provider/account, installed keyring UX, guest/Lenovo and physical audio remain unaccepted.",
+      "No installer acceptance gate is enabled by this probe."
+    ]
+  }
+}

@@ -17,6 +17,7 @@ ShellRoot {
       schemaVersion: 1,
       voice: { enabled: false, state: "disabled", microphone: false, speaking: false, level: 0, error: "" },
       settings: { mode: "gemini_live", livekit_url: "wss://your-project.livekit.cloud", gemini_live_model: "gemini-3.8-live", gemini_live_voice: "Puck", livekit_voice: "Ashley", realtime_voice: "cedar", live_voice: "marin", server_kind: "ollama", server_url: "http://127.0.0.1:11434", model: "qwen3:8b", default_coder: "auto", task_policy: "lab_auto", reduced_motion: false, fixed_position: false, orb_position: null, display: "", ollama_models: "/home/maslow/.ollama/models", speech_directory: "/home/maslow/.local/share/maslow-voice/speech" },
+      assistant: { enabled: true, ready: true },
       tasks: [], session: { id: "fixture", transcript: [] },
       readiness: { ready: true, checks: [{ name: "Speech models", ok: true, message: "Available on this computer." }], conversation: { ready: true, checks: [{ name: "Maslow Voice connection", ok: true, message: "Available on this computer." }] }, tasks: { ready: true, checks: [{ name: "Automatic routing", ok: true, message: "A coding agent will be selected for each task." }] }, models: [{ id: "qwen3:8b", label: "Qwen 3 · 8B" }] }
     })
@@ -156,6 +157,36 @@ ShellRoot {
       next.voice_preview = { state: state, voice: "Zephyr", error: state === "error" ? "Could not play this voice. Try again." : "" }
       panel.voiceController.setFixture(next)
     }
+    // Test-only controls: never contact accounts, the daemon or audio devices.
+    function assistantReadiness(enabled: bool, ready: bool): void {
+      var next = JSON.parse(JSON.stringify(panel.voiceController.snapshot))
+      next.assistant = { enabled: enabled, ready: ready }
+      panel.voiceController.setFixture(next)
+    }
+    function composer(text: string, project: string, documents: string, note: string, saveNote: bool): void {
+      panel.assistantDraft = text
+      panel.selectedProject = project
+      panel.assistantDocuments = documents
+      panel.assistantNote = note
+      panel.assistantSaveNote = saveNote
+    }
+    function composerStatus(): string { return JSON.stringify({ draft: panel.assistantDraft, project: panel.selectedProject, documents: panel.assistantDocuments, note: panel.assistantNote, saveNote: panel.assistantSaveNote, submitting: panel.assistantSubmitting, requestId: panel.assistantRequestId, feedback: panel.feedback, connection: panel.settings.execution_connection || "existing", accountLoading: panel.assistantAccountsLoading, accountError: panel.assistantAccountsError, accounts: panel.assistantAccounts, selectedAccounts: panel.assistantSelectedAccounts, accountConsent: panel.assistantAccountConsent, accountRequestId: panel.assistantAccountsRequestId }) }
+    function refreshAccounts(): void { panel.refreshAssistantAccounts() }
+    function accountsReply(identity: string, available: bool, accountsJson: string): void { panel.voiceController.applyLine(JSON.stringify({ ok: true, assistant_accounts_reply: true, account_request_id: identity, available: available, accounts: JSON.parse(accountsJson) })) }
+    function accountsError(identity: string): void { panel.voiceController.applyLine(JSON.stringify({ ok: false, assistant_accounts_reply: true, account_request_id: identity, error: { message: "Fixture account refresh failed." } })) }
+    function accountsFixture(kind: string): void {
+      var accounts = kind === "options" ? [
+        { id: "fixture_personal", label: "Personal Calendar · preview@example.invalid" },
+        { id: "fixture_work", label: "Work Calendar · team@example.invalid" }
+      ] : kind === "changed" ? [{ id: "fixture_work", label: "Work Calendar · team@example.invalid" }] : []
+      panel.voiceController.applyLine(JSON.stringify({ ok: kind !== "error", assistant_accounts_reply: true,
+        account_request_id: panel.assistantAccountsRequestId, available: kind !== "unavailable", accounts: accounts,
+        error: { message: "Fixture account refresh failed." } }))
+    }
+    function accountSelect(identity: string, selected: bool): void { panel.selectAssistantAccount(identity, selected) }
+    function accountConsent(value: bool): void { panel.assistantAccountConsent = value }
+    function composerTransportError(): void { panel.voiceController.applyLine("unreadable-fixture-response") }
+    function composerResponse(ok: bool, message: string): void { panel.voiceController.applyLine(JSON.stringify({ ok: ok, submitted_request_id: panel.assistantRequestId, error: { message: message } })) }
     function requests(): string { return JSON.stringify(panel.voiceController.fixtureRequests) }
     function typeStatus(): string { return JSON.stringify({ page: panel.page, messageFocused: panel.messageInputFocused, advancedOptionsOpen: panel.advancedRequestOptionsOpen }) }
     function taskFocusStatus(): string { return JSON.stringify({ page: panel.page, selectedTaskId: panel.selectedTaskId, focusedTaskInputId: panel.focusedTaskInputId, taskInputFocusTaskId: panel.taskInputFocusTaskId, taskInputFocusRequest: panel.taskInputFocusRequest, focusedTaskActionTaskId: panel.focusedTaskActionTaskId, focusedTaskActionName: panel.focusedTaskActionName, taskActionFocusRequest: panel.taskActionFocusRequest }) }
@@ -165,6 +196,7 @@ ShellRoot {
     function setupError(): void { panel.voiceController.applyLine('{"ok":false,"error":{"message":"LiveKit setup could not be saved. Check the project URL and try again."}}') }
     function position(x: real, y: real): void { panel.localOrbPositionActive = true; panel.localOrbPositionX = x; panel.localOrbPositionY = y }
     function geometry(): string { return JSON.stringify(panel.fixtureGeometry()) }
+    function workScrollEnd(): void { panel.fixtureWorkScrollEnd() }
     function status(): string { return JSON.stringify({ diameter: panel.heldDiameter, controllerOpen: panel.controllerOpen, status: panel.stateText(), badge: panel.taskBadge, state: panel.voice.state, selectedTaskId: panel.selectedTaskId, working: panel.working }) }
     function stressStatus(): string { return JSON.stringify({ taskDelegateCreations: panel.taskDelegateCreations, transcriptDelegateCreations: panel.transcriptDelegateCreations, meterFramesRemaining: meterFramesRemaining, meterLevel: panel.voice.level, taskApproval: panel.tasks[0] ? panel.tasks[0].approval.detail : "", captions: panel.transcript.length }) }
   }

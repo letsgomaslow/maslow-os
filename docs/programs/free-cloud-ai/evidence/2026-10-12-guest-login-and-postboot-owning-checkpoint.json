@@ -1,0 +1,36 @@
+{
+  "schema": 1,
+  "status": "preview-incomplete-current-checks-active",
+  "guest": {
+    "session": "24389981c8e2467695fee8b45a910d1f",
+    "exit": 1,
+    "stateSha256": "ad1862565582cf65d8a279f0f3ae6f606662dc5afb4b9b7462e0239489021c0d",
+    "launchGroupRetired": true,
+    "containerGone": true,
+    "baseMountedReadonly": true,
+    "facts": "Actual guest glibc2.44, Qt6.12.0-2, Quickshell0.3.2-1, Hub0.3.8-1, Hermes0.21.0-3. Voice/FreeAI/Connect absent. LocalFileSigLevel PackageOptional+PackageTrustedOnly. No optional installation or OS update.",
+    "packagesPolicySha256": "5870bbe983d8a57e1b295f09880fabd971628ac2abd1da5b9e02f94054536475",
+    "servicesSha256": "df0935cb31cdbfd5e9c197d757003c91966764b5bd519dcd73a69c9bc69b14c5",
+    "frameSha256": "c25de2a775c49d5172267d9a8de65bffc6cac8c9caf9c67e2df80b31da45806e",
+    "frameInspection": "Normal Maslow greeter waiting for QA user password. The driver had not signed in; Quickshell absence does not establish an OS/desktop crash. Preserve this failed desktop check.",
+    "signinRetakeSha256": "7502bb2f5f7945927c3b2ab961f00271e52b8e16dd83247783433a85b897118f",
+    "signinManifestSha256": "b4177916d45440e49996012f6631e8752dc16158d44730e6bc4c3164a1899c0d",
+    "signinReviewSha256": "d9ce3bea823d9cdc4506af7647d3d75dffe3f77015dbf21b64d5c2b5e2d85c2a",
+    "next": "Normal QA sign-in using existing harness/QMP, require actual Quickshell, inspect existing Hub Voice setup payload/dependencies and Secret Service name presence without secrets. Separate Root GO/current resource admission required; no ISO cycle."
+  },
+  "postbootSource": {
+    "checkpointSha256": "ec2bb7311b7b0377f764de17af7ceed848aa7642e08e191d30364d119365226f",
+    "independentReviewSha256": "4eb4fa4ff06e1f58fc7ae8ccd25e67d6db2148c3c6992725762e2bfcb153312a",
+    "acceptedScope": "Seven private Hub modules plus three test files; legacy/public Voice41 wire, four false product gates and terminal cleanup preserved. Source/inert review only.",
+    "owningFirstRun": "677 tests, one error: unchanged helper EOF case exceeded original5s subprocess timeout. Original result/log retained at postboot-operation-source/root-owning; python log SHA3000080632bcc226eab5d5e32643c12f5b1903efe7bc293f0cf113400ba31174.",
+    "diagnosis": "Unchanged exact EOF test passes in isolation. Instrumented children exit correctly3.329/3.071s under original5s limit, before ticket reads; original timeout cause unconfirmed. No source/test/deadline/resource weakening. Exact full retake serialized with other tests idle is active at root-owning-retake (exec56124)."
+  },
+  "postbuildControls": {
+    "identityAndSourceFindingsResolved": true,
+    "sourceReviewSha256": "fc6082057d61061f711efeda29b28ee43916040a7ccc86789725c20c56c65589",
+    "scope": "Protected descriptor hash+parse and immutable committed source expectations accepted. Real candidate/source pins remain null; no actual Hub artifact audit or build."
+  },
+  "preserved": "Backend2, Voice41, Connect8 and signed QA pair unchanged. Craft paused; one shared heavy slot. No private account, Groq, heard Voice, Lenovo install, production publication or merge.",
+  "nextAction": "Finish full Hub retake; commit exact accepted source, repin four-literal QA derivative/build context. Sequentially perform signed-in guest prerequisite check and matched Hub build/artifact checks before installed/private acceptance.",
+  "previewComplete": false
+}

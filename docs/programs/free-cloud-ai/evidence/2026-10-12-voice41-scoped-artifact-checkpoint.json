@@ -1,0 +1,21 @@
+{
+  "schema": 1,
+  "status": "voice41-scoped-native-artifact-checks-accepted-preview-incomplete",
+  "archiveSha256": "2c5e6666c753963049adc36059dffa048c52e8fb12a3bf2aeb546ce869f93800",
+  "sourceCommit": "914d77dda835cc3e884434ec18a589facdd4d8ae",
+  "recipeCommit": "6cc15c3b297a375897f078fee7ef27afcbcfcf72",
+  "independentReviewSha256": "1b73b211b606bec3ff51523747dccff3f0366458d0a3a1e7a4c18906bd4a7d8c",
+  "staticReportSha256": "90bfcdcf3f9651c4c4844a2f5817047e35f307c48a45285dbae5a6eb54187515",
+  "static": {"shippedSourceFiles": 63, "members": 9141, "privateDependenciesAndRemainingPayloadMatchVerifiedVoice40": true, "rootOwnershipModesPathsLinksPassed": true},
+  "owning": {"tests": 522, "passed": 517, "skipped": 5, "seconds": 122.712, "uiControllerComposerPassed": true, "logSha256": "b5a441c25951050e7ec3d359d307a0c27f830e7de9c60fa09a65d1d822d0be84", "session": "81102c37bfb341d599affc9002d28b80", "groupRetired": true},
+  "containerId": "5a69166deba0937f49877ed3fc727ac8adbb45e195592da1393c517930ca2b3e",
+  "containerRemoved": "Exact64-character CID queried by Root returned NoSuchObject; earlier mistyped65-character query excluded.",
+  "overlap": {"packages": ["FreeAI2", "Voice41", "Connect8"], "passed": true, "fullHubPackagePending": true, "stateSha256": "ba9effe01e012a5b8c541fb3af381dae84efec11b52460e9209b532a67160e00"},
+  "failureHistory": "First extraction hit64MiB text-output RLIMIT_FSIZE and SIGXFSZ; coredumpctl confirmed signal25/write. Partial tree and failure receipt retained, never executed. Fresh retry used256MiB per-file cap above actual216677784-byte maximum and corelimit0; the entire new tree was sealed before packaged execution. No artifact/source/test safety check was waived.",
+  "receiptCorrection": "Actual owning log hash begins b5a441; the earlier missing leading b was a transcription error and is excluded.",
+  "remaining": ["Authenticated Root rejection witness and exact masked loaded-Voice41 proof", "Remaining reboot/WAL/staging/damagedDB recovery", "Matched Hub package/signatures/full overlap", "Complete media trust and actual guest", "Live Groq/selected-account/revocation", "Audible Voice and Lenovo measurements/recovery"],
+  "installedAccepted": false,
+  "loadedCodeAccepted": false,
+  "publicGatesOpened": false,
+  "previewComplete": false
+}

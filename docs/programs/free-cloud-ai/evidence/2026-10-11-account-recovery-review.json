@@ -1,0 +1,130 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-11",
+  "reviewer": "independent boundary_review worker",
+  "status": "scoped-source-review-and-regressions-passed",
+  "candidate_ready": false,
+  "runtime_base_commit": "c4098a60b3fc581bb7ec2bc0f877461005aade6f",
+  "source_snapshot": "Exact reviewed working-tree hashes, including coordinator-owned uncommitted fixes. This report does not approve a built/installed package.",
+  "connect_source_commit": "646aa1149f36050a470ded7e3658ad0b0a38bcbb",
+  "connect_evidence": "/home/maslow/Projects/Maslow/free-ai-connect/docs/evidence/2026-10-11-managed-accounts.json",
+  "connect_evidence_sha256": "d580bebabfd70dd83febcb6bf48e01f87dbe82e6fe6c0d23c1b7d4025e71b21e",
+  "scope": [
+    "Fixed Connect CLI bridge/marker checks, immutable task/session/account binding and Continue/expiry behavior.",
+    "Conditional managed Calendar tool and private tool-session bridge.",
+    "Consumer speech summaries/notices/startup/reconnect briefing.",
+    "Owned subprocess transport, Stop/in-flight reads and grant cleanup.",
+    "Current-operation-only router SQLite snapshots/restoration, matching Secret Service key records and recovery admission."
+  ],
+  "findings_fixed": [
+    {
+      "id": "AR-1",
+      "priority": "P1",
+      "issue": "Consumer speech startup/reconnect briefing included raw titles of private assistant tasks.",
+      "reproduction": "A synthetic selected-account task was redacted by task_summary but its unique private title appeared in briefing().",
+      "fix": "Private task titles use a generic label in briefing; owning MVP regression verifies actual fake-provider config and reconnect briefing retain no private marker.",
+      "independent_retest": "48 owning MVP tests passed."
+    },
+    {
+      "id": "AR-2",
+      "priority": "P1",
+      "issue": "Stop did not immediately revoke a known account session and an awaited Calendar read could return private content after Stop.",
+      "reproduction": "Real VoiceService/TaskManager with a deferred synthetic read returned state=stopping, zero revokes at cancel, and private result after cancel.",
+      "fix": "Managed Stop marks stopping before external awaits, revokes known session before client.stop and never falls back to a consumer client. Account tool return rechecks task state, attempt and persisted session and withholds changed/stopped results.",
+      "independent_retest": "Updated assistant suite passes the actual service/manager deferred-read and Stop regression."
+    },
+    {
+      "id": "AR-3",
+      "priority": "P2",
+      "issue": "A newly created Connect grant survived local task-persistence failure without a revoke attempt.",
+      "reproduction": "Injected store.update disk-full failure produced only a create call and no revoke.",
+      "fix": "Validation/persistence failure revokes a well-formed returned session ID, preserves the original error and records cleanup-needed when storage permits.",
+      "independent_retest": "Updated assistant suite verifies create/revoke on persistence failure."
+    },
+    {
+      "id": "AR-4",
+      "priority": "P2",
+      "issue": "A single StreamReader.read call discarded subsequent CLI output chunks and rejected otherwise valid JSON.",
+      "reproduction": "A real synthetic executable emitted a valid JSON response in two flushed chunks; the bridge returned MANAGED_ACCOUNT_UNAVAILABLE.",
+      "fix": "Bounded chunk loop reads through EOF, rejects oversized totals and kills/reaps the owned child on failure.",
+      "independent_retest": "Updated assistant suite covers split small/near-limit JSON and oversized owned-process cleanup."
+    },
+    {
+      "id": "AR-5",
+      "priority": "P2",
+      "issue": "Preparation failure before maintenance-marker creation closed admission while status still advertised ready.",
+      "reproduction": "prepare_recovery({}) returned RECOVERY_ARTIFACT_REQUIRED with no marker, admission=false, status.ready=true and rejected acquire.",
+      "fix": "Artifact identity validation precedes admission closure. Snapshot failure without a durable marker restores previous admission after shutdown; other in-memory closure is represented as maintenance/not-ready.",
+      "independent_retest": "28 FreeAI tests passed including the new preparation/admission regression."
+    }
+  ],
+  "additional_review": [
+    "Malformed non-dict Connect errors now normalize to VoiceError so cleanup accounting sees the failure; no private-content disclosure was demonstrated from the former AttributeError.",
+    "The new assistant_admission callback checks existing/installed router maintenance before persisting a new task and before queued/continued grant creation. This does not replace the unfinished privileged installer quiescence/paired-artifact contract.",
+    "Model tool parameters cannot choose a Connect session ID, operation, endpoint or method. The host supplies immutable request/task/policy/session fields and Connect rechecks exact account authorization.",
+    "Session expiry is checked without replacement; TaskStore refuses changing an existing connect_session. Completed/cancelled/stopping sessions are revoked; failed/interrupted work retains only its original bounded session for explicit Continue.",
+    "The installed accepted managed-Connect gate was observed unavailable. Source tests use synthetic bridge/marker dependencies and do not enable that installed capability."
+  ],
+  "independently_run_checks": [
+    {
+      "command": "PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=voice:free_ai /usr/lib/maslow-voice/venv/bin/python -m unittest discover -s voice/tests -p 'test_assistant*.py' -q",
+      "result": "30 passed"
+    },
+    {
+      "command": "PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=free_ai /usr/lib/maslow-voice/venv/bin/python -m unittest discover -s free_ai/tests -p 'test_*.py' -q",
+      "result": "28 passed"
+    },
+    {
+      "command": "PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=voice:free_ai /usr/lib/maslow-voice/venv/bin/python -m unittest discover -s voice/tests -p test_mvp_service.py -q",
+      "result": "48 passed"
+    },
+    {
+      "command": "PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=voice:free_ai /usr/lib/maslow-voice/venv/bin/python -m unittest discover -s voice/tests -p test_ipc.py -q",
+      "result": "3 passed"
+    },
+    {
+      "command": "AccountBridge().available() read-only installed-file check",
+      "result": false
+    }
+  ],
+  "evidence_distinctions": {
+    "recovery_tests": "Actual temporary SQLite/WAL databases, real Node AES-GCM operations and actual owned synthetic processes where applicable; key-store responses are fakes.",
+    "account_tests": "Synthetic grants, account payloads and CLI processes; no Composio or Groq account request.",
+    "consumer_speech_tests": "Fake providers and synthetic content; no microphone/speaker proof.",
+    "private_secret_service": "Coordinator reports a separate actual disposable GNOME Secret Service probe using fake keys, source committed c4098a60. This reviewer inspected its role/source provenance but did not independently rerun that backend probe or inspect real host credentials.",
+    "prior_hermes_proof": "Earlier actual installed Hermes Runs proof used synthetic inference and three workspace tools. The new account-specific end-to-end live path is not accepted by that prior proof."
+  },
+  "unresolved_findings_in_reviewed_source_scope": [],
+  "remaining_gates": [
+    "A reviewed root-owned managed Connect marker and exact accepted packaged source are not installed/accepted. capabilities output alone is insufficient.",
+    "Privileged package installation/update remains blocked pending independently reviewed quiescence and paired signed artifacts. User-owned snapshot receipts are not privileged installation approval.",
+    "Full historical database/package rollback is deliberately unavailable; only the current prepared stopped operation can restore. Package downgrade compatibility remains unaccepted.",
+    "Live exact-account owner/scope evidence, selected read, provider/local revoke/disconnect and user privacy UI require direct acceptance.",
+    "Live Groq/free-plan behavior, complete credential/package recovery, clean guest, Lenovo and physical audio remain open.",
+    "This is a scoped source review, not an exhaustive audit or release approval; changed source/artifact inputs invalidate affected evidence."
+  ],
+  "source_sha256": {
+    "voice/assistant_plugin/__init__.py": "b0f082fb9e3d55511175517c1e1ed0acc656c0a83d51ae6d8ccee15e591b7119",
+    "voice/assistant_worker.py": "a36df7e7e0cc503516cd4623a7137bb62da66b2d56b1d041e69e363034726b8a",
+    "voice/maslow_voice/assistant_accounts.py": "21bfa727ea6ef26214f12a6b96ac40614e490a332e9cfdad2ea620ce3f1e220a",
+    "voice/maslow_voice/assistant_runtime.py": "cf3face73ed6ece9268e8301934e281ec1483acfd7028ed013df532edadea1a0",
+    "voice/maslow_voice/assistant.py": "b8eb377106f839d7598aa808d53cb3f3f2eed1688749d64de20975e1bd3ee884",
+    "voice/maslow_voice/tasks.py": "ba37ca6d6b7c13d52375a7befe2ae45056b422eec800f59d21234aba380d342a",
+    "voice/maslow_voice/store.py": "0380e3cefa0232119244693e1dcd7b84e5d3ca7e4b12306975d7366dd9e9ed14",
+    "voice/maslow_voice/daemon.py": "6a9266b6e5662378a474fa13eb6cd861e2b3f212f7d7a144443d1fb6d7f7e7e4",
+    "voice/maslow_voice/ipc.py": "772acab5cdaad5d8ce7ac89587273eef81e01b7a775c4f77e8e07fc74f66376d",
+    "voice/maslow_voice/live_tasks.py": "fb93d47e81d6e6235594af34c8b91cb001170d5f4a82e8f9c1f18f0c189975a3",
+    "free_ai/maslow_free_ai/recovery.py": "1fe6a65119427494f9bd1e0f307cb78337637e68f03dfb351ef0c69155b2081f",
+    "free_ai/maslow_free_ai/runtime.py": "97a2a0b90c7d52d5e3e8f231bf5708ce314a49139f586e80f88460899a6ef0bb",
+    "free_ai/maslow_free_ai/credentials.py": "8b1b3e99500d1bd815d015f73362e4b2e9dde1ccf7662d922894b4f5120830f4",
+    "free_ai/maslow_free_ai/state.py": "fff0eaade37b37cdfbaa4ee76f4e83663bc867400c6f97db3be0adaa93758f4a",
+    "free_ai/maslow_free_ai/control.py": "65a864c40d522c395e48974e0c5ab9581f7378b764ba5eb0e50fe220e23d574b",
+    "voice/tests/test_assistant.py": "5804c0a80ee8bc88ef16c97c0559b56781c0a7913a0d9ec5fb56ced33b7eb0cf",
+    "voice/tests/test_assistant_accounts.py": "8a92486c5329639e8b06557d02d1c0d37660c47ee4bfee7f00935c3f51371b2a",
+    "voice/tests/test_mvp_service.py": "68163c13334510c1a01289deb8049e7625df3cef4e095b4c54dad807fcebef3e",
+    "voice/tests/test_ipc.py": "20382f26eea6a85d6e636b617e9b498a600bdd3f7f6bcf2250d6b64e56243ca8",
+    "free_ai/tests/test_recovery.py": "56f7e66fe51d0411674cd4088912630338122d58a26c32352709e903267f9b9f",
+    "free_ai/tests/test_runtime.py": "9e6a225aee2151931a9b532084c242a1e6840b838c42efbaa8089ad1a7622ed7",
+    "free_ai/tests/secret_service_probe.py": "d90bd3f2779615c90971840288737d60a1790afc63c8fc2eb55dafc7fc72cfe2"
+  }
+}

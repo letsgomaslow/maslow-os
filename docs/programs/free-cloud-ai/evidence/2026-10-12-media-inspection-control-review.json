@@ -1,0 +1,62 @@
+{
+  "schema": 1,
+  "date": "2026-10-12",
+  "scope": "Bounded read-only control review for inspection of the one existing c667 baseline ISO. No ISO bytes read, inspection tools run, media extraction, new ISO/repair, Docker/VM, network or account operation by reviewer.",
+  "reviewedSha256": {
+    "inspect-media.py": "19368bb42b19264d1dbab5512fb9e65ffa5e2b358a1a3fc0a1850e95c99c526c",
+    "manifest.json": "76298cf412c32cc86b88beb939bbf98b13b9594db76f4f761ad5eb7c38cec1f3",
+    "preparation-proof.json": "708561fe9085b7f73e949e2b40431d7ab0e7a6ef3bc368f14572487287a325b2",
+    "test_inspect_media.py": "7c7424edd5a0108cf0d279e6465f4bb619eb6481d5126e38cdd8d218d9d44a81"
+  },
+  "status": "preparation-needs-output-absence-fix",
+  "finding": {
+    "id": "sfs-dangling-output-entry",
+    "severity": "P2",
+    "status": "confirmed-awaiting-fix",
+    "location": "main pre-extraction sfs.exists guard",
+    "reproduction": "Compiled and executed the exact pre-extraction If AST against a scratch airootfs.sfs symlink whose target is missing. The symlink exists but guard passed. No xorriso execution or actual overwrite claim.",
+    "impact": "Does not enforce documented exclusive owned output before extraction; the later type check cannot prove an existing entry was untouched. Path.exists can also classify stat failures as absence.",
+    "recommendedFix": "Use lstat; authorize extraction only on FileNotFoundError. Deny every existing entry, including regular file/directory/dangling link, and fail closed on other stat errors. Preserve entries; do not delete them.",
+    "requiredRetake": "Absent output permits next stage; regular/directory/dangling/permission-error cases deny before the extraction call."
+  },
+  "verified": [
+    "All22 manifest source/tool/adapter/control/receipt input hashes independently matched; large ISO was not hashed or scanned by this review.",
+    "Fixed ISO path/size/SHA and unique fixed /arch/x86_64/airootfs.sfs selection; no arbitrary CLI paths/commands, mounts or wildcard unpacking.",
+    "Every external stage, including source/slot preflight, uses hash-pinned02cb LaunchGroup with deferred signals, checked timeout/exit, journal-failure-safe retirement and shared workload lock retained until stage completion.",
+    "Fresh UUID evidence and exclusive stdout/stderr/argv files. Read-only xorriso listing and one fixed SFS extraction target; unsquashfs superblock, exact installer adapter, live pacman local database listing, offline mirror listing and pacman config only.",
+    "Child tools receive two-CPU affinity, nice10,4GiB address-space and8GiB per-file limits; stage stdout is rejected above64MiB after completion. This is a post-completion stdout acceptance bound, not a64MiB write-time limit.",
+    "Fixed literal environment/path and trusted tool-library directory. Existing inspector5 binaries/libraries and receipt pinned; no tool installation or mutable download.",
+    "Source5 identities match intended baseline runtime477d/packages2b1/Hub266/ISOb030/archiso424e; installer adapter hash402d355106e8ea20d5a1e6e6ee03664a36e6e0686c595e68c7684e38d2d5e048 checked against extracted output by prepared controller.",
+    "No version-command success gate: prior unsquashfs version exit1 is not reused as an inspection failure or media pass.",
+    "Controller never promotes six media findings, test-trust absence, guest/installed status or a VM-ready receipt to true."
+  ],
+  "tests": {
+    "command": "nice -n10 python3 -I -B; one CPU, fresh temporary sys.pycache_prefix, explicit media-inspection path; unittest test_inspect_media",
+    "passed": 7,
+    "seconds": 0.015,
+    "scope": "Mocked process launch/retirement and inert scratch evidence files; uniqueSFS, exit19, ENOSPC, interruption, exclusive output, GO and success controls. No actual external inspector execution.",
+    "additionalProbe": "Exact SFS existence-guard AST admits a dangling symlink; no extraction performed."
+  },
+  "existingIso": {
+    "path": "/home/maslow/Maslow-ai-os/free-ai-build/guest-baseline-prep/snapshots/iso/release/hub-build.m4G5KIGT/maslow-os-2026.10.12-x86_64-local.iso",
+    "rootSuppliedSha256": "c6674db434e0a5992399091c5af16bd8e79f7a60fefc298784d311de0b247d8d",
+    "rootSuppliedBytes": 6638323712,
+    "independentlyRead": false
+  },
+  "remaining": [
+    "Fix and inertly retake strict SFS output absence before coordinator inspection GO.",
+    "Actual collection and Root review of the fixed media outputs.",
+    "Exact9 local artifact hashes/versions against matching build provenance, target offline DB selections, optional-package absence and public test-fingerprint/trust absence.",
+    "Independent required six-finding media receipt; BIOS/UEFI header facts alone are insufficient.",
+    "No new media/repair loop or guest launch authorized by this report. Disposable baseline QA is not product readiness."
+  ],
+  "claims": {
+    "mediaVerified": false,
+    "guestVerified": false,
+    "testTrustAbsent": false,
+    "installedVerified": false,
+    "previewComplete": false,
+    "workerIsoRead": false,
+    "workerInspectorExecution": false
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "schema": 1,
+  "status": "active-source-units-unaccepted",
+  "acceptedHubSource": "bb66f9e053b5701d43ee98294498f089ff8a20eb",
+  "expiredV1": {
+    "freeze": "/home/maslow/Maslow-ai-os/free-ai-build/initial-rejection-prep/expired-review/source-checkpoint-routing-fix.json",
+    "sha256": "434fe8a9cc660aac05e8b5e3a0338bad5c5a6d50a89e2a3e2dd34bc2a92ee1a9",
+    "authorTests": 108,
+    "seconds": 23.241,
+    "status": "routing-fix-pending-independent-retake",
+    "finding": "Clock rollback could bypass existing fresh review through old live-ticket path; private review presence now forces guarded review route while preparing."
+  },
+  "v2InitialNegative": {
+    "design": "/home/maslow/Maslow-ai-os/free-ai-build/initial-rejection-prep/v2-initial-rejection-design.json",
+    "sha256": "a4956b25586532561807ce1b394bae30635c87f607e5e528993490bb9aec9bd8",
+    "rootApproved": true,
+    "status": "code-and-focused-tests-in-progress",
+    "scope": "New disjoint managed rejection module plus managed delivery and narrow recovery interception; eleven-field record and five-field protected evidence; gates false."
+  },
+  "nextAction": "Accept or fix the expired V1 routing retake; obtain exact V2 negative source freeze for independent review. Run combined owning/UI once both focused freezes accepted.",
+  "previewComplete": false
+}

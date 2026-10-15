@@ -1,0 +1,159 @@
+{
+  "schema_version": 1,
+  "recorded_at": "2026-10-13T13:25:28Z",
+  "user_deadlines": {
+    "investor_conversation": "tomorrow; 2026-10-14 relative to the session date",
+    "next_demo": "one week; approximately 2026-10-20",
+    "presentation_duration": "not specified"
+  },
+  "priority": "Rehearse a coherent installed Gemini-to-agent-to-result experience for tomorrow; develop shared context and explicit route choice for next week. Preserve the incomplete Free AI preview and its required acceptance gates.",
+  "observed_installed_versions": {
+    "maslow-hub": "0.3.10-1",
+    "maslow-voice": "0.1.5-41",
+    "maslow-free-ai": "0.1.0-2",
+    "hermes-agent": "0.21.6-3",
+    "codex_cli": "0.162.1",
+    "claude-code": "2.1.296-1",
+    "ollama": "0.40.1-1",
+    "obsidian": "1.14.4-2"
+  },
+  "read_only_checks": {
+    "voice_service": "active/running, PID 2825533",
+    "voice_ipc_status": "ok; Gemini conversation readiness and task readiness true; these do not prove live authentication, physical audio or successful execution",
+    "voice_state_at_check": "disabled; microphone and speaking false; zero active coordinated tasks",
+    "conversation_mode": "gemini_live",
+    "conversation_model_setting": "gemini-3.8-live",
+    "conversation_voice": "Erinome",
+    "default_coder": "auto",
+    "codex_login_status": "Logged in using ChatGPT",
+    "codex_configured_model": "gpt-6.1-sol; successful inference with this subscription remains to be checked",
+    "free_ai_status": "installed, ready, enabled",
+    "hindsight_voice_context": "absent: profile_context() currently returns an empty mapping",
+    "voice_to_obsidian": "existing implementation and historical evidence; current rehearsal still required"
+  },
+  "authorized_rehearsal_change": {
+    "execution_connection_before": "free-cloud",
+    "execution_connection_after": "existing",
+    "mechanism": "installed omarchy-voice-control configure; exit 0, ok true",
+    "reason": "User selected Ready now for the explicit existing-agent app-building rehearsal",
+    "other_settings": "not changed",
+    "launch_result": "Initial launch safely deferred: compositor unlocked but shell locked=true while requested/pending/sessionLocked/secure=false. After same-command idle/unlock checks, normal omarchy restart shell exited 0. Lock status became all false; installed launch talk exited 0. No lock guard was bypassed.",
+    "participation": "User instructed to unlock locally, press Super+H and explicitly tell Codex the calculator request",
+    "voice_start": "User Ready now and not yet spoken; installed IPC start_voice after exact unlock check exited 0, ok true. Physical audio and task outcome not yet verified."
+  },
+  "tomorrow_rehearsal": {
+    "spoken_request": "Tell Codex to build me a simple calculator web app in a new demo folder. I want large, readable buttons, basic arithmetic and a clear button. Keep it self-contained, check that it works, and open it so I can try it. Tell me if you need an approval.",
+    "pass_checks": [
+      "User hears Gemini and confirms natural conversation/interruption",
+      "Actual Codex handoff is visible and the received request matches",
+      "Any approvals are shown and answered by the user",
+      "Actual result files are identified and inspected",
+      "Calculator opens and basic arithmetic/clear behavior work",
+      "Maslow reports the checked result; Codex stops working, Voice has no active coordinated task, and the microphone is off"
+    ],
+    "status": "Calculator works; user-reported resumed conversation failed to recall completed task; targeted source fix in progress",
+    "fallback": "Generated checked local HTML is available as a clearly labelled result from this rehearsal; no claim of an independently verified browser interaction until user confirms it.",
+    "observed_task": {
+      "id": "c5a99ac6-5ffe-4308-8852-d9ec122880eb",
+      "selected_agent": "codex",
+      "execution_connection": "existing",
+      "project": "/home/maslow/Projects/Maslow Voice/demo-d28ae38637",
+      "child_id": "f1960124-201c-48de-8466-b64846197746",
+      "codex_thread_id": "01a13577-716f-7de2-99d9-a343ac3bf405",
+      "captured_request_matches": true,
+      "prepared_brief_contains_requested_constraints": true,
+      "first_read_only_command_approval": "user reports approving; next IPC status proves running and approval null",
+      "visible_terminal": "Not established; actual handoff used coordinated app-server task path, with prepared instructions and approvals",
+      "final_state": "completed",
+      "result_limit": "Codex reports browser security review denied opening/visual verification; normal Work open_artifact succeeded for checked local index.html"
+    },
+    "artifacts": [
+      {
+        "path": "/home/maslow/Projects/Maslow Voice/demo-d28ae38637/calculator-demo/index.html",
+        "bytes": 8151,
+        "sha256": "c30678c4950cd792f0db98cf1a1ef10e295dc9f60f0f2cf3b79a3bbcf67072ba"
+      },
+      {
+        "path": "/home/maslow/Projects/Maslow Voice/demo-d28ae38637/calculator-demo/test.cjs",
+        "bytes": 2645,
+        "sha256": "4f1cba32548072b0f1463afd974a3b182b823073edfcc059ac1774c88c621965"
+      },
+      {
+        "path": "/home/maslow/Projects/Maslow Voice/demo-d28ae38637/calculator-demo/README.md",
+        "bytes": 752,
+        "sha256": "39443351b2d95112cc879fabf656ecb523a4b3b93137a289fbafcd6a3742b684"
+      }
+    ],
+    "independent_verification": {
+      "source_inspection": "Single HTML with inline CSS/JS, no external resources or added dependencies",
+      "command": "node test.cjs",
+      "exit": 0,
+      "check_groups": 20,
+      "limits": "VM-based JS/document stub checks verify behavior logic and keyboard handlers; not a browser rendering/click test",
+      "open_artifact": "Installed task_action open_artifact exit 0, ok true, exact workspace HTML path",
+      "browser_tab_metadata": "Chrome reported multiple Everyday Calculator tabs at the exact generated file URL",
+      "browser_automation": "getTab blocked by browser URL policy because file:// is not permitted; stopped browser inspection, no alternate browser workaround",
+      "physical_interaction": "User reports calculator works after the requested arithmetic/clear checks",
+      "audio": "User deliberately paused/muted while work continued; after Resume, user reports assistant seemed like a new conversation and claimed no calculator was running. This is a task-context continuity defect, not a verified spoken-result pass.",
+      "voice_state_after_task": "paused, microphone and speaking false"
+    },
+    "remaining_demo_gaps": [
+      "Spoken result retrieval after user resumes",
+      "Automatic bring-up of the result was not achieved by Codex; Root used Work open_artifact",
+      "Same workflow across free and local coding routes remains absent"
+    ],
+    "confirmed_source_defect": "briefing() includes active coordinated tasks only, omits recently completed task context, and directs generic progress questions to agent_status rather than coordinated task_control. Worker patch in progress; not installed."
+  },
+  "next_week_scope_proposal": [
+    "Primary optional Hindsight with bounded lazy lifecycle and recoverable versioned updates",
+    "Explicitly selected Obsidian-compatible documents remain readable source material",
+    "Scoped context shared first with Voice and the chosen execution tools, not universal access",
+    "Visible original request, prepared brief, context used, selected execution connection and result",
+    "Prove supported route changes across sessions without silently changing provider, cost or privacy choices",
+    "Evaluate local and free coding capability before promising the same app-building task across all three routes"
+  ],
+  "not_delivered": [
+    "Hindsight integration in Voice or common cross-agent memory",
+    "Dedicated customizable intent-to-task profiles",
+    "Free/local app-building parity",
+    "Full verified installable Free AI preview"
+  ],
+  "workers": [
+    {
+      "task": "tomorrow_demo_inventory",
+      "model": "gpt-6-sol",
+      "reasoning": "medium",
+      "status": "completed read-only inventory"
+    },
+    {
+      "task": "week_memory_inventory",
+      "model": "gpt-6-luna",
+      "reasoning": "medium",
+      "status": "completed read-only inventory"
+    },
+    {
+      "task": "voice_task_continuity_fix",
+      "model": "gpt-6-sol",
+      "reasoning": "high",
+      "status": "active; owning focused source/test fix, no install/build"
+    }
+  ],
+  "preservation": "Craft stays paused. No package build, VM, ISO, installation, signing, publication, product merge, credential change or model download in this checkpoint. Voice42 remains built/audited but unsigned and uninstalled; Free AI candidate remains not-ready; previous live Groq quota hold remains.",
+  "next_action": "Review focused continuity fix and regression tests, then prepare a matched reviewed package update and repeat a natural-request live rehearsal. Preserve calculator and all current source/artifacts; no memory framework required for this defect.",
+  "independent_checkpoint_review": "tomorrow_demo_inventory found no material claim issue; clarified separate visible Codex session vs coordinated task cleanup",
+  "discovery_requirement": "Reuse Work records and persist agreed brief/decisions. For natural requests, ask only material discovery questions, propose explicit defaults and summarize before execution. Separate next increment after continuity; no new task framework.",
+  "continuity_fix": {
+    "status": "source correction under independent review; not installed",
+    "author": {
+      "model": "gpt-6-sol",
+      "reasoning": "high"
+    },
+    "reviewer": {
+      "model": "gpt-6-astra",
+      "reasoning": "high"
+    },
+    "initial_focused_result": "89 tests passed in 46.717s before review correction",
+    "review_finding": "A selected task or another eligible recent task can fall below list(50), making briefing/target selection inconsistent. Author correcting full recent-window lookup and direct selected lookup with regressions.",
+    "scope": "Persisted task briefing and task-control routing; no audio calibration, pause semantics, public schema or memory framework change"
+  }
+}

@@ -1,0 +1,67 @@
+{
+  "schema": 1,
+  "date": "2026-10-11",
+  "status": "admitted-build-preserved-paused-after-new-craft-job",
+  "authority": "User explicitly assigned FreeAI the next heavy slot after Craft; actual current Craft VM ended, inventory empty, runner acquired exclusive shared lock and checked identities before dispatch.",
+  "admitted_at": "2026-10-11T23:01:07.699680Z",
+  "session": "200e3daafe734d22a6aa2b2f5881f1c2",
+  "runner_sha256": "9e95a38ac3655f9330255667de18921ba046532d7da7b3ecfec402a26f342d6e",
+  "held_runner_sha256": "2ea8455f98fa3fbdf2216fd9565d6bed55b55c35641504a8cbe3e870cac60c4f",
+  "cleared_change": "SOURCE_HOLD literal changed to None only; all logic remains reviewed.",
+  "context_sha256": "08bca127d23a3cdd7e193d0a05dbc5a4a09d4d6213faa2e227155b600a3aea65",
+  "source": "c2b03842a81645998a79cbca525c03ddf67813b4",
+  "archive_sha256": "c7dd7013a33f264a9f9523af70e4ae82e982490644d37494ad416d2bf5562bc1",
+  "recipes": "333f4f83ddcba6651687a7723c6778f68023cc5b",
+  "connect_source": "97ac20eed146a8c6b37e33c2c29901a00f3045ff",
+  "connect_recipe": "f4df4dad2da480ce95c7e53a3fc263b79a87c5c0",
+  "ordered_packages": [
+    "maslow-free-ai 0.1.0-2",
+    "maslow-voice 0.1.5-39",
+    "maslow-connect 0.1.0-6"
+  ],
+  "actual_first_container": {
+    "id": "518858edd80dfba2fa31418de94baa073bc47986e5ee71fbbe29ce81bb67783c",
+    "image": "sha256:cfd891bf262d24bac53aa489af912484a08545e38001624a94640de4e43b840f",
+    "user": "builder",
+    "nano_cpus": 2000000000,
+    "memory_bytes": 4294967296,
+    "memory_and_swap_bytes": 6442450944
+  },
+  "coordinator_reconciliation": {
+    "all27_input_hashes": true,
+    "actual24_committed_recipe_blobs": true,
+    "cached_archives": 3,
+    "reviewed_621ce_runner_reconstructed_from_preserved_5e": true,
+    "runner_normalized_ast_equality": "Luna inventory; only reviewed proof/archive path pins and root hold changes",
+    "historical_6db_guide": "Preserved historical; current POSTBUILD_REQUIRED and parameterized auditor use checksum-approved c2 context"
+  },
+  "coordination": {
+    "shared_request": "/home/maslow/Maslow-ai-os/craft-build/free-ai-slot-handoff.json",
+    "peer_acknowledged": false,
+    "cross_chat_transport": "No direct chat/tab available; shared files and exclusive lock, user relay requested. Do not claim Craft acknowledged.",
+    "reservation_tty_released": true
+  },
+  "pending": [
+    "All three successful builds",
+    "Actual archive/ABI/production dependency/licenses/capsule/overlap checks",
+    "Network-none compiled runtime and pinned Voice owning checks",
+    "Current production advisory reconciliation",
+    "Matched native6 Hub identity after actual deployed proof",
+    "Installed recovery/visual/guest/live/hardware/audio gates"
+  ],
+  "installed_or_live_acceptance": false,
+  "production_signing_or_publication": false,
+  "pause_checkpoint": {
+    "recorded_at": "2026-10-11T23:18:19.728430+00:00",
+    "owned_container": "518858edd80dfba2fa31418de94baa073bc47986e5ee71fbbe29ce81bb67783c",
+    "owned_image": "sha256:cfd891bf262d24bac53aa489af912484a08545e38001624a94640de4e43b840f",
+    "identity_checked_before_pause": true,
+    "craft_container": "0df1b79516121003beccb3eb6f5cfca71b7266edd021ac3005ff92f17282b259",
+    "both_observed_paused": true,
+    "craft_changed_by_this_thread": false,
+    "completed_builds": [],
+    "peer_ack_received": false,
+    "user_reply": "I\u2019ll relay this to Craft",
+    "next_action": "Craft owner must safely checkpoint/end its own new job; verify idle slot and exact owned identity before resuming. No dependency on finishing the entire Craft program."
+  }
+}

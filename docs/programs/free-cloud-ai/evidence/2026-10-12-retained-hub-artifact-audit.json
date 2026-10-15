@@ -1,0 +1,28 @@
+{
+  "schema": 1,
+  "status": "scoped-static-artifact-audit-passed-native-installation-open",
+  "candidate": {
+    "path": "/home/maslow/Maslow-ai-os/free-ai-build/hub-bundle-prep/qa-hub-build-1/evidence/99f88f71815b4a76b5954abacda89a6f/work/maslow-hub-0.3.9-1-any.pkg.tar.zst",
+    "sha256": "fe60da60266623c535d7f82c6018b70c6ae567864153d0504d4c228d2383df9c",
+    "bytes": 332772871,
+    "sourceCommit": "c00b88da49a0bf8a350ca5ac7a5c5a6cd44a60a5",
+    "productParent": "52966604271db965147b25c9997121b584bf15fc",
+    "recipeSha256": "5301daba2f614402cc9afae57c28c01e6cee11c91b33ec54133183e2e6867746",
+    "scope": "QA-only four literal acceptance gates enabled; product gates remain false. Contains dedicated signed backend2/Voice41 pair, no standalone Voice bootstrap payload or bundled trust."
+  },
+  "independentAdmissionReviewSha256": "7afd2953eb6a06974f7072349266ccc31aa62e2f5b604785ca19cb0417a36739",
+  "approvedManifestSha256": "fd1648a0871d1bf3c0ae33a4fc45bce3eafd9607f6c18077d8fb67a615228137",
+  "actualAudit": {
+    "exit": 0,
+    "seconds": 33.175,
+    "logSha256": "687b15f14c6f0619680760359b158784bf756dbdc77a61df736c6e0403c9f329",
+    "externalResult": "/home/maslow/Maslow-ai-os/free-ai-build/hub-bundle-prep/hub-postbuild-prep/root-actual-audit-result.json",
+    "checked": "Actual archive SHA and BUILDINFO/PKGINFO, exact committed-source payload mapping (44 files), 76 permitted members/types/owners/modes, six opaque signed pair files, and four-package overlap against unchanged backend2/Voice41/Connect8.",
+    "resources": "One CPU nice10,1GiB address-space and240s deadline under existing shared heavy-work lock; no concurrent VM/build.",
+    "preservedFailure": "Original build state remains stopped-on-failure at SHA0325a54952745980eebf31c47a03451d0619cf6c17400795956a894ab969fd30. Separate reviewed disposition admits the actual successful makepkg output after deterministic pkgver postcheck rejection; no old state relabeled and no rebuild."
+  },
+  "userPivot": "User authorizes moving ordinary/live/audio acceptance to Lenovo after due diligence. Inspect installed state, backup/rollback, trusted delivery and development-link compatibility before host changes. Retain clean guest only for required fresh-install/destructive fault gates.",
+  "nextAction": "Review read-only Lenovo readiness and normal delivery inventories. Resolve actual trust, Voice bootstrap, current-state recovery and rollback prerequisites before installing this candidate on the development laptop.",
+  "installedAccepted": false,
+  "previewComplete": false
+}

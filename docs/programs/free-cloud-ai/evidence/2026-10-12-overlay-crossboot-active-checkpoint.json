@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "status": "active-preparation-no-VM-GO",
+  "acceptedHubSource": "ceba096b7ea8d36e6124ffbf121b1eef192ecc75",
+  "overlayFreeze": {
+    "path": "/home/maslow/Maslow-ai-os/free-ai-build/hub-bundle-prep/overlay-acceptance-prep/source-freeze.json",
+    "sha256": "1096b0c0b53b5db12654bb3a54a91f51cdcb0ce1c2cddf5b345f61c132bd378a"
+  },
+  "overlayReview": {
+    "path": "/home/maslow/Maslow-ai-os/free-ai-build/hub-bundle-prep/overlay-acceptance-prep/independent-admission-review.json",
+    "sha256": "beca8707582c2355b8fc8165c6ccbd99b7f920dc3dd97acb5413a4d77b0c7ef6",
+    "verdict": "changes-required-no-GO",
+    "findings": [
+      "OVERLAY-A1 actual approved source/harness inputs must be rechecked after slow baseline work before launch.",
+      "OVERLAY-A2 output parent aliases/foreign symlinks must refuse before creating run data."
+    ],
+    "nativeLaunched": false
+  },
+  "crossbootCharter": {
+    "path": "/home/maslow/Maslow-ai-os/free-ai-build/hub-bundle-prep/offline-crossboot-and-native-admission-design.json",
+    "sha256": "9de49ca4390f1835c4a84ac5807062b938849546d9791874592cc6de1fcea5ec",
+    "rootCodeApproved": true,
+    "scope": "Two executor/test files only; immutable historical compatibility for same already-quiesced current operation; stopped current Voice and exact current facts; no launch authority mint or process check bypass.",
+    "qaGateCandidatePolicy": "Separate unpublished candidate with only four reviewed literal gate deltas after internal/source checks; exact artifact review required before native GO; product source gates remain false."
+  },
+  "nextAction": "Collect exact blocked review reports, fix the narrow crossboot boundary recheck and overlay descriptor-write gap, then independently retake both. No VM GO.",
+  "previewComplete": false,
+  "overlayRetake": {
+    "path": "/home/maslow/Maslow-ai-os/free-ai-build/hub-bundle-prep/overlay-acceptance-prep/admission-retake.json",
+    "sha256": "667a553c0c699fcaa6a9304ee39fd30dc5cba381f5cb97f1a90e49471f12029b",
+    "manifestSha256": "b16072c2691555809b667bf0290b4f9b0e1e38010fb2f1f49ee45f3977040de2",
+    "status": "blocked-independent-retake",
+    "finding": "Held session pathname substitution after vm_command causes lexical argv.json write in foreign parent; launch itself refused. Evidence writes must use held directory descriptor."
+  },
+  "crossbootFreeze": {
+    "path": "/home/maslow/Maslow-ai-os/free-ai-build/hub-bundle-prep/offline-crossboot/source-checkpoint.json",
+    "sha256": "ee1b9fcf1c625c9bee00e87fdd1c04e823db8412bd3f716257078bd4b96e6e81",
+    "status": "review-found-missing-boundary-recheck",
+    "finding": "Protected historical boundary changes during slow package pass while CURRENT unchanged; final proof needs exact boundary reread/hash comparison."
+  }
+}
