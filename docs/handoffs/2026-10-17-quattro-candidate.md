@@ -2,7 +2,7 @@
 
 This is an isolated development evaluation authorized by the user; Maslow `main` remains `9ad7229e24ce0e5a2753da171030ff296f1da3ee`. No source push, package publication, ISO build, physical installation or macOS erase is authorized by these results.
 
-Outcome: current Omarchy source integrates with the current Hub/Voice presentation in the disposable VM, but a black lock surface prevents normal visible unlock acceptance. Keep the candidate isolated. The complete current Quickshell/Qt6.12 distribution stack, migration/update path and physical MacBook remain untested.
+Historical outcome, corrected by the [current Quickshell / Qt 6.12 retest](2026-10-17-qt612-stack-lock.md): the black-lock diagnosis below was based on insufficient capture controls. The older stack displays its password form and unlocks normally when tested awake; the current official Qt6.12 stack also passes visible lock, wrong-password rejection, two normal unlock cycles and Voice recovery. The later handoff supersedes this lock conclusion and the old dependency/source-test status while preserving these original artifacts. Keep the candidate isolated: broader migrations, update/release and physical MacBook gates remain open.
 
 ## Exact source and scope
 

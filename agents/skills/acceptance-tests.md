@@ -44,3 +44,11 @@ unless `--no-preview` is passed.
 The ISO harness exercises compositor-level shortcuts with QMP virtual keyboard
 input. In-guest `wtype` is suitable for typing into focused controls, but it
 does not reliably prove that a global Hyprland keybinding works.
+
+## Lock screenshots and normal unlock
+
+The lock service intentionally blanks idle displays after five seconds. A delayed wake screenshot can therefore capture QEMU's inactive-output screen rather than the lock UI. Confirm `hyprctl monitors -j` reports an enabled output with `dpmsStatus: true`, keep it awake with bounded normal non-authentication input while capturing through QMP, and inspect the actual password form. Stop that input before entering the disposable fixture password. Do not change the blank timer or disable locking to obtain a screenshot.
+
+Wait for the lock protocol to become secure, but do not treat `secure: true` as proof that the form rendered. Likewise, an initial compositor failsafe frame alone does not establish a client crash; inspect the settled, awake surface and the process/journal evidence. Verify an inactive-output control separately from an awake rendered control. Enter fixture credentials only after observing the authentication form, and require ordinary PAM unlock plus visible desktop recovery. Never clear the compositor lock or replace authentication to make the test pass.
+
+For Voice integration, open only a passive panel before locking, check its guarded opener defers while locked, and verify normal reopening after authenticated unlock and an unlocked plugin rescan. Keep provider requests, microphone use and real task execution separate from this lifecycle check.

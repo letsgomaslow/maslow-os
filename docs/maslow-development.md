@@ -2,7 +2,7 @@
 
 ## ISOLATED EVALUATION — current Omarchy candidate, 2026-10-17
 
-The [isolated quattro handoff](handoffs/2026-10-17-quattro-candidate.md) records source integration, corrected package builds, passing Hub/Voice visual checks and an unresolved installed lock-surface failure. Maslow main and the accepted installed preview remain unchanged. Do not build a release ISO or move to destructive native installation from this result. Next: diagnose the black locked surface using the exact current Quickshell/Qt distribution stack and a disposable control, then repeat visible lock and normal unlock acceptance.
+The [current Quickshell / Qt 6.12 handoff](handoffs/2026-10-17-qt612-stack-lock.md) records successful isolated dependency admission and reboot, six Hub pages, three Voice panels, wrong-password rejection, two observed normal lock/unlock cycles and Voice controller recovery. The previous black-lock diagnosis was a capture-timing error: the older stack also unlocks with the corrected control. No new product lock patch was needed. Hub source tests pass 759 tests; Voice passes 557 with five explicit skips. Maslow main and the accepted installed preview remain unchanged. These scoped passes do not clear the remaining source aggregate, migrations, fresh-install/update/rollback, signing, provider/audio or physical MacBook gates. Next: coordinate package/ISO candidate inputs and exercise fresh installation plus the supported migration/update path before a release ISO or destructive native installation.
 
 ## CURRENT — accepted installed preview, 2026-10-15
 
@@ -20,7 +20,8 @@ The [source integration closeout](handoffs/2026-10-15-hub-2-main-integration.md)
 
 ## Evidence and historical work
 
-- [Isolated current Omarchy candidate, October 17](handoffs/2026-10-17-quattro-candidate.md): pinned development merge, exact artifacts, source failures/retakes, installed Hub/Voice visual evidence and the lock gate.
+- [Current Quickshell / Qt 6.12 installed retest, October 17](handoffs/2026-10-17-qt612-stack-lock.md): exact signed dependency stack, corrected lock controls, source reruns, installed Hub/Voice lifecycle evidence and remaining gates.
+- [Isolated current Omarchy candidate, October 17](handoffs/2026-10-17-quattro-candidate.md): pinned development merge, exact artifacts, source failures/retakes, installed Hub/Voice visual evidence and the historical lock diagnosis corrected by the later retest.
 - [Current Hub/Voice VM and upstream audit, October 17](handoffs/2026-10-17-current-vm-upstream.md): preserved current-product baseline, separate Hub fresh-state correction and initial upstream comparison.
 - [2012 Retina MacBook Pro local VM check, October 17](handoffs/2026-10-17-macbook-2012-vm.md): historical installed-image/CPU-emulation evidence and physical-hardware limits.
 
