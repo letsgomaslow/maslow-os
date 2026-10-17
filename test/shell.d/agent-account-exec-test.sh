@@ -71,6 +71,12 @@ done
 cd "$test_tmp"
 run_isolated mise reshim
 
+# This fixture runs harmless fake agents. Record their explicit test-only
+# launch consent through the real confirmation interface before dispatch.
+run_isolated omarchy-agent-trust confirm claude 'claude:--permission-mode=auto' --yes
+run_isolated omarchy-agent-trust confirm codex 'codex:--approve-for-me' --yes
+run_isolated omarchy-agent-trust confirm grok 'grok:--permission-mode=bypassPermissions' --yes
+
 for provider in claude codex grok; do
   select_account "$provider" side
   account_dir="$test_tmp/accounts/$provider side"

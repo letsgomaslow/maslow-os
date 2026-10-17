@@ -100,6 +100,12 @@ export OMARCHY_TEST_BROWSER_LOG="$test_tmp/browser"
 unset CLAUDE_CONFIG_DIR CODEX_HOME GROK_HOME BROWSER
 unset OMARCHY_AGENT_CLAUDE_HOME OMARCHY_AGENT_CODEX_HOME OMARCHY_AGENT_GROK_HOME
 
+# This fixture runs harmless fake agents. Record their explicit test-only
+# launch consent through the real confirmation interface before dispatch.
+omarchy-agent-trust confirm claude 'claude:--permission-mode=auto' --yes
+omarchy-agent-trust confirm codex 'codex:--approve-for-me' --yes
+omarchy-agent-trust confirm grok 'grok:--permission-mode=bypassPermissions' --yes
+
 accounts="$XDG_STATE_HOME/omarchy/agents/accounts"
 
 echo '{"oauthAccount":{"accountUuid":"u-main","emailAddress":"me@example.com","organizationName":"Me"},"mcpServers":{"docs":{"command":"docs-mcp"}}}' >"$HOME/.claude.json"
