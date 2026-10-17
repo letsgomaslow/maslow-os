@@ -2,7 +2,9 @@
 
 ## ISOLATED EVALUATION — current Omarchy candidate, 2026-10-17
 
-The [current Quickshell / Qt 6.12 handoff](handoffs/2026-10-17-qt612-stack-lock.md) records successful isolated dependency admission and reboot, six Hub pages, three Voice panels, wrong-password rejection, two observed normal lock/unlock cycles and Voice controller recovery. The previous black-lock diagnosis was a capture-timing error: the older stack also unlocks with the corrected control. No new product lock patch was needed. Hub source tests pass 759 tests; Voice passes 557 with five explicit skips. Maslow main and the accepted installed preview remain unchanged. These scoped passes do not clear the remaining source aggregate, migrations, fresh-install/update/rollback, signing, provider/audio or physical MacBook gates. Next: coordinate package/ISO candidate inputs and exercise fresh installation plus the supported migration/update path before a release ISO or destructive native installation.
+The [installation, migration, update and rollback evaluation](handoffs/2026-10-17-install-update-rollback.md) passed its isolated lifecycle gates: normal fresh installation/independent boot/first app, real migration execution and idempotence, supported update exit zero and selected-kernel boot, genuine snapshot restore and normal restored boot. Hub/Voice panels, secure lock/unlock and fresh/updated no-inference Hermes profiles pass within their recorded limits. Kernel-metapackage validation and stale localized migration notifications are fixed on the candidate; focused regression checks and installed checks pass. Main remains unchanged. This used the historical installer with injected current packages, not a rebuilt or signed current ISO.
+
+The [Quickshell / Qt stack handoff](handoffs/2026-10-17-qt612-stack-lock.md) records exact inputs and corrects the prior black-lock capture diagnosis. Remaining gates include strict translation parity, companion sudo recipes, compatible Hermes/Voice product package inputs, upstream ISO kernel/header integration, coordinated new ISO/signing, encrypted recovery, rollback reapply, real providers/audio and physical MacBook acceptance. Read the latest lifecycle handoff for exact artifacts, failed attempts, cold TCG readiness limits and the next integration action. No ISO build, merge, publication or physical erase occurred.
 
 ## CURRENT — accepted installed preview, 2026-10-15
 
@@ -20,6 +22,7 @@ The [source integration closeout](handoffs/2026-10-15-hub-2-main-integration.md)
 
 ## Evidence and historical work
 
+- [Installation, migration, update and rollback evaluation, October 17](handoffs/2026-10-17-install-update-rollback.md): exact candidate lifecycle evidence, scoped fixes and remaining ISO/native gates.
 - [Current Quickshell / Qt 6.12 installed retest, October 17](handoffs/2026-10-17-qt612-stack-lock.md): exact signed dependency stack, corrected lock controls, source reruns, installed Hub/Voice lifecycle evidence and remaining gates.
 - [Isolated current Omarchy candidate, October 17](handoffs/2026-10-17-quattro-candidate.md): pinned development merge, exact artifacts, source failures/retakes, installed Hub/Voice visual evidence and the historical lock diagnosis corrected by the later retest.
 - [Current Hub/Voice VM and upstream audit, October 17](handoffs/2026-10-17-current-vm-upstream.md): preserved current-product baseline, separate Hub fresh-state correction and initial upstream comparison.
