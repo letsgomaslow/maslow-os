@@ -129,7 +129,12 @@ if omarchy_dock position diagonal 2>/dev/null; then
 fi
 pass "dock position is set and read through omarchy-dock"
 
-[[ $(omarchy_dock pinned | paste -sd " ") == "org.gnome.Nautilus chromium foot omacalc omawrite X YouTube" ]] || fail "dock pins start from the defaults"
+jq -e '.disabledPlugins | index("omarchy.dock") != null' "$ROOT/config/omarchy/shell.json" >/dev/null ||
+  fail "Maslow leaves the optional native dock disabled"
+jq -e '([.plugins[].id] | index("omadock") != null and index("tyrsolution.app-launcher") != null) and (.dock.pinned // [] | length == 0)' "$ROOT/config/omarchy/shell.json" >/dev/null ||
+  fail "Maslow retains its bundled dock and launcher without seeding native pins"
+[[ -z $(omarchy_dock pinned) ]] || fail "optional native dock starts with no pins"
+pass "native dock stays optional and its CLI starts without seeded pins"
 omarchy_dock unpin spotify >/dev/null
 omarchy_dock pin com.example.App.desktop >/dev/null
 omarchy_dock pin com.example.App >/dev/null

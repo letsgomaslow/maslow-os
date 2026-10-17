@@ -2,6 +2,12 @@
   "root": {
     "label": "Go"
   },
+  "hub": {
+    "label": "Maslow Hub"
+  },
+  "voice": {
+    "label": "Maslow Voice"
+  },
   "apps": {
     "label": "Apps"
   },
@@ -27,7 +33,7 @@
     "label": "Update"
   },
   "about": {
-    "label": "About"
+    "label": "About Maslow AI-OS"
   },
   "system": {
     "label": "System"
@@ -60,7 +66,7 @@
     "label": "Keybindings"
   },
   "learn.omarchy": {
-    "label": "Omarchy"
+    "label": "Maslow AI-OS Guide"
   },
   "learn.hyprland": {
     "label": "Hyprland"
@@ -81,7 +87,10 @@
     "label": "Herdr"
   },
   "learn.community": {
-    "label": "Community"
+    "label": "Omarchy Community — engine support"
+  },
+  "learn.support": {
+    "label": "Maslow AI-OS Support"
   },
   "trigger.appearance": {
     "label": "Appearance"
@@ -366,6 +375,9 @@
   "trigger.share.receive": {
     "label": "Receive"
   },
+  "trigger.toggle.reduced-motion": {
+    "label": "Reduced Motion"
+  },
   "trigger.tests.network-speedtest": {
     "label": "Network Speed Test"
   },
@@ -436,6 +448,10 @@
   "setup.monitors": {
     "label": "Monitors"
   },
+  "setup.ai": {
+    "label": "AI",
+    "title": "Maslow AI-OS Setup"
+  },
   "setup.keybindings": {
     "label": "Keybindings"
   },
@@ -497,26 +513,14 @@
   "setup.default.agent.crush": {
     "label": "Crush"
   },
-  "setup.default.agent.cursor-agent": {
-    "label": "Cursor CLI"
-  },
   "setup.default.agent.grok": {
     "label": "Grok"
   },
   "setup.default.agent.hermes": {
     "label": "Hermes"
   },
-  "setup.default.agent.kimi": {
-    "label": "Kimi"
-  },
-  "setup.default.agent.muse": {
-    "label": "Muse Code"
-  },
   "setup.default.agent.omp": {
     "label": "omp"
-  },
-  "setup.default.agent.openclaw": {
-    "label": "OpenClaw"
   },
   "setup.default.agent.opencode": {
     "label": "OpenCode"
@@ -1153,7 +1157,7 @@
     "label": "Phoenix"
   },
   "update.omarchy": {
-    "label": "Omarchy"
+    "label": "Maslow AI-OS"
   },
   "update.channel": {
     "label": "Channel"

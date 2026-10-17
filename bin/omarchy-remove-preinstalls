@@ -41,14 +41,13 @@ if gum confirm --affirmative "$(omarchy-i18n common.yes)" --negative "$(omarchy-
     rm -f ~/.local/bin/muse
   fi
 
+  # Docker and lazydocker remain infrastructure after optional app removal.
   omarchy-pkg-drop \
     aether \
     cliamp \
     libreoffice-fresh \
     pinta \
     obsidian \
-    lazydocker \
-    moonlight-qt \
     omacut \
     monologue \
     omacalc \

@@ -25,7 +25,7 @@ for platform in aarch64-apple aarch64 x86; do
     fail "$platform: the detected platform selects its own list"
   printf '%s\n' "$defaults" >"$work/$platform.packages"
 
-  grep -Fxq superwhisper-bin "$work/$platform.packages" || fail "$platform: Superwhisper is a default package"
+  ! grep -Fxq superwhisper-bin "$work/$platform.packages" || fail "$platform: standalone dictation remains deferred in Maslow defaults"
   [[ -z $(sort "$work/$platform.packages" | uniq -d) ]] || fail "$platform: each package is listed once"
   # aarch64 platforms leave out the base packages only x86_64 builds.
   expected_base=$base
@@ -125,7 +125,16 @@ chmod +x "$failing_bin/omarchy-hw-platform"
 ! PATH="$failing_bin:$ROOT/bin:$PATH" omarchy-pkg-defaults >/dev/null 2>&1 || fail "a platform the detector cannot tell is refused"
 pass "an unknown or undetectable platform is refused"
 
-# omarchy-reinstall-pkgs installs the detected platform's set.
+# omarchy-reinstall-pkgs installs the platform set while retaining Maslow's
+# reviewed runtime hold. Pin product identity so host state cannot bypass it.
+export MASLOW_PRODUCT_FILE="$ROOT/branding/product.json"
+unset MASLOW_ALLOW_RUNTIME_UPDATE
+expected_reinstall() {
+  local platform=$1
+  local packages
+  packages=$(grep -Ev '^(omarchy|omarchy-settings|omarchy-dev|omarchy-settings-dev)$' "$work/$platform.packages" | paste -sd ' ')
+  printf '%s' "-Syu --noconfirm --needed --ignore omarchy,omarchy-settings,omarchy-dev,omarchy-settings-dev $packages"
+}
 mkdir -p "$work/stubs"
 cat >"$work/stubs/omarchy-update-pacman" <<'SH'
 #!/bin/bash
@@ -143,7 +152,9 @@ for platform in aarch64 x86; do
   : >"$STUB_LOG"
   OMARCHY_PROC_ROOT="$work/$platform/proc" PATH="$work/stubs:$work/$platform/bin:$ROOT/bin:$PATH" \
     omarchy-reinstall-pkgs
-  expected="-Syu --noconfirm --needed $(tr '\n' ' ' <"$work/$platform.packages")"
+  grep -Fxq -- '-Suu --noconfirm --ignore omarchy,omarchy-settings,omarchy-dev,omarchy-settings-dev' "$STUB_LOG" ||
+    fail "$platform: stable reconciliation preserves the runtime hold"
+  expected=$(expected_reinstall "$platform")
   [[ $(tail -n 1 "$STUB_LOG") == "${expected% }" ]] ||
     fail "$platform: reinstall installs the platform's default set" "$(tail -n 1 "$STUB_LOG")"
 done
@@ -161,7 +172,7 @@ reinstall_on() {
 for platform in x86 aarch64 aarch64-apple; do
   reinstall_on "$platform" || fail "$platform: reinstall completes" "$(cat "$work/channel.out")"
   [[ $(head -n 1 "$STUB_LOG") == "refresh " ]] || fail "$platform: reinstall refreshes on stable" "$(cat "$STUB_LOG")"
-  expected="-Syu --noconfirm --needed $(tr '\n' ' ' <"$work/$platform.packages")"
+  expected=$(expected_reinstall "$platform")
   [[ $(tail -n 1 "$STUB_LOG") == "${expected% }" ]] || fail "$platform: reinstall installs the platform's set"
 done
 pass "omarchy-reinstall-pkgs refreshes on stable on every platform"

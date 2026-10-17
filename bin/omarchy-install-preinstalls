@@ -10,15 +10,14 @@ if gum confirm --affirmative "$(omarchy-i18n common.yes)" --negative "$(omarchy-
   # that back claude, gh, opencode, and the rest of the agents
   omarchy-refresh-applications
 
-  # Mirrors the list in omarchy-remove-preinstalls; both track omarchy-base.packages
+  # Mirrors the optional list in omarchy-remove-preinstalls. Docker and
+  # lazydocker are retained infrastructure; games are outside the slim payload.
   if ! omarchy-pkg-add \
     aether \
     cliamp \
     libreoffice-fresh \
     pinta \
     obsidian \
-    lazydocker \
-    moonlight-qt \
     omacut \
     monologue \
     omacalc \

@@ -104,6 +104,21 @@ if [[ $mode == "--owns" ]]; then
   if ours; then exit 0; else exit 1; fi
 fi
 
+# The installed Maslow agent package owns its runtime independently of Desktop.
+# Keep --owns above this branch: it describes only the exact legacy wrapper,
+# never package presence or an arbitrary user command.
+if omarchy-pkg-present hermes-agent; then
+  source "$OMARCHY_PATH/install/helpers/agent.sh"
+  omarchy_agent_resolve hermes
+  if [[ $mode != "--check" ]]; then
+    omarchy_agent_prepare_packaged hermes
+  fi
+  # A shadowed or incomplete package is attention, not permission to bootstrap
+  # another copy or execute the unverified command to infer readiness.
+  omarchy_agent_is_packaged && omarchy_agent_package_on_path
+  exit $?
+fi
+
 # --check lets callers tell a cold stub from a working one before they commit
 # to a path that assumes Hermes is ready.
 if [[ $mode == "--check" ]]; then

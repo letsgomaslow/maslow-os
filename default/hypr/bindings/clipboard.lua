@@ -42,7 +42,7 @@ local function universal_clipboard_shortcut(default_mods, default_key, terminal_
   end
 end
 
-o.bind("SUPER + A", "Select all", send_shortcut_once("CTRL", "A"))
+-- Super+A belongs to the bundled Maslow app launcher; Ctrl+A selects all.
 o.bind("SUPER + C", "Universal copy", universal_clipboard_shortcut("CTRL", "C", "CTRL SHIFT", "C"))
 o.bind("SUPER + V", "Universal paste", universal_clipboard_shortcut("CTRL", "V", "CTRL SHIFT", "V"))
 o.bind("SUPER + X", "Universal cut", send_shortcut_once("CTRL", "X"))

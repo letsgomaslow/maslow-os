@@ -116,9 +116,13 @@ case "$1:$2" in
   mark:first-run-user) touch "$FIRST_RUN_MARKER" ;;
 esac
 SH
-for helper in omarchy-provision-user omarchy-hook-install omarchy-notification-wait; do
+for helper in omarchy-hook-install omarchy-notification-wait omarchy-setup-ai omarchy-notification-send; do
   printf '#!/bin/bash\nexit 0\n' >"$first_bin/$helper"
 done
+cat >"$first_bin/omarchy-provision-user" <<'SH'
+#!/bin/bash
+exit "${TEST_FINALIZE_FAIL:-0}"
+SH
 chmod +x "$first_bin"/*
 for script in welcome.sh wifi.sh enable-user-units.sh gnome-theme.sh gtk-primary-paste.sh audio-tuning.sh; do
   printf 'exit 0\n' >"$first_root/install/user/first-run/$script"
@@ -136,11 +140,27 @@ first_run apple || fail "apple: first run finishes" "$(cat "$tmp/output")"
 [[ $(cat "$tmp/ran") == "setup-user" && -e $tmp/first-run-marker ]] ||
   fail "apple: first run runs setup-user and completes" "$(cat "$tmp/ran" 2>/dev/null)"
 touch "$tmp/fail"
-first_run apple || fail "apple: first run with a failing setup-user still runs its other steps"
+if first_run apple; then
+  fail "apple: first run must report a required platform setup failure"
+fi
+[[ -s $tmp/home/.local/state/maslow-os/setup-pending ]] || fail "apple: failed core setup retains its pending recovery marker"
 [[ ! -e $tmp/first-run-marker ]] || fail "apple: a failed setup-user keeps first run pending"
+grep -q "Completed: apply speaker tuning" "$tmp/home/.local/state/omarchy/first-run.log" ||
+  fail "apple: a platform failure still permits later optional setup steps"
 grep -q "Failed: run the platform's user setup" "$tmp/home/.local/state/omarchy/first-run.log" ||
   fail "apple: first run logs the failed platform setup" "$(cat "$tmp/home/.local/state/omarchy/first-run.log")"
 first_run x86 || fail "x86: first run finishes"
 [[ ! -e $tmp/ran && -e $tmp/first-run-marker ]] || fail "x86: first run runs no platform setup and completes"
 rm -f "$tmp/fail"
 pass "first run runs the platform's user setup, and a failure keeps first run pending"
+
+if TEST_FINALIZE_FAIL=1 first_run x86; then
+  fail "required finalization failure must report an error"
+fi
+[[ ! -e $tmp/first-run-marker && -s $tmp/home/.local/state/maslow-os/setup-pending ]] ||
+  fail "required finalization failure retains recovery state without marking completion"
+for step in "enable user systemd units" "run the platform's user setup" "apply speaker tuning"; do
+  grep -q "Completed: $step" "$tmp/home/.local/state/omarchy/first-run.log" ||
+    fail "required finalization failure skipped $step"
+done
+pass "required finalization failure retains its gate while remaining setup steps execute"

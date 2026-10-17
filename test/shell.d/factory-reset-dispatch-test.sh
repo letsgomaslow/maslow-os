@@ -168,7 +168,8 @@ fixture() {
     "$tmp/top/@factory/usr/share/omarchy/install/provisioning/omarchy-provision-owner.service"
   printf '#!/bin/bash\n' >"$tmp/top/@factory/usr/bin/omarchy-provision-owner"
   chmod +x "$tmp/top/@factory/usr/bin/omarchy-provision-owner"
-  printf '%s /boot vfat defaults 0 2\n' "$tmp/esp" >"$tmp/top/@factory/etc/fstab"
+  # Use a supported /dev source; mount below is a recording-only test double.
+  printf '%s /boot vfat defaults 0 2\n' /dev/null >"$tmp/top/@factory/etc/fstab"
   : >"$device"
   printf '0 %s\n' "$current_password" >"$tmp/slots"
   : >"$tmp/reset.log"

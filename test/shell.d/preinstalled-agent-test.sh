@@ -93,6 +93,12 @@ try {
 
   const leaf = run('source "$OMARCHY_PATH/install/user/mise.sh"', {}, `
 omarchy-pkg-present() { return 1; }
+mise() {
+  case "$*" in
+    "settings set upgrade.auto_prune false"|reshim) return 0 ;;
+    *) printf 'unexpected mise %s\\n' "$*" >>"$TEST_LOG"; return 1 ;;
+  esac
+}
 omarchy-mise-install() { printf 'stub %s\\n' "$*" >>"$TEST_LOG"; }
 omarchy-install-hermes-cli() { printf 'unexpected Hermes installer\\n' >>"$TEST_LOG"; return 1; }
 `)

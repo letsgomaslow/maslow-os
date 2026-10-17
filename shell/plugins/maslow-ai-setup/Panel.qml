@@ -571,7 +571,7 @@ Item {
 
   FloatingWindow {
     id: window
-    title: root.productName + " AI Setup"
+    title: root.productName + " " + I18n.t("maslowSetup.title")
     color: root.background
     implicitWidth: 1120
     implicitHeight: 680
@@ -726,7 +726,7 @@ Item {
                         Text { textFormat: Text.PlainText; Layout.fillWidth: true; text: root.statusLabel(accountCard.entry.authentication); color: accountCard.entry.authentication === "signed-out" ? root.urgent : root.foreground; font.family: root.fontFamily; font.weight: Font.DemiBold; font.pixelSize: Math.max(Style.font.body, Math.round(12 * root.contentScale)) }
                         EditorialButton {
                           id: accountChoiceButton
-                          text: root.accountChoice === accountCard.modelData.id ? "Selected" : "Choose"
+                          text: root.accountChoice === accountCard.modelData.id ? I18n.t("maslowSetup.selected") : I18n.t("maslowSetup.choose")
                           quiet: root.accountChoice !== accountCard.modelData.id
                           Accessible.name: "Choose " + accountCard.modelData.title
                           onClicked: root.selectAccount(accountCard.modelData.id)
@@ -813,7 +813,7 @@ Item {
               Text { textFormat: Text.PlainText; Layout.fillWidth: true; wrapMode: Text.WordWrap; text: "Give your AI\na place to open."; color: root.foreground; font.family: root.fontFamily; font.weight: Font.DemiBold; font.pixelSize: Math.round(42 * root.contentScale); lineHeight: 1.0 }
               Text { textFormat: Text.PlainText; Layout.fillWidth: true; text: "Desktop apps are optional. Choose one if you want a dedicated place to open your tools."; color: root.subdued; font.family: root.fontFamily; font.pixelSize: Math.max(Style.font.heading, Math.round(16 * root.contentScale)); wrapMode: Text.WordWrap }
               EditorialButton {
-                text: "Open " + root.statusFor(root.accountChoice).toolName
+                text: I18n.t("maslowSetup.openTool").arg(root.statusFor(root.accountChoice).toolName)
                 visible: root.accountProofSufficient()
                 enabled: !root.busy
                 onClicked: root.runToolAction(root.accountChoice, "launch")
@@ -845,7 +845,7 @@ Item {
                         Text { textFormat: Text.PlainText; Layout.fillWidth: true; text: root.desktopStateLabel(desktopCard.entry); color: desktopCard.entry.runtimeState === "attention" ? root.urgent : root.subdued; font.family: root.fontFamily; font.weight: Font.DemiBold; font.pixelSize: Math.max(Style.font.body, Math.round(12 * root.contentScale)) }
                         EditorialButton {
                           id: desktopChoiceButton
-                          text: root.desktopChoice === desktopCard.modelData.id ? "Selected" : "Choose"
+                          text: root.desktopChoice === desktopCard.modelData.id ? I18n.t("maslowSetup.selected") : I18n.t("maslowSetup.choose")
                           quiet: root.desktopChoice !== desktopCard.modelData.id
                           Accessible.name: "Choose " + desktopCard.modelData.title
                           onClicked: root.selectDesktop(desktopCard.modelData.id)

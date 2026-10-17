@@ -14,7 +14,7 @@ mkdir -p "$mock_bin" "$test_home/.local/bin"
 
 cat >"$mock_bin/omarchy-pkg-present" <<'SH'
 #!/bin/bash
-[[ ${OMARCHY_TEST_DESKTOP_INSTALLED:-0} == 1 ]]
+[[ $1 == "hermes-desktop" && ${OMARCHY_TEST_DESKTOP_INSTALLED:-0} == 1 ]]
 SH
 
 cat >"$mock_bin/omarchy-cmd-missing" <<'SH'

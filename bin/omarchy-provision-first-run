@@ -123,7 +123,7 @@ if (( first_run_core_failed == 0 )); then
   else
     mkdir -p "$MASLOW_STATE_DIR"
     printf 'Optional Maslow OS setup needs attention. See %s\n' "$FIRST_RUN_LOG" >"$PENDING_FILE"
-    omarchy-notification-send "Finish Maslow OS setup" \
+    omarchy-notification-send "$(omarchy-i18n maslowSetup.finish)" \
       "One or more optional setup steps can be retried." -u normal \
       --exec omarchy-launch-floating-terminal-with-presentation omarchy-setup-finish || true
   fi
@@ -131,7 +131,7 @@ else
   mkdir -p "$MASLOW_STATE_DIR"
   printf 'Core Maslow OS setup failed. See %s\n' "$FIRST_RUN_LOG" >"$PENDING_FILE"
   log_first_run "Core first-run setup failed; first-run will retry next login"
-  omarchy-notification-send "Finish Maslow OS setup" \
+  omarchy-notification-send "$(omarchy-i18n maslowSetup.finish)" \
     "A required setup step failed. Open the recovery flow for details." -u critical \
     --exec omarchy-launch-floating-terminal-with-presentation omarchy-setup-finish || true
   exit 1

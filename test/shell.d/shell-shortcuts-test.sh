@@ -75,6 +75,7 @@ expect_binding() {
   grep -Fxq "$expected" <<<"$bindings" || fail "$message: $(grep -F "$(cut -f3 <<<"$expected")" <<<"$bindings")"
 }
 
+expect_binding $'exec\tomarchy-menu toggle apps\tApps menu' "the retained Apps provider uses only its exact bounded command"
 expect_binding $'global\tomarchy:menu.theme\tlisted menu' "a listed menu route binds its global shortcut"
 expect_binding $'exec\tomarchy-menu toggle \'setup.power\'\tunlisted menu' "an unlisted menu route falls back to the command"
 expect_binding $'global\tomarchy:panel.omarchy.emojis\tlisted panel' "a listed panel binds its global shortcut"
@@ -87,10 +88,10 @@ expect_binding $'exec\tomarchy-shell \'media\' \'sourceNext\'\tunlisted ipc' "an
 pass "shell bindings use global shortcuts only for what the shell registers"
 
 # Every default binding that toggles a listed route or panel goes through its
-# shortcut, and none toggles one through a command any more.
-! grep -E $'^exec\t(omarchy-menu toggle|omarchy-shell shell toggle) ' <<<"$bindings" | grep -v $'\tunlisted ' ||
+# shortcut. The retained Maslow Apps provider has one exact command exception.
+! grep -E $'^exec\t(omarchy-menu toggle|omarchy-shell shell toggle) ' <<<"$bindings" | grep -v $'\tunlisted ' | grep -Fxv $'exec\tomarchy-menu toggle apps\tApps menu' ||
   fail "default bindings toggle menus and panels through global shortcuts"
-expect_binding $'global\tomarchy:menu.root\tOmarchy menu' "SUPER+SPACE opens the menu through its shortcut"
+expect_binding $'global\tomarchy:menu.root\tMaslow OS menu' "SUPER+SPACE opens the menu through its shortcut"
 expect_binding $'global\tomarchy:menu.theme\tTheme menu' "the theme menu binding uses its shortcut"
 expect_binding $'global\tomarchy:panel.omarchy.clipboard\tClipboard manager' "the clipboard binding uses its shortcut"
 expect_binding $'global\tomarchy:audio.raise\tVolume up' "the volume up key steps the volume in the shell"
