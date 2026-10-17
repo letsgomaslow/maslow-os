@@ -48,7 +48,7 @@ Maaari mong simulan ang WhatsApp gamit ang `Super + Shift + Alt + G`.
 
 Kasama rin bilang mga web app ang Google Messages, Google Photos, Google Maps, at Google Contacts.
 
-Maaari mong simulan ang Google Messages gamit ang `Super + Shift + Ctrl + G`, ang Google Photos gamit ang `Super + Shift + P`, at ang Google Maps gamit ang `Super + Shift + S`. Magagamit ang Google Contacts sa pamamagitan ng app launcher (`Super + Space`).
+Maaari mong simulan ang Google Messages gamit ang `Super + Shift + Ctrl + G`, ang Google Photos gamit ang `Super + Shift + P`, at ang Google Maps gamit ang `Super + Shift + Alt + S`. Magagamit ang Google Contacts sa pamamagitan ng app launcher (`Super + Space`).
 
 ## X
 

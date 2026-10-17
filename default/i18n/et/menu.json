@@ -2,6 +2,12 @@
   "root": {
     "label": "Mine"
   },
+  "hub": {
+    "label": "Maslow Hub"
+  },
+  "voice": {
+    "label": "Maslow Voice"
+  },
   "apps": {
     "label": "Rakendused"
   },
@@ -27,7 +33,7 @@
     "label": "Uuenda"
   },
   "about": {
-    "label": "Teave"
+    "label": "Teave Maslow AI-OS-i kohta"
   },
   "system": {
     "label": "Süsteem"
@@ -50,6 +56,9 @@
   "system.reboot": {
     "label": "Taaskäivita"
   },
+  "system.reboot-boot-menu": {
+    "label": "Taaskäivita alglaadimismenüüsse"
+  },
   "system.shutdown": {
     "label": "Lülita välja"
   },
@@ -57,7 +66,7 @@
     "label": "Kiirklahvid"
   },
   "learn.omarchy": {
-    "label": "Omarchy"
+    "label": "Maslow AI-OS-i juhend"
   },
   "learn.hyprland": {
     "label": "Hyprland"
@@ -78,7 +87,10 @@
     "label": "Herdr"
   },
   "learn.community": {
-    "label": "Kogukond"
+    "label": "Kogukond Omarchy — mootori tugi"
+  },
+  "learn.support": {
+    "label": "Maslow AI-OS-i tugi"
   },
   "trigger.appearance": {
     "label": "Välimus"
@@ -363,6 +375,9 @@
   "trigger.share.receive": {
     "label": "Võta vastu"
   },
+  "trigger.toggle.reduced-motion": {
+    "label": "Vähendatud liikumine"
+  },
   "trigger.tests.network-speedtest": {
     "label": "Võrgukiiruse test"
   },
@@ -380,6 +395,28 @@
   },
   "style.font": {
     "label": "Kirjatüüp"
+  },
+  "style.font.cjk": {
+    "label": "Hiina, jaapani, korea",
+    "title": "Hiina, jaapani ja korea kirjamärgid"
+  },
+  "style.font.cjk.auto": {
+    "label": "Automaatne"
+  },
+  "style.font.cjk.jp": {
+    "label": "Jaapani"
+  },
+  "style.font.cjk.kr": {
+    "label": "Korea"
+  },
+  "style.font.cjk.sc": {
+    "label": "Lihtsustatud hiina"
+  },
+  "style.font.cjk.tc": {
+    "label": "Taiwan"
+  },
+  "style.font.cjk.hk": {
+    "label": "Hongkong"
   },
   "style.hyprland": {
     "label": "Hyprland"
@@ -410,6 +447,10 @@
   },
   "setup.monitors": {
     "label": "Kuvarid"
+  },
+  "setup.ai": {
+    "label": "AI",
+    "title": "Tehisintellekti seadistus — Maslow AI-OS"
   },
   "setup.keybindings": {
     "label": "Kiirklahvid"
@@ -472,23 +513,14 @@
   "setup.default.agent.crush": {
     "label": "Crush"
   },
-  "setup.default.agent.cursor-agent": {
-    "label": "Cursor CLI"
-  },
   "setup.default.agent.grok": {
     "label": "Grok"
   },
   "setup.default.agent.hermes": {
     "label": "Hermes"
   },
-  "setup.default.agent.muse": {
-    "label": "Muse Code"
-  },
   "setup.default.agent.omp": {
     "label": "omp"
-  },
-  "setup.default.agent.openclaw": {
-    "label": "OpenClaw"
   },
   "setup.default.agent.opencode": {
     "label": "OpenCode"
@@ -1125,7 +1157,7 @@
     "label": "Phoenix"
   },
   "update.omarchy": {
-    "label": "Omarchy"
+    "label": "Maslow AI-OS"
   },
   "update.channel": {
     "label": "Kanal"
@@ -1207,11 +1239,5 @@
   },
   "update.password.user": {
     "label": "Kasutaja"
-  },
-  "system.reboot-boot-menu": {
-    "label": "Taaskäivita alglaadimismenüüsse"
-  },
-  "setup.default.agent.kimi": {
-    "label": "Kimi"
   }
 }

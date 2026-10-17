@@ -32,7 +32,7 @@ Windows-användare: din Win + V-urklippshistorik bor på `Super + Ctrl + V`, och
 | ------------- | ---------- |
 | Spotlight / Raycast / Start-menyn | `Super + Space` — Omarchy-menyn |
 | AirDrop | LocalSend, via `Super + Ctrl + S` — se [GUI:er](22-guis.md) |
-| Cmd + Shift + 4 / Win + Shift + S | `Print Screen` — se [skärmbilder & inspelning](12-screenshots-recording.md) |
+| Cmd + Shift + 4 / Win + Shift + S | `Super + Shift + S` / `Print Screen` — se [skärmbilder & inspelning](12-screenshots-recording.md) |
 | Notiscenter | Aviseringshistorik på `Super + Shift + Alt + ,` |
 | Time Machine (för systemet) | Automatiska [systemsnapshot](47-system-snapshots.md) vid varje uppdatering |
 | App Store / ladda ner en installatör | _Install_ i menyn, eller `omarchy pkg add` — se [andra paket](29-other-packages.md) |

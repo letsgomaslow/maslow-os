@@ -32,7 +32,7 @@ Windowsi rahvas: teie Win + V lõikelaua ajalugu asub `Super + Ctrl + V` peal ja
 | ------------- | ---------- |
 | Spotlight / Raycast / Start menüü | `Super + Space` — Omarchy menüü |
 | AirDrop | LocalSend, `Super + Ctrl + S` kaudu — vt [GUI-d](22-guis.md) |
-| Cmd + Shift + 4 / Win + Shift + S | `Print Screen` — vt [ekraanitõmmised ja salvestamine](12-screenshots-recording.md) |
+| Cmd + Shift + 4 / Win + Shift + S | `Super + Shift + S` / `Print Screen` — vt [ekraanitõmmised ja salvestamine](12-screenshots-recording.md) |
 | Notification Center | Teavituste ajalugu `Super + Shift + Alt + ,` peal |
 | Time Machine (süsteemi jaoks) | Automaatsed [süsteemi hetktõmmised](47-system-snapshots.md) igal uuendusel |
 | App Store / paigaldaja allalaadimine | _Paigalda_ menüüs või `omarchy pkg add` — vt [muud paketid](29-other-packages.md) |

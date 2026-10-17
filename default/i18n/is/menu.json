@@ -2,6 +2,12 @@
   "root": {
     "label": "Fara"
   },
+  "hub": {
+    "label": "Maslow Hub"
+  },
+  "voice": {
+    "label": "Maslow Voice"
+  },
   "apps": {
     "label": "Forrit"
   },
@@ -27,7 +33,7 @@
     "label": "Uppfæra"
   },
   "about": {
-    "label": "Um"
+    "label": "Um Maslow AI-OS"
   },
   "system": {
     "label": "Kerfi"
@@ -50,6 +56,9 @@
   "system.reboot": {
     "label": "Endurræsa"
   },
+  "system.reboot-boot-menu": {
+    "label": "Endurræsa í ræsivalmynd"
+  },
   "system.shutdown": {
     "label": "Slökkva"
   },
@@ -57,7 +66,7 @@
     "label": "Flýtilyklar"
   },
   "learn.omarchy": {
-    "label": "Omarchy"
+    "label": "Leiðarvísir Maslow AI-OS"
   },
   "learn.hyprland": {
     "label": "Hyprland"
@@ -78,7 +87,10 @@
     "label": "Herdr"
   },
   "learn.community": {
-    "label": "Samfélag"
+    "label": "Samfélag Omarchy — aðstoð við vélina"
+  },
+  "learn.support": {
+    "label": "Aðstoð við Maslow AI-OS"
   },
   "trigger.appearance": {
     "label": "Útlit"
@@ -363,6 +375,9 @@
   "trigger.share.receive": {
     "label": "Taka á móti"
   },
+  "trigger.toggle.reduced-motion": {
+    "label": "Minni hreyfing"
+  },
   "trigger.tests.network-speedtest": {
     "label": "Nethraðapróf"
   },
@@ -380,6 +395,28 @@
   },
   "style.font": {
     "label": "Leturgerð"
+  },
+  "style.font.cjk": {
+    "label": "Kínverska, japanska, kóreska",
+    "title": "Kínversk, japönsk og kóresk stafbrigði"
+  },
+  "style.font.cjk.auto": {
+    "label": "Sjálfvirkt"
+  },
+  "style.font.cjk.jp": {
+    "label": "Japanska"
+  },
+  "style.font.cjk.kr": {
+    "label": "Kóreska"
+  },
+  "style.font.cjk.sc": {
+    "label": "Einfölduð kínverska"
+  },
+  "style.font.cjk.tc": {
+    "label": "Taívan"
+  },
+  "style.font.cjk.hk": {
+    "label": "Hong Kong"
   },
   "style.hyprland": {
     "label": "Hyprland"
@@ -410,6 +447,10 @@
   },
   "setup.monitors": {
     "label": "Skjár"
+  },
+  "setup.ai": {
+    "label": "AI",
+    "title": "Uppsetning gervigreindar — Maslow AI-OS"
   },
   "setup.keybindings": {
     "label": "Flýtilyklar"
@@ -472,23 +513,14 @@
   "setup.default.agent.crush": {
     "label": "Crush"
   },
-  "setup.default.agent.cursor-agent": {
-    "label": "Cursor CLI"
-  },
   "setup.default.agent.grok": {
     "label": "Grok"
   },
   "setup.default.agent.hermes": {
     "label": "Hermes"
   },
-  "setup.default.agent.muse": {
-    "label": "Muse Code"
-  },
   "setup.default.agent.omp": {
     "label": "omp"
-  },
-  "setup.default.agent.openclaw": {
-    "label": "OpenClaw"
   },
   "setup.default.agent.opencode": {
     "label": "OpenCode"
@@ -1125,7 +1157,7 @@
     "label": "Phoenix"
   },
   "update.omarchy": {
-    "label": "Omarchy"
+    "label": "Maslow AI-OS"
   },
   "update.channel": {
     "label": "Rás"
@@ -1207,11 +1239,5 @@
   },
   "update.password.user": {
     "label": "Notandi"
-  },
-  "system.reboot-boot-menu": {
-    "label": "Endurræsa í ræsivalmynd"
-  },
-  "setup.default.agent.kimi": {
-    "label": "Kimi"
   }
 }

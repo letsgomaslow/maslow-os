@@ -2,6 +2,12 @@
   "root": {
     "label": "برو"
   },
+  "hub": {
+    "label": "Maslow Hub"
+  },
+  "voice": {
+    "label": "Maslow Voice"
+  },
   "apps": {
     "label": "برنامه‌ها"
   },
@@ -27,7 +33,7 @@
     "label": "به‌روزرسانی"
   },
   "about": {
-    "label": "درباره"
+    "label": "دربارهٔ Maslow AI-OS"
   },
   "system": {
     "label": "سیستم"
@@ -50,6 +56,9 @@
   "system.reboot": {
     "label": "راه‌اندازی مجدد"
   },
+  "system.reboot-boot-menu": {
+    "label": "راه‌اندازی مجدد به منوی بوت"
+  },
   "system.shutdown": {
     "label": "خاموش"
   },
@@ -57,7 +66,7 @@
     "label": "میانبرها"
   },
   "learn.omarchy": {
-    "label": "Omarchy"
+    "label": "راهنمای Maslow AI-OS"
   },
   "learn.hyprland": {
     "label": "Hyprland"
@@ -78,7 +87,10 @@
     "label": "Herdr"
   },
   "learn.community": {
-    "label": "جامعه"
+    "label": "جامعه Omarchy — پشتیبانی موتور"
+  },
+  "learn.support": {
+    "label": "پشتیبانی Maslow AI-OS"
   },
   "trigger.appearance": {
     "label": "ظاهر"
@@ -363,6 +375,9 @@
   "trigger.share.receive": {
     "label": "دریافت"
   },
+  "trigger.toggle.reduced-motion": {
+    "label": "کاهش حرکت"
+  },
   "trigger.tests.network-speedtest": {
     "label": "تست سرعت شبکه"
   },
@@ -380,6 +395,28 @@
   },
   "style.font": {
     "label": "قلم"
+  },
+  "style.font.cjk": {
+    "label": "چینی، ژاپنی، کره‌ای",
+    "title": "شکل حروف چینی، ژاپنی و کره‌ای"
+  },
+  "style.font.cjk.auto": {
+    "label": "خودکار"
+  },
+  "style.font.cjk.jp": {
+    "label": "ژاپنی"
+  },
+  "style.font.cjk.kr": {
+    "label": "کره‌ای"
+  },
+  "style.font.cjk.sc": {
+    "label": "چینی ساده‌شده"
+  },
+  "style.font.cjk.tc": {
+    "label": "تایوان"
+  },
+  "style.font.cjk.hk": {
+    "label": "هنگ‌کنگ"
   },
   "style.hyprland": {
     "label": "Hyprland"
@@ -410,6 +447,10 @@
   },
   "setup.monitors": {
     "label": "مانیتورها"
+  },
+  "setup.ai": {
+    "label": "AI",
+    "title": "راه‌اندازی هوش مصنوعی — Maslow AI-OS"
   },
   "setup.keybindings": {
     "label": "میانبرها"
@@ -472,23 +513,14 @@
   "setup.default.agent.crush": {
     "label": "Crush"
   },
-  "setup.default.agent.cursor-agent": {
-    "label": "Cursor CLI"
-  },
   "setup.default.agent.grok": {
     "label": "Grok"
   },
   "setup.default.agent.hermes": {
     "label": "Hermes"
   },
-  "setup.default.agent.muse": {
-    "label": "Muse Code"
-  },
   "setup.default.agent.omp": {
     "label": "omp"
-  },
-  "setup.default.agent.openclaw": {
-    "label": "OpenClaw"
   },
   "setup.default.agent.opencode": {
     "label": "OpenCode"
@@ -1125,7 +1157,7 @@
     "label": "Phoenix"
   },
   "update.omarchy": {
-    "label": "Omarchy"
+    "label": "Maslow AI-OS"
   },
   "update.channel": {
     "label": "کانال"
@@ -1207,11 +1239,5 @@
   },
   "update.password.user": {
     "label": "کاربر"
-  },
-  "system.reboot-boot-menu": {
-    "label": "راه‌اندازی مجدد به منوی بوت"
-  },
-  "setup.default.agent.kimi": {
-    "label": "Kimi"
   }
 }

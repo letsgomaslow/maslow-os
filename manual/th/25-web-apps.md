@@ -48,7 +48,7 @@
 
 Google Messages, Google Photos, Google Maps และ Google Contacts ทั้งหมดรวมอยู่ในฐานะเว็บแอปด้วยเช่นกัน
 
-คุณสามารถเริ่ม Google Messages ได้ด้วย `Super + Shift + Ctrl + G` Google Photos ด้วย `Super + Shift + P` และ Google Maps ด้วย `Super + Shift + S` ส่วน Google Contacts มีให้ผ่านตัวเปิดแอป (`Super + Space`)
+คุณสามารถเริ่ม Google Messages ได้ด้วย `Super + Shift + Ctrl + G` Google Photos ด้วย `Super + Shift + P` และ Google Maps ด้วย `Super + Shift + Alt + S` ส่วน Google Contacts มีให้ผ่านตัวเปิดแอป (`Super + Space`)
 
 ## X
 

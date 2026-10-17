@@ -48,7 +48,7 @@ Bạn có thể khởi động WhatsApp bằng `Super + Shift + Alt + G`.
 
 Google Messages, Google Photos, Google Maps và Google Contacts đều được bao gồm dưới dạng ứng dụng web.
 
-Bạn có thể khởi động Google Messages bằng `Super + Shift + Ctrl + G`, Google Photos bằng `Super + Shift + P`, và Google Maps bằng `Super + Shift + S`. Google Contacts có sẵn qua trình khởi chạy ứng dụng (`Super + Space`).
+Bạn có thể khởi động Google Messages bằng `Super + Shift + Ctrl + G`, Google Photos bằng `Super + Shift + P`, và Google Maps bằng `Super + Shift + Alt + S`. Google Contacts có sẵn qua trình khởi chạy ứng dụng (`Super + Space`).
 
 ## X
 

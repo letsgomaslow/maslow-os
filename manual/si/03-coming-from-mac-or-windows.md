@@ -32,7 +32,7 @@ Windows අය: ඔබේ Win + V ක්ලිප්බෝඩ් ඉතිහා
 | ------------- | ---------- |
 | Spotlight / Raycast / Start මෙනුව | `Super + Space` — Omarchy මෙනුව |
 | AirDrop | LocalSend, `Super + Ctrl + S` හරහා — බලන්න [GUI](22-guis.md) |
-| Cmd + Shift + 4 / Win + Shift + S | `Print Screen` — බලන්න [තිර රූ සහ පටිගත කිරීම](12-screenshots-recording.md) |
+| Cmd + Shift + 4 / Win + Shift + S | `Super + Shift + S` / `Print Screen` — බලන්න [තිර රූ සහ පටිගත කිරීම](12-screenshots-recording.md) |
 | Notification Center | `Super + Shift + Alt + ,` හි දැනුම්දීම් ඉතිහාසය |
 | Time Machine (පද්ධතිය සඳහා) | සෑම යාවත්කාලීනයකදීම ස්වයංක්‍රීය [පද්ධති ඡායාරූප](47-system-snapshots.md) |
 | App Store / ස්ථාපකයක් බාගැනීම | මෙනුවේ _ස්ථාපනය_, හෝ `omarchy pkg add` — බලන්න [වෙනත් පැකේජ](29-other-packages.md) |

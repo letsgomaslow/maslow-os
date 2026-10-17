@@ -32,7 +32,7 @@ A dhaoine Windows: tá stair do ghearrthaisce Win + V ar `Super + Ctrl + V`, agu
 | ------------- | ---------- |
 | Spotlight / Raycast / Roghchlár Tosaithe | `Super + Space` — roghchlár Omarchy |
 | AirDrop | LocalSend, trí `Super + Ctrl + S` — féach [GUIanna](22-guis.md) |
-| Cmd + Shift + 4 / Win + Shift + S | `Print Screen` — féach [seatanna scáileáin & taifeadadh](12-screenshots-recording.md) |
+| Cmd + Shift + 4 / Win + Shift + S | `Super + Shift + S` / `Print Screen` — féach [seatanna scáileáin & taifeadadh](12-screenshots-recording.md) |
 | Ionad Fógraí | Stair fógraí ar `Super + Shift + Alt + ,` |
 | Time Machine (don chóras) | [Seatanna córais](47-system-snapshots.md) uathoibríocha ar gach nuashonrú |
 | App Store / suiteálaí a íoslódáil | _Suiteáil_ sa roghchlár, nó `omarchy pkg add` — féach [pacáistí eile](29-other-packages.md) |

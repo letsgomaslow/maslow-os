@@ -48,7 +48,7 @@ Poți porni WhatsApp folosind `Super + Shift + Alt + G`.
 
 Google Messages, Google Photos, Google Maps și Google Contacts sunt toate incluse și ele ca aplicații web.
 
-Poți porni Google Messages folosind `Super + Shift + Ctrl + G`, Google Photos folosind `Super + Shift + P` și Google Maps folosind `Super + Shift + S`. Google Contacts este disponibil prin lansatorul de aplicații (`Super + Space`).
+Poți porni Google Messages folosind `Super + Shift + Ctrl + G`, Google Photos folosind `Super + Shift + P` și Google Maps folosind `Super + Shift + Alt + S`. Google Contacts este disponibil prin lansatorul de aplicații (`Super + Space`).
 
 ## X
 

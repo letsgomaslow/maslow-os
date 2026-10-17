@@ -48,7 +48,7 @@
 
 Google Messages وGoogle Photos وGoogle Maps وGoogle Contacts كلها مضمّنة بوصفها تطبيقات ويب أيضًا.
 
-يمكنك بدء Google Messages باستخدام `Super + Shift + Ctrl + G`، وGoogle Photos باستخدام `Super + Shift + P`، وGoogle Maps باستخدام `Super + Shift + S`. وتتوفر Google Contacts عبر مشغّل التطبيقات (`Super + Space`).
+يمكنك بدء Google Messages باستخدام `Super + Shift + Ctrl + G`، وGoogle Photos باستخدام `Super + Shift + P`، وGoogle Maps باستخدام `Super + Shift + Alt + S`. وتتوفر Google Contacts عبر مشغّل التطبيقات (`Super + Space`).
 
 ## X
 

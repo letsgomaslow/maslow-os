@@ -32,7 +32,7 @@ Pessoal do Windows: seu histórico da área de transferência com Win + V mora e
 | ------------- | ---------- |
 | Spotlight / Raycast / Menu Iniciar | `Super + Space` — o menu do Omarchy |
 | AirDrop | LocalSend, via `Super + Ctrl + S` — veja [GUIs](22-guis.md) |
-| Cmd + Shift + 4 / Win + Shift + S | `Print Screen` — veja [capturas de tela e gravação](12-screenshots-recording.md) |
+| Cmd + Shift + 4 / Win + Shift + S | `Super + Shift + S` / `Print Screen` — veja [capturas de tela e gravação](12-screenshots-recording.md) |
 | Central de Notificações | Histórico de notificações em `Super + Shift + Alt + ,` |
 | Time Machine (para o sistema) | [Snapshots automáticos do sistema](47-system-snapshots.md) a cada atualização |
 | App Store / baixar um instalador | _Instalar_ no menu, ou `omarchy pkg add` — veja [outros pacotes](29-other-packages.md) |

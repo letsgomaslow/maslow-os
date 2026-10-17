@@ -2,6 +2,12 @@
   "root": {
     "label": "Vai"
   },
+  "hub": {
+    "label": "Maslow Hub"
+  },
+  "voice": {
+    "label": "Maslow Voice"
+  },
   "apps": {
     "label": "App"
   },
@@ -27,7 +33,7 @@
     "label": "Aggiorna"
   },
   "about": {
-    "label": "Info"
+    "label": "Informazioni su Maslow AI-OS"
   },
   "system": {
     "label": "Sistema"
@@ -50,6 +56,9 @@
   "system.reboot": {
     "label": "Riavvia"
   },
+  "system.reboot-boot-menu": {
+    "label": "Riavvia al menu di avvio"
+  },
   "system.shutdown": {
     "label": "Spegni"
   },
@@ -57,7 +66,7 @@
     "label": "Scorciatoie"
   },
   "learn.omarchy": {
-    "label": "Omarchy"
+    "label": "Guida di Maslow AI-OS"
   },
   "learn.hyprland": {
     "label": "Hyprland"
@@ -78,7 +87,10 @@
     "label": "Herdr"
   },
   "learn.community": {
-    "label": "Comunità"
+    "label": "Comunità Omarchy — assistenza del motore"
+  },
+  "learn.support": {
+    "label": "Assistenza Maslow AI-OS"
   },
   "trigger.appearance": {
     "label": "Aspetto"
@@ -363,6 +375,9 @@
   "trigger.share.receive": {
     "label": "Ricevi"
   },
+  "trigger.toggle.reduced-motion": {
+    "label": "Movimento ridotto"
+  },
   "trigger.tests.network-speedtest": {
     "label": "Test velocità rete"
   },
@@ -380,6 +395,28 @@
   },
   "style.font": {
     "label": "Carattere"
+  },
+  "style.font.cjk": {
+    "label": "Cinese, giapponese, coreano",
+    "title": "Glifi cinesi, giapponesi e coreani"
+  },
+  "style.font.cjk.auto": {
+    "label": "Automatico"
+  },
+  "style.font.cjk.jp": {
+    "label": "Giapponese"
+  },
+  "style.font.cjk.kr": {
+    "label": "Coreano"
+  },
+  "style.font.cjk.sc": {
+    "label": "Cinese semplificato"
+  },
+  "style.font.cjk.tc": {
+    "label": "Taiwan"
+  },
+  "style.font.cjk.hk": {
+    "label": "Hong Kong"
   },
   "style.hyprland": {
     "label": "Hyprland"
@@ -410,6 +447,10 @@
   },
   "setup.monitors": {
     "label": "Monitor"
+  },
+  "setup.ai": {
+    "label": "AI",
+    "title": "Configurazione IA — Maslow AI-OS"
   },
   "setup.keybindings": {
     "label": "Scorciatoie"
@@ -472,23 +513,14 @@
   "setup.default.agent.crush": {
     "label": "Crush"
   },
-  "setup.default.agent.cursor-agent": {
-    "label": "Cursor CLI"
-  },
   "setup.default.agent.grok": {
     "label": "Grok"
   },
   "setup.default.agent.hermes": {
     "label": "Hermes"
   },
-  "setup.default.agent.muse": {
-    "label": "Muse Code"
-  },
   "setup.default.agent.omp": {
     "label": "omp"
-  },
-  "setup.default.agent.openclaw": {
-    "label": "OpenClaw"
   },
   "setup.default.agent.opencode": {
     "label": "OpenCode"
@@ -1125,7 +1157,7 @@
     "label": "Phoenix"
   },
   "update.omarchy": {
-    "label": "Omarchy"
+    "label": "Maslow AI-OS"
   },
   "update.channel": {
     "label": "Canale"
@@ -1207,11 +1239,5 @@
   },
   "update.password.user": {
     "label": "Utente"
-  },
-  "system.reboot-boot-menu": {
-    "label": "Riavvia al menu di avvio"
-  },
-  "setup.default.agent.kimi": {
-    "label": "Kimi"
   }
 }

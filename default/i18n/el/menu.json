@@ -2,6 +2,12 @@
   "root": {
     "label": "Μετάβαση"
   },
+  "hub": {
+    "label": "Maslow Hub"
+  },
+  "voice": {
+    "label": "Maslow Voice"
+  },
   "apps": {
     "label": "Εφαρμογές"
   },
@@ -27,7 +33,7 @@
     "label": "Ενημέρωση"
   },
   "about": {
-    "label": "Σχετικά"
+    "label": "Σχετικά με το Maslow AI-OS"
   },
   "system": {
     "label": "Σύστημα"
@@ -50,6 +56,9 @@
   "system.reboot": {
     "label": "Επανεκκίνηση"
   },
+  "system.reboot-boot-menu": {
+    "label": "Επανεκκίνηση στο μενού εκκίνησης"
+  },
   "system.shutdown": {
     "label": "Απενεργοποίηση"
   },
@@ -57,7 +66,7 @@
     "label": "Συντομεύσεις"
   },
   "learn.omarchy": {
-    "label": "Omarchy"
+    "label": "Οδηγός Maslow AI-OS"
   },
   "learn.hyprland": {
     "label": "Hyprland"
@@ -78,7 +87,10 @@
     "label": "Herdr"
   },
   "learn.community": {
-    "label": "Κοινότητα"
+    "label": "Κοινότητα Omarchy — υποστήριξη μηχανής"
+  },
+  "learn.support": {
+    "label": "Υποστήριξη Maslow AI-OS"
   },
   "trigger.appearance": {
     "label": "Εμφάνιση"
@@ -363,6 +375,9 @@
   "trigger.share.receive": {
     "label": "Λήψη"
   },
+  "trigger.toggle.reduced-motion": {
+    "label": "Μειωμένη κίνηση"
+  },
   "trigger.tests.network-speedtest": {
     "label": "Δοκιμή ταχύτητας δικτύου"
   },
@@ -380,6 +395,28 @@
   },
   "style.font": {
     "label": "Γραμματοσειρά"
+  },
+  "style.font.cjk": {
+    "label": "Κινεζικά, ιαπωνικά, κορεατικά",
+    "title": "Κινεζικοί, ιαπωνικοί και κορεατικοί χαρακτήρες"
+  },
+  "style.font.cjk.auto": {
+    "label": "Αυτόματα"
+  },
+  "style.font.cjk.jp": {
+    "label": "Ιαπωνικά"
+  },
+  "style.font.cjk.kr": {
+    "label": "Κορεατικά"
+  },
+  "style.font.cjk.sc": {
+    "label": "Απλοποιημένα κινεζικά"
+  },
+  "style.font.cjk.tc": {
+    "label": "Ταϊβάν"
+  },
+  "style.font.cjk.hk": {
+    "label": "Χονγκ Κονγκ"
   },
   "style.hyprland": {
     "label": "Hyprland"
@@ -410,6 +447,10 @@
   },
   "setup.monitors": {
     "label": "Οθόνες"
+  },
+  "setup.ai": {
+    "label": "AI",
+    "title": "Ρύθμιση ΤΝ — Maslow AI-OS"
   },
   "setup.keybindings": {
     "label": "Συντομεύσεις"
@@ -472,23 +513,14 @@
   "setup.default.agent.crush": {
     "label": "Crush"
   },
-  "setup.default.agent.cursor-agent": {
-    "label": "Cursor CLI"
-  },
   "setup.default.agent.grok": {
     "label": "Grok"
   },
   "setup.default.agent.hermes": {
     "label": "Hermes"
   },
-  "setup.default.agent.muse": {
-    "label": "Muse Code"
-  },
   "setup.default.agent.omp": {
     "label": "omp"
-  },
-  "setup.default.agent.openclaw": {
-    "label": "OpenClaw"
   },
   "setup.default.agent.opencode": {
     "label": "OpenCode"
@@ -1125,7 +1157,7 @@
     "label": "Phoenix"
   },
   "update.omarchy": {
-    "label": "Omarchy"
+    "label": "Maslow AI-OS"
   },
   "update.channel": {
     "label": "Κανάλι"
@@ -1207,11 +1239,5 @@
   },
   "update.password.user": {
     "label": "Χρήστης"
-  },
-  "system.reboot-boot-menu": {
-    "label": "Επανεκκίνηση στο μενού εκκίνησης"
-  },
-  "setup.default.agent.kimi": {
-    "label": "Kimi"
   }
 }

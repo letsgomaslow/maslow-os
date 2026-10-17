@@ -32,7 +32,7 @@ Watu wa Windows: historia yako ya ubao wa kunakili ya Win + V inaishi kwenye `Su
 | ------------- | ---------- |
 | Spotlight / Raycast / menyu ya Start | `Super + Space` — menyu ya Omarchy |
 | AirDrop | LocalSend, kupitia `Super + Ctrl + S` — tazama [GUIs](22-guis.md) |
-| Cmd + Shift + 4 / Win + Shift + S | `Print Screen` — tazama [picha za skrini na kurekodi](12-screenshots-recording.md) |
+| Cmd + Shift + 4 / Win + Shift + S | `Super + Shift + S` / `Print Screen` — tazama [picha za skrini na kurekodi](12-screenshots-recording.md) |
 | Notification Center | Historia ya arifa kwenye `Super + Shift + Alt + ,` |
 | Time Machine (kwa mfumo) | [Picha za mfumo](47-system-snapshots.md) kiotomatiki kwenye kila sasisho |
 | App Store / kupakua kisakinishi | _Sakinisha_ katika menyu, au `omarchy pkg add` — tazama [vifurushi vingine](29-other-packages.md) |

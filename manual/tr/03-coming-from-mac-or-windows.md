@@ -32,7 +32,7 @@ Windows kullanıcıları: Win + V pano geçmişiniz `Super + Ctrl + V` üzerinde
 | ------------- | ---------- |
 | Spotlight / Raycast / Başlat menüsü | `Super + Space` — Omarchy menüsü |
 | AirDrop | LocalSend, `Super + Ctrl + S` ile — bkz. [GUI'ler](22-guis.md) |
-| Cmd + Shift + 4 / Win + Shift + S | `Print Screen` — bkz. [ekran görüntüleri ve kayıt](12-screenshots-recording.md) |
+| Cmd + Shift + 4 / Win + Shift + S | `Super + Shift + S` / `Print Screen` — bkz. [ekran görüntüleri ve kayıt](12-screenshots-recording.md) |
 | Bildirim Merkezi | `Super + Shift + Alt + ,` üzerindeki bildirim geçmişi |
 | Time Machine (sistem için) | Her güncellemede otomatik [sistem anlık görüntüleri](47-system-snapshots.md) |
 | App Store / kurulumcu indirme | Menüde _Kur_, veya `omarchy pkg add` — bkz. [diğer paketler](29-other-packages.md) |

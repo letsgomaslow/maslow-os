@@ -2,6 +2,12 @@
   "root": {
     "label": "යන්න"
   },
+  "hub": {
+    "label": "Maslow Hub"
+  },
+  "voice": {
+    "label": "Maslow Voice"
+  },
   "apps": {
     "label": "යෙදුම්"
   },
@@ -27,7 +33,7 @@
     "label": "යාවත්කාලීන"
   },
   "about": {
-    "label": "ගැන"
+    "label": "Maslow AI-OS පිළිබඳව"
   },
   "system": {
     "label": "පද්ධතිය"
@@ -50,6 +56,9 @@
   "system.reboot": {
     "label": "නැවත අරඹන්න"
   },
+  "system.reboot-boot-menu": {
+    "label": "බූට් මෙනුවට නැවත ආරම්භ කරන්න"
+  },
   "system.shutdown": {
     "label": "වසන්න"
   },
@@ -57,7 +66,7 @@
     "label": "යතුරු බන්ධන"
   },
   "learn.omarchy": {
-    "label": "Omarchy"
+    "label": "Maslow AI-OS මාර්ගෝපදේශය"
   },
   "learn.hyprland": {
     "label": "Hyprland"
@@ -78,7 +87,10 @@
     "label": "Herdr"
   },
   "learn.community": {
-    "label": "ප්‍රජාව"
+    "label": "ප්‍රජාව Omarchy — එන්ජින් සහාය"
+  },
+  "learn.support": {
+    "label": "Maslow AI-OS සහාය"
   },
   "trigger.appearance": {
     "label": "පෙනුම"
@@ -363,6 +375,9 @@
   "trigger.share.receive": {
     "label": "ලබාගන්න"
   },
+  "trigger.toggle.reduced-motion": {
+    "label": "චලනය අඩු කරන්න"
+  },
   "trigger.tests.network-speedtest": {
     "label": "ජාල වේග පරීක්ෂණය"
   },
@@ -380,6 +395,28 @@
   },
   "style.font": {
     "label": "ෆොන්ටය"
+  },
+  "style.font.cjk": {
+    "label": "චීන, ජපන්, කොරියානු",
+    "title": "චීන, ජපන් සහ කොරියානු අක්ෂර හැඩ"
+  },
+  "style.font.cjk.auto": {
+    "label": "ස්වයංක්‍රීය"
+  },
+  "style.font.cjk.jp": {
+    "label": "ජපන්"
+  },
+  "style.font.cjk.kr": {
+    "label": "කොරියානු"
+  },
+  "style.font.cjk.sc": {
+    "label": "සරල චීන"
+  },
+  "style.font.cjk.tc": {
+    "label": "තායිවානය"
+  },
+  "style.font.cjk.hk": {
+    "label": "හොංකොං"
   },
   "style.hyprland": {
     "label": "Hyprland"
@@ -410,6 +447,10 @@
   },
   "setup.monitors": {
     "label": "මොනිටර"
+  },
+  "setup.ai": {
+    "label": "AI",
+    "title": "AI සැකසුම — Maslow AI-OS"
   },
   "setup.keybindings": {
     "label": "යතුරු බන්ධන"
@@ -472,23 +513,14 @@
   "setup.default.agent.crush": {
     "label": "Crush"
   },
-  "setup.default.agent.cursor-agent": {
-    "label": "Cursor CLI"
-  },
   "setup.default.agent.grok": {
     "label": "Grok"
   },
   "setup.default.agent.hermes": {
     "label": "Hermes"
   },
-  "setup.default.agent.muse": {
-    "label": "Muse Code"
-  },
   "setup.default.agent.omp": {
     "label": "omp"
-  },
-  "setup.default.agent.openclaw": {
-    "label": "OpenClaw"
   },
   "setup.default.agent.opencode": {
     "label": "OpenCode"
@@ -1125,7 +1157,7 @@
     "label": "Phoenix"
   },
   "update.omarchy": {
-    "label": "Omarchy"
+    "label": "Maslow AI-OS"
   },
   "update.channel": {
     "label": "නාලිකාව"
@@ -1207,11 +1239,5 @@
   },
   "update.password.user": {
     "label": "පරිශීලකයා"
-  },
-  "system.reboot-boot-menu": {
-    "label": "බූට් මෙනුවට නැවත ආරම්භ කරන්න"
-  },
-  "setup.default.agent.kimi": {
-    "label": "Kimi"
   }
 }

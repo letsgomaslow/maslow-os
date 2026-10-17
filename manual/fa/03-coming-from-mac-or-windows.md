@@ -32,7 +32,7 @@
 | ------------- | ---------- |
 | Spotlight / Raycast / منوی شروع | `Super + Space` — منوی Omarchy |
 | AirDrop | LocalSend، از طریق `Super + Ctrl + S` — به [رابط‌های گرافیکی](22-guis.md) مراجعه کنید |
-| Cmd + Shift + 4 / Win + Shift + S | `Print Screen` — به [عکس‌های صفحه و ضبط](12-screenshots-recording.md) مراجعه کنید |
+| Cmd + Shift + 4 / Win + Shift + S | `Super + Shift + S` / `Print Screen` — به [عکس‌های صفحه و ضبط](12-screenshots-recording.md) مراجعه کنید |
 | مرکز اعلان | سابقهٔ اعلان روی `Super + Shift + Alt + ,` |
 | Time Machine (برای سیستم) | [تصاویر لحظه‌ای سیستم](47-system-snapshots.md) خودکار در هر به‌روزرسانی |
 | App Store / دانلود یک نصب‌کننده | _نصب_ در منو، یا `omarchy pkg add` — به [بسته‌های دیگر](29-other-packages.md) مراجعه کنید |

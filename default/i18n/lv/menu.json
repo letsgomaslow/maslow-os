@@ -2,6 +2,12 @@
   "root": {
     "label": "Iet"
   },
+  "hub": {
+    "label": "Maslow Hub"
+  },
+  "voice": {
+    "label": "Maslow Voice"
+  },
   "apps": {
     "label": "Lietotnes"
   },
@@ -27,7 +33,7 @@
     "label": "Atjaunināt"
   },
   "about": {
-    "label": "Par"
+    "label": "Par Maslow AI-OS"
   },
   "system": {
     "label": "Sistēma"
@@ -50,6 +56,9 @@
   "system.reboot": {
     "label": "Restartēt"
   },
+  "system.reboot-boot-menu": {
+    "label": "Restartēt uz sāknēšanas izvēlni"
+  },
   "system.shutdown": {
     "label": "Izslēgt"
   },
@@ -57,7 +66,7 @@
     "label": "Taustiņu saīsnes"
   },
   "learn.omarchy": {
-    "label": "Omarchy"
+    "label": "Maslow AI-OS ceļvedis"
   },
   "learn.hyprland": {
     "label": "Hyprland"
@@ -78,7 +87,10 @@
     "label": "Herdr"
   },
   "learn.community": {
-    "label": "Kopiena"
+    "label": "Kopiena Omarchy — dzinēja atbalsts"
+  },
+  "learn.support": {
+    "label": "Maslow AI-OS atbalsts"
   },
   "trigger.appearance": {
     "label": "Izskats"
@@ -363,6 +375,9 @@
   "trigger.share.receive": {
     "label": "Saņemt"
   },
+  "trigger.toggle.reduced-motion": {
+    "label": "Samazināta kustība"
+  },
   "trigger.tests.network-speedtest": {
     "label": "Tīkla ātruma tests"
   },
@@ -380,6 +395,28 @@
   },
   "style.font": {
     "label": "Fonts"
+  },
+  "style.font.cjk": {
+    "label": "Ķīniešu, japāņu, korejiešu",
+    "title": "Ķīniešu, japāņu un korejiešu glifi"
+  },
+  "style.font.cjk.auto": {
+    "label": "Automātiski"
+  },
+  "style.font.cjk.jp": {
+    "label": "Japāņu"
+  },
+  "style.font.cjk.kr": {
+    "label": "Korejiešu"
+  },
+  "style.font.cjk.sc": {
+    "label": "Vienkāršotā ķīniešu"
+  },
+  "style.font.cjk.tc": {
+    "label": "Taivāna"
+  },
+  "style.font.cjk.hk": {
+    "label": "Honkonga"
   },
   "style.hyprland": {
     "label": "Hyprland"
@@ -410,6 +447,10 @@
   },
   "setup.monitors": {
     "label": "Monitori"
+  },
+  "setup.ai": {
+    "label": "AI",
+    "title": "MI iestatīšana — Maslow AI-OS"
   },
   "setup.keybindings": {
     "label": "Taustiņu saīsnes"
@@ -472,23 +513,14 @@
   "setup.default.agent.crush": {
     "label": "Crush"
   },
-  "setup.default.agent.cursor-agent": {
-    "label": "Cursor CLI"
-  },
   "setup.default.agent.grok": {
     "label": "Grok"
   },
   "setup.default.agent.hermes": {
     "label": "Hermes"
   },
-  "setup.default.agent.muse": {
-    "label": "Muse Code"
-  },
   "setup.default.agent.omp": {
     "label": "omp"
-  },
-  "setup.default.agent.openclaw": {
-    "label": "OpenClaw"
   },
   "setup.default.agent.opencode": {
     "label": "OpenCode"
@@ -1125,7 +1157,7 @@
     "label": "Phoenix"
   },
   "update.omarchy": {
-    "label": "Omarchy"
+    "label": "Maslow AI-OS"
   },
   "update.channel": {
     "label": "Kanāls"
@@ -1207,11 +1239,5 @@
   },
   "update.password.user": {
     "label": "Lietotājs"
-  },
-  "system.reboot-boot-menu": {
-    "label": "Restartēt uz sāknēšanas izvēlni"
-  },
-  "setup.default.agent.kimi": {
-    "label": "Kimi"
   }
 }

@@ -32,7 +32,7 @@ Windows நண்பர்களே: உங்கள் Win + V கிளிப�
 | ------------- | ---------- |
 | Spotlight / Raycast / Start மெனு | `Super + Space` — Omarchy மெனு |
 | AirDrop | LocalSend, `Super + Ctrl + S` வழியாக — [GUIs](22-guis.md) பார்க்கவும் |
-| Cmd + Shift + 4 / Win + Shift + S | `Print Screen` — [திரைப்பிடிப்புகள் & பதிவு](12-screenshots-recording.md) பார்க்கவும் |
+| Cmd + Shift + 4 / Win + Shift + S | `Super + Shift + S` / `Print Screen` — [திரைப்பிடிப்புகள் & பதிவு](12-screenshots-recording.md) பார்க்கவும் |
 | அறிவிப்பு மையம் | `Super + Shift + Alt + ,` இல் அறிவிப்பு வரலாறு |
 | Time Machine (அமைப்பிற்காக) | ஒவ்வொரு புதுப்பிப்பிலும் தானியங்கு [அமைப்பு ஸ்னாப்ஷாட்கள்](47-system-snapshots.md) |
 | App Store / ஒரு நிறுவியைப் பதிவிறக்குதல் | மெனுவில் _நிறுவு_, அல்லது `omarchy pkg add` — [பிற தொகுப்புகள்](29-other-packages.md) பார்க்கவும் |

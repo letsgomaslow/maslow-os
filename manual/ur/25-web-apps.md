@@ -48,7 +48,7 @@
 
 Google میسجز، Google تصاویر، Google نقشے اور Google رابطے سب ویب ایپس کے طور پر شامل ہیں۔
 
-آپ Google میسجز کو `Super + Shift + Ctrl + G` استعمال کرتے ہوئے، Google تصاویر کو `Super + Shift + P` استعمال کرتے ہوئے، اور Google نقشے کو `Super + Shift + S` استعمال کرتے ہوئے شروع कर सकते हैं। Google رابطے ایپ لانچر (`Super + Space`) کے ذریعے دستیاب ہیں۔
+آپ Google میسجز کو `Super + Shift + Ctrl + G` استعمال کرتے ہوئے، Google تصاویر کو `Super + Shift + P` استعمال کرتے ہوئے، اور Google نقشے کو `Super + Shift + Alt + S` استعمال کرتے ہوئے شروع कर सकते हैं। Google رابطے ایپ لانچر (`Super + Space`) کے ذریعے دستیاب ہیں۔
 
 ## X
 

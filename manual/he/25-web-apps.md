@@ -48,7 +48,7 @@
 
 Google Messages, Google Photos, Google Maps ו-Google Contacts כלולות כולן גם כאפליקציות רשת.
 
-תוכלו להפעיל את Google Messages באמצעות `Super + Shift + Ctrl + G`, את Google Photos באמצעות `Super + Shift + P`, ואת Google Maps באמצעות `Super + Shift + S`. Google Contacts זמינה דרך מפעיל האפליקציות (`Super + Space`).
+תוכלו להפעיל את Google Messages באמצעות `Super + Shift + Ctrl + G`, את Google Photos באמצעות `Super + Shift + P`, ואת Google Maps באמצעות `Super + Shift + Alt + S`. Google Contacts זמינה דרך מפעיל האפליקציות (`Super + Space`).
 
 ## X
 

@@ -32,7 +32,7 @@
 | ------------- | ---------- |
 | Spotlight / Raycast / เมนู Start | `Super + Space` — เมนู Omarchy |
 | AirDrop | LocalSend ผ่าน `Super + Ctrl + S` — ดู [GUI](22-guis.md) |
-| Cmd + Shift + 4 / Win + Shift + S | `Print Screen` — ดู [ภาพหน้าจอและการอัด](12-screenshots-recording.md) |
+| Cmd + Shift + 4 / Win + Shift + S | `Super + Shift + S` / `Print Screen` — ดู [ภาพหน้าจอและการอัด](12-screenshots-recording.md) |
 | Notification Center | ประวัติการแจ้งเตือนบน `Super + Shift + Alt + ,` |
 | Time Machine (สำหรับระบบ) | [ภาพรวมระบบ](47-system-snapshots.md) อัตโนมัติทุกครั้งที่มีการอัปเดต |
 | App Store / ดาวน์โหลดตัวติดตั้ง | _ติดตั้ง_ ในเมนู หรือ `omarchy pkg add` — ดู [แพ็กเกจอื่น ๆ](29-other-packages.md) |

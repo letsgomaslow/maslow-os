@@ -32,7 +32,7 @@
 | ------------- | ---------- |
 | Spotlight / Raycast / μενού Start | `Super + Space` — το μενού Omarchy |
 | AirDrop | LocalSend, μέσω `Super + Ctrl + S` — δες [GUIs](22-guis.md) |
-| Cmd + Shift + 4 / Win + Shift + S | `Print Screen` — δες [στιγμιότυπα & εγγραφή](12-screenshots-recording.md) |
+| Cmd + Shift + 4 / Win + Shift + S | `Super + Shift + S` / `Print Screen` — δες [στιγμιότυπα & εγγραφή](12-screenshots-recording.md) |
 | Notification Center | Ιστορικό ειδοποιήσεων στο `Super + Shift + Alt + ,` |
 | Time Machine (για το σύστημα) | Αυτόματα [στιγμιότυπα συστήματος](47-system-snapshots.md) σε κάθε ενημέρωση |
 | App Store / κατέβασμα εγκαταστάτη | _Εγκατάσταση_ στο μενού, ή `omarchy pkg add` — δες [άλλα πακέτα](29-other-packages.md) |

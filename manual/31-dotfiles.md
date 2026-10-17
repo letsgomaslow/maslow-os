@@ -1,8 +1,8 @@
 # Dotfiles
 
-Maslow OS is primarily configured through dotfiles in `~/.config`; those are your files. Files in `/usr/share/omarchy` belong to the compatible engine packages and should not be edited directly. Override their values in `~/.config` instead.
+Omarchy is primarily configured through the so-called dotfiles that live in `~/.config`. Those are considered your files for your changes. The files that live in `/usr/share/omarchy` belong to Omarchy itself, and you shouldn't be messing with those. If you need to change anything in `/usr/share/omarchy`, you should be overwriting the value in `~/.config` instead.
 
-The key configs can be edited straight from the Maslow OS menu (`Super + Space`), like _Setup > Monitors_, _Setup > Keybindings_, _Setup > Input_, and _Setup > Config > [file]_. When you do it this way, any process that needs restarting after config edits automatically will be after you quit the editor (Neovim by default — `:wq`, remember! — but you can change that via _Setup > Defaults > Editor_).
+The key configs can be edited straight from the Omarchy menu (`Super + Space`), like _Setup > Monitors_, _Setup > Keybindings_, _Setup > Input_, and _Setup > Config > [file]_. When you do it this way, any process that needs restarting after config edits automatically will be after you quit the editor (Neovim by default — `:wq`, remember! — but you can change that via _Setup > Defaults > Editor_).
 
 Here's a list of the key files in `~/.config` and what they control:
 
@@ -49,7 +49,7 @@ Each of those directories already holds a `.sample` file showing the shape of a 
 
 ### Adding your own menu entries
 
-The Maslow OS menu (`Super + Space`) can be extended with your own rows by editing `~/.config/omarchy/extensions/omarchy-menu.jsonc`. Entries are keyed by a dotted id, and the id is what places them in the tree, so `personal` shows up on the root menu and `personal.notes` shows up inside it:
+The Omarchy menu (`Super + Space`) can be extended with your own rows by editing `~/.config/omarchy/extensions/omarchy-menu.jsonc`. Entries are keyed by a dotted id, and the id is what places them in the tree, so `personal` shows up on the root menu and `personal.notes` shows up inside it:
 
 ```jsonc
 "personal": {"icon":"","label":"Personal"},
@@ -60,9 +60,9 @@ Reuse an existing id and you override that row instead of adding a new one. The 
 
 ### Adding your own shell exports, functions, and aliases
 
-Maslow OS ships with ergonomic aliases and helper functions, and you can add your own aliases, functions, and exports in `~/.bashrc`. This file is not overwritten on updates. You can also override engine defaults safely here.
+Omarchy ships with a bunch of ergonomic aliases and helpful functions, but it's very common to want to add your own. You should add both aliases, functions, and exports in `~/.bashrc`. This file will not be overwritten on updates. If you want to change any of the Omarchy defaults, you can also safely add them here.
 
-### Changing internal engine files
+### Changing internal Omarchy files
 
 Look, this is your computer. You can do whatever you want with it, but I would advise against making changes to the files in `/usr/share/omarchy` directly. They belong to the Omarchy pacman package, so your changes will simply be overwritten on the next update. You're better off just overwriting any default values you don't like in the `~/.config/*` folder instead.
 
@@ -78,4 +78,4 @@ If you insist on hacking on the internal Omarchy files, switch to the dev channe
 
 ### Resetting any changes
 
-If you end up making a mess of the configurations, you can always revert them to the defaults via _Update > Config_ in the Maslow OS menu. Or by running `omarchy reinstall configs` to reset everything.
+If you end up making a mess of the configurations, you can always revert them to the defaults via _Update > Config_ in the Omarchy menu. Or by running `omarchy reinstall configs` to reset everything.

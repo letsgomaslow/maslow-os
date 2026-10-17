@@ -2,6 +2,12 @@
   "root": {
     "label": "이동"
   },
+  "hub": {
+    "label": "Maslow Hub"
+  },
+  "voice": {
+    "label": "Maslow Voice"
+  },
   "apps": {
     "label": "앱"
   },
@@ -27,7 +33,7 @@
     "label": "업데이트"
   },
   "about": {
-    "label": "정보"
+    "label": "Maslow AI-OS 정보"
   },
   "system": {
     "label": "시스템"
@@ -50,6 +56,9 @@
   "system.reboot": {
     "label": "재시작"
   },
+  "system.reboot-boot-menu": {
+    "label": "부트 메뉴로 재시작"
+  },
   "system.shutdown": {
     "label": "종료"
   },
@@ -57,7 +66,7 @@
     "label": "단축키"
   },
   "learn.omarchy": {
-    "label": "Omarchy"
+    "label": "Maslow AI-OS 안내서"
   },
   "learn.hyprland": {
     "label": "Hyprland"
@@ -78,7 +87,10 @@
     "label": "Herdr"
   },
   "learn.community": {
-    "label": "커뮤니티"
+    "label": "커뮤니티 Omarchy — 엔진 지원"
+  },
+  "learn.support": {
+    "label": "Maslow AI-OS 지원"
   },
   "trigger.appearance": {
     "label": "모양"
@@ -363,6 +375,9 @@
   "trigger.share.receive": {
     "label": "받기"
   },
+  "trigger.toggle.reduced-motion": {
+    "label": "동작 줄이기"
+  },
   "trigger.tests.network-speedtest": {
     "label": "네트워크 속도 테스트"
   },
@@ -380,6 +395,28 @@
   },
   "style.font": {
     "label": "글꼴"
+  },
+  "style.font.cjk": {
+    "label": "중국어, 일본어, 한국어",
+    "title": "중국어, 일본어 및 한국어 글리프"
+  },
+  "style.font.cjk.auto": {
+    "label": "자동"
+  },
+  "style.font.cjk.jp": {
+    "label": "일본어"
+  },
+  "style.font.cjk.kr": {
+    "label": "한국어"
+  },
+  "style.font.cjk.sc": {
+    "label": "중국어 간체"
+  },
+  "style.font.cjk.tc": {
+    "label": "대만"
+  },
+  "style.font.cjk.hk": {
+    "label": "홍콩"
   },
   "style.hyprland": {
     "label": "Hyprland"
@@ -410,6 +447,10 @@
   },
   "setup.monitors": {
     "label": "모니터"
+  },
+  "setup.ai": {
+    "label": "AI",
+    "title": "AI 설정 — Maslow AI-OS"
   },
   "setup.keybindings": {
     "label": "단축키"
@@ -472,23 +513,14 @@
   "setup.default.agent.crush": {
     "label": "Crush"
   },
-  "setup.default.agent.cursor-agent": {
-    "label": "Cursor CLI"
-  },
   "setup.default.agent.grok": {
     "label": "Grok"
   },
   "setup.default.agent.hermes": {
     "label": "Hermes"
   },
-  "setup.default.agent.muse": {
-    "label": "Muse Code"
-  },
   "setup.default.agent.omp": {
     "label": "omp"
-  },
-  "setup.default.agent.openclaw": {
-    "label": "OpenClaw"
   },
   "setup.default.agent.opencode": {
     "label": "OpenCode"
@@ -1125,7 +1157,7 @@
     "label": "Phoenix"
   },
   "update.omarchy": {
-    "label": "Omarchy"
+    "label": "Maslow AI-OS"
   },
   "update.channel": {
     "label": "채널"
@@ -1207,11 +1239,5 @@
   },
   "update.password.user": {
     "label": "사용자"
-  },
-  "system.reboot-boot-menu": {
-    "label": "부트 메뉴로 재시작"
-  },
-  "setup.default.agent.kimi": {
-    "label": "Kimi"
   }
 }

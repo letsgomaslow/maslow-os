@@ -32,7 +32,7 @@ Windows žmonės: jūsų Win + V iškarpinės istorija gyvena ant `Super + Ctrl 
 | ------------- | ---------- |
 | Spotlight / Raycast / meniu Start | `Super + Space` — Omarchy meniu |
 | AirDrop | LocalSend, per `Super + Ctrl + S` — žr. [GUI](22-guis.md) |
-| Cmd + Shift + 4 / Win + Shift + S | `Print Screen` — žr. [ekrano nuotraukas ir įrašymą](12-screenshots-recording.md) |
+| Cmd + Shift + 4 / Win + Shift + S | `Super + Shift + S` / `Print Screen` — žr. [ekrano nuotraukas ir įrašymą](12-screenshots-recording.md) |
 | Notification Center | Pranešimų istorija ant `Super + Shift + Alt + ,` |
 | Time Machine (sistemai) | Automatiniai [sistemos momentiniai atvaizdai](47-system-snapshots.md) kiekvieno atnaujinimo metu |
 | App Store / diegimo programos atsisiuntimas | _Įdiegti_ meniu arba `omarchy pkg add` — žr. [kitus paketus](29-other-packages.md) |

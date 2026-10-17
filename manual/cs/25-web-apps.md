@@ -48,7 +48,7 @@ WhatsApp můžete spustit pomocí klávesové zkratky `Super + Shift + Alt + G`.
 
 Google Messages, Google Photos, Google Maps a Google Contacts jsou všechny zahrnuty také jako webové aplikace.
 
-Google Messages můžete spustit pomocí klávesové zkratky `Super + Shift + Ctrl + G`, Google Photos pomocí klávesové zkratky `Super + Shift + P` a Google Maps pomocí klávesové zkratky `Super + Shift + S`. Google Contacts je k dispozici prostřednictvím spouštěče aplikací (`Super + Space`).
+Google Messages můžete spustit pomocí klávesové zkratky `Super + Shift + Ctrl + G`, Google Photos pomocí klávesové zkratky `Super + Shift + P` a Google Maps pomocí klávesové zkratky `Super + Shift + Alt + S`. Google Contacts je k dispozici prostřednictvím spouštěče aplikací (`Super + Space`).
 
 ## X
 

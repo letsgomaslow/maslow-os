@@ -32,7 +32,7 @@ Windowsliklar: Win + V bufer tarixingiz `Super + Ctrl + V` da yashaydi va u matn
 | ------------- | ---------- |
 | Spotlight / Raycast / Start menyusi | `Super + Space` — Omarchy menyusi |
 | AirDrop | LocalSend, `Super + Ctrl + S` orqali — [GUIlar](22-guis.md) ga qarang |
-| Cmd + Shift + 4 / Win + Shift + S | `Print Screen` — [skrinshotlar va yozuv](12-screenshots-recording.md) ga qarang |
+| Cmd + Shift + 4 / Win + Shift + S | `Super + Shift + S` / `Print Screen` — [skrinshotlar va yozuv](12-screenshots-recording.md) ga qarang |
 | Notification Center | Bildirishnoma tarixi `Super + Shift + Alt + ,` da |
 | Time Machine (tizim uchun) | Har yangilanishda avtomatik [tizim snatshotlari](47-system-snapshots.md) |
 | App Store / oʻrnatuvchi yuklab olish | Menyudagi _Oʻrnatish_ yoki `omarchy pkg add` — [boshqa paketlar](29-other-packages.md) ga qarang |

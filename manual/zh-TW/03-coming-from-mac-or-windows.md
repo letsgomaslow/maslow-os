@@ -32,7 +32,7 @@ Windows 的朋友們：你們的 Win + V 剪貼簿紀錄位在 `Super + Ctrl + V
 | ------------- | ---------- |
 | Spotlight / Raycast / 開始選單 | `Super + Space`——Omarchy 選單 |
 | AirDrop | LocalSend，透過 `Super + Ctrl + S`——見 [GUI 應用程式](22-guis.md) |
-| Cmd + Shift + 4 / Win + Shift + S | `Print Screen`——見[螢幕截圖與錄影](12-screenshots-recording.md) |
+| Cmd + Shift + 4 / Win + Shift + S | `Super + Shift + S` / `Print Screen`——見[螢幕截圖與錄影](12-screenshots-recording.md) |
 | 通知中心 | 通知紀錄，位在 `Super + Shift + Alt + ,` |
 | Time Machine（針對系統） | 每次更新時自動建立[系統快照](47-system-snapshots.md) |
 | App Store / 下載安裝程式 | 選單中的_安裝_，或 `omarchy pkg add`——見[其他套件](29-other-packages.md) |

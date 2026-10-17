@@ -32,7 +32,7 @@ Lidé z Windows: vaše historie schránky Win + V žije na `Super + Ctrl + V` a 
 | ------------- | ---------- |
 | Spotlight / Raycast / nabídka Start | `Super + Space` — nabídka Omarchy |
 | AirDrop | LocalSend, přes `Super + Ctrl + S` — viz [GUI](22-guis.md) |
-| Cmd + Shift + 4 / Win + Shift + S | `Print Screen` — viz [snímky obrazovky a nahrávání](12-screenshots-recording.md) |
+| Cmd + Shift + 4 / Win + Shift + S | `Super + Shift + S` / `Print Screen` — viz [snímky obrazovky a nahrávání](12-screenshots-recording.md) |
 | Centrum oznámení | Historie oznámení na `Super + Shift + Alt + ,` |
 | Time Machine (pro systém) | Automatické [snímky systému](47-system-snapshots.md) při každé aktualizaci |
 | App Store / stahování instalátoru | _Instalovat_ v nabídce, nebo `omarchy pkg add` — viz [další balíčky](29-other-packages.md) |

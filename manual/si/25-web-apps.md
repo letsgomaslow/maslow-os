@@ -48,7 +48,7 @@ Omarchy මෙනුවේ (`Super + Space`) _ස්ථාපනය > වෙබ�
 
 Google Messages, Google Photos, Google Maps, සහ Google Contacts යන සියල්ල වෙබ් යෙදුම් ලෙසද ඇතුළත්ය.
 
-ඔබට Google Messages එක `Super + Shift + Ctrl + G` භාවිතයෙන්, Google Photos එක `Super + Shift + P` භාවිතයෙන්, සහ Google Maps එක `Super + Shift + S` භාවිතයෙන් ආරම්භ කළ හැක. Google Contacts යෙදුම් දියත් කරන්නා හරහා ලබාගත හැක (`Super + Space`).
+ඔබට Google Messages එක `Super + Shift + Ctrl + G` භාවිතයෙන්, Google Photos එක `Super + Shift + P` භාවිතයෙන්, සහ Google Maps එක `Super + Shift + Alt + S` භාවිතයෙන් ආරම්භ කළ හැක. Google Contacts යෙදුම් දියත් කරන්නා හරහා ලබාගත හැක (`Super + Space`).
 
 ## X
 

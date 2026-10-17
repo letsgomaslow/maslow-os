@@ -32,7 +32,7 @@ Utilisateurs Windows : votre historique de presse-papiers Win + V vit sur `Super
 | ------------- | ---------- |
 | Spotlight / Raycast / menu Démarrer | `Super + Space` — le menu Omarchy |
 | AirDrop | LocalSend, via `Super + Ctrl + S` — voir [interfaces graphiques](22-guis.md) |
-| Cmd + Shift + 4 / Win + Shift + S | `Print Screen` — voir [captures d'écran et enregistrement](12-screenshots-recording.md) |
+| Cmd + Shift + 4 / Win + Shift + S | `Super + Shift + S` / `Print Screen` — voir [captures d'écran et enregistrement](12-screenshots-recording.md) |
 | Centre de notifications | Historique des notifications sur `Super + Shift + Alt + ,` |
 | Time Machine (pour le système) | [Snapshots système](47-system-snapshots.md) automatiques à chaque mise à jour |
 | App Store / téléchargement d'un installateur | _Installer_ dans le menu, ou `omarchy pkg add` — voir [autres paquets](29-other-packages.md) |

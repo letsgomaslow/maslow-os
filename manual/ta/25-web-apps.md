@@ -48,7 +48,7 @@ Omarchy மெனுவில் (`Super + Space`) _நிறுவு > Web App
 
 Google Messages, Google Photos, Google Maps மற்றும் Google Contacts அனைத்தும் வலைச் செயலிகளாகவும் சேர்க்கப்பட்டுள்ளன.
 
-`Super + Shift + Ctrl + G` ஐப் பயன்படுத்தி Google Messages ஐயும், `Super + Shift + P` ஐப் பயன்படுத்தி Google Photos ஐயும், `Super + Shift + S` ஐப் பயன்படுத்தி Google Maps ஐயும் தொடங்கலாம். Google Contacts செயலி தொடக்கி (`Super + Space`) வழியாகக் கிடைக்கிறது.
+`Super + Shift + Ctrl + G` ஐப் பயன்படுத்தி Google Messages ஐயும், `Super + Shift + P` ஐப் பயன்படுத்தி Google Photos ஐயும், `Super + Shift + Alt + S` ஐப் பயன்படுத்தி Google Maps ஐயும் தொடங்கலாம். Google Contacts செயலி தொடக்கி (`Super + Space`) வழியாகக் கிடைக்கிறது.
 
 ## X
 

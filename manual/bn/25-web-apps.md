@@ -48,7 +48,7 @@
 
 Google Messages, Google Photos, Google Maps এবং Google Contacts সবই ওয়েব অ্যাপ হিসেবেও অন্তর্ভুক্ত আছে।
 
-আপনি `Super + Shift + Ctrl + G` ব্যবহার করে Google Messages, `Super + Shift + P` ব্যবহার করে Google Photos এবং `Super + Shift + S` ব্যবহার করে Google Maps শুরু করতে পারেন। Google Contacts অ্যাপ লঞ্চারের (`Super + Space`) মাধ্যমে পাওয়া যায়।
+আপনি `Super + Shift + Ctrl + G` ব্যবহার করে Google Messages, `Super + Shift + P` ব্যবহার করে Google Photos এবং `Super + Shift + Alt + S` ব্যবহার করে Google Maps শুরু করতে পারেন। Google Contacts অ্যাপ লঞ্চারের (`Super + Space`) মাধ্যমে পাওয়া যায়।
 
 ## X
 

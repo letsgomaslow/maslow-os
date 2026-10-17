@@ -32,7 +32,7 @@ Gente de Windows: su historial del portapapeles de Win + V vive en `Super + Ctrl
 | ------------- | ---------- |
 | Spotlight / Raycast / menú Inicio | `Super + Space` — el menú de Omarchy |
 | AirDrop | LocalSend, con `Super + Ctrl + S` — consulta [GUIs](22-guis.md) |
-| Cmd + Shift + 4 / Win + Shift + S | `Print Screen` — consulta [capturas y grabación](12-screenshots-recording.md) |
+| Cmd + Shift + 4 / Win + Shift + S | `Super + Shift + S` / `Print Screen` — consulta [capturas y grabación](12-screenshots-recording.md) |
 | Centro de notificaciones | Historial de notificaciones en `Super + Shift + Alt + ,` |
 | Time Machine (para el sistema) | [Instantáneas del sistema](47-system-snapshots.md) automáticas en cada actualización |
 | App Store / descargar un instalador | _Instalar_ en el menú, o `omarchy pkg add` — consulta [otros paquetes](29-other-packages.md) |

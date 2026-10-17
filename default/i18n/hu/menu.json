@@ -2,6 +2,12 @@
   "root": {
     "label": "Mehet"
   },
+  "hub": {
+    "label": "Maslow Hub"
+  },
+  "voice": {
+    "label": "Maslow Voice"
+  },
   "apps": {
     "label": "Appok"
   },
@@ -27,7 +33,7 @@
     "label": "Frissítés"
   },
   "about": {
-    "label": "Névjegy"
+    "label": "A Maslow AI-OS névjegye"
   },
   "system": {
     "label": "Rendszer"
@@ -50,6 +56,9 @@
   "system.reboot": {
     "label": "Újraindítás"
   },
+  "system.reboot-boot-menu": {
+    "label": "Újraindítás a bootmenübe"
+  },
   "system.shutdown": {
     "label": "Kikapcsolás"
   },
@@ -57,7 +66,7 @@
     "label": "Billentyűk"
   },
   "learn.omarchy": {
-    "label": "Omarchy"
+    "label": "Maslow AI-OS útmutató"
   },
   "learn.hyprland": {
     "label": "Hyprland"
@@ -78,7 +87,10 @@
     "label": "Herdr"
   },
   "learn.community": {
-    "label": "Közösség"
+    "label": "Közösség Omarchy — motortámogatás"
+  },
+  "learn.support": {
+    "label": "Maslow AI-OS támogatás"
   },
   "trigger.appearance": {
     "label": "Megjelenés"
@@ -363,6 +375,9 @@
   "trigger.share.receive": {
     "label": "Fogadás"
   },
+  "trigger.toggle.reduced-motion": {
+    "label": "Csökkentett mozgás"
+  },
   "trigger.tests.network-speedtest": {
     "label": "Hálózati sebességteszt"
   },
@@ -380,6 +395,28 @@
   },
   "style.font": {
     "label": "Betűtípus"
+  },
+  "style.font.cjk": {
+    "label": "Kínai, japán, koreai",
+    "title": "Kínai, japán és koreai írásjelek"
+  },
+  "style.font.cjk.auto": {
+    "label": "Automatikus"
+  },
+  "style.font.cjk.jp": {
+    "label": "Japán"
+  },
+  "style.font.cjk.kr": {
+    "label": "Koreai"
+  },
+  "style.font.cjk.sc": {
+    "label": "Egyszerűsített kínai"
+  },
+  "style.font.cjk.tc": {
+    "label": "Tajvan"
+  },
+  "style.font.cjk.hk": {
+    "label": "Hongkong"
   },
   "style.hyprland": {
     "label": "Hyprland"
@@ -410,6 +447,10 @@
   },
   "setup.monitors": {
     "label": "Monitorok"
+  },
+  "setup.ai": {
+    "label": "AI",
+    "title": "MI beállítása — Maslow AI-OS"
   },
   "setup.keybindings": {
     "label": "Billentyűk"
@@ -472,23 +513,14 @@
   "setup.default.agent.crush": {
     "label": "Crush"
   },
-  "setup.default.agent.cursor-agent": {
-    "label": "Cursor CLI"
-  },
   "setup.default.agent.grok": {
     "label": "Grok"
   },
   "setup.default.agent.hermes": {
     "label": "Hermes"
   },
-  "setup.default.agent.muse": {
-    "label": "Muse Code"
-  },
   "setup.default.agent.omp": {
     "label": "omp"
-  },
-  "setup.default.agent.openclaw": {
-    "label": "OpenClaw"
   },
   "setup.default.agent.opencode": {
     "label": "OpenCode"
@@ -1125,7 +1157,7 @@
     "label": "Phoenix"
   },
   "update.omarchy": {
-    "label": "Omarchy"
+    "label": "Maslow AI-OS"
   },
   "update.channel": {
     "label": "Csatorna"
@@ -1207,11 +1239,5 @@
   },
   "update.password.user": {
     "label": "Felhasználó"
-  },
-  "system.reboot-boot-menu": {
-    "label": "Újraindítás a bootmenübe"
-  },
-  "setup.default.agent.kimi": {
-    "label": "Kimi"
   }
 }

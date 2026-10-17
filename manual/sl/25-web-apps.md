@@ -48,7 +48,7 @@ WhatsApp lahko zaženete s `Super + Shift + Alt + G`.
 
 Google Messages, Google Photos, Google Maps in Google Contacts so prav tako vključeni kot spletne aplikacije.
 
-Google Messages lahko zaženete s `Super + Shift + Ctrl + G`, Google Photos s `Super + Shift + P` in Google Maps s `Super + Shift + S`. Google Contacts je na voljo prek zaganjalnika aplikacij (`Super + Space`).
+Google Messages lahko zaženete s `Super + Shift + Ctrl + G`, Google Photos s `Super + Shift + P` in Google Maps s `Super + Shift + Alt + S`. Google Contacts je na voljo prek zaganjalnika aplikacij (`Super + Space`).
 
 ## X
 

@@ -32,7 +32,7 @@ Những người dùng Windows: lịch sử bảng nhớ tạm Win + V của b�
 | ------------- | ---------- |
 | Spotlight / Raycast / menu Start | `Super + Space` — menu Omarchy |
 | AirDrop | LocalSend, qua `Super + Ctrl + S` — xem [GUI](22-guis.md) |
-| Cmd + Shift + 4 / Win + Shift + S | `Print Screen` — xem [ảnh chụp màn hình & ghi hình](12-screenshots-recording.md) |
+| Cmd + Shift + 4 / Win + Shift + S | `Super + Shift + S` / `Print Screen` — xem [ảnh chụp màn hình & ghi hình](12-screenshots-recording.md) |
 | Trung tâm thông báo | Lịch sử thông báo trên `Super + Shift + Alt + ,` |
 | Time Machine (cho hệ thống) | [Ảnh chụp hệ thống](47-system-snapshots.md) tự động trong mỗi lần cập nhật |
 | App Store / tải xuống trình cài đặt | _Cài đặt_ trong menu, hoặc `omarchy pkg add` — xem [các gói khác](29-other-packages.md) |

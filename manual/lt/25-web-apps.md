@@ -48,7 +48,7 @@ WhatsApp gali paleisti naudodamas `Super + Shift + Alt + G`.
 
 Google Messages, Google Photos, Google Maps ir Google Contacts taip pat įtraukti kaip žiniatinklio programos.
 
-Google Messages gali paleisti naudodamas `Super + Shift + Ctrl + G`, Google Photos naudodamas `Super + Shift + P`, o Google Maps naudodamas `Super + Shift + S`. Google Contacts prieinama per programų paleidimo priemonę (`Super + Space`).
+Google Messages gali paleisti naudodamas `Super + Shift + Ctrl + G`, Google Photos naudodamas `Super + Shift + P`, o Google Maps naudodamas `Super + Shift + Alt + S`. Google Contacts prieinama per programų paleidimo priemonę (`Super + Space`).
 
 ## X
 

@@ -32,7 +32,7 @@ Windows cilvēki: jūsu Win + V starpliktuves vēsture dzīvo uz `Super + Ctrl +
 | ------------- | ---------- |
 | Spotlight / Raycast / Start izvēlne | `Super + Space` — Omarchy izvēlne |
 | AirDrop | LocalSend, izmantojot `Super + Ctrl + S` — skat. [GUI](22-guis.md) |
-| Cmd + Shift + 4 / Win + Shift + S | `Print Screen` — skat. [ekrānuzņēmumi un ierakstīšana](12-screenshots-recording.md) |
+| Cmd + Shift + 4 / Win + Shift + S | `Super + Shift + S` / `Print Screen` — skat. [ekrānuzņēmumi un ierakstīšana](12-screenshots-recording.md) |
 | Paziņojumu centrs | Paziņojumu vēsture uz `Super + Shift + Alt + ,` |
 | Time Machine (sistēmai) | Automātiski [sistēmas momentuzņēmumi](47-system-snapshots.md) pie katra atjauninājuma |
 | App Store / instalētāja lejupielāde | _Instalēt_ izvēlnē vai `omarchy pkg add` — skat. [citas pakotnes](29-other-packages.md) |

@@ -32,7 +32,7 @@ Windows-fólk: Win + V klippiborðssagan ykkar býr á `Super + Ctrl + V`, og h�
 | ------------- | ---------- |
 | Spotlight / Raycast / Start-valmynd | `Super + Space` — Omarchy-valmyndin |
 | AirDrop | LocalSend, með `Super + Ctrl + S` — sjá [GUI-forrit](22-guis.md) |
-| Cmd + Shift + 4 / Win + Shift + S | `Print Screen` — sjá [skjámyndir og upptaka](12-screenshots-recording.md) |
+| Cmd + Shift + 4 / Win + Shift + S | `Super + Shift + S` / `Print Screen` — sjá [skjámyndir og upptaka](12-screenshots-recording.md) |
 | Tilkynningamiðstöð | Tilkynningasaga á `Super + Shift + Alt + ,` |
 | Time Machine (fyrir kerfið) | Sjálfvirkar [kerfismyndir](47-system-snapshots.md) við hverja uppfærslu |
 | App Store / að sækja uppsetningarforrit | _Setja upp_ í valmyndinni, eða `omarchy pkg add` — sjá [aðrir pakkar](29-other-packages.md) |

@@ -48,7 +48,7 @@ Unaweza kuanzisha WhatsApp kwa kutumia `Super + Shift + Alt + G`.
 
 Google Messages, Google Photos, Google Maps, na Google Contacts zote zimejumuishwa kama programu za wavuti pia.
 
-Unaweza kuanzisha Google Messages kwa kutumia `Super + Shift + Ctrl + G`, Google Photos kwa kutumia `Super + Shift + P`, na Google Maps kwa kutumia `Super + Shift + S`. Google Contacts inapatikana kupitia kizinduzi cha programu (`Super + Space`).
+Unaweza kuanzisha Google Messages kwa kutumia `Super + Shift + Ctrl + G`, Google Photos kwa kutumia `Super + Shift + P`, na Google Maps kwa kutumia `Super + Shift + Alt + S`. Google Contacts inapatikana kupitia kizinduzi cha programu (`Super + Space`).
 
 ## X
 

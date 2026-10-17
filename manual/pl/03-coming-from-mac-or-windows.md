@@ -32,7 +32,7 @@ Użytkownicy Windowsa: wasza historia schowka spod Win + V mieszka pod `Super + 
 | ------------- | ---------- |
 | Spotlight / Raycast / menu Start | `Super + Space` — menu Omarchy |
 | AirDrop | LocalSend, przez `Super + Ctrl + S` — zob. [GUIs](22-guis.md) |
-| Cmd + Shift + 4 / Win + Shift + S | `Print Screen` — zob. [zrzuty ekranu i nagrywanie](12-screenshots-recording.md) |
+| Cmd + Shift + 4 / Win + Shift + S | `Super + Shift + S` / `Print Screen` — zob. [zrzuty ekranu i nagrywanie](12-screenshots-recording.md) |
 | Centrum powiadomień | Historia powiadomień pod `Super + Shift + Alt + ,` |
 | Time Machine (dla systemu) | Automatyczne [migawek systemu](47-system-snapshots.md) przy każdej aktualizacji |
 | App Store / pobieranie instalatora | _Instaluj_ w menu albo `omarchy pkg add` — zob. [inne pakiety](29-other-packages.md) |

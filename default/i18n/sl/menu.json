@@ -2,6 +2,12 @@
   "root": {
     "label": "Pojdi"
   },
+  "hub": {
+    "label": "Maslow Hub"
+  },
+  "voice": {
+    "label": "Maslow Voice"
+  },
   "apps": {
     "label": "Aplikacije"
   },
@@ -27,7 +33,7 @@
     "label": "Posodobi"
   },
   "about": {
-    "label": "Vizitka"
+    "label": "O Maslow AI-OS"
   },
   "system": {
     "label": "Sistem"
@@ -50,6 +56,9 @@
   "system.reboot": {
     "label": "Ponovni zagon"
   },
+  "system.reboot-boot-menu": {
+    "label": "Znova zaženi v zagonski meni"
+  },
   "system.shutdown": {
     "label": "Izklop"
   },
@@ -57,7 +66,7 @@
     "label": "Bližnjice"
   },
   "learn.omarchy": {
-    "label": "Omarchy"
+    "label": "Vodnik za Maslow AI-OS"
   },
   "learn.hyprland": {
     "label": "Hyprland"
@@ -78,7 +87,10 @@
     "label": "Herdr"
   },
   "learn.community": {
-    "label": "Skupnost"
+    "label": "Skupnost Omarchy — podpora za pogon"
+  },
+  "learn.support": {
+    "label": "Podpora za Maslow AI-OS"
   },
   "trigger.appearance": {
     "label": "Videz"
@@ -363,6 +375,9 @@
   "trigger.share.receive": {
     "label": "Prejmi"
   },
+  "trigger.toggle.reduced-motion": {
+    "label": "Zmanjšano gibanje"
+  },
   "trigger.tests.network-speedtest": {
     "label": "Hitrost omrežja"
   },
@@ -380,6 +395,28 @@
   },
   "style.font": {
     "label": "Pisava"
+  },
+  "style.font.cjk": {
+    "label": "Kitajščina, japonščina, korejščina",
+    "title": "Kitajski, japonski in korejski glifi"
+  },
+  "style.font.cjk.auto": {
+    "label": "Samodejno"
+  },
+  "style.font.cjk.jp": {
+    "label": "Japonščina"
+  },
+  "style.font.cjk.kr": {
+    "label": "Korejščina"
+  },
+  "style.font.cjk.sc": {
+    "label": "Poenostavljena kitajščina"
+  },
+  "style.font.cjk.tc": {
+    "label": "Tajvan"
+  },
+  "style.font.cjk.hk": {
+    "label": "Hongkong"
   },
   "style.hyprland": {
     "label": "Hyprland"
@@ -410,6 +447,10 @@
   },
   "setup.monitors": {
     "label": "Zasloni"
+  },
+  "setup.ai": {
+    "label": "AI",
+    "title": "Nastavitev UI — Maslow AI-OS"
   },
   "setup.keybindings": {
     "label": "Bližnjice"
@@ -472,23 +513,14 @@
   "setup.default.agent.crush": {
     "label": "Crush"
   },
-  "setup.default.agent.cursor-agent": {
-    "label": "Cursor CLI"
-  },
   "setup.default.agent.grok": {
     "label": "Grok"
   },
   "setup.default.agent.hermes": {
     "label": "Hermes"
   },
-  "setup.default.agent.muse": {
-    "label": "Muse Code"
-  },
   "setup.default.agent.omp": {
     "label": "omp"
-  },
-  "setup.default.agent.openclaw": {
-    "label": "OpenClaw"
   },
   "setup.default.agent.opencode": {
     "label": "OpenCode"
@@ -1125,7 +1157,7 @@
     "label": "Phoenix"
   },
   "update.omarchy": {
-    "label": "Omarchy"
+    "label": "Maslow AI-OS"
   },
   "update.channel": {
     "label": "Kanal"
@@ -1207,11 +1239,5 @@
   },
   "update.password.user": {
     "label": "Uporabnik"
-  },
-  "system.reboot-boot-menu": {
-    "label": "Znova zaženi v zagonski meni"
-  },
-  "setup.default.agent.kimi": {
-    "label": "Kimi"
   }
 }

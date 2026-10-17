@@ -32,7 +32,7 @@ Windows वालों: आपका Win + V क्लिपबोर्ड इ
 | ------------- | ---------- |
 | Spotlight / Raycast / Start मेनू | `Super + Space` — Omarchy मेनू |
 | AirDrop | LocalSend, `Super + Ctrl + S` के ज़रिए — देखें [GUIs](22-guis.md) |
-| Cmd + Shift + 4 / Win + Shift + S | `Print Screen` — देखें [स्क्रीनशॉट & रिकॉर्डिंग](12-screenshots-recording.md) |
+| Cmd + Shift + 4 / Win + Shift + S | `Super + Shift + S` / `Print Screen` — देखें [स्क्रीनशॉट & रिकॉर्डिंग](12-screenshots-recording.md) |
 | Notification Center | `Super + Shift + Alt + ,` पर सूचना इतिहास |
 | Time Machine (सिस्टम के लिए) | हर अपडेट में स्वचालित [सिस्टम स्नैपशॉट](47-system-snapshots.md) |
 | App Store / इंस्टॉलर डाउनलोड करना | मेनू में _Install_, या `omarchy pkg add` — देखें [अन्य पैकेज](29-other-packages.md) |

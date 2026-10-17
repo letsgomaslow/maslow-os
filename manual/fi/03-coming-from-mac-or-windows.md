@@ -32,7 +32,7 @@ Windows-ihmiset: Win + V -leikepöytähistoriasi elää yhdistelmässä `Super +
 | ------------- | ---------- |
 | Spotlight / Raycast / Käynnistä-valikko | `Super + Space` — Omarchy-valikko |
 | AirDrop | LocalSend yhdistelmällä `Super + Ctrl + S` — katso [GUI:t](22-guis.md) |
-| Cmd + Shift + 4 / Win + Shift + S | `Print Screen` — katso [kuvakaappaukset ja tallennus](12-screenshots-recording.md) |
+| Cmd + Shift + 4 / Win + Shift + S | `Super + Shift + S` / `Print Screen` — katso [kuvakaappaukset ja tallennus](12-screenshots-recording.md) |
 | Ilmoituskeskus | Ilmoitushistoria yhdistelmällä `Super + Shift + Alt + ,` |
 | Time Machine (järjestelmää varten) | Automaattiset [järjestelmän tilannekuvat](47-system-snapshots.md) jokaisessa päivityksessä |
 | App Store / asentajan lataaminen | _Asenna_ valikossa tai `omarchy pkg add` — katso [muut paketit](29-other-packages.md) |

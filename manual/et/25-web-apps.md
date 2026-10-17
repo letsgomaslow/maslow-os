@@ -48,7 +48,7 @@ WhatsAppi saad käivitada kombinatsiooniga `Super + Shift + Alt + G`.
 
 Google Messages, Google Photos, Google Maps ja Google Contacts on kõik samuti veebirakendustena kaasas.
 
-Google Messages'i saad käivitada kombinatsiooniga `Super + Shift + Ctrl + G`, Google Photosi kombinatsiooniga `Super + Shift + P` ja Google Mapsi kombinatsiooniga `Super + Shift + S`. Google Contacts on saadaval rakenduste käivitaja kaudu (`Super + Space`).
+Google Messages'i saad käivitada kombinatsiooniga `Super + Shift + Ctrl + G`, Google Photosi kombinatsiooniga `Super + Shift + P` ja Google Mapsi kombinatsiooniga `Super + Shift + Alt + S`. Google Contacts on saadaval rakenduste käivitaja kaudu (`Super + Space`).
 
 ## X
 

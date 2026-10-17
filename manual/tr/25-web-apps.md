@@ -48,7 +48,7 @@ WhatsApp'ı `Super + Shift + Alt + G` kullanarak başlatabilirsiniz.
 
 Google Messages, Google Photos, Google Maps ve Google Contacts da web uygulamaları olarak dahil edilmiştir.
 
-Google Messages'ı `Super + Shift + Ctrl + G` kullanarak, Google Photos'u `Super + Shift + P` kullanarak ve Google Maps'i `Super + Shift + S` kullanarak başlatabilirsiniz. Google Contacts, uygulama başlatıcı (`Super + Space`) aracılığıyla kullanılabilir.
+Google Messages'ı `Super + Shift + Ctrl + G` kullanarak, Google Photos'u `Super + Shift + P` kullanarak ve Google Maps'i `Super + Shift + Alt + S` kullanarak başlatabilirsiniz. Google Contacts, uygulama başlatıcı (`Super + Space`) aracılığıyla kullanılabilir.
 
 ## X
 

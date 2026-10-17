@@ -2,6 +2,12 @@
   "root": {
     "label": "जाएं"
   },
+  "hub": {
+    "label": "Maslow Hub"
+  },
+  "voice": {
+    "label": "Maslow Voice"
+  },
   "apps": {
     "label": "ऐप्स"
   },
@@ -27,7 +33,7 @@
     "label": "अपडेट करें"
   },
   "about": {
-    "label": "बारे में"
+    "label": "Maslow AI-OS के बारे में"
   },
   "system": {
     "label": "सिस्टम"
@@ -50,6 +56,9 @@
   "system.reboot": {
     "label": "रीबूट"
   },
+  "system.reboot-boot-menu": {
+    "label": "बूट मेनू में रीबूट"
+  },
   "system.shutdown": {
     "label": "बंद करें"
   },
@@ -57,7 +66,7 @@
     "label": "कीबोर्ड शॉर्टकट"
   },
   "learn.omarchy": {
-    "label": "Omarchy"
+    "label": "Maslow AI-OS मार्गदर्शिका"
   },
   "learn.hyprland": {
     "label": "Hyprland"
@@ -78,7 +87,10 @@
     "label": "Herdr"
   },
   "learn.community": {
-    "label": "समुदाय"
+    "label": "समुदाय Omarchy — इंजन सहायता"
+  },
+  "learn.support": {
+    "label": "Maslow AI-OS सहायता"
   },
   "trigger.appearance": {
     "label": "दिखावट"
@@ -363,6 +375,9 @@
   "trigger.share.receive": {
     "label": "प्राप्त करें"
   },
+  "trigger.toggle.reduced-motion": {
+    "label": "कम गति"
+  },
   "trigger.tests.network-speedtest": {
     "label": "नेटवर्क गति परीक्षण"
   },
@@ -380,6 +395,28 @@
   },
   "style.font": {
     "label": "फ़ॉन्ट"
+  },
+  "style.font.cjk": {
+    "label": "चीनी, जापानी, कोरियाई",
+    "title": "चीनी, जापानी और कोरियाई अक्षर-रूप"
+  },
+  "style.font.cjk.auto": {
+    "label": "स्वचालित"
+  },
+  "style.font.cjk.jp": {
+    "label": "जापानी"
+  },
+  "style.font.cjk.kr": {
+    "label": "कोरियाई"
+  },
+  "style.font.cjk.sc": {
+    "label": "सरलीकृत चीनी"
+  },
+  "style.font.cjk.tc": {
+    "label": "ताइवान"
+  },
+  "style.font.cjk.hk": {
+    "label": "हांगकांग"
   },
   "style.hyprland": {
     "label": "Hyprland"
@@ -410,6 +447,10 @@
   },
   "setup.monitors": {
     "label": "मॉनिटर"
+  },
+  "setup.ai": {
+    "label": "AI",
+    "title": "AI सेटअप — Maslow AI-OS"
   },
   "setup.keybindings": {
     "label": "कीबोर्ड शॉर्टकट"
@@ -472,23 +513,14 @@
   "setup.default.agent.crush": {
     "label": "Crush"
   },
-  "setup.default.agent.cursor-agent": {
-    "label": "Cursor CLI"
-  },
   "setup.default.agent.grok": {
     "label": "Grok"
   },
   "setup.default.agent.hermes": {
     "label": "Hermes"
   },
-  "setup.default.agent.muse": {
-    "label": "Muse Code"
-  },
   "setup.default.agent.omp": {
     "label": "omp"
-  },
-  "setup.default.agent.openclaw": {
-    "label": "OpenClaw"
   },
   "setup.default.agent.opencode": {
     "label": "OpenCode"
@@ -1125,7 +1157,7 @@
     "label": "Phoenix"
   },
   "update.omarchy": {
-    "label": "Omarchy"
+    "label": "Maslow AI-OS"
   },
   "update.channel": {
     "label": "चैनल"
@@ -1207,11 +1239,5 @@
   },
   "update.password.user": {
     "label": "उपयोगकर्ता"
-  },
-  "system.reboot-boot-menu": {
-    "label": "बूट मेनू में रीबूट"
-  },
-  "setup.default.agent.kimi": {
-    "label": "Kimi"
   }
 }

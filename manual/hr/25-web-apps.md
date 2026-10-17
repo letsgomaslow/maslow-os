@@ -48,7 +48,7 @@ WhatsApp možeš pokrenuti koristeći `Super + Shift + Alt + G`.
 
 Google Messages, Google Photos, Google Maps i Google Contacts također su uključeni kao web-aplikacije.
 
-Google Messages možeš pokrenuti koristeći `Super + Shift + Ctrl + G`, Google Photos koristeći `Super + Shift + P`, a Google Maps koristeći `Super + Shift + S`. Google Contacts dostupan je putem pokretača aplikacija (`Super + Space`).
+Google Messages možeš pokrenuti koristeći `Super + Shift + Ctrl + G`, Google Photos koristeći `Super + Shift + P`, a Google Maps koristeći `Super + Shift + Alt + S`. Google Contacts dostupan je putem pokretača aplikacija (`Super + Space`).
 
 ## X
 

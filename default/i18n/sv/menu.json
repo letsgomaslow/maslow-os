@@ -2,6 +2,12 @@
   "root": {
     "label": "Gå"
   },
+  "hub": {
+    "label": "Maslow Hub"
+  },
+  "voice": {
+    "label": "Maslow Voice"
+  },
   "apps": {
     "label": "Appar"
   },
@@ -27,7 +33,7 @@
     "label": "Uppdatera"
   },
   "about": {
-    "label": "Om"
+    "label": "Om Maslow AI-OS"
   },
   "system": {
     "label": "System"
@@ -50,6 +56,9 @@
   "system.reboot": {
     "label": "Starta om"
   },
+  "system.reboot-boot-menu": {
+    "label": "Starta om till startmenyn"
+  },
   "system.shutdown": {
     "label": "Stäng av"
   },
@@ -57,7 +66,7 @@
     "label": "Tangentgenvägar"
   },
   "learn.omarchy": {
-    "label": "Omarchy"
+    "label": "Maslow AI-OS-guide"
   },
   "learn.hyprland": {
     "label": "Hyprland"
@@ -78,7 +87,10 @@
     "label": "Herdr"
   },
   "learn.community": {
-    "label": "Gemenskap"
+    "label": "Gemenskap Omarchy — support för motorn"
+  },
+  "learn.support": {
+    "label": "Maslow AI-OS-support"
   },
   "trigger.appearance": {
     "label": "Utseende"
@@ -363,6 +375,9 @@
   "trigger.share.receive": {
     "label": "Ta emot"
   },
+  "trigger.toggle.reduced-motion": {
+    "label": "Minskad rörelse"
+  },
   "trigger.tests.network-speedtest": {
     "label": "Nätverkshastighetstest"
   },
@@ -380,6 +395,28 @@
   },
   "style.font": {
     "label": "Typsnitt"
+  },
+  "style.font.cjk": {
+    "label": "Kinesiska, japanska, koreanska",
+    "title": "Kinesiska, japanska och koreanska teckenformer"
+  },
+  "style.font.cjk.auto": {
+    "label": "Automatiskt"
+  },
+  "style.font.cjk.jp": {
+    "label": "Japanska"
+  },
+  "style.font.cjk.kr": {
+    "label": "Koreanska"
+  },
+  "style.font.cjk.sc": {
+    "label": "Förenklad kinesiska"
+  },
+  "style.font.cjk.tc": {
+    "label": "Taiwan"
+  },
+  "style.font.cjk.hk": {
+    "label": "Hongkong"
   },
   "style.hyprland": {
     "label": "Hyprland"
@@ -410,6 +447,10 @@
   },
   "setup.monitors": {
     "label": "Skärmar"
+  },
+  "setup.ai": {
+    "label": "AI",
+    "title": "AI-inställningar — Maslow AI-OS"
   },
   "setup.keybindings": {
     "label": "Tangentgenvägar"
@@ -472,23 +513,14 @@
   "setup.default.agent.crush": {
     "label": "Crush"
   },
-  "setup.default.agent.cursor-agent": {
-    "label": "Cursor CLI"
-  },
   "setup.default.agent.grok": {
     "label": "Grok"
   },
   "setup.default.agent.hermes": {
     "label": "Hermes"
   },
-  "setup.default.agent.muse": {
-    "label": "Muse Code"
-  },
   "setup.default.agent.omp": {
     "label": "omp"
-  },
-  "setup.default.agent.openclaw": {
-    "label": "OpenClaw"
   },
   "setup.default.agent.opencode": {
     "label": "OpenCode"
@@ -1125,7 +1157,7 @@
     "label": "Phoenix"
   },
   "update.omarchy": {
-    "label": "Omarchy"
+    "label": "Maslow AI-OS"
   },
   "update.channel": {
     "label": "Kanal"
@@ -1207,11 +1239,5 @@
   },
   "update.password.user": {
     "label": "Användare"
-  },
-  "system.reboot-boot-menu": {
-    "label": "Starta om till startmenyn"
-  },
-  "setup.default.agent.kimi": {
-    "label": "Kimi"
   }
 }

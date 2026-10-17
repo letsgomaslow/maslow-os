@@ -2,6 +2,12 @@
   "root": {
     "label": "Git"
   },
+  "hub": {
+    "label": "Maslow Hub"
+  },
+  "voice": {
+    "label": "Maslow Voice"
+  },
   "apps": {
     "label": "Uygulamalar"
   },
@@ -27,7 +33,7 @@
     "label": "Güncelle"
   },
   "about": {
-    "label": "Hakkında"
+    "label": "Maslow AI-OS hakkında"
   },
   "system": {
     "label": "Sistem"
@@ -50,6 +56,9 @@
   "system.reboot": {
     "label": "Yeniden Başlat"
   },
+  "system.reboot-boot-menu": {
+    "label": "Önyükleme Menüsüne Yeniden Başlat"
+  },
   "system.shutdown": {
     "label": "Kapat"
   },
@@ -57,7 +66,7 @@
     "label": "Kısayollar"
   },
   "learn.omarchy": {
-    "label": "Omarchy"
+    "label": "Maslow AI-OS kılavuzu"
   },
   "learn.hyprland": {
     "label": "Hyprland"
@@ -78,7 +87,10 @@
     "label": "Herdr"
   },
   "learn.community": {
-    "label": "Topluluk"
+    "label": "Topluluk Omarchy — motor desteği"
+  },
+  "learn.support": {
+    "label": "Maslow AI-OS desteği"
   },
   "trigger.appearance": {
     "label": "Görünüm"
@@ -363,6 +375,9 @@
   "trigger.share.receive": {
     "label": "Al"
   },
+  "trigger.toggle.reduced-motion": {
+    "label": "Azaltılmış hareket"
+  },
   "trigger.tests.network-speedtest": {
     "label": "Ağ Hız Testi"
   },
@@ -380,6 +395,28 @@
   },
   "style.font": {
     "label": "Yazı Tipi"
+  },
+  "style.font.cjk": {
+    "label": "Çince, Japonca, Korece",
+    "title": "Çince, Japonca ve Korece glifler"
+  },
+  "style.font.cjk.auto": {
+    "label": "Otomatik"
+  },
+  "style.font.cjk.jp": {
+    "label": "Japonca"
+  },
+  "style.font.cjk.kr": {
+    "label": "Korece"
+  },
+  "style.font.cjk.sc": {
+    "label": "Basitleştirilmiş Çince"
+  },
+  "style.font.cjk.tc": {
+    "label": "Tayvan"
+  },
+  "style.font.cjk.hk": {
+    "label": "Hong Kong"
   },
   "style.hyprland": {
     "label": "Hyprland"
@@ -410,6 +447,10 @@
   },
   "setup.monitors": {
     "label": "Monitörler"
+  },
+  "setup.ai": {
+    "label": "AI",
+    "title": "Yapay zekâ kurulumu — Maslow AI-OS"
   },
   "setup.keybindings": {
     "label": "Kısayollar"
@@ -472,23 +513,14 @@
   "setup.default.agent.crush": {
     "label": "Crush"
   },
-  "setup.default.agent.cursor-agent": {
-    "label": "Cursor CLI"
-  },
   "setup.default.agent.grok": {
     "label": "Grok"
   },
   "setup.default.agent.hermes": {
     "label": "Hermes"
   },
-  "setup.default.agent.muse": {
-    "label": "Muse Code"
-  },
   "setup.default.agent.omp": {
     "label": "omp"
-  },
-  "setup.default.agent.openclaw": {
-    "label": "OpenClaw"
   },
   "setup.default.agent.opencode": {
     "label": "OpenCode"
@@ -1125,7 +1157,7 @@
     "label": "Phoenix"
   },
   "update.omarchy": {
-    "label": "Omarchy"
+    "label": "Maslow AI-OS"
   },
   "update.channel": {
     "label": "Kanal"
@@ -1207,11 +1239,5 @@
   },
   "update.password.user": {
     "label": "Kullanıcı"
-  },
-  "system.reboot-boot-menu": {
-    "label": "Önyükleme Menüsüne Yeniden Başlat"
-  },
-  "setup.default.agent.kimi": {
-    "label": "Kimi"
   }
 }

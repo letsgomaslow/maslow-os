@@ -32,7 +32,7 @@ Teman-teman Windows: riwayat papan klip Win + V Anda ada di `Super + Ctrl + V`, 
 | ------------- | ---------- |
 | Spotlight / Raycast / menu Start | `Super + Space` — menu Omarchy |
 | AirDrop | LocalSend, via `Super + Ctrl + S` — lihat [GUI](22-guis.md) |
-| Cmd + Shift + 4 / Win + Shift + S | `Print Screen` — lihat [tangkapan layar & perekaman](12-screenshots-recording.md) |
+| Cmd + Shift + 4 / Win + Shift + S | `Super + Shift + S` / `Print Screen` — lihat [tangkapan layar & perekaman](12-screenshots-recording.md) |
 | Pusat Notifikasi | Riwayat notifikasi di `Super + Shift + Alt + ,` |
 | Time Machine (untuk sistem) | [Snapshot sistem](47-system-snapshots.md) otomatis pada setiap pembaruan |
 | App Store / mengunduh pemasang | _Pasang_ di menu, atau `omarchy pkg add` — lihat [paket lain](29-other-packages.md) |

@@ -2,6 +2,12 @@
   "root": {
     "label": "Перейти"
   },
+  "hub": {
+    "label": "Maslow Hub"
+  },
+  "voice": {
+    "label": "Maslow Voice"
+  },
   "apps": {
     "label": "Програми"
   },
@@ -27,7 +33,7 @@
     "label": "Оновити"
   },
   "about": {
-    "label": "Про програму"
+    "label": "Про Maslow AI-OS"
   },
   "system": {
     "label": "Система"
@@ -50,6 +56,9 @@
   "system.reboot": {
     "label": "Перезавантажити"
   },
+  "system.reboot-boot-menu": {
+    "label": "Перезавантажити в меню завантаження"
+  },
   "system.shutdown": {
     "label": "Вимкнути"
   },
@@ -57,7 +66,7 @@
     "label": "Сполучення клавіш"
   },
   "learn.omarchy": {
-    "label": "Omarchy"
+    "label": "Посібник Maslow AI-OS"
   },
   "learn.hyprland": {
     "label": "Hyprland"
@@ -78,7 +87,10 @@
     "label": "Herdr"
   },
   "learn.community": {
-    "label": "Спільнота"
+    "label": "Спільнота Omarchy — підтримка рушія"
+  },
+  "learn.support": {
+    "label": "Підтримка Maslow AI-OS"
   },
   "trigger.appearance": {
     "label": "Вигляд"
@@ -363,6 +375,9 @@
   "trigger.share.receive": {
     "label": "Отримати"
   },
+  "trigger.toggle.reduced-motion": {
+    "label": "Зменшення руху"
+  },
   "trigger.tests.network-speedtest": {
     "label": "Тест швидкості мережі"
   },
@@ -380,6 +395,28 @@
   },
   "style.font": {
     "label": "Шрифт"
+  },
+  "style.font.cjk": {
+    "label": "Китайська, японська, корейська",
+    "title": "Китайські, японські та корейські гліфи"
+  },
+  "style.font.cjk.auto": {
+    "label": "Автоматично"
+  },
+  "style.font.cjk.jp": {
+    "label": "Японська"
+  },
+  "style.font.cjk.kr": {
+    "label": "Корейська"
+  },
+  "style.font.cjk.sc": {
+    "label": "Спрощена китайська"
+  },
+  "style.font.cjk.tc": {
+    "label": "Тайвань"
+  },
+  "style.font.cjk.hk": {
+    "label": "Гонконг"
   },
   "style.hyprland": {
     "label": "Hyprland"
@@ -410,6 +447,10 @@
   },
   "setup.monitors": {
     "label": "Монітори"
+  },
+  "setup.ai": {
+    "label": "AI",
+    "title": "Налаштування ШІ — Maslow AI-OS"
   },
   "setup.keybindings": {
     "label": "Сполучення клавіш"
@@ -472,23 +513,14 @@
   "setup.default.agent.crush": {
     "label": "Crush"
   },
-  "setup.default.agent.cursor-agent": {
-    "label": "Cursor CLI"
-  },
   "setup.default.agent.grok": {
     "label": "Grok"
   },
   "setup.default.agent.hermes": {
     "label": "Hermes"
   },
-  "setup.default.agent.muse": {
-    "label": "Muse Code"
-  },
   "setup.default.agent.omp": {
     "label": "omp"
-  },
-  "setup.default.agent.openclaw": {
-    "label": "OpenClaw"
   },
   "setup.default.agent.opencode": {
     "label": "OpenCode"
@@ -1125,7 +1157,7 @@
     "label": "Phoenix"
   },
   "update.omarchy": {
-    "label": "Omarchy"
+    "label": "Maslow AI-OS"
   },
   "update.channel": {
     "label": "Канал"
@@ -1207,11 +1239,5 @@
   },
   "update.password.user": {
     "label": "Користувач"
-  },
-  "system.reboot-boot-menu": {
-    "label": "Перезавантажити в меню завантаження"
-  },
-  "setup.default.agent.kimi": {
-    "label": "Kimi"
   }
 }

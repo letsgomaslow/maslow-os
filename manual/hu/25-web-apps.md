@@ -48,7 +48,7 @@ A WhatsAppot a `Super + Shift + Alt + G` kombinációval indíthatod.
 
 A Google Messages, a Google Photos, a Google Maps és a Google Contacts szintén webalkalmazásként találhatók meg.
 
-A Google Messages-t a `Super + Shift + Ctrl + G`, a Google Photost a `Super + Shift + P`, a Google Mapset pedig a `Super + Shift + S` kombinációval indíthatod. A Google Contacts az alkalmazásindítón (`Super + Space`) keresztül érhető el.
+A Google Messages-t a `Super + Shift + Ctrl + G`, a Google Photost a `Super + Shift + P`, a Google Mapset pedig a `Super + Shift + Alt + S` kombinációval indíthatod. A Google Contacts az alkalmazásindítón (`Super + Space`) keresztül érhető el.
 
 ## X
 

@@ -2,6 +2,12 @@
   "root": {
     "label": "جائیں"
   },
+  "hub": {
+    "label": "Maslow Hub"
+  },
+  "voice": {
+    "label": "Maslow Voice"
+  },
   "apps": {
     "label": "ایپس"
   },
@@ -27,7 +33,7 @@
     "label": "اپ ڈیٹ کریں"
   },
   "about": {
-    "label": "بارے میں"
+    "label": "Maslow AI-OS کے بارے میں"
   },
   "system": {
     "label": "سسٹم"
@@ -50,6 +56,9 @@
   "system.reboot": {
     "label": "ری بوٹ کریں"
   },
+  "system.reboot-boot-menu": {
+    "label": "بوٹ مینو میں ری بوٹ کریں"
+  },
   "system.shutdown": {
     "label": "بند کریں"
   },
@@ -57,7 +66,7 @@
     "label": "کلید شارٹ کٹ"
   },
   "learn.omarchy": {
-    "label": "Omarchy"
+    "label": "Maslow AI-OS رہنما"
   },
   "learn.hyprland": {
     "label": "Hyprland"
@@ -78,7 +87,10 @@
     "label": "Herdr"
   },
   "learn.community": {
-    "label": "کمیونٹی"
+    "label": "کمیونٹی Omarchy — انجن کی معاونت"
+  },
+  "learn.support": {
+    "label": "Maslow AI-OS معاونت"
   },
   "trigger.appearance": {
     "label": "ظاہری شکل"
@@ -363,6 +375,9 @@
   "trigger.share.receive": {
     "label": "وصول کریں"
   },
+  "trigger.toggle.reduced-motion": {
+    "label": "کم حرکت"
+  },
   "trigger.tests.network-speedtest": {
     "label": "نیٹ ورک رفتار ٹیسٹ"
   },
@@ -380,6 +395,28 @@
   },
   "style.font": {
     "label": "فونٹ"
+  },
+  "style.font.cjk": {
+    "label": "چینی، جاپانی، کوریائی",
+    "title": "چینی، جاپانی اور کوریائی حروف کی شکلیں"
+  },
+  "style.font.cjk.auto": {
+    "label": "خودکار"
+  },
+  "style.font.cjk.jp": {
+    "label": "جاپانی"
+  },
+  "style.font.cjk.kr": {
+    "label": "کوریائی"
+  },
+  "style.font.cjk.sc": {
+    "label": "آسان چینی"
+  },
+  "style.font.cjk.tc": {
+    "label": "تائیوان"
+  },
+  "style.font.cjk.hk": {
+    "label": "ہانگ کانگ"
   },
   "style.hyprland": {
     "label": "Hyprland"
@@ -410,6 +447,10 @@
   },
   "setup.monitors": {
     "label": "مانیٹرز"
+  },
+  "setup.ai": {
+    "label": "AI",
+    "title": "AI سیٹ اپ — Maslow AI-OS"
   },
   "setup.keybindings": {
     "label": "کلید شارٹ کٹ"
@@ -472,23 +513,14 @@
   "setup.default.agent.crush": {
     "label": "Crush"
   },
-  "setup.default.agent.cursor-agent": {
-    "label": "Cursor CLI"
-  },
   "setup.default.agent.grok": {
     "label": "Grok"
   },
   "setup.default.agent.hermes": {
     "label": "Hermes"
   },
-  "setup.default.agent.muse": {
-    "label": "Muse Code"
-  },
   "setup.default.agent.omp": {
     "label": "omp"
-  },
-  "setup.default.agent.openclaw": {
-    "label": "OpenClaw"
   },
   "setup.default.agent.opencode": {
     "label": "OpenCode"
@@ -1125,7 +1157,7 @@
     "label": "Phoenix"
   },
   "update.omarchy": {
-    "label": "Omarchy"
+    "label": "Maslow AI-OS"
   },
   "update.channel": {
     "label": "چینل"
@@ -1207,11 +1239,5 @@
   },
   "update.password.user": {
     "label": "صارف"
-  },
-  "system.reboot-boot-menu": {
-    "label": "بوٹ مینو میں ری بوٹ کریں"
-  },
-  "setup.default.agent.kimi": {
-    "label": "Kimi"
   }
 }

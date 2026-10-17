@@ -32,7 +32,7 @@ Gent de Windows: el vostre historial del porta-retalls de Win + V viu a `Super +
 | ------------- | ---------- |
 | Spotlight / Raycast / menú Inici | `Super + Space` — el menú d'Omarchy |
 | AirDrop | LocalSend, amb `Super + Ctrl + S` — vegeu [interfícies gràfiques](22-guis.md) |
-| Cmd + Shift + 4 / Win + Shift + S | `Print Screen` — vegeu [captures de pantalla i gravació](12-screenshots-recording.md) |
+| Cmd + Shift + 4 / Win + Shift + S | `Super + Shift + S` / `Print Screen` — vegeu [captures de pantalla i gravació](12-screenshots-recording.md) |
 | Centre de notificacions | Historial de notificacions a `Super + Shift + Alt + ,` |
 | Time Machine (per al sistema) | [Instantànies del sistema](47-system-snapshots.md) automàtiques a cada actualització |
 | App Store / baixar un instal·lador | _Instal·la_ al menú, o `omarchy pkg add` — vegeu [altres paquets](29-other-packages.md) |

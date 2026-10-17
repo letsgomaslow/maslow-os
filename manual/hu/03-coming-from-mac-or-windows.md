@@ -32,7 +32,7 @@ Windowsosoknak: a Win + V vágólap-előzményetek a `Super + Ctrl + V` alatt é
 | ------------- | ---------- |
 | Spotlight / Raycast / Start menü | `Super + Space` — az Omarchy menü |
 | AirDrop | LocalSend, a `Super + Ctrl + S` kombinációval — lásd a [GUI-kat](22-guis.md) |
-| Cmd + Shift + 4 / Win + Shift + S | `Print Screen` — lásd a [képernyőképeket és felvételt](12-screenshots-recording.md) |
+| Cmd + Shift + 4 / Win + Shift + S | `Super + Shift + S` / `Print Screen` — lásd a [képernyőképeket és felvételt](12-screenshots-recording.md) |
 | Értesítési központ | Értesítési előzmények a `Super + Shift + Alt + ,` kombinációval |
 | Time Machine (a rendszerhez) | Automatikus [rendszer-pillanatképek](47-system-snapshots.md) minden frissítéskor |
 | App Store / telepítő letöltése | _Telepítés_ a menüben, vagy `omarchy pkg add` — lásd az [egyéb csomagokat](29-other-packages.md) |

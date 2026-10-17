@@ -83,6 +83,8 @@ Preview images; appearance may change.
 
 ## Help and contributing
 
+Read the [Maslow preview guide](guides/maslow-ai-os.md) first for availability, AI features, support, and hardware limits. The engine manual below preserves Omarchy documentation and credits.
+
 - [Getting started](manual/02-getting-started.md)
 - [Keyboard shortcuts](manual/07-hotkeys.md)
 - [Themes](manual/06-themes.md)

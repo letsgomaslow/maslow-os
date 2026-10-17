@@ -32,7 +32,7 @@ Windows 用户：你的 Win + V 剪贴板历史位于 `Super + Ctrl + V`，它�
 | ------------- | ---------- |
 | Spotlight / Raycast / “开始”菜单 | `Super + Space` — Omarchy 菜单 |
 | 隔空投送 | LocalSend，通过 `Super + Ctrl + S` — 参见 [GUI](22-guis.md) |
-| Cmd + Shift + 4 / Win + Shift + S | `Print Screen` — 参见[截图与录屏](12-screenshots-recording.md) |
+| Cmd + Shift + 4 / Win + Shift + S | `Super + Shift + S` / `Print Screen` — 参见[截图与录屏](12-screenshots-recording.md) |
 | 通知中心 | 通知历史，位于 `Super + Shift + Alt + ,` |
 | 时间机器（针对系统） | 每次更新时自动创建[系统快照](47-system-snapshots.md) |
 | 应用商店 / 下载安装程序 | 菜单中的_安装_，或 `omarchy pkg add` — 参见[其他软件包](29-other-packages.md) |

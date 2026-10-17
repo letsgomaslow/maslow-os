@@ -48,7 +48,7 @@ Pots iniciar WhatsApp amb `Super + Shift + Alt + G`.
 
 Google Messages, Google Photos, Google Maps i Google Contacts també s'inclouen com a aplicacions web.
 
-Pots iniciar Google Messages amb `Super + Shift + Ctrl + G`, Google Photos amb `Super + Shift + P` i Google Maps amb `Super + Shift + S`. Google Contacts està disponible mitjançant el llançador d'aplicacions (`Super + Space`).
+Pots iniciar Google Messages amb `Super + Shift + Ctrl + G`, Google Photos amb `Super + Shift + P` i Google Maps amb `Super + Shift + Alt + S`. Google Contacts està disponible mitjançant el llançador d'aplicacions (`Super + Space`).
 
 ## X
 

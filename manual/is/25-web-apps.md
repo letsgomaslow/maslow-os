@@ -48,7 +48,7 @@ Sjálfgefið kemur Omarchy þegar með úrvali af sjálfgefnum forritum:
 
 Google Messages, Google Photos, Google Maps og Google Contacts eru öll líka innifalin sem vefforrit.
 
-Þú getur ræst Google Messages með `Super + Shift + Ctrl + G`, Google Photos með `Super + Shift + P` og Google Maps með `Super + Shift + S`. Google Contacts er fáanlegt í gegnum forritaræsinn (`Super + Space`).
+Þú getur ræst Google Messages með `Super + Shift + Ctrl + G`, Google Photos með `Super + Shift + P` og Google Maps með `Super + Shift + Alt + S`. Google Contacts er fáanlegt í gegnum forritaræsinn (`Super + Space`).
 
 ## X
 

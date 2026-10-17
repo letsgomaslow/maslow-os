@@ -48,7 +48,7 @@ Voit käynnistää WhatsAppin näppäimillä `Super + Shift + Alt + G`.
 
 Google Messages, Google Photos, Google Maps ja Google Contacts ovat myös mukana verkkosovelluksina.
 
-Voit käynnistää Google Messagesin näppäimillä `Super + Shift + Ctrl + G`, Google Photosin näppäimillä `Super + Shift + P` ja Google Mapsin näppäimillä `Super + Shift + S`. Google Contacts on saatavilla sovellusten käynnistimen kautta (`Super + Space`).
+Voit käynnistää Google Messagesin näppäimillä `Super + Shift + Ctrl + G`, Google Photosin näppäimillä `Super + Shift + P` ja Google Mapsin näppäimillä `Super + Shift + Alt + S`. Google Contacts on saatavilla sovellusten käynnistimen kautta (`Super + Space`).
 
 ## X
 

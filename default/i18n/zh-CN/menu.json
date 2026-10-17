@@ -2,6 +2,12 @@
   "root": {
     "label": "前往"
   },
+  "hub": {
+    "label": "Maslow Hub"
+  },
+  "voice": {
+    "label": "Maslow Voice"
+  },
   "apps": {
     "label": "应用"
   },
@@ -27,7 +33,7 @@
     "label": "更新"
   },
   "about": {
-    "label": "关于"
+    "label": "关于 Maslow AI-OS"
   },
   "system": {
     "label": "系统"
@@ -50,6 +56,9 @@
   "system.reboot": {
     "label": "重启"
   },
+  "system.reboot-boot-menu": {
+    "label": "重启到启动菜单"
+  },
   "system.shutdown": {
     "label": "关机"
   },
@@ -57,7 +66,7 @@
     "label": "快捷键"
   },
   "learn.omarchy": {
-    "label": "Omarchy"
+    "label": "Maslow AI-OS 指南"
   },
   "learn.hyprland": {
     "label": "Hyprland"
@@ -78,7 +87,10 @@
     "label": "Herdr"
   },
   "learn.community": {
-    "label": "社区"
+    "label": "社区 Omarchy — 引擎支持"
+  },
+  "learn.support": {
+    "label": "Maslow AI-OS 支持"
   },
   "trigger.appearance": {
     "label": "外观"
@@ -363,6 +375,9 @@
   "trigger.share.receive": {
     "label": "接收"
   },
+  "trigger.toggle.reduced-motion": {
+    "label": "减少动态效果"
+  },
   "trigger.tests.network-speedtest": {
     "label": "网络测速"
   },
@@ -380,6 +395,28 @@
   },
   "style.font": {
     "label": "字体"
+  },
+  "style.font.cjk": {
+    "label": "中文、日文、韩文",
+    "title": "中文、日文和韩文字形"
+  },
+  "style.font.cjk.auto": {
+    "label": "自动"
+  },
+  "style.font.cjk.jp": {
+    "label": "日文"
+  },
+  "style.font.cjk.kr": {
+    "label": "韩文"
+  },
+  "style.font.cjk.sc": {
+    "label": "简体中文"
+  },
+  "style.font.cjk.tc": {
+    "label": "台湾"
+  },
+  "style.font.cjk.hk": {
+    "label": "香港"
   },
   "style.hyprland": {
     "label": "Hyprland"
@@ -410,6 +447,10 @@
   },
   "setup.monitors": {
     "label": "显示器"
+  },
+  "setup.ai": {
+    "label": "AI",
+    "title": "AI 设置 — Maslow AI-OS"
   },
   "setup.keybindings": {
     "label": "快捷键"
@@ -472,23 +513,14 @@
   "setup.default.agent.crush": {
     "label": "Crush"
   },
-  "setup.default.agent.cursor-agent": {
-    "label": "Cursor CLI"
-  },
   "setup.default.agent.grok": {
     "label": "Grok"
   },
   "setup.default.agent.hermes": {
     "label": "Hermes"
   },
-  "setup.default.agent.muse": {
-    "label": "Muse Code"
-  },
   "setup.default.agent.omp": {
     "label": "omp"
-  },
-  "setup.default.agent.openclaw": {
-    "label": "OpenClaw"
   },
   "setup.default.agent.opencode": {
     "label": "OpenCode"
@@ -1125,7 +1157,7 @@
     "label": "Phoenix"
   },
   "update.omarchy": {
-    "label": "Omarchy"
+    "label": "Maslow AI-OS"
   },
   "update.channel": {
     "label": "渠道"
@@ -1207,11 +1239,5 @@
   },
   "update.password.user": {
     "label": "用户"
-  },
-  "system.reboot-boot-menu": {
-    "label": "重启到启动菜单"
-  },
-  "setup.default.agent.kimi": {
-    "label": "Kimi"
   }
 }

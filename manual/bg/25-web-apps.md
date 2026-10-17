@@ -48,7 +48,7 @@
 
 Google Messages, Google Photos, Google Maps и Google Contacts също са включени като уеб приложения.
 
-Можете да стартирате Google Messages чрез `Super + Shift + Ctrl + G`, Google Photos чрез `Super + Shift + P`, а Google Maps чрез `Super + Shift + S`. Google Contacts е наличен чрез стартера на приложения (`Super + Space`).
+Можете да стартирате Google Messages чрез `Super + Shift + Ctrl + G`, Google Photos чрез `Super + Shift + P`, а Google Maps чрез `Super + Shift + Alt + S`. Google Contacts е наличен чрез стартера на приложения (`Super + Space`).
 
 ## X
 

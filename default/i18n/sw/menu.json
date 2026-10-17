@@ -2,6 +2,12 @@
   "root": {
     "label": "Nenda"
   },
+  "hub": {
+    "label": "Maslow Hub"
+  },
+  "voice": {
+    "label": "Maslow Voice"
+  },
   "apps": {
     "label": "Programu"
   },
@@ -27,7 +33,7 @@
     "label": "Sasisha"
   },
   "about": {
-    "label": "Kuhusu"
+    "label": "Kuhusu Maslow AI-OS"
   },
   "system": {
     "label": "Mfumo"
@@ -50,6 +56,9 @@
   "system.reboot": {
     "label": "Anzisha upya"
   },
+  "system.reboot-boot-menu": {
+    "label": "Washa upya kwa menyu ya kuwasha"
+  },
   "system.shutdown": {
     "label": "Zima"
   },
@@ -57,7 +66,7 @@
     "label": "Mikato ya vitufe"
   },
   "learn.omarchy": {
-    "label": "Omarchy"
+    "label": "Mwongozo wa Maslow AI-OS"
   },
   "learn.hyprland": {
     "label": "Hyprland"
@@ -78,7 +87,10 @@
     "label": "Herdr"
   },
   "learn.community": {
-    "label": "Jumuiya"
+    "label": "Jumuiya Omarchy — usaidizi wa injini"
+  },
+  "learn.support": {
+    "label": "Usaidizi wa Maslow AI-OS"
   },
   "trigger.appearance": {
     "label": "Muonekano"
@@ -363,6 +375,9 @@
   "trigger.share.receive": {
     "label": "Pokea"
   },
+  "trigger.toggle.reduced-motion": {
+    "label": "Mwendo uliopunguzwa"
+  },
   "trigger.tests.network-speedtest": {
     "label": "Jaribio la kasi ya mtandao"
   },
@@ -380,6 +395,28 @@
   },
   "style.font": {
     "label": "Fonti"
+  },
+  "style.font.cjk": {
+    "label": "Kichina, Kijapani, Kikorea",
+    "title": "Maumbo ya herufi za Kichina, Kijapani na Kikorea"
+  },
+  "style.font.cjk.auto": {
+    "label": "Kiotomatiki"
+  },
+  "style.font.cjk.jp": {
+    "label": "Kijapani"
+  },
+  "style.font.cjk.kr": {
+    "label": "Kikorea"
+  },
+  "style.font.cjk.sc": {
+    "label": "Kichina kilichorahisishwa"
+  },
+  "style.font.cjk.tc": {
+    "label": "Taiwan"
+  },
+  "style.font.cjk.hk": {
+    "label": "Hong Kong"
   },
   "style.hyprland": {
     "label": "Hyprland"
@@ -410,6 +447,10 @@
   },
   "setup.monitors": {
     "label": "Skrini"
+  },
+  "setup.ai": {
+    "label": "AI",
+    "title": "Usanidi wa AI — Maslow AI-OS"
   },
   "setup.keybindings": {
     "label": "Mikato ya vitufe"
@@ -472,23 +513,14 @@
   "setup.default.agent.crush": {
     "label": "Crush"
   },
-  "setup.default.agent.cursor-agent": {
-    "label": "Cursor CLI"
-  },
   "setup.default.agent.grok": {
     "label": "Grok"
   },
   "setup.default.agent.hermes": {
     "label": "Hermes"
   },
-  "setup.default.agent.muse": {
-    "label": "Muse Code"
-  },
   "setup.default.agent.omp": {
     "label": "omp"
-  },
-  "setup.default.agent.openclaw": {
-    "label": "OpenClaw"
   },
   "setup.default.agent.opencode": {
     "label": "OpenCode"
@@ -1125,7 +1157,7 @@
     "label": "Phoenix"
   },
   "update.omarchy": {
-    "label": "Omarchy"
+    "label": "Maslow AI-OS"
   },
   "update.channel": {
     "label": "Kituo"
@@ -1207,11 +1239,5 @@
   },
   "update.password.user": {
     "label": "Mtumiaji"
-  },
-  "system.reboot-boot-menu": {
-    "label": "Washa upya kwa menyu ya kuwasha"
-  },
-  "setup.default.agent.kimi": {
-    "label": "Kimi"
   }
 }

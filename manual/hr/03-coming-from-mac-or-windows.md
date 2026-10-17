@@ -32,7 +32,7 @@ Ljudi s Windowsa: vaša povijest međuspremnika s Win + V živi na `Super + Ctrl
 | ------------- | ---------- |
 | Spotlight / Raycast / izbornik Start | `Super + Space` — Omarchy izbornik |
 | AirDrop | LocalSend, putem `Super + Ctrl + S` — pogledajte [GUI-je](22-guis.md) |
-| Cmd + Shift + 4 / Win + Shift + S | `Print Screen` — pogledajte [snimke zaslona i snimanje](12-screenshots-recording.md) |
+| Cmd + Shift + 4 / Win + Shift + S | `Super + Shift + S` / `Print Screen` — pogledajte [snimke zaslona i snimanje](12-screenshots-recording.md) |
 | Centar za obavijesti | Povijest obavijesti na `Super + Shift + Alt + ,` |
 | Time Machine (za sustav) | Automatski [sistemski snimci](47-system-snapshots.md) pri svakom ažuriranju |
 | App Store / preuzimanje instalacijskoga programa | _Instaliraj_ u izborniku ili `omarchy pkg add` — pogledajte [ostale pakete](29-other-packages.md) |

@@ -2,6 +2,12 @@
   "root": {
     "label": "Aller"
   },
+  "hub": {
+    "label": "Maslow Hub"
+  },
+  "voice": {
+    "label": "Maslow Voice"
+  },
   "apps": {
     "label": "Applis"
   },
@@ -27,7 +33,7 @@
     "label": "Mettre à jour"
   },
   "about": {
-    "label": "À propos"
+    "label": "À propos de Maslow AI-OS"
   },
   "system": {
     "label": "Système"
@@ -50,6 +56,9 @@
   "system.reboot": {
     "label": "Redémarrer"
   },
+  "system.reboot-boot-menu": {
+    "label": "Redémarrer sur le menu de démarrage"
+  },
   "system.shutdown": {
     "label": "Éteindre"
   },
@@ -57,7 +66,7 @@
     "label": "Raccourcis clavier"
   },
   "learn.omarchy": {
-    "label": "Omarchy"
+    "label": "Guide Maslow AI-OS"
   },
   "learn.hyprland": {
     "label": "Hyprland"
@@ -78,7 +87,10 @@
     "label": "Herdr"
   },
   "learn.community": {
-    "label": "Communauté"
+    "label": "Communauté Omarchy — assistance du moteur"
+  },
+  "learn.support": {
+    "label": "Assistance Maslow AI-OS"
   },
   "trigger.appearance": {
     "label": "Apparence"
@@ -363,6 +375,9 @@
   "trigger.share.receive": {
     "label": "Recevoir"
   },
+  "trigger.toggle.reduced-motion": {
+    "label": "Mouvements réduits"
+  },
   "trigger.tests.network-speedtest": {
     "label": "Test débit réseau"
   },
@@ -380,6 +395,28 @@
   },
   "style.font": {
     "label": "Police"
+  },
+  "style.font.cjk": {
+    "label": "Chinois, japonais, coréen",
+    "title": "Glyphes chinois, japonais et coréens"
+  },
+  "style.font.cjk.auto": {
+    "label": "Automatique"
+  },
+  "style.font.cjk.jp": {
+    "label": "Japonais"
+  },
+  "style.font.cjk.kr": {
+    "label": "Coréen"
+  },
+  "style.font.cjk.sc": {
+    "label": "Chinois simplifié"
+  },
+  "style.font.cjk.tc": {
+    "label": "Taïwan"
+  },
+  "style.font.cjk.hk": {
+    "label": "Hong Kong"
   },
   "style.hyprland": {
     "label": "Hyprland"
@@ -410,6 +447,10 @@
   },
   "setup.monitors": {
     "label": "Écrans"
+  },
+  "setup.ai": {
+    "label": "AI",
+    "title": "Configuration de l’IA — Maslow AI-OS"
   },
   "setup.keybindings": {
     "label": "Raccourcis clavier"
@@ -472,23 +513,14 @@
   "setup.default.agent.crush": {
     "label": "Crush"
   },
-  "setup.default.agent.cursor-agent": {
-    "label": "Cursor CLI"
-  },
   "setup.default.agent.grok": {
     "label": "Grok"
   },
   "setup.default.agent.hermes": {
     "label": "Hermes"
   },
-  "setup.default.agent.muse": {
-    "label": "Muse Code"
-  },
   "setup.default.agent.omp": {
     "label": "omp"
-  },
-  "setup.default.agent.openclaw": {
-    "label": "OpenClaw"
   },
   "setup.default.agent.opencode": {
     "label": "OpenCode"
@@ -1125,7 +1157,7 @@
     "label": "Phoenix"
   },
   "update.omarchy": {
-    "label": "Omarchy"
+    "label": "Maslow AI-OS"
   },
   "update.channel": {
     "label": "Canal"
@@ -1207,11 +1239,5 @@
   },
   "update.password.user": {
     "label": "Utilisateur"
-  },
-  "system.reboot-boot-menu": {
-    "label": "Redémarrer sur le menu de démarrage"
-  },
-  "setup.default.agent.kimi": {
-    "label": "Kimi"
   }
 }

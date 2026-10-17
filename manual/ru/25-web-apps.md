@@ -48,7 +48,7 @@ WhatsApp запускается сочетанием `Super + Shift + Alt + G`.
 
 Google Messages, Google Photos, Google Maps и Google Contacts также включены как веб-приложения.
 
-Google Messages запускается сочетанием `Super + Shift + Ctrl + G`, Google Photos — сочетанием `Super + Shift + P`, а Google Maps — сочетанием `Super + Shift + S`. Google Contacts доступен через средство запуска приложений (`Super + Space`).
+Google Messages запускается сочетанием `Super + Shift + Ctrl + G`, Google Photos — сочетанием `Super + Shift + P`, а Google Maps — сочетанием `Super + Shift + Alt + S`. Google Contacts доступен через средство запуска приложений (`Super + Space`).
 
 ## X
 

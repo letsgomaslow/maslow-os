@@ -48,7 +48,7 @@
 
 Google Messages、Google Photos、Google Maps 和 Google Contacts 也都作为网页应用包含在内。
 
-你可以用 `Super + Shift + Ctrl + G` 启动 Google Messages，用 `Super + Shift + P` 启动 Google Photos，并用 `Super + Shift + S` 启动 Google Maps。Google Contacts 通过应用程序启动器（`Super + Space`）可用。
+你可以用 `Super + Shift + Ctrl + G` 启动 Google Messages，用 `Super + Shift + P` 启动 Google Photos，并用 `Super + Shift + Alt + S` 启动 Google Maps。Google Contacts 通过应用程序启动器（`Super + Space`）可用。
 
 ## X
 

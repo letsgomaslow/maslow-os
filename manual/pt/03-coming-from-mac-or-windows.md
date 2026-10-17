@@ -32,7 +32,7 @@ Malta do Windows: o vosso histórico da área de transferência do Win + V vive 
 | ------------- | ---------- |
 | Spotlight / Raycast / menu Iniciar | `Super + Space` — o menu do Omarchy |
 | AirDrop | LocalSend, com `Super + Ctrl + S` — vê [GUIs](22-guis.md) |
-| Cmd + Shift + 4 / Win + Shift + S | `Print Screen` — vê [capturas de ecrã e gravação](12-screenshots-recording.md) |
+| Cmd + Shift + 4 / Win + Shift + S | `Super + Shift + S` / `Print Screen` — vê [capturas de ecrã e gravação](12-screenshots-recording.md) |
 | Central de Notificações | Histórico de notificações em `Super + Shift + Alt + ,` |
 | Time Machine (para o sistema) | [Instantâneos do sistema](47-system-snapshots.md) automáticos a cada atualização |
 | App Store / transferir um instalador | _Instalar_ no menu, ou `omarchy pkg add` — vê [outros pacotes](29-other-packages.md) |

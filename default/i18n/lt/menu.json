@@ -2,6 +2,12 @@
   "root": {
     "label": "Eiti"
   },
+  "hub": {
+    "label": "Maslow Hub"
+  },
+  "voice": {
+    "label": "Maslow Voice"
+  },
   "apps": {
     "label": "Programos"
   },
@@ -27,7 +33,7 @@
     "label": "Atnaujinti"
   },
   "about": {
-    "label": "Apie"
+    "label": "Apie Maslow AI-OS"
   },
   "system": {
     "label": "Sistema"
@@ -50,6 +56,9 @@
   "system.reboot": {
     "label": "Paleisti iš naujo"
   },
+  "system.reboot-boot-menu": {
+    "label": "Perkrauti į įkrovos meniu"
+  },
   "system.shutdown": {
     "label": "Išjungti"
   },
@@ -57,7 +66,7 @@
     "label": "Spartieji klavišai"
   },
   "learn.omarchy": {
-    "label": "Omarchy"
+    "label": "Maslow AI-OS vadovas"
   },
   "learn.hyprland": {
     "label": "Hyprland"
@@ -78,7 +87,10 @@
     "label": "Herdr"
   },
   "learn.community": {
-    "label": "Bendruomenė"
+    "label": "Bendruomenė Omarchy — variklio pagalba"
+  },
+  "learn.support": {
+    "label": "Maslow AI-OS pagalba"
   },
   "trigger.appearance": {
     "label": "Išvaizda"
@@ -363,6 +375,9 @@
   "trigger.share.receive": {
     "label": "Gauti"
   },
+  "trigger.toggle.reduced-motion": {
+    "label": "Sumažintas judėjimas"
+  },
   "trigger.tests.network-speedtest": {
     "label": "Tinklo greičio testas"
   },
@@ -380,6 +395,28 @@
   },
   "style.font": {
     "label": "Šriftas"
+  },
+  "style.font.cjk": {
+    "label": "Kinų, japonų, korėjiečių",
+    "title": "Kinų, japonų ir korėjiečių glifai"
+  },
+  "style.font.cjk.auto": {
+    "label": "Automatiškai"
+  },
+  "style.font.cjk.jp": {
+    "label": "Japonų"
+  },
+  "style.font.cjk.kr": {
+    "label": "Korėjiečių"
+  },
+  "style.font.cjk.sc": {
+    "label": "Supaprastinta kinų"
+  },
+  "style.font.cjk.tc": {
+    "label": "Taivanas"
+  },
+  "style.font.cjk.hk": {
+    "label": "Honkongas"
   },
   "style.hyprland": {
     "label": "Hyprland"
@@ -410,6 +447,10 @@
   },
   "setup.monitors": {
     "label": "Monitoriai"
+  },
+  "setup.ai": {
+    "label": "AI",
+    "title": "DI sąranka — Maslow AI-OS"
   },
   "setup.keybindings": {
     "label": "Spartieji klavišai"
@@ -472,23 +513,14 @@
   "setup.default.agent.crush": {
     "label": "Crush"
   },
-  "setup.default.agent.cursor-agent": {
-    "label": "Cursor CLI"
-  },
   "setup.default.agent.grok": {
     "label": "Grok"
   },
   "setup.default.agent.hermes": {
     "label": "Hermes"
   },
-  "setup.default.agent.muse": {
-    "label": "Muse Code"
-  },
   "setup.default.agent.omp": {
     "label": "omp"
-  },
-  "setup.default.agent.openclaw": {
-    "label": "OpenClaw"
   },
   "setup.default.agent.opencode": {
     "label": "OpenCode"
@@ -1125,7 +1157,7 @@
     "label": "Phoenix"
   },
   "update.omarchy": {
-    "label": "Omarchy"
+    "label": "Maslow AI-OS"
   },
   "update.channel": {
     "label": "Kanalas"
@@ -1207,11 +1239,5 @@
   },
   "update.password.user": {
     "label": "Vartotojas"
-  },
-  "system.reboot-boot-menu": {
-    "label": "Perkrauti į įkrovos meniu"
-  },
-  "setup.default.agent.kimi": {
-    "label": "Kimi"
   }
 }

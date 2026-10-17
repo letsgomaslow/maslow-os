@@ -48,7 +48,7 @@ WhatsApp は `Super + Shift + Alt + G` で起動できます。
 
 Google Messages、Google Photos、Google Maps、Google Contacts もすべて Web アプリとして含まれています。
 
-Google Messages は `Super + Shift + Ctrl + G`、Google Photos は `Super + Shift + P`、Google Maps は `Super + Shift + S` で起動できます。Google Contacts はアプリランチャー（`Super + Space`）から利用できます。
+Google Messages は `Super + Shift + Ctrl + G`、Google Photos は `Super + Shift + P`、Google Maps は `Super + Shift + Alt + S` で起動できます。Google Contacts はアプリランチャー（`Super + Space`）から利用できます。
 
 ## X
 

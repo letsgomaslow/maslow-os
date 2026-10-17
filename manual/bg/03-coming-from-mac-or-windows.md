@@ -32,7 +32,7 @@
 | ------------- | ---------- |
 | Spotlight / Raycast / меню Start | `Super + Space` — менюто на Omarchy |
 | AirDrop | LocalSend, чрез `Super + Ctrl + S` — виж [GUI-та](22-guis.md) |
-| Cmd + Shift + 4 / Win + Shift + S | `Print Screen` — виж [снимки на екрана и запис](12-screenshots-recording.md) |
+| Cmd + Shift + 4 / Win + Shift + S | `Super + Shift + S` / `Print Screen` — виж [снимки на екрана и запис](12-screenshots-recording.md) |
 | Notification Center | История на известията на `Super + Shift + Alt + ,` |
 | Time Machine (за системата) | Автоматични [системни моментни снимки](47-system-snapshots.md) при всяка актуализация |
 | App Store / изтегляне на инсталатор | _Инсталирай_ в менюто или `omarchy pkg add` — виж [други пакети](29-other-packages.md) |

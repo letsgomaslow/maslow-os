@@ -48,7 +48,7 @@ WhatsApp ni `Super + Shift + Alt + G` yordamida boshlashingiz mumkin.
 
 Google Messages, Google Photos, Google Maps va Google Contacts ham veb-ilovalar sifatida kiritilgan.
 
-Google Messages ni `Super + Shift + Ctrl + G`, Google Photos ni `Super + Shift + P` va Google Maps ni `Super + Shift + S` yordamida boshlashingiz mumkin. Google Contacts ilova ishga tushirgichi (`Super + Space`) orqali mavjud.
+Google Messages ni `Super + Shift + Ctrl + G`, Google Photos ni `Super + Shift + P` va Google Maps ni `Super + Shift + Alt + S` yordamida boshlashingiz mumkin. Google Contacts ilova ishga tushirgichi (`Super + Space`) orqali mavjud.
 
 ## X
 

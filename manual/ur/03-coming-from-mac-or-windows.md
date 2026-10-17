@@ -32,7 +32,7 @@ Windows والو: آپ کی Win + V کلپ بورڈ تاریخ `Super + Ctrl + V
 | ------------- | ---------- |
 | Spotlight / Raycast / Start menu | `Super + Space` — Omarchy مینیو |
 | AirDrop | LocalSend، `Super + Ctrl + S` کے ذریعے — [GUIs](22-guis.md) دیکھیں |
-| Cmd + Shift + 4 / Win + Shift + S | `Print Screen` — [اسکرین شاٹس اور ریکارڈنگ](12-screenshots-recording.md) دیکھیں |
+| Cmd + Shift + 4 / Win + Shift + S | `Super + Shift + S` / `Print Screen` — [اسکرین شاٹس اور ریکارڈنگ](12-screenshots-recording.md) دیکھیں |
 | Notification Center | نوٹیفکیشن تاریخ `Super + Shift + Alt + ,` پر |
 | Time Machine (سسٹم کے لیے) | ہر اپ ڈیٹ پر خودکار [سسٹم اسنیپ شاٹس](47-system-snapshots.md) |
 | App Store / انسٹالر ڈاؤن لوڈ کرنا | مینیو میں _انسٹال کریں_، یا `omarchy pkg add` — [دیگر پیکیجز](29-other-packages.md) دیکھیں |

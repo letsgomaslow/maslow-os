@@ -2,6 +2,12 @@
   "root": {
     "label": "செல்"
   },
+  "hub": {
+    "label": "Maslow Hub"
+  },
+  "voice": {
+    "label": "Maslow Voice"
+  },
   "apps": {
     "label": "செயலிகள்"
   },
@@ -27,7 +33,7 @@
     "label": "புதுப்பி"
   },
   "about": {
-    "label": "பற்றி"
+    "label": "Maslow AI-OS பற்றி"
   },
   "system": {
     "label": "கணினி"
@@ -50,6 +56,9 @@
   "system.reboot": {
     "label": "மறுதொடக்கம்"
   },
+  "system.reboot-boot-menu": {
+    "label": "துவக்க மெனுவுக்கு மறுதொடக்கம்"
+  },
   "system.shutdown": {
     "label": "அணை"
   },
@@ -57,7 +66,7 @@
     "label": "விசைப்பிணைப்புகள்"
   },
   "learn.omarchy": {
-    "label": "Omarchy"
+    "label": "Maslow AI-OS வழிகாட்டி"
   },
   "learn.hyprland": {
     "label": "Hyprland"
@@ -78,7 +87,10 @@
     "label": "Herdr"
   },
   "learn.community": {
-    "label": "சமூகம்"
+    "label": "சமூகம் Omarchy — இயந்திர ஆதரவு"
+  },
+  "learn.support": {
+    "label": "Maslow AI-OS ஆதரவு"
   },
   "trigger.appearance": {
     "label": "தோற்றம்"
@@ -363,6 +375,9 @@
   "trigger.share.receive": {
     "label": "பெறு"
   },
+  "trigger.toggle.reduced-motion": {
+    "label": "குறைக்கப்பட்ட இயக்கம்"
+  },
   "trigger.tests.network-speedtest": {
     "label": "வலையமைப்பு வேக சோதனை"
   },
@@ -380,6 +395,28 @@
   },
   "style.font": {
     "label": "எழுத்துரு"
+  },
+  "style.font.cjk": {
+    "label": "சீனம், ஜப்பானியம், கொரியம்",
+    "title": "சீன, ஜப்பானிய மற்றும் கொரிய எழுத்துருவங்கள்"
+  },
+  "style.font.cjk.auto": {
+    "label": "தானியங்கி"
+  },
+  "style.font.cjk.jp": {
+    "label": "ஜப்பானியம்"
+  },
+  "style.font.cjk.kr": {
+    "label": "கொரியம்"
+  },
+  "style.font.cjk.sc": {
+    "label": "எளிய சீனம்"
+  },
+  "style.font.cjk.tc": {
+    "label": "தைவான்"
+  },
+  "style.font.cjk.hk": {
+    "label": "ஹாங்காங்"
   },
   "style.hyprland": {
     "label": "Hyprland"
@@ -410,6 +447,10 @@
   },
   "setup.monitors": {
     "label": "திரைகள்"
+  },
+  "setup.ai": {
+    "label": "AI",
+    "title": "AI அமைப்பு — Maslow AI-OS"
   },
   "setup.keybindings": {
     "label": "விசைப்பிணைப்புகள்"
@@ -472,23 +513,14 @@
   "setup.default.agent.crush": {
     "label": "Crush"
   },
-  "setup.default.agent.cursor-agent": {
-    "label": "Cursor CLI"
-  },
   "setup.default.agent.grok": {
     "label": "Grok"
   },
   "setup.default.agent.hermes": {
     "label": "Hermes"
   },
-  "setup.default.agent.muse": {
-    "label": "Muse Code"
-  },
   "setup.default.agent.omp": {
     "label": "omp"
-  },
-  "setup.default.agent.openclaw": {
-    "label": "OpenClaw"
   },
   "setup.default.agent.opencode": {
     "label": "OpenCode"
@@ -1125,7 +1157,7 @@
     "label": "Phoenix"
   },
   "update.omarchy": {
-    "label": "Omarchy"
+    "label": "Maslow AI-OS"
   },
   "update.channel": {
     "label": "சேனல்"
@@ -1207,11 +1239,5 @@
   },
   "update.password.user": {
     "label": "பயனர்"
-  },
-  "system.reboot-boot-menu": {
-    "label": "துவக்க மெனுவுக்கு மறுதொடக்கம்"
-  },
-  "setup.default.agent.kimi": {
-    "label": "Kimi"
   }
 }

@@ -1,6 +1,6 @@
 # Shell Functions
 
-Maslow OS includes shell functions that simplify common tasks and encapsulate longer command sequences.
+Omarchy comes with a set of shell functions to simplify common tasks and encapsulate convoluted parameter calls.
 
 ## Compression
 

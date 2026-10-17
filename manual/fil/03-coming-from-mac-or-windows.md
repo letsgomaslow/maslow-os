@@ -32,7 +32,7 @@ Mga taga-Windows: ang iyong kasaysayan ng clipboard na Win + V ay nasa `Super + 
 | ------------- | ---------- |
 | Spotlight / Raycast / Start menu | `Super + Space` — ang menu ng Omarchy |
 | AirDrop | LocalSend, sa pamamagitan ng `Super + Ctrl + S` — tingnan ang [mga GUI](22-guis.md) |
-| Cmd + Shift + 4 / Win + Shift + S | `Print Screen` — tingnan ang [mga screenshot at pag-record](12-screenshots-recording.md) |
+| Cmd + Shift + 4 / Win + Shift + S | `Super + Shift + S` / `Print Screen` — tingnan ang [mga screenshot at pag-record](12-screenshots-recording.md) |
 | Notification Center | Kasaysayan ng notipikasyon sa `Super + Shift + Alt + ,` |
 | Time Machine (para sa sistema) | Awtomatikong [mga snapshot ng sistema](47-system-snapshots.md) sa bawat update |
 | App Store / pag-download ng installer | _I-install_ sa menu, o `omarchy pkg add` — tingnan ang [iba pang mga package](29-other-packages.md) |

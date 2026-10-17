@@ -32,7 +32,7 @@ Utenti Windows: la vostra cronologia appunti Win + V vive su `Super + Ctrl + V`,
 | ------------- | ---------- |
 | Spotlight / Raycast / menu Start | `Super + Space` — il menu Omarchy |
 | AirDrop | LocalSend, tramite `Super + Ctrl + S` — vedi [GUI](22-guis.md) |
-| Cmd + Shift + 4 / Win + Shift + S | `Print Screen` — vedi [schermate e registrazione](12-screenshots-recording.md) |
+| Cmd + Shift + 4 / Win + Shift + S | `Super + Shift + S` / `Print Screen` — vedi [schermate e registrazione](12-screenshots-recording.md) |
 | Centro Notifiche | Cronologia notifiche su `Super + Shift + Alt + ,` |
 | Time Machine (per il sistema) | [Snapshot di sistema](47-system-snapshots.md) automatici a ogni aggiornamento |
 | App Store / scaricare un installatore | _Installa_ nel menu, oppure `omarchy pkg add` — vedi [altri pacchetti](29-other-packages.md) |

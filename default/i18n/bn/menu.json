@@ -2,6 +2,12 @@
   "root": {
     "label": "যান"
   },
+  "hub": {
+    "label": "Maslow Hub"
+  },
+  "voice": {
+    "label": "Maslow Voice"
+  },
   "apps": {
     "label": "অ্যাপ"
   },
@@ -27,7 +33,7 @@
     "label": "আপডেট"
   },
   "about": {
-    "label": "সম্পর্কে"
+    "label": "Maslow AI-OS সম্পর্কে"
   },
   "system": {
     "label": "সিস্টেম"
@@ -50,6 +56,9 @@
   "system.reboot": {
     "label": "রিবুট"
   },
+  "system.reboot-boot-menu": {
+    "label": "বুট মেনুতে রিবুট"
+  },
   "system.shutdown": {
     "label": "শাটডাউন"
   },
@@ -57,7 +66,7 @@
     "label": "কিবাইন্ডিং"
   },
   "learn.omarchy": {
-    "label": "Omarchy"
+    "label": "Maslow AI-OS নির্দেশিকা"
   },
   "learn.hyprland": {
     "label": "Hyprland"
@@ -78,7 +87,10 @@
     "label": "Herdr"
   },
   "learn.community": {
-    "label": "কমিউনিটি"
+    "label": "কমিউনিটি Omarchy — ইঞ্জিন সহায়তা"
+  },
+  "learn.support": {
+    "label": "Maslow AI-OS সহায়তা"
   },
   "trigger.appearance": {
     "label": "চেহারা"
@@ -363,6 +375,9 @@
   "trigger.share.receive": {
     "label": "গ্রহণ"
   },
+  "trigger.toggle.reduced-motion": {
+    "label": "কম নড়াচড়া"
+  },
   "trigger.tests.network-speedtest": {
     "label": "নেটওয়ার্ক গতি পরীক্ষা"
   },
@@ -380,6 +395,28 @@
   },
   "style.font": {
     "label": "ফন্ট"
+  },
+  "style.font.cjk": {
+    "label": "চীনা, জাপানি, কোরীয়",
+    "title": "চীনা, জাপানি ও কোরীয় অক্ষররূপ"
+  },
+  "style.font.cjk.auto": {
+    "label": "স্বয়ংক্রিয়"
+  },
+  "style.font.cjk.jp": {
+    "label": "জাপানি"
+  },
+  "style.font.cjk.kr": {
+    "label": "কোরীয়"
+  },
+  "style.font.cjk.sc": {
+    "label": "সরলীকৃত চীনা"
+  },
+  "style.font.cjk.tc": {
+    "label": "তাইওয়ান"
+  },
+  "style.font.cjk.hk": {
+    "label": "হংকং"
   },
   "style.hyprland": {
     "label": "Hyprland"
@@ -410,6 +447,10 @@
   },
   "setup.monitors": {
     "label": "মনিটর"
+  },
+  "setup.ai": {
+    "label": "AI",
+    "title": "AI সেটআপ — Maslow AI-OS"
   },
   "setup.keybindings": {
     "label": "কিবাইন্ডিং"
@@ -472,23 +513,14 @@
   "setup.default.agent.crush": {
     "label": "Crush"
   },
-  "setup.default.agent.cursor-agent": {
-    "label": "Cursor CLI"
-  },
   "setup.default.agent.grok": {
     "label": "Grok"
   },
   "setup.default.agent.hermes": {
     "label": "Hermes"
   },
-  "setup.default.agent.muse": {
-    "label": "Muse Code"
-  },
   "setup.default.agent.omp": {
     "label": "omp"
-  },
-  "setup.default.agent.openclaw": {
-    "label": "OpenClaw"
   },
   "setup.default.agent.opencode": {
     "label": "OpenCode"
@@ -1125,7 +1157,7 @@
     "label": "Phoenix"
   },
   "update.omarchy": {
-    "label": "Omarchy"
+    "label": "Maslow AI-OS"
   },
   "update.channel": {
     "label": "চ্যানেল"
@@ -1207,11 +1239,5 @@
   },
   "update.password.user": {
     "label": "ব্যবহারকারী"
-  },
-  "system.reboot-boot-menu": {
-    "label": "বুট মেনুতে রিবুট"
-  },
-  "setup.default.agent.kimi": {
-    "label": "Kimi"
   }
 }

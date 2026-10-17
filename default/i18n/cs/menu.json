@@ -2,6 +2,12 @@
   "root": {
     "label": "Přejít"
   },
+  "hub": {
+    "label": "Maslow Hub"
+  },
+  "voice": {
+    "label": "Maslow Voice"
+  },
   "apps": {
     "label": "Aplikace"
   },
@@ -27,7 +33,7 @@
     "label": "Aktualizovat"
   },
   "about": {
-    "label": "O aplikaci"
+    "label": "O Maslow AI-OS"
   },
   "system": {
     "label": "Systém"
@@ -50,6 +56,9 @@
   "system.reboot": {
     "label": "Restartovat"
   },
+  "system.reboot-boot-menu": {
+    "label": "Restartovat do spouštěcí nabídky"
+  },
   "system.shutdown": {
     "label": "Vypnout"
   },
@@ -57,7 +66,7 @@
     "label": "Klávesové zkratky"
   },
   "learn.omarchy": {
-    "label": "Omarchy"
+    "label": "Průvodce Maslow AI-OS"
   },
   "learn.hyprland": {
     "label": "Hyprland"
@@ -78,7 +87,10 @@
     "label": "Herdr"
   },
   "learn.community": {
-    "label": "Komunita"
+    "label": "Komunita Omarchy — podpora enginu"
+  },
+  "learn.support": {
+    "label": "Podpora Maslow AI-OS"
   },
   "trigger.appearance": {
     "label": "Vzhled"
@@ -363,6 +375,9 @@
   "trigger.share.receive": {
     "label": "Přijmout"
   },
+  "trigger.toggle.reduced-motion": {
+    "label": "Omezený pohyb"
+  },
   "trigger.tests.network-speedtest": {
     "label": "Test rychlosti sítě"
   },
@@ -380,6 +395,28 @@
   },
   "style.font": {
     "label": "Písmo"
+  },
+  "style.font.cjk": {
+    "label": "Čínština, japonština, korejština",
+    "title": "Čínské, japonské a korejské glyfy"
+  },
+  "style.font.cjk.auto": {
+    "label": "Automaticky"
+  },
+  "style.font.cjk.jp": {
+    "label": "Japonština"
+  },
+  "style.font.cjk.kr": {
+    "label": "Korejština"
+  },
+  "style.font.cjk.sc": {
+    "label": "Zjednodušená čínština"
+  },
+  "style.font.cjk.tc": {
+    "label": "Tchaj-wan"
+  },
+  "style.font.cjk.hk": {
+    "label": "Hongkong"
   },
   "style.hyprland": {
     "label": "Hyprland"
@@ -410,6 +447,10 @@
   },
   "setup.monitors": {
     "label": "Monitory"
+  },
+  "setup.ai": {
+    "label": "AI",
+    "title": "Nastavení AI — Maslow AI-OS"
   },
   "setup.keybindings": {
     "label": "Klávesové zkratky"
@@ -472,23 +513,14 @@
   "setup.default.agent.crush": {
     "label": "Crush"
   },
-  "setup.default.agent.cursor-agent": {
-    "label": "Cursor CLI"
-  },
   "setup.default.agent.grok": {
     "label": "Grok"
   },
   "setup.default.agent.hermes": {
     "label": "Hermes"
   },
-  "setup.default.agent.muse": {
-    "label": "Muse Code"
-  },
   "setup.default.agent.omp": {
     "label": "omp"
-  },
-  "setup.default.agent.openclaw": {
-    "label": "OpenClaw"
   },
   "setup.default.agent.opencode": {
     "label": "OpenCode"
@@ -1125,7 +1157,7 @@
     "label": "Phoenix"
   },
   "update.omarchy": {
-    "label": "Omarchy"
+    "label": "Maslow AI-OS"
   },
   "update.channel": {
     "label": "Kanál"
@@ -1207,11 +1239,5 @@
   },
   "update.password.user": {
     "label": "Uživatel"
-  },
-  "system.reboot-boot-menu": {
-    "label": "Restartovat do spouštěcí nabídky"
-  },
-  "setup.default.agent.kimi": {
-    "label": "Kimi"
   }
 }

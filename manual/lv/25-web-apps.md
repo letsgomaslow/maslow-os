@@ -48,7 +48,7 @@ WhatsApp varat palaist ar `Super + Shift + Alt + G`.
 
 Kā tīmekļa lietotnes ir iekļautas arī Google Messages, Google Photos, Google Maps un Google Contacts.
 
-Google Messages varat palaist ar `Super + Shift + Ctrl + G`, Google Photos — ar `Super + Shift + P`, bet Google Maps — ar `Super + Shift + S`. Google Contacts ir pieejams lietotņu palaidējā (`Super + Space`).
+Google Messages varat palaist ar `Super + Shift + Ctrl + G`, Google Photos — ar `Super + Shift + P`, bet Google Maps — ar `Super + Shift + Alt + S`. Google Contacts ir pieejams lietotņu palaidējā (`Super + Space`).
 
 ## X
 

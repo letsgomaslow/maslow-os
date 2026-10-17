@@ -32,7 +32,7 @@ Windows-mensen: je Win + V-klembordgeschiedenis leeft op `Super + Ctrl + V`, en 
 | ------------- | ---------- |
 | Spotlight / Raycast / Startmenu | `Super + Space` — het Omarchy-menu |
 | AirDrop | LocalSend, via `Super + Ctrl + S` — zie [GUIs](22-guis.md) |
-| Cmd + Shift + 4 / Win + Shift + S | `Print Screen` — zie [schermafbeeldingen & opname](12-screenshots-recording.md) |
+| Cmd + Shift + 4 / Win + Shift + S | `Super + Shift + S` / `Print Screen` — zie [schermafbeeldingen & opname](12-screenshots-recording.md) |
 | Berichtencentrum | Meldingsgeschiedenis op `Super + Shift + Alt + ,` |
 | Time Machine (voor het systeem) | Automatische [systeemsnapshots](47-system-snapshots.md) bij elke update |
 | App Store / een installatieprogramma downloaden | _Installeren_ in het menu, of `omarchy pkg add` — zie [andere pakketten](29-other-packages.md) |

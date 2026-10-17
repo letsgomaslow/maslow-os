@@ -2,6 +2,12 @@
   "root": {
     "label": "Đi"
   },
+  "hub": {
+    "label": "Maslow Hub"
+  },
+  "voice": {
+    "label": "Maslow Voice"
+  },
   "apps": {
     "label": "Ứng dụng"
   },
@@ -27,7 +33,7 @@
     "label": "Cập nhật"
   },
   "about": {
-    "label": "Giới thiệu"
+    "label": "Giới thiệu Maslow AI-OS"
   },
   "system": {
     "label": "Hệ thống"
@@ -50,6 +56,9 @@
   "system.reboot": {
     "label": "Khởi động lại"
   },
+  "system.reboot-boot-menu": {
+    "label": "Khởi động lại vào Boot Menu"
+  },
   "system.shutdown": {
     "label": "Tắt máy"
   },
@@ -57,7 +66,7 @@
     "label": "Phím tắt"
   },
   "learn.omarchy": {
-    "label": "Omarchy"
+    "label": "Hướng dẫn Maslow AI-OS"
   },
   "learn.hyprland": {
     "label": "Hyprland"
@@ -78,7 +87,10 @@
     "label": "Herdr"
   },
   "learn.community": {
-    "label": "Cộng đồng"
+    "label": "Cộng đồng Omarchy — hỗ trợ bộ máy"
+  },
+  "learn.support": {
+    "label": "Hỗ trợ Maslow AI-OS"
   },
   "trigger.appearance": {
     "label": "Giao diện"
@@ -363,6 +375,9 @@
   "trigger.share.receive": {
     "label": "Nhận"
   },
+  "trigger.toggle.reduced-motion": {
+    "label": "Giảm chuyển động"
+  },
   "trigger.tests.network-speedtest": {
     "label": "Kiểm tra tốc độ mạng"
   },
@@ -380,6 +395,28 @@
   },
   "style.font": {
     "label": "Phông chữ"
+  },
+  "style.font.cjk": {
+    "label": "Tiếng Trung, Nhật, Hàn",
+    "title": "Kiểu chữ Trung, Nhật và Hàn"
+  },
+  "style.font.cjk.auto": {
+    "label": "Tự động"
+  },
+  "style.font.cjk.jp": {
+    "label": "Tiếng Nhật"
+  },
+  "style.font.cjk.kr": {
+    "label": "Tiếng Hàn"
+  },
+  "style.font.cjk.sc": {
+    "label": "Tiếng Trung giản thể"
+  },
+  "style.font.cjk.tc": {
+    "label": "Đài Loan"
+  },
+  "style.font.cjk.hk": {
+    "label": "Hồng Kông"
   },
   "style.hyprland": {
     "label": "Hyprland"
@@ -410,6 +447,10 @@
   },
   "setup.monitors": {
     "label": "Màn hình"
+  },
+  "setup.ai": {
+    "label": "AI",
+    "title": "Thiết lập AI — Maslow AI-OS"
   },
   "setup.keybindings": {
     "label": "Phím tắt"
@@ -472,23 +513,14 @@
   "setup.default.agent.crush": {
     "label": "Crush"
   },
-  "setup.default.agent.cursor-agent": {
-    "label": "Cursor CLI"
-  },
   "setup.default.agent.grok": {
     "label": "Grok"
   },
   "setup.default.agent.hermes": {
     "label": "Hermes"
   },
-  "setup.default.agent.muse": {
-    "label": "Muse Code"
-  },
   "setup.default.agent.omp": {
     "label": "omp"
-  },
-  "setup.default.agent.openclaw": {
-    "label": "OpenClaw"
   },
   "setup.default.agent.opencode": {
     "label": "OpenCode"
@@ -1125,7 +1157,7 @@
     "label": "Phoenix"
   },
   "update.omarchy": {
-    "label": "Omarchy"
+    "label": "Maslow AI-OS"
   },
   "update.channel": {
     "label": "Kênh"
@@ -1207,11 +1239,5 @@
   },
   "update.password.user": {
     "label": "Người dùng"
-  },
-  "system.reboot-boot-menu": {
-    "label": "Khởi động lại vào Boot Menu"
-  },
-  "setup.default.agent.kimi": {
-    "label": "Kimi"
   }
 }

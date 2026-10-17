@@ -2,6 +2,12 @@
   "root": {
     "label": "Kreni"
   },
+  "hub": {
+    "label": "Maslow Hub"
+  },
+  "voice": {
+    "label": "Maslow Voice"
+  },
   "apps": {
     "label": "Aplikacije"
   },
@@ -27,7 +33,7 @@
     "label": "Ažuriraj"
   },
   "about": {
-    "label": "O programu"
+    "label": "O sustavu Maslow AI-OS"
   },
   "system": {
     "label": "Sustav"
@@ -50,6 +56,9 @@
   "system.reboot": {
     "label": "Ponovno pokreni"
   },
+  "system.reboot-boot-menu": {
+    "label": "Ponovno pokreni u izbornik pokretanja"
+  },
   "system.shutdown": {
     "label": "Isključi"
   },
@@ -57,7 +66,7 @@
     "label": "Prečaci"
   },
   "learn.omarchy": {
-    "label": "Omarchy"
+    "label": "Vodič za Maslow AI-OS"
   },
   "learn.hyprland": {
     "label": "Hyprland"
@@ -78,7 +87,10 @@
     "label": "Herdr"
   },
   "learn.community": {
-    "label": "Zajednica"
+    "label": "Zajednica Omarchy — podrška za jezgru"
+  },
+  "learn.support": {
+    "label": "Podrška za Maslow AI-OS"
   },
   "trigger.appearance": {
     "label": "Izgled"
@@ -363,6 +375,9 @@
   "trigger.share.receive": {
     "label": "Primi"
   },
+  "trigger.toggle.reduced-motion": {
+    "label": "Smanjeno kretanje"
+  },
   "trigger.tests.network-speedtest": {
     "label": "Test brzine mreže"
   },
@@ -380,6 +395,28 @@
   },
   "style.font": {
     "label": "Font"
+  },
+  "style.font.cjk": {
+    "label": "Kineski, japanski, korejski",
+    "title": "Kineski, japanski i korejski glifovi"
+  },
+  "style.font.cjk.auto": {
+    "label": "Automatski"
+  },
+  "style.font.cjk.jp": {
+    "label": "Japanski"
+  },
+  "style.font.cjk.kr": {
+    "label": "Korejski"
+  },
+  "style.font.cjk.sc": {
+    "label": "Pojednostavljeni kineski"
+  },
+  "style.font.cjk.tc": {
+    "label": "Tajvan"
+  },
+  "style.font.cjk.hk": {
+    "label": "Hong Kong"
   },
   "style.hyprland": {
     "label": "Hyprland"
@@ -410,6 +447,10 @@
   },
   "setup.monitors": {
     "label": "Monitori"
+  },
+  "setup.ai": {
+    "label": "AI",
+    "title": "Postavljanje umjetne inteligencije — Maslow AI-OS"
   },
   "setup.keybindings": {
     "label": "Prečaci"
@@ -472,23 +513,14 @@
   "setup.default.agent.crush": {
     "label": "Crush"
   },
-  "setup.default.agent.cursor-agent": {
-    "label": "Cursor CLI"
-  },
   "setup.default.agent.grok": {
     "label": "Grok"
   },
   "setup.default.agent.hermes": {
     "label": "Hermes"
   },
-  "setup.default.agent.muse": {
-    "label": "Muse Code"
-  },
   "setup.default.agent.omp": {
     "label": "omp"
-  },
-  "setup.default.agent.openclaw": {
-    "label": "OpenClaw"
   },
   "setup.default.agent.opencode": {
     "label": "OpenCode"
@@ -1125,7 +1157,7 @@
     "label": "Phoenix"
   },
   "update.omarchy": {
-    "label": "Omarchy"
+    "label": "Maslow AI-OS"
   },
   "update.channel": {
     "label": "Kanal"
@@ -1207,11 +1239,5 @@
   },
   "update.password.user": {
     "label": "Korisnik"
-  },
-  "system.reboot-boot-menu": {
-    "label": "Ponovno pokreni u izbornik pokretanja"
-  },
-  "setup.default.agent.kimi": {
-    "label": "Kimi"
   }
 }

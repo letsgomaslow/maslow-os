@@ -2,6 +2,12 @@
   "root": {
     "label": "Oʻtish"
   },
+  "hub": {
+    "label": "Maslow Hub"
+  },
+  "voice": {
+    "label": "Maslow Voice"
+  },
   "apps": {
     "label": "Ilovalar"
   },
@@ -27,7 +33,7 @@
     "label": "Yangilash"
   },
   "about": {
-    "label": "Haqida"
+    "label": "Maslow AI-OS haqida"
   },
   "system": {
     "label": "Tizim"
@@ -50,6 +56,9 @@
   "system.reboot": {
     "label": "Qayta yuklash"
   },
+  "system.reboot-boot-menu": {
+    "label": "Yuklanish menyusiga qayta yuklash"
+  },
   "system.shutdown": {
     "label": "Oʻchirish"
   },
@@ -57,7 +66,7 @@
     "label": "Tugmalar birikmasi"
   },
   "learn.omarchy": {
-    "label": "Omarchy"
+    "label": "Maslow AI-OS qoʻllanmasi"
   },
   "learn.hyprland": {
     "label": "Hyprland"
@@ -78,7 +87,10 @@
     "label": "Herdr"
   },
   "learn.community": {
-    "label": "Hamjamiyat"
+    "label": "Hamjamiyat Omarchy — mexanizm yordami"
+  },
+  "learn.support": {
+    "label": "Maslow AI-OS yordami"
   },
   "trigger.appearance": {
     "label": "Koʻrinish"
@@ -363,6 +375,9 @@
   "trigger.share.receive": {
     "label": "Qabul qilish"
   },
+  "trigger.toggle.reduced-motion": {
+    "label": "Kamaytirilgan harakat"
+  },
   "trigger.tests.network-speedtest": {
     "label": "Tarmoq tezligi testi"
   },
@@ -380,6 +395,28 @@
   },
   "style.font": {
     "label": "Shrift"
+  },
+  "style.font.cjk": {
+    "label": "Xitoycha, yaponcha, koreyscha",
+    "title": "Xitoy, yapon va koreys gliflari"
+  },
+  "style.font.cjk.auto": {
+    "label": "Avtomatik"
+  },
+  "style.font.cjk.jp": {
+    "label": "Yaponcha"
+  },
+  "style.font.cjk.kr": {
+    "label": "Koreyscha"
+  },
+  "style.font.cjk.sc": {
+    "label": "Soddalashtirilgan xitoycha"
+  },
+  "style.font.cjk.tc": {
+    "label": "Tayvan"
+  },
+  "style.font.cjk.hk": {
+    "label": "Gonkong"
   },
   "style.hyprland": {
     "label": "Hyprland"
@@ -410,6 +447,10 @@
   },
   "setup.monitors": {
     "label": "Monitorlar"
+  },
+  "setup.ai": {
+    "label": "AI",
+    "title": "Sunʼiy intellektni sozlash — Maslow AI-OS"
   },
   "setup.keybindings": {
     "label": "Tugmalar birikmasi"
@@ -472,23 +513,14 @@
   "setup.default.agent.crush": {
     "label": "Crush"
   },
-  "setup.default.agent.cursor-agent": {
-    "label": "Cursor CLI"
-  },
   "setup.default.agent.grok": {
     "label": "Grok"
   },
   "setup.default.agent.hermes": {
     "label": "Hermes"
   },
-  "setup.default.agent.muse": {
-    "label": "Muse Code"
-  },
   "setup.default.agent.omp": {
     "label": "omp"
-  },
-  "setup.default.agent.openclaw": {
-    "label": "OpenClaw"
   },
   "setup.default.agent.opencode": {
     "label": "OpenCode"
@@ -1125,7 +1157,7 @@
     "label": "Phoenix"
   },
   "update.omarchy": {
-    "label": "Omarchy"
+    "label": "Maslow AI-OS"
   },
   "update.channel": {
     "label": "Kanal"
@@ -1207,11 +1239,5 @@
   },
   "update.password.user": {
     "label": "Foydalanuvchi"
-  },
-  "system.reboot-boot-menu": {
-    "label": "Yuklanish menyusiga qayta yuklash"
-  },
-  "setup.default.agent.kimi": {
-    "label": "Kimi"
   }
 }

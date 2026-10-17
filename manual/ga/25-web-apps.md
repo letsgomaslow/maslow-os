@@ -48,7 +48,7 @@ Is féidir leat WhatsApp a thosú trí `Super + Shift + Alt + G` a úsáid.
 
 Tá Google Messages, Google Photos, Google Maps, agus Google Contacts uile san áireamh mar aipeanna gréasáin freisin.
 
-Is féidir leat Google Messages a thosú trí `Super + Shift + Ctrl + G` a úsáid, Google Photos trí `Super + Shift + P` a úsáid, agus Google Maps trí `Super + Shift + S` a úsáid. Tá Google Contacts ar fáil tríd an lainseálaí aipeanna (`Super + Space`).
+Is féidir leat Google Messages a thosú trí `Super + Shift + Ctrl + G` a úsáid, Google Photos trí `Super + Shift + P` a úsáid, agus Google Maps trí `Super + Shift + Alt + S` a úsáid. Tá Google Contacts ar fáil tríd an lainseálaí aipeanna (`Super + Space`).
 
 ## X
 

@@ -32,7 +32,7 @@ Na Macu ste mali Cmd + C všade. Vo Windowse ste mali Ctrl + C všade — okrem 
 | ------------- | ---------- |
 | Spotlight / Raycast / ponuka Štart | `Super + Space` — menu Omarchy |
 | AirDrop | LocalSend, cez `Super + Ctrl + S` — pozrite si [GUI](22-guis.md) |
-| Cmd + Shift + 4 / Win + Shift + S | `Print Screen` — pozrite si [snímky obrazovky a nahrávanie](12-screenshots-recording.md) |
+| Cmd + Shift + 4 / Win + Shift + S | `Super + Shift + S` / `Print Screen` — pozrite si [snímky obrazovky a nahrávanie](12-screenshots-recording.md) |
 | Centrum upozornení | História upozornení na `Super + Shift + Alt + ,` |
 | Time Machine (pre systém) | Automatické [snímky systému](47-system-snapshots.md) pri každej aktualizácii |
 | App Store / sťahovanie inštalátora | _Inštalovať_ v menu alebo `omarchy pkg add` — pozrite si [ďalšie balíčky](29-other-packages.md) |

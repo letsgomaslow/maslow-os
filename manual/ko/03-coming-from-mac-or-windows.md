@@ -32,7 +32,7 @@ Windows 사용자 여러분: Win + V 클립보드 히스토리는 `Super + Ctrl 
 | ------------- | ---------- |
 | Spotlight / Raycast / 시작 메뉴 | `Super + Space` — Omarchy 메뉴 |
 | AirDrop | `Super + Ctrl + S`를 통한 LocalSend — [GUI](22-guis.md) 참조 |
-| Cmd + Shift + 4 / Win + Shift + S | `Print Screen` — [스크린샷 및 녹화](12-screenshots-recording.md) 참조 |
+| Cmd + Shift + 4 / Win + Shift + S | `Super + Shift + S` / `Print Screen` — [스크린샷 및 녹화](12-screenshots-recording.md) 참조 |
 | 알림 센터 | `Super + Shift + Alt + ,`의 알림 히스토리 |
 | Time Machine(시스템용) | 모든 업데이트 때 자동 [시스템 스냅샷](47-system-snapshots.md) |
 | App Store / 설치 프로그램 다운로드 | 메뉴의 _설치_, 또는 `omarchy pkg add` — [기타 패키지](29-other-packages.md) 참조 |

@@ -48,7 +48,7 @@ Du kan starta WhatsApp med `Super + Shift + Alt + G`.
 
 Google Messages, Google Photos, Google Maps och Google Contacts är också inkluderade som webbappar.
 
-Du kan starta Google Messages med `Super + Shift + Ctrl + G`, Google Photos med `Super + Shift + P` och Google Maps med `Super + Shift + S`. Google Contacts finns tillgängligt via app-launchern (`Super + Space`).
+Du kan starta Google Messages med `Super + Shift + Ctrl + G`, Google Photos med `Super + Shift + P` och Google Maps med `Super + Shift + Alt + S`. Google Contacts finns tillgängligt via app-launchern (`Super + Space`).
 
 ## X
 

@@ -32,7 +32,7 @@ Windows の方：Win + V のクリップボード履歴は `Super + Ctrl + V` �
 | ------------- | ---------- |
 | Spotlight / Raycast / スタートメニュー | `Super + Space` — Omarchy メニュー |
 | AirDrop | LocalSend、`Super + Ctrl + S` 経由 — [GUI](22-guis.md) を参照 |
-| Cmd + Shift + 4 / Win + Shift + S | `Print Screen` — [スクリーンショットと録画](12-screenshots-recording.md) を参照 |
+| Cmd + Shift + 4 / Win + Shift + S | `Super + Shift + S` / `Print Screen` — [スクリーンショットと録画](12-screenshots-recording.md) を参照 |
 | 通知センター | `Super + Shift + Alt + ,` の通知履歴 |
 | Time Machine（システム用） | 更新ごとの自動 [システムスナップショット](47-system-snapshots.md) |
 | App Store / インストーラーのダウンロード | メニューの _インストール_、または `omarchy pkg add` — [その他のパッケージ](29-other-packages.md) を参照 |

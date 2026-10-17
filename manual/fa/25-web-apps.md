@@ -48,7 +48,7 @@
 
 Google Messages، Google Photos، Google Maps و Google Contacts همه به‌عنوان برنامه وب هم گنجانده شده‌اند.
 
-می‌توانید Google Messages را با استفاده از `Super + Shift + Ctrl + G`، Google Photos را با استفاده از `Super + Shift + P`، و Google Maps را با استفاده از `Super + Shift + S` شروع کنید. Google Contacts از طریق اجراکننده برنامه (`Super + Space`) در دسترس است.
+می‌توانید Google Messages را با استفاده از `Super + Shift + Ctrl + G`، Google Photos را با استفاده از `Super + Shift + P`، و Google Maps را با استفاده از `Super + Shift + Alt + S` شروع کنید. Google Contacts از طریق اجراکننده برنامه (`Super + Space`) در دسترس است.
 
 ## X
 

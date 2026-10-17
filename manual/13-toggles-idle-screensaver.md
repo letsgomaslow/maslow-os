@@ -1,10 +1,10 @@
 # Toggles, Idle & the Screensaver
 
-A lot of what you change day to day isn't really a setting. It's a mode you flip on for an hour and off again: night light while you're working late, do not disturb while you're presenting, or stay awake while you're watching something. Maslow OS calls these toggles, and each one uses the same underlying switch whether you choose a hotkey, menu entry, or command.
+A lot of what you change day to day isn't really a setting. It's a mode you flip on for an hour and off again: night light while you're working late, do not disturb while you're presenting, stay awake while you're watching something. Omarchy calls those toggles, and they all work the same way — a hotkey, a menu entry, and a command, all hitting the same switch.
 
 ### The toggle menu
 
-`Super + Ctrl + O` opens _Trigger > Toggle_ directly, or you can walk there from the Maslow OS menu (`Super + Space`). Everything in that list is a switch you can flip without thinking about where the state lives.
+`Super + Ctrl + O` opens _Trigger > Toggle_ directly, or you can walk there from the Omarchy menu (`Super + Space`). Everything in that list is a switch you can flip without thinking about where the state lives. Switches for how the desktop looks sit next to it, under _Trigger > Appearance_.
 
 From the terminal, the same switches are `omarchy toggle <thing>`. Run `omarchy toggle` on its own to see the whole group.
 
@@ -15,6 +15,7 @@ From the terminal, the same switches are `omarchy toggle <thing>`. Run `omarchy 
 | Stay awake (no idle lock) | `Super + Ctrl + I` | `omarchy toggle idle` |
 | Crash capture | — | `omarchy toggle crash-capture` |
 | Screensaver | — | `omarchy toggle screensaver` |
+| [Herdr](https://herdr.dev) theme sync | — | `omarchy toggle theme sync` |
 | Menu bar | `Super + Shift + Space` | `omarchy toggle bar` |
 | Touchpad | `XF86TouchpadToggle` | `omarchy toggle touchpad` |
 | Touchscreen | — | `omarchy toggle touchscreen` |
@@ -23,7 +24,7 @@ From the terminal, the same switches are `omarchy toggle <thing>`. Run `omarchy 
 
 The touchpad, touchscreen, and hybrid GPU switches live under _Trigger > Hardware_ (`Super + Ctrl + H`) rather than under Toggle, since they only show up when you actually have that hardware. The touchpad and touchscreen ones survive a Hyprland reload — the disabled device's name is saved to a small state file that Hyprland reads on startup to disable it again.
 
-The Toggle menu also carries a few things that aren't `omarchy toggle` commands but behave the same: battery percentage in the bar, workspace layout (`Super + L`), window gaps (`Super + Shift + Backspace`), and the 1-window square aspect (`Super + Ctrl + Backspace`).
+_Trigger > Appearance_ holds the menu bar and animations, plus a few things that aren't `omarchy toggle` commands but behave the same: battery percentage in the bar, the default workspace layout, window gaps (`Super + Shift + Backspace`), and the 1-window square aspect (`Super + Ctrl + Backspace`).
 
 Most of these are just a flag file under `~/.local/state/omarchy/toggles/`. If you want to branch on one in a script, `omarchy-toggle-enabled` gives you an exit code instead of making you go looking:
 
@@ -37,7 +38,7 @@ The flags are named for the off state — `screensaver-off`, `suspend-off`, `bar
 
 When a mode is on, you get a small glyph in the middle of the top bar next to the clock. That's the indicators widget, and it carries dictation, screen recording, pending reminders, night light, do not disturb, and stay awake.
 
-Inactive indicators are hidden. Hover the area around them and they fade in dimmed, so you can click one to turn it on without knowing its hotkey. Clicking an active one turns it back off. If you'd rather see all of them all the time, set `alwaysShow` to `true` on the `omarchy.indicators` entry in `~/.config/omarchy/shell.json` — see [the top bar](05-the-top-bar.md) for how bar widgets are configured.
+Inactive indicators are hidden. Hover anywhere on the bar and they fade in dimmed, so you can click one to turn it on without knowing its hotkey. Clicking an active one turns it back off. If you'd rather see all of them all the time, set `alwaysShow` to `true` on the `omarchy.indicators` entry in `~/.config/omarchy/shell.json` — see [the top bar](05-the-top-bar.md) for how bar widgets are configured.
 
 ### Night light
 
@@ -60,7 +61,7 @@ Then start hyprsunset at login by adding `o.launch_on_start("hyprsunset")` to `~
 
 Nothing is lost, though. A silenced notification is written straight into your notification history, which is exactly the record you want when you come back and wonder what you missed. Open it with `Super + Shift + Alt + ,`. See [notices](10-notices.md) for the rest of the notification story.
 
-Two kinds of message still get through: Maslow OS confirmation toasts for something you just did ("Theme changed", "Screenshot saved"), and critical alerts sent from the command line. Chat apps that mark everything critical to force their way in front of you don't qualify.
+Two kinds of message still get through: Omarchy's own confirmation toasts for something you just did ("Theme changed", "Screenshot saved"), and critical alerts sent from the command line. Chat apps that mark everything critical to force their way in front of you don't qualify.
 
 ### Idle
 
@@ -86,7 +87,7 @@ This is about locking and the screensaver, not power. Suspend and hibernation ha
 
 ### The screensaver
 
-The Maslow OS screensaver is ASCII art running through random text effects, one instance per monitor. Any key or mouse movement exits it.
+Omarchy's screensaver is ASCII art running through random text effects, one instance per monitor. Any key or mouse movement exits it.
 
 You can start it on demand from _System > Screensaver_ (`Super + Esc`), which forces it up even if you've turned the idle screensaver off. There's no hotkey bound to it by default.
 

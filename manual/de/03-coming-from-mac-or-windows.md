@@ -32,7 +32,7 @@ Windows-Nutzer: Euer Win + V-Zwischenablageverlauf liegt auf `Super + Ctrl + V` 
 | ------------- | ---------- |
 | Spotlight / Raycast / Startmenü | `Super + Space` — das Omarchy-Menü |
 | AirDrop | LocalSend, über `Super + Ctrl + S` — siehe [GUIs](22-guis.md) |
-| Cmd + Shift + 4 / Win + Shift + S | `Print Screen` — siehe [Screenshots & Aufnahme](12-screenshots-recording.md) |
+| Cmd + Shift + 4 / Win + Shift + S | `Super + Shift + S` / `Print Screen` — siehe [Screenshots & Aufnahme](12-screenshots-recording.md) |
 | Mitteilungszentrale | Benachrichtigungsverlauf auf `Super + Shift + Alt + ,` |
 | Time Machine (für das System) | Automatische [System-Snapshots](47-system-snapshots.md) bei jeder Aktualisierung |
 | App Store / einen Installer herunterladen | _Installieren_ im Menü oder `omarchy pkg add` — siehe [andere Pakete](29-other-packages.md) |

@@ -2,6 +2,12 @@
   "root": {
     "label": "Siirry"
   },
+  "hub": {
+    "label": "Maslow Hub"
+  },
+  "voice": {
+    "label": "Maslow Voice"
+  },
   "apps": {
     "label": "Sovellukset"
   },
@@ -27,7 +33,7 @@
     "label": "Päivitä"
   },
   "about": {
-    "label": "Tietoja"
+    "label": "Tietoja Maslow AI-OS:stä"
   },
   "system": {
     "label": "Järjestelmä"
@@ -50,6 +56,9 @@
   "system.reboot": {
     "label": "Käynnistä uudelleen"
   },
+  "system.reboot-boot-menu": {
+    "label": "Käynnistä uudelleen käynnistysvalikkoon"
+  },
   "system.shutdown": {
     "label": "Sammuta"
   },
@@ -57,7 +66,7 @@
     "label": "Pikanäppäimet"
   },
   "learn.omarchy": {
-    "label": "Omarchy"
+    "label": "Maslow AI-OS:n opas"
   },
   "learn.hyprland": {
     "label": "Hyprland"
@@ -78,7 +87,10 @@
     "label": "Herdr"
   },
   "learn.community": {
-    "label": "Yhteisö"
+    "label": "Yhteisö Omarchy — moottorin tuki"
+  },
+  "learn.support": {
+    "label": "Maslow AI-OS:n tuki"
   },
   "trigger.appearance": {
     "label": "Ulkoasu"
@@ -363,6 +375,9 @@
   "trigger.share.receive": {
     "label": "Vastaanota"
   },
+  "trigger.toggle.reduced-motion": {
+    "label": "Vähennetty liike"
+  },
   "trigger.tests.network-speedtest": {
     "label": "Verkon nopeustesti"
   },
@@ -380,6 +395,28 @@
   },
   "style.font": {
     "label": "Fontti"
+  },
+  "style.font.cjk": {
+    "label": "Kiina, japani, korea",
+    "title": "Kiinalaiset, japanilaiset ja korealaiset merkkimuodot"
+  },
+  "style.font.cjk.auto": {
+    "label": "Automaattinen"
+  },
+  "style.font.cjk.jp": {
+    "label": "Japani"
+  },
+  "style.font.cjk.kr": {
+    "label": "Korea"
+  },
+  "style.font.cjk.sc": {
+    "label": "Yksinkertaistettu kiina"
+  },
+  "style.font.cjk.tc": {
+    "label": "Taiwan"
+  },
+  "style.font.cjk.hk": {
+    "label": "Hongkong"
   },
   "style.hyprland": {
     "label": "Hyprland"
@@ -410,6 +447,10 @@
   },
   "setup.monitors": {
     "label": "Näytöt"
+  },
+  "setup.ai": {
+    "label": "AI",
+    "title": "Tekoälyn asetukset — Maslow AI-OS"
   },
   "setup.keybindings": {
     "label": "Pikanäppäimet"
@@ -472,23 +513,14 @@
   "setup.default.agent.crush": {
     "label": "Crush"
   },
-  "setup.default.agent.cursor-agent": {
-    "label": "Cursor CLI"
-  },
   "setup.default.agent.grok": {
     "label": "Grok"
   },
   "setup.default.agent.hermes": {
     "label": "Hermes"
   },
-  "setup.default.agent.muse": {
-    "label": "Muse Code"
-  },
   "setup.default.agent.omp": {
     "label": "omp"
-  },
-  "setup.default.agent.openclaw": {
-    "label": "OpenClaw"
   },
   "setup.default.agent.opencode": {
     "label": "OpenCode"
@@ -1125,7 +1157,7 @@
     "label": "Phoenix"
   },
   "update.omarchy": {
-    "label": "Omarchy"
+    "label": "Maslow AI-OS"
   },
   "update.channel": {
     "label": "Kanava"
@@ -1207,11 +1239,5 @@
   },
   "update.password.user": {
     "label": "Käyttäjä"
-  },
-  "system.reboot-boot-menu": {
-    "label": "Käynnistä uudelleen käynnistysvalikkoon"
-  },
-  "setup.default.agent.kimi": {
-    "label": "Kimi"
   }
 }

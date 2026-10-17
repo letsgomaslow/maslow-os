@@ -32,7 +32,7 @@ Windows ব্যবহারকারীদের জন্য: আপনার
 | ------------- | ---------- |
 | Spotlight / Raycast / Start menu | `Super + Space` — Omarchy মেনু |
 | AirDrop | LocalSend, `Super + Ctrl + S` দিয়ে — দেখুন [GUI](22-guis.md) |
-| Cmd + Shift + 4 / Win + Shift + S | `Print Screen` — দেখুন [স্ক্রিনশট ও রেকর্ডিং](12-screenshots-recording.md) |
+| Cmd + Shift + 4 / Win + Shift + S | `Super + Shift + S` / `Print Screen` — দেখুন [স্ক্রিনশট ও রেকর্ডিং](12-screenshots-recording.md) |
 | Notification Center | বিজ্ঞপ্তির ইতিহাস, `Super + Shift + Alt + ,`-তে |
 | Time Machine (সিস্টেমের জন্য) | প্রতিটি আপডেটে স্বয়ংক্রিয় [সিস্টেম স্ন্যাপশট](47-system-snapshots.md) |
 | App Store / ইনস্টলার ডাউনলোড করা | মেনুতে _ইনস্টল_, অথবা `omarchy pkg add` — দেখুন [অন্যান্য প্যাকেজ](29-other-packages.md) |

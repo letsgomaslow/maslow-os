@@ -48,7 +48,7 @@ WhatsApp ви можете запустити натисканням `Super + Sh
 
 Google Messages, Google Photos, Google Maps і Google Contacts також усі входять як вебзастосунки.
 
-Google Messages ви можете запустити натисканням `Super + Shift + Ctrl + G`, Google Photos — натисканням `Super + Shift + P`, а Google Maps — натисканням `Super + Shift + S`. Google Contacts доступний через запускач застосунків (`Super + Space`).
+Google Messages ви можете запустити натисканням `Super + Shift + Ctrl + G`, Google Photos — натисканням `Super + Shift + P`, а Google Maps — натисканням `Super + Shift + Alt + S`. Google Contacts доступний через запускач застосунків (`Super + Space`).
 
 ## X
 

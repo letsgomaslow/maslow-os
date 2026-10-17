@@ -32,7 +32,7 @@
 | ------------- | ---------- |
 | Spotlight / Raycast / قائمة ابدأ | `Super + Space` — قائمة Omarchy |
 | AirDrop | LocalSend، عبر `Super + Ctrl + S` — راجع [GUIs](22-guis.md) |
-| Cmd + Shift + 4 / Win + Shift + S | `Print Screen` — راجع [لقطات الشاشة والتسجيل](12-screenshots-recording.md) |
+| Cmd + Shift + 4 / Win + Shift + S | `Super + Shift + S` / `Print Screen` — راجع [لقطات الشاشة والتسجيل](12-screenshots-recording.md) |
 | مركز الإشعارات | سجل الإشعارات على `Super + Shift + Alt + ,` |
 | Time Machine (للنظام) | [لقطات نظام](47-system-snapshots.md) تلقائية عند كل تحديث |
 | App Store / تنزيل مثبّت | _تثبيت_ في القائمة، أو `omarchy pkg add` — راجع [حزم أخرى](29-other-packages.md) |

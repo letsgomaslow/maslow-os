@@ -48,7 +48,7 @@ Omarchy 메뉴(`Super + Space`)의 _설치 > 웹 앱_을 사용해 자체 웹 �
 
 Google Messages, Google Photos, Google Maps, Google Contacts도 모두 웹 앱으로 포함되어 있습니다.
 
-`Super + Shift + Ctrl + G`로 Google Messages를, `Super + Shift + P`로 Google Photos를, `Super + Shift + S`로 Google Maps를 시작할 수 있습니다. Google Contacts는 앱 실행 프로그램(`Super + Space`)을 통해 사용할 수 있습니다.
+`Super + Shift + Ctrl + G`로 Google Messages를, `Super + Shift + P`로 Google Photos를, `Super + Shift + Alt + S`로 Google Maps를 시작할 수 있습니다. Google Contacts는 앱 실행 프로그램(`Super + Space`)을 통해 사용할 수 있습니다.
 
 ## X
 

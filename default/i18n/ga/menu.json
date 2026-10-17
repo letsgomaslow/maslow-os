@@ -2,6 +2,12 @@
   "root": {
     "label": "Téigh"
   },
+  "hub": {
+    "label": "Maslow Hub"
+  },
+  "voice": {
+    "label": "Maslow Voice"
+  },
   "apps": {
     "label": "Aipeanna"
   },
@@ -27,7 +33,7 @@
     "label": "Nuashonraigh"
   },
   "about": {
-    "label": "Faisnéis"
+    "label": "Maidir le Maslow AI-OS"
   },
   "system": {
     "label": "Córas"
@@ -50,6 +56,9 @@
   "system.reboot": {
     "label": "Atosaigh"
   },
+  "system.reboot-boot-menu": {
+    "label": "Atosaigh go roghchlár tosaithe"
+  },
   "system.shutdown": {
     "label": "Múch"
   },
@@ -57,7 +66,7 @@
     "label": "Naisc eochrach"
   },
   "learn.omarchy": {
-    "label": "Omarchy"
+    "label": "Treoir Maslow AI-OS"
   },
   "learn.hyprland": {
     "label": "Hyprland"
@@ -78,7 +87,10 @@
     "label": "Herdr"
   },
   "learn.community": {
-    "label": "Pobal"
+    "label": "Pobal Omarchy — tacaíocht don inneall"
+  },
+  "learn.support": {
+    "label": "Tacaíocht Maslow AI-OS"
   },
   "trigger.appearance": {
     "label": "Cuma"
@@ -363,6 +375,9 @@
   "trigger.share.receive": {
     "label": "Glac"
   },
+  "trigger.toggle.reduced-motion": {
+    "label": "Gluaiseacht laghdaithe"
+  },
   "trigger.tests.network-speedtest": {
     "label": "Tástáil luais líonra"
   },
@@ -380,6 +395,28 @@
   },
   "style.font": {
     "label": "Clú"
+  },
+  "style.font.cjk": {
+    "label": "Sínis, Seapáinis, Cóiréis",
+    "title": "Gilfeanna Síneacha, Seapánacha agus Cóiréacha"
+  },
+  "style.font.cjk.auto": {
+    "label": "Uathoibríoch"
+  },
+  "style.font.cjk.jp": {
+    "label": "Seapáinis"
+  },
+  "style.font.cjk.kr": {
+    "label": "Cóiréis"
+  },
+  "style.font.cjk.sc": {
+    "label": "Sínis shimplithe"
+  },
+  "style.font.cjk.tc": {
+    "label": "An Téaváin"
+  },
+  "style.font.cjk.hk": {
+    "label": "Hong Cong"
   },
   "style.hyprland": {
     "label": "Hyprland"
@@ -410,6 +447,10 @@
   },
   "setup.monitors": {
     "label": "Monatóirí"
+  },
+  "setup.ai": {
+    "label": "AI",
+    "title": "Socrú IS — Maslow AI-OS"
   },
   "setup.keybindings": {
     "label": "Naisc eochrach"
@@ -472,23 +513,14 @@
   "setup.default.agent.crush": {
     "label": "Crush"
   },
-  "setup.default.agent.cursor-agent": {
-    "label": "Cursor CLI"
-  },
   "setup.default.agent.grok": {
     "label": "Grok"
   },
   "setup.default.agent.hermes": {
     "label": "Hermes"
   },
-  "setup.default.agent.muse": {
-    "label": "Muse Code"
-  },
   "setup.default.agent.omp": {
     "label": "omp"
-  },
-  "setup.default.agent.openclaw": {
-    "label": "OpenClaw"
   },
   "setup.default.agent.opencode": {
     "label": "OpenCode"
@@ -1125,7 +1157,7 @@
     "label": "Phoenix"
   },
   "update.omarchy": {
-    "label": "Omarchy"
+    "label": "Maslow AI-OS"
   },
   "update.channel": {
     "label": "Cainéal"
@@ -1207,11 +1239,5 @@
   },
   "update.password.user": {
     "label": "Úsáideoir"
-  },
-  "system.reboot-boot-menu": {
-    "label": "Atosaigh go roghchlár tosaithe"
-  },
-  "setup.default.agent.kimi": {
-    "label": "Kimi"
   }
 }

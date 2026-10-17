@@ -2,6 +2,12 @@
   "root": {
     "label": "Ga"
   },
+  "hub": {
+    "label": "Maslow Hub"
+  },
+  "voice": {
+    "label": "Maslow Voice"
+  },
   "apps": {
     "label": "Apps"
   },
@@ -27,7 +33,7 @@
     "label": "Bijwerken"
   },
   "about": {
-    "label": "Over"
+    "label": "Over Maslow AI-OS"
   },
   "system": {
     "label": "Systeem"
@@ -50,6 +56,9 @@
   "system.reboot": {
     "label": "Herstarten"
   },
+  "system.reboot-boot-menu": {
+    "label": "Opnieuw opstarten naar opstartmenu"
+  },
   "system.shutdown": {
     "label": "Afsluiten"
   },
@@ -57,7 +66,7 @@
     "label": "Sneltoetsen"
   },
   "learn.omarchy": {
-    "label": "Omarchy"
+    "label": "Maslow AI-OS-handleiding"
   },
   "learn.hyprland": {
     "label": "Hyprland"
@@ -78,7 +87,10 @@
     "label": "Herdr"
   },
   "learn.community": {
-    "label": "Gemeenschap"
+    "label": "Gemeenschap Omarchy — ondersteuning voor de engine"
+  },
+  "learn.support": {
+    "label": "Maslow AI-OS-ondersteuning"
   },
   "trigger.appearance": {
     "label": "Weergave"
@@ -363,6 +375,9 @@
   "trigger.share.receive": {
     "label": "Ontvangen"
   },
+  "trigger.toggle.reduced-motion": {
+    "label": "Minder beweging"
+  },
   "trigger.tests.network-speedtest": {
     "label": "Netwerksnelheidstest"
   },
@@ -380,6 +395,28 @@
   },
   "style.font": {
     "label": "Lettertype"
+  },
+  "style.font.cjk": {
+    "label": "Chinees, Japans, Koreaans",
+    "title": "Chinese, Japanse en Koreaanse tekens"
+  },
+  "style.font.cjk.auto": {
+    "label": "Automatisch"
+  },
+  "style.font.cjk.jp": {
+    "label": "Japans"
+  },
+  "style.font.cjk.kr": {
+    "label": "Koreaans"
+  },
+  "style.font.cjk.sc": {
+    "label": "Vereenvoudigd Chinees"
+  },
+  "style.font.cjk.tc": {
+    "label": "Taiwan"
+  },
+  "style.font.cjk.hk": {
+    "label": "Hongkong"
   },
   "style.hyprland": {
     "label": "Hyprland"
@@ -410,6 +447,10 @@
   },
   "setup.monitors": {
     "label": "Monitoren"
+  },
+  "setup.ai": {
+    "label": "AI",
+    "title": "AI-instellingen — Maslow AI-OS"
   },
   "setup.keybindings": {
     "label": "Sneltoetsen"
@@ -472,23 +513,14 @@
   "setup.default.agent.crush": {
     "label": "Crush"
   },
-  "setup.default.agent.cursor-agent": {
-    "label": "Cursor CLI"
-  },
   "setup.default.agent.grok": {
     "label": "Grok"
   },
   "setup.default.agent.hermes": {
     "label": "Hermes"
   },
-  "setup.default.agent.muse": {
-    "label": "Muse Code"
-  },
   "setup.default.agent.omp": {
     "label": "omp"
-  },
-  "setup.default.agent.openclaw": {
-    "label": "OpenClaw"
   },
   "setup.default.agent.opencode": {
     "label": "OpenCode"
@@ -1125,7 +1157,7 @@
     "label": "Phoenix"
   },
   "update.omarchy": {
-    "label": "Omarchy"
+    "label": "Maslow AI-OS"
   },
   "update.channel": {
     "label": "Kanaal"
@@ -1207,11 +1239,5 @@
   },
   "update.password.user": {
     "label": "Gebruiker"
-  },
-  "system.reboot-boot-menu": {
-    "label": "Opnieuw opstarten naar opstartmenu"
-  },
-  "setup.default.agent.kimi": {
-    "label": "Kimi"
   }
 }

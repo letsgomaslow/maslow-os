@@ -48,7 +48,7 @@
 
 Τα Google Messages, Google Photos, Google Maps και Google Contacts περιλαμβάνονται όλα και ως web εφαρμογές.
 
-Μπορείτε να εκκινήσετε το Google Messages χρησιμοποιώντας το `Super + Shift + Ctrl + G`, το Google Photos χρησιμοποιώντας το `Super + Shift + P`, και το Google Maps χρησιμοποιώντας το `Super + Shift + S`. Το Google Contacts διατίθεται μέσω του εκκινητή εφαρμογών (`Super + Space`).
+Μπορείτε να εκκινήσετε το Google Messages χρησιμοποιώντας το `Super + Shift + Ctrl + G`, το Google Photos χρησιμοποιώντας το `Super + Shift + P`, και το Google Maps χρησιμοποιώντας το `Super + Shift + Alt + S`. Το Google Contacts διατίθεται μέσω του εκκινητή εφαρμογών (`Super + Space`).
 
 ## X
 

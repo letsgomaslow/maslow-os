@@ -1,33 +1,33 @@
-# Maslow OS CLI
+# Omarchy CLI
 
-Maslow OS is usually controlled through the hotkeys and the Maslow OS menu (`Super + Space`). From a terminal, use `maslow` — for example `maslow update` or `maslow theme list`. It runs exactly the same commands as the compatible engine's `omarchy` CLI, which stays available along with its package names and paths so upstream tools and extensions continue to work. The CLI is particularly helpful when you're having an AI agent work with you on customization or configuration.
+Omarchy is usually controlled through the hotkeys and the Omarchy menu (`Super + Space`). But you can also control it through the `omarchy` CLI. This is particularly helpful when you're having an AI agent work with you on customization or configuration.
 
-The CLI has access to all the internal tooling that is used both via the menu and otherwise. You can see everything that's available by running `maslow` in the terminal.
+The CLI has access to all the internal tooling that is used both via the menu and otherwise. You can see everything that's available by running `omarchy` in the terminal.
 
 It looks something like this:
 
 ```
-~ ❯ maslow
-Maslow OS command center
+~ ❯ omarchy
+Omarchy command center
 
 Usage:
-  maslow <command> [args...]
-  maslow commands [--all] [--json] [--check]
-  maslow <group> --help
-  maslow <group> <command> --help
+  omarchy <command> [args...]
+  omarchy commands [--all] [--json] [--check]
+  omarchy <group> --help
+  omarchy <group> <command> --help
 
 Common commands:
-  maslow update              Update Maslow OS and system packages
-  maslow theme list          List available themes
-  maslow theme set <name>    Apply a theme
-  maslow font list           List available fonts
-  maslow screenshot          Take a screenshot
-  maslow debug               Print debugging information
+  omarchy update              Update Omarchy and system packages
+  omarchy theme list          List available themes
+  omarchy theme set <name>    Apply a theme
+  omarchy font list           List available fonts
+  omarchy screenshot          Take a screenshot
+  omarchy debug               Print debugging information
 
 Groups:
   agent          AI coding agents, their usage, and subscription accounts
   audio          Audio input and output controls
-  bar            Maslow OS bar layout and settings
+  bar            Omarchy shell bar layout and settings
   battery        Battery status helpers
   bluetooth      Bluetooth device controls
   branch         Omarchy git branch management
@@ -59,4 +59,4 @@ Every command takes `--help` too, whether you ask a whole group (`omarchy captur
 
 ### Opening the menu from the terminal
 
-The Maslow OS menu is scriptable as well, which is handy for your own keybindings. `omarchy menu` opens it at the root, and you can jump straight to any point in the tree by naming it: `omarchy menu summon style.theme` goes right to the theme picker, `omarchy menu toggle system` opens the system menu and closes it again if it's already up, and `omarchy menu close` puts it away.
+The Omarchy menu is scriptable as well, which is handy for your own keybindings. `omarchy menu` opens it at the root, and you can jump straight to any point in the tree by naming it: `omarchy menu summon style.theme` goes right to the theme picker, `omarchy menu toggle system` opens the system menu and closes it again if it's already up, and `omarchy menu close` puts it away.

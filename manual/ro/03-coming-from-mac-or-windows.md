@@ -32,7 +32,7 @@ Cei de pe Windows: istoricul tău de clipboard de la Win + V trăiește pe `Supe
 | ------------- | ---------- |
 | Spotlight / Raycast / meniul Start | `Super + Space` — meniul Omarchy |
 | AirDrop | LocalSend, prin `Super + Ctrl + S` — vezi [GUI-uri](22-guis.md) |
-| Cmd + Shift + 4 / Win + Shift + S | `Print Screen` — vezi [capturile de ecran și înregistrarea](12-screenshots-recording.md) |
+| Cmd + Shift + 4 / Win + Shift + S | `Super + Shift + S` / `Print Screen` — vezi [capturile de ecran și înregistrarea](12-screenshots-recording.md) |
 | Centrul de notificări | Istoricul notificărilor pe `Super + Shift + Alt + ,` |
 | Time Machine (pentru sistem) | [Instantanee de sistem](47-system-snapshots.md) automate la fiecare actualizare |
 | App Store / descărcarea unui program de instalare | _Instalează_ în meniu sau `omarchy pkg add` — vezi [alte pachete](29-other-packages.md) |
