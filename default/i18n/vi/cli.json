@@ -130,6 +130,7 @@
   "migrate.clickToRun": {
     "other": "Nhấp để chạy %1 di chuyển đang chờ."
   },
+  "migrate.legacyPending": "Di chuyển Omarchy đang chờ",
   "migrate.pending": "Các bước chuyển đổi Maslow OS đang chờ",
   "monitor.extendedRestored": "Đã khôi phục chế độ mở rộng",
   "monitor.laptopDisabled": "Đã tắt màn hình laptop",

@@ -131,6 +131,7 @@
     "one": "I-click para patakbuhin ang %1 nakabinbing migration.",
     "other": "I-click para patakbuhin ang %1 nakabinbing migration."
   },
+  "migrate.legacyPending": "Mga Nakabinbing Migration ng Omarchy",
   "migrate.pending": "Mga nakabinbing migrasyon ng Maslow OS",
   "monitor.extendedRestored": "Naibalik ang extended mode",
   "monitor.laptopDisabled": "Naka-disable ang display ng laptop",

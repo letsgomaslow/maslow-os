@@ -131,6 +131,7 @@
     "one": "%1 ta kutilayotgan migratsiyani ishga tushirish uchun bosing.",
     "other": "%1 ta kutilayotgan migratsiyani ishga tushirish uchun bosing."
   },
+  "migrate.legacyPending": "Kutilayotgan Omarchy migratsiyalari",
   "migrate.pending": "Kutilayotgan Maslow OS migratsiyalari",
   "monitor.extendedRestored": "Kengaytirilgan rejim tiklandi",
   "monitor.laptopDisabled": "Noutbuk ekrani oʻchirildi",

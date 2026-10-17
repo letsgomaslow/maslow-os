@@ -133,6 +133,7 @@
     "other": "Kliknite, da zaženete %1 čakajočih migracij.",
     "two": "Kliknite, da zaženete %1 čakajoči migraciji."
   },
+  "migrate.legacyPending": "Čakajoče migracije Omarchy",
   "migrate.pending": "Čakajoče migracije Maslow OS",
   "monitor.extendedRestored": "Razširjeni način obnovljen",
   "monitor.laptopDisabled": "Zaslon prenosnika onemogočen",

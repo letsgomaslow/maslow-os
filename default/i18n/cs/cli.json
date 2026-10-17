@@ -132,6 +132,7 @@
     "one": "Kliknutím spustíte %1 čekající migraci.",
     "other": "Kliknutím spustíte %1 čekajících migrací."
   },
+  "migrate.legacyPending": "Čekající migrace Omarchy",
   "migrate.pending": "Čekající migrace Maslow OS",
   "monitor.extendedRestored": "Rozšířený režim obnoven",
   "monitor.laptopDisabled": "Displej notebooku vypnut",

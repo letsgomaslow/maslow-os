@@ -131,6 +131,7 @@
     "one": "Klik om %1 openstaande migratie uit te voeren.",
     "other": "Klik om %1 openstaande migraties uit te voeren."
   },
+  "migrate.legacyPending": "Openstaande Omarchy-migraties",
   "migrate.pending": "Openstaande Maslow OS-migraties",
   "monitor.extendedRestored": "Uitgebreide modus hersteld",
   "monitor.laptopDisabled": "Laptopscherm uitgeschakeld",

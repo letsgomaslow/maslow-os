@@ -132,6 +132,7 @@
     "one": "Kliknite za pokretanje %1 migracije na čekanju.",
     "other": "Kliknite za pokretanje %1 migracija na čekanju."
   },
+  "migrate.legacyPending": "Omarchy migracije na čekanju",
   "migrate.pending": "Migracije sustava Maslow OS na čekanju",
   "monitor.extendedRestored": "Prošireni način vraćen",
   "monitor.laptopDisabled": "Zaslon prijenosnika onemogućen",

@@ -131,6 +131,7 @@
     "one": "Smelltu til að keyra %1 flutning í bið.",
     "other": "Smelltu til að keyra %1 flutninga í bið."
   },
+  "migrate.legacyPending": "Omarchy-flutningar í bið",
   "migrate.pending": "Óloknar Maslow OS-flutningsaðgerðir",
   "monitor.extendedRestored": "Útvíkkaður hamur endurheimtur",
   "monitor.laptopDisabled": "Fartölvuskjár óvirkur",

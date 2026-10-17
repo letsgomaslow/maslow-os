@@ -131,6 +131,7 @@
     "one": "Klicka för att köra %1 väntande migrering.",
     "other": "Klicka för att köra %1 väntande migreringar."
   },
+  "migrate.legacyPending": "Väntande Omarchy-migreringar",
   "migrate.pending": "Väntande Maslow OS-migreringar",
   "monitor.extendedRestored": "Utökat läge återställt",
   "monitor.laptopDisabled": "Bärbar skärm inaktiverad",

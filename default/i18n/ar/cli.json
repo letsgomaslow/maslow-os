@@ -135,6 +135,7 @@
     "two": "انقر لتشغيل ترحيلين معلّقين.",
     "zero": "لا ترحيلات معلّقة للتشغيل."
   },
+  "migrate.legacyPending": "ترحيلات Omarchy المعلّقة",
   "migrate.pending": "عمليات ترحيل Maslow OS المعلقة",
   "monitor.extendedRestored": "استعيد الوضع الموسّع",
   "monitor.laptopDisabled": "عُطّلت شاشة المحمول",

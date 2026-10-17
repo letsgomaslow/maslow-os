@@ -131,6 +131,7 @@
     "one": "Click to run %1 pending migration.",
     "other": "Click to run %1 pending migrations."
   },
+  "migrate.legacyPending": "Pending Omarchy Migrations",
   "migrate.pending": "Pending Maslow OS Migrations",
   "monitor.extendedRestored": "Extended mode restored",
   "monitor.laptopDisabled": "Laptop display disabled",

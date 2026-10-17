@@ -132,6 +132,7 @@
     "one": "Fai clic per eseguire %1 migrazione in sospeso.",
     "other": "Fai clic per eseguire %1 migrazioni in sospeso."
   },
+  "migrate.legacyPending": "Migrazioni Omarchy in sospeso",
   "migrate.pending": "Migrazioni Maslow OS in sospeso",
   "monitor.extendedRestored": "Modalità estesa ripristinata",
   "monitor.laptopDisabled": "Schermo portatile disattivato",

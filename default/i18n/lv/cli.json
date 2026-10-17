@@ -132,6 +132,7 @@
     "other": "Noklikšķini, lai palaistu %1 gaidāmās migrācijas.",
     "zero": "Noklikšķini, lai palaistu %1 gaidāmo migrāciju."
   },
+  "migrate.legacyPending": "Gaidāmas Omarchy migrācijas",
   "migrate.pending": "Gaidošās Maslow OS migrācijas",
   "monitor.extendedRestored": "Paplašinātais režīms atjaunots",
   "monitor.laptopDisabled": "Klēpjdatora ekrāns izslēgts",

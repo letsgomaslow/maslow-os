@@ -133,6 +133,7 @@
     "one": "Натисніть, щоб запустити %1 очікувану міграцію.",
     "other": "Натисніть, щоб запустити %1 очікуваної міграції."
   },
+  "migrate.legacyPending": "Очікувані міграції Omarchy",
   "migrate.pending": "Очікувані міграції Maslow OS",
   "monitor.extendedRestored": "Розширений режим відновлено",
   "monitor.laptopDisabled": "Дисплей ноутбука вимкнено",

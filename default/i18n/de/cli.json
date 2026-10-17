@@ -131,6 +131,7 @@
     "one": "Klicke, um %1 ausstehende Migration auszuführen.",
     "other": "Klicke, um %1 ausstehende Migrationen auszuführen."
   },
+  "migrate.legacyPending": "Ausstehende Omarchy-Migrationen",
   "migrate.pending": "Ausstehende Maslow OS-Migrationen",
   "monitor.extendedRestored": "Erweiterter Modus wiederhergestellt",
   "monitor.laptopDisabled": "Laptop-Display deaktiviert",

@@ -130,6 +130,7 @@
   "migrate.clickToRun": {
     "other": "點擊執行 %1 項待處理的遷移。"
   },
+  "migrate.legacyPending": "待處理的 Omarchy 遷移",
   "migrate.pending": "待處理的 Maslow OS 遷移",
   "monitor.extendedRestored": "已還原延伸模式",
   "monitor.laptopDisabled": "筆電螢幕已停用",

@@ -131,6 +131,7 @@
     "one": "Klikk for å kjøre %1 ventende migrasjon.",
     "other": "Klikk for å kjøre %1 ventende migrasjoner."
   },
+  "migrate.legacyPending": "Ventende Omarchy-migrasjoner",
   "migrate.pending": "Ventende Maslow OS-migreringer",
   "monitor.extendedRestored": "Utvidet modus gjenopprettet",
   "monitor.laptopDisabled": "Bærbar skjerm deaktivert",

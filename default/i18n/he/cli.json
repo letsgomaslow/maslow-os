@@ -132,6 +132,7 @@
     "other": "לחצו להפעלת %1 העברות ממתינות.",
     "two": "לחצו להפעלת שתי העברות ממתינות."
   },
+  "migrate.legacyPending": "העברות Omarchy ממתינות",
   "migrate.pending": "העברות Maslow OS ממתינות",
   "monitor.extendedRestored": "מצב מורחב שוחזר",
   "monitor.laptopDisabled": "תצוגת המחשב הנייד כובתה",

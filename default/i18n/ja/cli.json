@@ -130,6 +130,7 @@
   "migrate.clickToRun": {
     "other": "クリックして %1 件の保留中のマイグレーションを実行。"
   },
+  "migrate.legacyPending": "保留中のOmarchyマイグレーション",
   "migrate.pending": "保留中のMaslow OS移行処理",
   "monitor.extendedRestored": "拡張モードに戻りました",
   "monitor.laptopDisabled": "ノートPC画面を無効にしました",

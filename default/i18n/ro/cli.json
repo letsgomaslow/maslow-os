@@ -132,6 +132,7 @@
     "one": "Clic pentru a rula %1 migrare în așteptare.",
     "other": "Clic pentru a rula %1 de migrări în așteptare."
   },
+  "migrate.legacyPending": "Migrări Omarchy în așteptare",
   "migrate.pending": "Migrări Maslow OS în așteptare",
   "monitor.extendedRestored": "Mod extins restabilit",
   "monitor.laptopDisabled": "Ecran laptop dezactivat",

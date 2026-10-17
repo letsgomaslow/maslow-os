@@ -131,6 +131,7 @@
     "one": "Щракни, за да стартираш %1 чакаща миграция.",
     "other": "Щракни, за да стартираш %1 чакащи миграции."
   },
+  "migrate.legacyPending": "Чакащи миграции Omarchy",
   "migrate.pending": "Чакащи миграции на Maslow OS",
   "monitor.extendedRestored": "Разширеният режим е възстановен",
   "monitor.laptopDisabled": "Дисплеят на лаптопа е изключен",

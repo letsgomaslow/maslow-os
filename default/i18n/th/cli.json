@@ -130,6 +130,7 @@
   "migrate.clickToRun": {
     "other": "คลิกเพื่อรันการย้ายที่รอดำเนินการ %1 รายการ"
   },
+  "migrate.legacyPending": "การย้าย Omarchy ที่รอดำเนินการ",
   "migrate.pending": "การย้ายระบบ Maslow OS ที่รอดำเนินการ",
   "monitor.extendedRestored": "คืนค่าโหมดขยายแล้ว",
   "monitor.laptopDisabled": "ปิดจอแล็ปท็อปแล้ว",

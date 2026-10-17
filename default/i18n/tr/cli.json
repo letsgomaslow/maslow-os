@@ -131,6 +131,7 @@
     "one": "Bekleyen %1 geçişi çalıştırmak için tıklayın.",
     "other": "Bekleyen %1 geçişi çalıştırmak için tıklayın."
   },
+  "migrate.legacyPending": "Bekleyen Omarchy Geçişleri",
   "migrate.pending": "Bekleyen Maslow OS geçişleri",
   "monitor.extendedRestored": "Genişletilmiş mod geri yüklendi",
   "monitor.laptopDisabled": "Dizüstü ekranı devre dışı",

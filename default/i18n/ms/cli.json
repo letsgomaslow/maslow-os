@@ -130,6 +130,7 @@
   "migrate.clickToRun": {
     "other": "Klik untuk menjalankan %1 migrasi tertunda."
   },
+  "migrate.legacyPending": "Migrasi Omarchy Tertunda",
   "migrate.pending": "Migrasi Maslow OS tertunda",
   "monitor.extendedRestored": "Mod dilanjutkan dipulihkan",
   "monitor.laptopDisabled": "Paparan laptop dilumpuhkan",

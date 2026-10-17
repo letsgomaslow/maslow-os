@@ -132,6 +132,7 @@
     "one": "Cliquez pour exécuter %1 migration en attente.",
     "other": "Cliquez pour exécuter %1 migrations en attente."
   },
+  "migrate.legacyPending": "Migrations Omarchy en attente",
   "migrate.pending": "Migrations Maslow OS en attente",
   "monitor.extendedRestored": "Mode étendu restauré",
   "monitor.laptopDisabled": "Écran du portable désactivé",

@@ -131,6 +131,7 @@
     "one": "%1টি অপেক্ষমাণ মাইগ্রেশন চালাতে ক্লিক করুন।",
     "other": "%1টি অপেক্ষমাণ মাইগ্রেশন চালাতে ক্লিক করুন।"
   },
+  "migrate.legacyPending": "অপেক্ষমাণ Omarchy মাইগ্রেশন",
   "migrate.pending": "অপেক্ষমাণ Maslow OS মাইগ্রেশন",
   "monitor.extendedRestored": "এক্সটেন্ডেড মোড পুনরুদ্ধার হয়েছে",
   "monitor.laptopDisabled": "ল্যাপটপ ডিসপ্লে বন্ধ",

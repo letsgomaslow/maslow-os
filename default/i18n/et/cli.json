@@ -131,6 +131,7 @@
     "one": "Kliki, et käivitada %1 ootel migratsioon.",
     "other": "Kliki, et käivitada %1 ootel migratsiooni."
   },
+  "migrate.legacyPending": "Ootel Omarchy migratsioonid",
   "migrate.pending": "Ootel Maslow OS-i migratsioonid",
   "monitor.extendedRestored": "Laiendatud režiim taastatud",
   "monitor.laptopDisabled": "Sülearvuti ekraan keelatud",

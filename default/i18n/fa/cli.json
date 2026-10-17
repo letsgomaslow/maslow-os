@@ -131,6 +131,7 @@
     "one": "برای اجرای %1 مهاجرت در انتظار کلیک کنید.",
     "other": "برای اجرای %1 مهاجرت در انتظار کلیک کنید."
   },
+  "migrate.legacyPending": "مهاجرت‌های در انتظار Omarchy",
   "migrate.pending": "مهاجرت‌های در انتظار Maslow OS",
   "monitor.extendedRestored": "حالت گسترده بازیابی شد",
   "monitor.laptopDisabled": "نمایشگر لپ‌تاپ غیرفعال شد",

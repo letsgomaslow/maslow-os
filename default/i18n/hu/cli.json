@@ -131,6 +131,7 @@
     "one": "Kattints %1 függő migráció futtatásához.",
     "other": "Kattints %1 függő migráció futtatásához."
   },
+  "migrate.legacyPending": "Függő Omarchy-migrációk",
   "migrate.pending": "Függőben lévő Maslow OS migrációk",
   "monitor.extendedRestored": "Kiterjesztett mód visszaállítva",
   "monitor.laptopDisabled": "Laptopkijelző kikapcsolva",

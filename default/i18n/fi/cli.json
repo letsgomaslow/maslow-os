@@ -131,6 +131,7 @@
     "one": "Napsauta ja suorita %1 odottava siirto.",
     "other": "Napsauta ja suorita %1 odottavaa siirtoa."
   },
+  "migrate.legacyPending": "Odottavat Omarchy-siirrot",
   "migrate.pending": "Odottavat Maslow OS -migraatiot",
   "monitor.extendedRestored": "Laajennettu tila palautettu",
   "monitor.laptopDisabled": "Kannettavan näyttö pois käytöstä",

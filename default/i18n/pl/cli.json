@@ -133,6 +133,7 @@
     "one": "Kliknij, aby uruchomić %1 oczekującą migrację.",
     "other": "Kliknij, aby uruchomić %1 oczekującej migracji."
   },
+  "migrate.legacyPending": "Oczekujące migracje Omarchy",
   "migrate.pending": "Oczekujące migracje Maslow OS",
   "monitor.extendedRestored": "Przywrócono tryb rozszerzony",
   "monitor.laptopDisabled": "Ekran laptopa wyłączony",

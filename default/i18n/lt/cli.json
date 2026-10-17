@@ -132,6 +132,7 @@
     "one": "Spustelėkite, kad paleistumėte %1 laukiantį perkėlimą.",
     "other": "Spustelėkite, kad paleistumėte %1 laukiančių perkėlimų."
   },
+  "migrate.legacyPending": "Laukiantys Omarchy perkėlimai",
   "migrate.pending": "Laukiančios Maslow OS migracijos",
   "monitor.extendedRestored": "Išplėstinis režimas atkurtas",
   "monitor.laptopDisabled": "Nešiojamojo ekranas išjungtas",

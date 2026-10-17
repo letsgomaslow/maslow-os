@@ -134,6 +134,7 @@
     "other": "Cliceáil chun %1 imirce ar feitheamh a rith.",
     "two": "Cliceáil chun dhá imirce ar feitheamh a rith."
   },
+  "migrate.legacyPending": "Imircí Omarchy ar feitheamh",
   "migrate.pending": "Aistrithe Maslow OS ar feitheamh",
   "monitor.extendedRestored": "Mód leathnaithe athchóirithe",
   "monitor.laptopDisabled": "Scáileán ríomhaire glúine díchumasaithe",

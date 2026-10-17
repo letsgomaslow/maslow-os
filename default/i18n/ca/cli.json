@@ -132,6 +132,7 @@
     "one": "Fes clic per executar %1 migració pendent.",
     "other": "Fes clic per executar %1 migracions pendents."
   },
+  "migrate.legacyPending": "Migracions pendents d'Omarchy",
   "migrate.pending": "Migracions pendents de Maslow OS",
   "monitor.extendedRestored": "Mode estès restablit",
   "monitor.laptopDisabled": "Pantalla del portàtil desactivada",
