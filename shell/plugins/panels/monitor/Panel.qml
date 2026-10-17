@@ -4,6 +4,7 @@ import Quickshell
 import Quickshell.Io
 import qs.Ui
 import qs.Commons
+import qs.Commons as Theme
 import "Model.js" as Model
 
 Panel {
@@ -867,8 +868,8 @@ Panel {
     onHasCursorChanged: if (hasCursor) root.ensureCursorVisible(monitorRow)
     current: isFocused
     foreground: root.bar.foreground
-    fill: Style.hoverFillFor(root.bar.foreground, Color.accent)
-    currentFill: Style.selectedFillFor(root.bar.foreground, Color.accent)
+    fill: Style.hoverFillFor(root.bar.foreground, Theme.Color.accent)
+    currentFill: Style.selectedFillFor(root.bar.foreground, Theme.Color.accent)
     implicitHeight: monitorInner.implicitHeight + Style.spacing.xl
     opacity: canToggle ? 1.0 : 0.45
 

@@ -2,6 +2,7 @@ import QtQuick
 import Quickshell
 import qs.Ui
 import qs.Commons
+import qs.Commons as Theme
 
 BarWidget {
   id: root
@@ -123,8 +124,8 @@ BarWidget {
           width: Style.space(64)
           height: Style.space(64)
           radius: Style.spacing.labelGap
-          color: Style.normalFillFor(root.bar.foreground, Color.accent)
-          borderSpec: Border.controlSpec("normal", root.bar.foreground, Color.accent)
+          color: Style.normalFillFor(root.bar.foreground, Theme.Color.accent)
+          borderSpec: Border.controlSpec("normal", root.bar.foreground, Theme.Color.accent)
 
           Image {
             anchors.fill: parent
@@ -247,8 +248,8 @@ BarWidget {
             width: sourceList.width
             height: sourceInner.implicitHeight + Style.space(10)
             radius: Style.spacing.labelGap
-            color: selected ? Style.selectedFillFor(root.bar.foreground, Color.accent) : "transparent"
-            borderSpec: selected ? Border.controlSpec("normal", root.bar.foreground, Color.accent) : Border.none()
+            color: selected ? Style.selectedFillFor(root.bar.foreground, Theme.Color.accent) : "transparent"
+            borderSpec: selected ? Border.controlSpec("normal", root.bar.foreground, Theme.Color.accent) : Border.none()
 
             Row {
               id: sourceInner

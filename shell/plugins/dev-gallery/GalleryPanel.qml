@@ -3,6 +3,7 @@ import QtQuick.Controls
 import Quickshell
 import qs.Ui
 import qs.Commons
+import qs.Commons as Theme
 
 // Visual reference + live playground for omarchy-shell's common UI
 // components. Summon with `omarchy dev ui-preview`, or directly via:
@@ -66,10 +67,10 @@ Item {
   property var shell: null
 
   // ---- theme --------------------------------------------------------------
-  readonly property color foreground: Color.foreground
-  readonly property color background: Color.background
-  readonly property color accent: Color.accent
-  readonly property color urgent: Color.urgent
+  readonly property color foreground: Theme.Color.foreground
+  readonly property color background: Theme.Color.background
+  readonly property color accent: Theme.Color.accent
+  readonly property color urgent: Theme.Color.urgent
   readonly property string fontFamily: "monospace"
 
   // Fake `bar` for components that take a whole bar object (e.g. Slider).

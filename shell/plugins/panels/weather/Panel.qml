@@ -2,6 +2,7 @@ import QtQuick
 import Quickshell
 import Quickshell.Io
 import qs.Commons
+import qs.Commons as Theme
 import qs.Ui
 import "Model.js" as Model
 
@@ -644,7 +645,7 @@ Panel {
               height: Style.space(18)
               anchors.verticalCenter: parent.verticalCenter
               radius: Math.min(4, Style.cornerRadius)
-              color: !root.savingLocation && clearLocationArea.containsMouse ? Style.hoverFillFor(root.bar.foreground, Color.accent) : "transparent"
+              color: !root.savingLocation && clearLocationArea.containsMouse ? Style.hoverFillFor(root.bar.foreground, Theme.Color.accent) : "transparent"
 
               Text {
                 textFormat: Text.PlainText
@@ -750,7 +751,7 @@ Panel {
             width: parent.width
             height: suggestionRow.implicitHeight + Style.space(12)
             radius: Style.cornerRadius
-            color: index === root.suggestionIndex ? Style.hoverFillFor(root.bar.foreground, Color.accent) : "transparent"
+            color: index === root.suggestionIndex ? Style.hoverFillFor(root.bar.foreground, Theme.Color.accent) : "transparent"
 
             Row {
               id: suggestionRow
@@ -762,7 +763,7 @@ Panel {
               Text {
                 textFormat: Text.PlainText
                 text: modelData.name
-                color: index === root.suggestionIndex ? Style.hoverStateColor(root.bar.foreground, Color.accent) : root.bar.foreground
+                color: index === root.suggestionIndex ? Style.hoverStateColor(root.bar.foreground, Theme.Color.accent) : root.bar.foreground
                 font.family: root.bar.fontFamily
                 font.pixelSize: Style.font.body
               }

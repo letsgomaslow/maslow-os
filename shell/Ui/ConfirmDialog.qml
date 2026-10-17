@@ -1,5 +1,6 @@
 import QtQuick
 import qs.Commons
+import qs.Commons as Theme
 
 Item {
   id: root
@@ -9,11 +10,11 @@ Item {
   property string cancelText: "Cancel"
   property string confirmText: "Confirm"
   property int selectedIndex: 1
-  property color background: Color.background
-  property color foreground: Color.foreground
-  property color scrim: Util.alpha(Color.background, 0.7)
-  property color selectedBackground: Util.alpha(Color.foreground, 0.08)
-  property color selectedText: Color.accent
+  property color background: Theme.Color.background
+  property color foreground: Theme.Color.foreground
+  property color scrim: Util.alpha(Theme.Color.background, 0.7)
+  property color selectedBackground: Util.alpha(Theme.Color.foreground, 0.08)
+  property color selectedText: Theme.Color.accent
   property string fontFamily: Style.font.family
   property int cornerRadius: Style.cornerRadius
 
@@ -98,10 +99,10 @@ Item {
               width: Style.space(88)
               height: Style.space(34)
               color: selected
-                ? (destructive ? Util.alpha(Color.urgent, 0.22) : root.selectedBackground)
+                ? (destructive ? Util.alpha(Theme.Color.urgent, 0.22) : root.selectedBackground)
                 : "transparent"
               borderSpec: Border.flat(destructive
-                ? (selected ? Color.urgent : Util.alpha(Color.urgent, 0.56))
+                ? (selected ? Theme.Color.urgent : Util.alpha(Theme.Color.urgent, 0.56))
                 : (selected ? root.selectedText : Util.alpha(root.foreground, 0.38)), Style.normalBorderWidth)
               radius: 0
 
@@ -109,7 +110,7 @@ Item {
                 textFormat: Text.PlainText
                 anchors.centerIn: parent
                 text: modelData
-                color: destructive ? (selected ? Color.urgent : root.foreground) : (selected ? root.selectedText : root.foreground)
+                color: destructive ? (selected ? Theme.Color.urgent : root.foreground) : (selected ? root.selectedText : root.foreground)
                 font.family: root.fontFamily
                 font.pixelSize: Style.font.caption
               }
