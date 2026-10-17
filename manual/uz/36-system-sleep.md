@@ -2,7 +2,7 @@
 
 Omarchy standart holatda kutish va uyqu rejimini yoqadi, lekin agar mashinangizda ikkalasidan ham muammolaringiz boʻlsa, ularni oʻchirishingiz mumkin.
 
-DGX Spark va ASUS Ascent GX10 kabi NVIDIA GB10 kompyuterlarda, bu uskunada ishlashi hali isbotlanmagani uchun NVIDIA DGX OSʼdagi kabi uyqu va kutish rejimlari oʻchirilgan. Uyqu tugmasi va kutish rejimi sozlamalari bu yerda amal qilmaydi. Qayta yoqish uchun `/etc/systemd/sleep.conf.d/omarchy-sleep-disabled.conf` faylini `sudo rm` bilan oʻchiring; Uyqu menyuga qaytadi va kutish rejimini odatdagidek sozlash mumkin. `sudo omarchy apply hardware --install-user "$USER"` faylni qayta yaratadi.
+DGX Spark va ASUS Ascent GX10 kabi NVIDIA GB10 kompyuterlarda, bu uskunada ishlashi hali isbotlanmagani uchun NVIDIA DGX OSʼdagi kabi kutish va hibernatsiya rejimlari oʻchirilgan. Kutish tugmasi va hibernatsiya sozlamalari bu yerda amal qilmaydi. Qayta yoqish uchun `/etc/systemd/sleep.conf.d/omarchy-sleep-disabled.conf` faylini `sudo rm` bilan oʻchiring; Kutish menyuga qaytadi va hibernatsiyani odatdagidek sozlash mumkin. `sudo omarchy apply hardware --install-user "$USER"` faylni qayta yaratadi.
 
 ### Quvvat profillari
 

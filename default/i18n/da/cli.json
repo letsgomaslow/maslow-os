@@ -225,7 +225,7 @@
   "sshd.removeAuthorizedKeys": "Fjern også alle godkendte SSH-nøgler (%1)?",
   "suspend.availableInMenu": "Hvile er nu tilgængelig i systemmenuen",
   "suspend.removedFromMenu": "Hvile fjernet fra systemmenuen",
-  "suspend.turnedOffOnMachine": "Dvale er slået fra på denne maskine",
+  "suspend.turnedOffOnMachine": "Hvile er slået fra på denne maskine",
   "system.loggingOut": "Logger ud",
   "system.logoutFailed": "Log ud mislykkedes",
   "system.logoutRetry": "Kunne ikke fuldføre log ud. Prøv igen.",
