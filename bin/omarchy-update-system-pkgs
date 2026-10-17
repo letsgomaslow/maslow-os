@@ -15,7 +15,7 @@ done < <(omarchy-update-runtime-guard pacman-args)
 # a stream, because an upgrade without --noconfirm prompts on stderr. The
 # handler has already said why, so no heading here either.
 if [[ ${OMARCHY_UPDATE_CONFLICT:-} == 1 && ${OMARCHY_UPDATE_INTERACTIVE:-} == 1 ]]; then
-  exec sudo env OMARCHY_UPDATE_PACMAN=1 pacman -Syu "${runtime_hold_args[@]}" --overwrite '/usr/share/omarchy/*'
+  exec omarchy-update-pacman -Syu "${runtime_hold_args[@]}" --overwrite '/usr/share/omarchy/*'
 fi
 
 echo -e "\e[32m\nUpdate system packages\e[0m"
@@ -28,7 +28,7 @@ trap 'rm -f "$errors"' EXIT
 #
 # Progress bars stay on stdout. Errors are on stderr, kept for the conflict
 # handler below; LC_ALL=C is what keeps them parseable in any locale.
-if sudo env LC_ALL=C OMARCHY_UPDATE_PACMAN=1 pacman -Syu --noconfirm "${runtime_hold_args[@]}" \
+if LC_ALL=C omarchy-update-pacman -Syu --noconfirm "${runtime_hold_args[@]}" \
   --overwrite '/usr/share/omarchy/*' 2>"$errors"; then
   cat "$errors" >&2
   exit 0
@@ -40,7 +40,7 @@ cat "$errors" >&2
 # pacman resumes partial downloads, and the held runtime stays held.
 if grep -q "failed retrieving file" "$errors" && [[ ${OMARCHY_UPDATE_DOWNLOAD_RETRY:-} != 1 ]]; then
   echo -e "\e[33mA package download stalled. Retrying without the stall cutoff; finished downloads are kept.\e[0m"
-  if sudo env LC_ALL=C OMARCHY_UPDATE_PACMAN=1 pacman -Syu --noconfirm --disable-download-timeout "${runtime_hold_args[@]}" \
+  if LC_ALL=C omarchy-update-pacman -Syu --noconfirm --disable-download-timeout "${runtime_hold_args[@]}" \
     --overwrite '/usr/share/omarchy/*' 2>"$errors"; then
     cat "$errors" >&2
     exit 0

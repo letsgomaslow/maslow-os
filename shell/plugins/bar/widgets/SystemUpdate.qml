@@ -24,7 +24,7 @@ BarWidget {
   implicitWidth: button.implicitWidth
   implicitHeight: button.implicitHeight
 
-  IpcHandler {
+  ShellIpc {
     target: "omarchy.system-update"
 
     function refresh(): void {
@@ -59,7 +59,7 @@ BarWidget {
     text: "\uf021"
     slotSize: Style.bar.statusSlot
     fontSize: Style.font.caption
-    tooltipText: "Pending Maslow OS Updates"
+    tooltipText: I18n.t("bar.pendingUpdates").replace("Omarchy", "Maslow OS")
     onPressed: root.runUpdate()
   }
 }

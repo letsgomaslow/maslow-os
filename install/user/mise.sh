@@ -1,3 +1,6 @@
+# Keep running agent installs until their sessions finish.
+mise settings set upgrade.auto_prune false
+
 source "$OMARCHY_PATH/install/helpers/agent.sh"
 omarchy_agent_prepare_packaged codex || true
 omarchy_agent_prepare_packaged claude || true
@@ -15,3 +18,5 @@ omarchy-mise-install npm:@kitlangton/ghui ghui
 omarchy-mise-install aqua:modem-dev/hunk hunk
 omarchy-mise-install github:basecamp/hey-cli hey
 omarchy-mise-install github:OpenRouterLabs/ori-releases ori
+
+mise reshim

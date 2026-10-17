@@ -1,27 +1,29 @@
 #!/bin/bash
 
-# omarchy:summary=Reinstall all default Omarchy packages from the stable channel
+# omarchy:summary=Reinstall all default Omarchy packages from the stable channel, or on aarch64 the edge channel
 # omarchy:requires-sudo=true
 
 set -e
 
-# Reinstall all default Omarchy packages from the stable channel and downgrade any packages that are too new.
+# Reinstall all default Omarchy packages from the platform's default channel
+# (stable, or edge on aarch64) and downgrade any packages that are too new.
 
-# Set the package repository to the stable mirrors
+# Set the package repository to the platform's default channel
 omarchy-refresh-pacman
 
-# Downgrade any packages to the stable setup
+# The default channel still must not replace Maslow's held runtime.
 runtime_hold_args=()
 while IFS= read -r arg; do
   runtime_hold_args+=("$arg")
 done < <(omarchy-update-runtime-guard pacman-args)
-sudo env OMARCHY_UPDATE_PACMAN=1 pacman -Suu --noconfirm "${runtime_hold_args[@]}"
+omarchy-update-pacman -Suu --noconfirm "${runtime_hold_args[@]}"
 
-# Ensure all packages are installed
-mapfile -t packages < <(grep -v '^#' "$OMARCHY_PATH/install/omarchy-base.packages" | grep -v '^$')
+# Compose the platform's defaults, then exclude held runtime packages.
+default_packages=$(omarchy-pkg-defaults)
+mapfile -t packages <<<"$default_packages"
 filtered_packages=()
 while IFS= read -r package; do
   filtered_packages+=("$package")
 done < <(omarchy-update-runtime-guard filter-packages "${packages[@]}")
 packages=("${filtered_packages[@]}")
-sudo env OMARCHY_UPDATE_PACMAN=1 pacman -Syu --noconfirm --needed "${runtime_hold_args[@]}" "${packages[@]}"
+omarchy-update-pacman -Syu --noconfirm --needed "${runtime_hold_args[@]}" "${packages[@]}"

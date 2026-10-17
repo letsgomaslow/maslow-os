@@ -438,6 +438,17 @@ assert_launched() {
   # Every agent window launches under the same app-id, whichever agent is
   # default, so window rules and themes see one class for all of them.
   local expected=(--app-id=org.omarchy.agent "$@")
+  # Upstream pins a newly selected account in the launched terminal. With no
+  # configured account, assert its exact empty pin as well as the agent argv.
+  local home_env=""
+  case "$agent" in
+    claude) home_env=CLAUDE_CONFIG_DIR ;;
+    codex) home_env=CODEX_HOME ;;
+    grok) home_env=GROK_HOME ;;
+  esac
+  if [[ -n $home_env ]]; then
+    expected=(--app-id=org.omarchy.agent env -u "$home_env" "OMARCHY_AGENT_${agent^^}_HOME=" "$@")
+  fi
 
   mapfile -d '' -t actual <"$launch_log"
 

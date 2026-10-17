@@ -11,7 +11,7 @@ usage() {
 Usage: omarchy-provision-first-run [--force]
 
 Run first-login user setup and notification hooks. By default this only runs
-once per user. Use --force to rerun the full sequence and refresh user setup.
+once per user.
 USAGE
 }
 
@@ -39,7 +39,7 @@ done
 state_dir=~/.local/state/omarchy
 FIRST_RUN_DONE="first-run-user"
 if omarchy-done check "$FIRST_RUN_DONE" && (( force == 0 )); then
-  echo "First-run already complete (rerun with --force to refresh)."
+  echo "First-run already complete."
   exit 0
 fi
 
@@ -93,6 +93,10 @@ fi
 
 run_first_run_step core "enable user systemd units" \
   bash "$OMARCHY_PATH/install/user/first-run/enable-user-units.sh"
+# Finalization may run before a graphical session; finish the platform setup
+# here too, and retain retryability if its required session work fails.
+run_first_run_step core "run the platform's user setup" \
+  omarchy-lifecycle-dispatch setup-user
 run_first_run_step optional "set GNOME theme" \
   bash "$OMARCHY_PATH/install/user/first-run/gnome-theme.sh"
 run_first_run_step optional "set GTK primary paste" \
