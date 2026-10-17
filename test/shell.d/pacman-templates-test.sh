@@ -115,6 +115,10 @@ fi
 rm -rf "$work"
 source "$SHELL_TEST_DIR/fixtures/sudo-boundary-test.sh"
 copy_boundary_file bin/omarchy-refresh-pacman
+copy_boundary_file bin/omarchy-update-runtime-guard
+# Exercise the Maslow hold without reading an installed host's product metadata.
+export MASLOW_PRODUCT_FILE="$boundary_tmp/product.json"
+printf '%s\n' '{"product":{"id":"maslow-os"}}' >"$MASLOW_PRODUCT_FILE"
 
 refresh() {
   "$SUDO_TEST_ROOT/bin/omarchy-refresh-pacman" "$@" >"$boundary_tmp/output" 2>&1
@@ -147,7 +151,7 @@ expected = [
 copies = [e for e in events if e.startswith('step:cp ')]
 assert copies == expected, events
 hook = events.index('step:omarchy-hook pre-refresh-pacman')
-transaction = events.index('step:pacman -Syyuu --noconfirm')
+transaction = events.index('step:pacman -Syyuu --noconfirm --ignore omarchy,omarchy-settings,omarchy-dev,omarchy-settings-dev')
 assert events.index(expected[-1]) < hook < transaction, events
 PY
     assert_boundary_cold "$platform $channel"
