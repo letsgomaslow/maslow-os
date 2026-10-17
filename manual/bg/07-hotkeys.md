@@ -116,7 +116,7 @@
 | `Super + Shift + Alt + A`           | AI (Grok)  |
 | `Super + Shift + G`           | Съобщения (Signal)  |
 | `Super + Shift + P`           | Google Photos  |
-| `Super + Shift + S`           | Google Maps  |
+| `Super + Shift + Alt + S`           | Google Maps  |
 | `Super + Shift + Alt + G`           | Съобщения (WhatsApp)  |
 | `Super + Shift + Ctrl + G`           | Съобщения (Google)  |
 | `Super + Shift + O`           | Obsidian  |
@@ -142,8 +142,9 @@
 
 | Клавишна комбинация              | Функция                       |
 | ------------------- | ------------------------------ |
-| `Super + Ctrl + C` | Меню за заснемане (за клавиатури без бутон PrintScr) |
+| `Super + Ctrl + C` | Меню за заснемане |
 | `Print Screen`            | Снимка на екрана                      |
+| `Super + Shift + S`            | Снимка на екрана                      |
 | `Alt + Print Screen`            | Запис на екрана                     |
 | `Super + Print Screen` | Избор на цвят |
 | `Super + Ctrl + Print Screen` | Извличане на текст в клипборда |

@@ -116,7 +116,7 @@ Vse glavne vezave tipkovnice si lahko ogledate s `Super + K` (vezave Tmux s `Sup
 | `Super + Shift + Alt + A`           | AI (Grok)  |
 | `Super + Shift + G`           | Sporočilnik (Signal)  |
 | `Super + Shift + P`           | Google Photos  |
-| `Super + Shift + S`           | Google Maps  |
+| `Super + Shift + Alt + S`           | Google Maps  |
 | `Super + Shift + Alt + G`           | Sporočilnik (WhatsApp)  |
 | `Super + Shift + Ctrl + G`           | Sporočilnik (Google)  |
 | `Super + Shift + O`           | Obsidian  |
@@ -142,8 +142,9 @@ Običajno v Linuxu za kopiranje in lepljenje v terminalu potrebujete `Ctrl + Shi
 
 | Bližnjica              | Funkcija                       |
 | ------------------- | ------------------------------ |
-| `Super + Ctrl + C` | Meni za zajem (za tipkovnice brez gumba PrintScr) |
+| `Super + Ctrl + C` | Meni za zajem |
 | `Print Screen`            | Posnetek zaslona                      |
+| `Super + Shift + S`            | Posnetek zaslona                      |
 | `Alt + Print Screen`            | Snemanje zaslona                     |
 | `Super + Print Screen` | Izbirnik barve |
 | `Super + Ctrl + Print Screen` | Izvlečenje besedila v odložišče |

@@ -1,10 +1,11 @@
 # Seatanna Scáileáin & Taifeadadh
 
-Crochtar gach rud is féidir leat a ghlacadh den scáileán d'eochair Print Screen. Glacann eochair amháin léi féin pictiúr, agus glacann na modhnóirí taifeadadh, dath, nó an téacs taobh istigh de réigiún. Mura bhfuil eochair Print Screen ar bith ag do mhéarchlár, osclaíonn `Super + Ctrl + C` an tacar céanna mar roghchlár.
+Crochtar gach rud is féidir leat a ghlacadh den scáileán d'eochair Print Screen. Glacann eochair amháin léi féin pictiúr, agus glacann na modhnóirí taifeadadh, dath, nó an téacs taobh istigh de réigiún. Mura bhfuil eochair Print Screen ar bith ag do mhéarchlár, osclaíonn `Super + Ctrl + C` an tacar céanna mar roghchlár. `Super + Shift + S`: Seat scáileáin.
 
 | Eochair ghasta | Feidhm |
 | ------ | -------- |
 | `Print Screen` | Seat scáileáin |
+| `Super + Shift + S` | Seat scáileáin |
 | `Alt + Print Screen` | Taifead scáileáin (nó stop an ceann atá ag rith) |
 | `Super + Print Screen` | Roghnóir datha |
 | `Super + Ctrl + Print Screen` | Asbhain téacs as réigiún |
@@ -13,7 +14,7 @@ Crochtar gach rud is féidir leat a ghlacadh den scáileán d'eochair Print Scre
 
 ## Seatanna scáileáin
 
-Buail `Print Screen` agus gabhann Omasnap an monatóir dírithe sula dtaispeántar a fhorleagan, mar sin ní aistríonn rud ar bith fút fad is a dhíríonn tú. Tarraing réigiún saorfhoirme, cliceáil fuinneog chun í a ghabháil, nó cliceáil spás oscailte chun an monatóir ar fad a ghabháil. Brúigh `S` sula dtarraingíonn tú chun réigiún scrollaithe a ghabháil. D'athraigh tú d'intinn? Buail `Print Screen` arís chun Omasnap a dhíbhe.
+Buail `Print Screen` (`Super + Shift + S`) agus gabhann Omasnap an monatóir dírithe sula dtaispeántar a fhorleagan, mar sin ní aistríonn rud ar bith fút fad is a dhíríonn tú. Tarraing réigiún saorfhoirme, cliceáil fuinneog chun í a ghabháil, nó cliceáil spás oscailte chun an monatóir ar fad a ghabháil. Brúigh `S` sula dtarraingíonn tú chun réigiún scrollaithe a ghabháil. D'athraigh tú d'intinn? Buail `Print Screen` (`Super + Shift + S`) arís chun Omasnap a dhíbhe.
 
 Tar éis duit limistéar a roghnú, sábhálann Omasnap an ghabháil, cóipeálann sé chuig an ngearrthaisce í, agus taispeánann sé réamhamharc ar feadh 10 soicind. Úsáid cnaipe bioráin an réamhamhairc nó `Ctrl + P` chun í a choinneáil ar an scáileán, nó roghnaigh Edit chun í a anótáil.
 

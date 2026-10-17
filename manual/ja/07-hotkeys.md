@@ -116,7 +116,7 @@
 | `Super + Shift + Alt + A`           | AI（Grok）  |
 | `Super + Shift + G`           | メッセンジャー（Signal）  |
 | `Super + Shift + P`           | Google Photos  |
-| `Super + Shift + S`           | Google Maps  |
+| `Super + Shift + Alt + S`           | Google Maps  |
 | `Super + Shift + Alt + G`           | メッセンジャー（WhatsApp）  |
 | `Super + Shift + Ctrl + G`           | メッセンジャー（Google）  |
 | `Super + Shift + O`           | Obsidian  |
@@ -142,8 +142,9 @@ Linux では通常、ターミナルでコピー＆ペーストするには `Ctr
 
 | ホットキー              | 機能                       |
 | ------------------- | ------------------------------ |
-| `Super + Ctrl + C` | キャプチャメニュー（PrintScr ボタンなしのキーボード用） |
+| `Super + Ctrl + C` | キャプチャメニュー |
 | `Print Screen`            | スクリーンショット                      |
+| `Super + Shift + S`            | スクリーンショット                      |
 | `Alt + Print Screen`            | 画面録画                     |
 | `Super + Print Screen` | カラーピッカー |
 | `Super + Ctrl + Print Screen` | クリップボードへテキスト抽出 |

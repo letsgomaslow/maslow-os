@@ -38,7 +38,7 @@ omarchy-toggle-enabled screensaver-off && echo "screensaver is off"
 
 모드가 켜져 있으면 시계 옆 상단 바 가운데에 작은 글리프가 나타납니다. 이는 표시기 위젯으로, 받아쓰기, 화면 녹화, 대기 중인 리마인더, 야간 조명, 방해 금지, 절전 금지를 표시합니다.
 
-비활성 표시기는 숨겨져 있습니다. 그 주변 영역에 마우스를 올리면 흐릿하게 나타나므로, 단축키를 몰라도 클릭해 켤 수 있습니다. 활성 표시기를 클릭하면 다시 꺼집니다. 항상 전부 보이게 하고 싶다면 `~/.config/omarchy/shell.json`의 `omarchy.indicators` 항목에서 `alwaysShow`를 `true`로 설정하세요 — 바 위젯 구성 방식은 [상단 바](05-the-top-bar.md)를 참조하세요.
+막대의 아무 곳에나 포인터를 올리면 비활성 표시기가 나타납니다. 비활성 표시기는 숨겨져 있습니다. 그 주변 영역에 마우스를 올리면 흐릿하게 나타나므로, 단축키를 몰라도 클릭해 켤 수 있습니다. 활성 표시기를 클릭하면 다시 꺼집니다. 항상 전부 보이게 하고 싶다면 `~/.config/omarchy/shell.json`의 `omarchy.indicators` 항목에서 `alwaysShow`를 `true`로 설정하세요 — 바 위젯 구성 방식은 [상단 바](05-the-top-bar.md)를 참조하세요.
 
 ### 야간 조명
 

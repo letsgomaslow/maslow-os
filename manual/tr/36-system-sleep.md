@@ -2,6 +2,8 @@
 
 Omarchy varsayılan olarak askıya alma ve hazırda bekletmeyi etkinleştirir, ancak makinenizde bunlardan biriyle sorun yaşıyorsanız, onları kapatabilirsiniz.
 
+DGX Spark ve ASUS Ascent GX10 gibi NVIDIA GB10 makinelerde, bu donanımda çalıştıkları henüz gösterilmediği için NVIDIA DGX OS'teki gibi askıya alma ve hazırda bekletme kapalıdır. Askıya alma düğmesi ve hazırda bekletme kurulumu burada geçerli değildir. Yeniden etkinleştirmek için `/etc/systemd/sleep.conf.d/omarchy-sleep-disabled.conf` dosyasını `sudo rm` ile silin; askıya alma menüye döner, hazırda bekletme normal şekilde kurulabilir. `sudo omarchy apply hardware --install-user "$USER"` dosyayı geri getirir.
+
 ### Güç profilleri
 
 Bir dizüstü bilgisayarda Omarchy, güç profilinizi prize takılı ve pille çalışma için ayrı ayrı hatırlar ve takıp çıkardıkça ikisi arasında geçiş yapar. Kutudan çıktığı haliyle bu, AC'de performans ve pilde dengeli anlamına gelir.

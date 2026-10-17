@@ -116,7 +116,7 @@ Barcha asosiy klaviatura bogʻlanishlarini `Super + K` bilan koʻrishingiz mumki
 | `Super + Shift + Alt + A`           | AI (Grok)  |
 | `Super + Shift + G`           | Messenger (Signal)  |
 | `Super + Shift + P`           | Google Photos  |
-| `Super + Shift + S`           | Google Maps  |
+| `Super + Shift + Alt + S`           | Google Maps  |
 | `Super + Shift + Alt + G`           | Messenger (WhatsApp)  |
 | `Super + Shift + Ctrl + G`           | Messenger (Google)  |
 | `Super + Shift + O`           | Obsidian  |
@@ -142,8 +142,9 @@ Odatda Linuxda terminalda nusxalash va qoʻyish uchun `Ctrl + Shift + C/V`, bosh
 
 | Hotkey              | Function                       |
 | ------------------- | ------------------------------ |
-| `Super + Ctrl + C` | Yozib olish menyusi (PrintScr tugmasi boʻlmagan klaviaturalar uchun) |
+| `Super + Ctrl + C` | Yozib olish menyusi |
 | `Print Screen`            | Skrinshot                      |
+| `Super + Shift + S`            | Skrinshot                      |
 | `Alt + Print Screen`            | Ekran yozuvi                     |
 | `Super + Print Screen` | Rang tanlagich |
 | `Super + Ctrl + Print Screen` | Matnni buferga ajratish |

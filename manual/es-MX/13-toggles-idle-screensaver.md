@@ -38,7 +38,7 @@ Las marcas se nombran según el estado desactivado — `screensaver-off`, `suspe
 
 Cuando un modo está activo, obtienes un glifo pequeño en el centro de la barra superior junto al reloj. Ese es el widget de indicadores, y lleva el dictado, la grabación de pantalla, los recordatorios pendientes, la luz nocturna, no molestar y mantenerse despierta.
 
-Los indicadores inactivos están ocultos. Pasa el cursor por el área a su alrededor y aparecen atenuados, para que puedas hacer clic en uno para activarlo sin saber su atajo. Al hacer clic en uno activo se desactiva. Si prefieres verlos todos siempre, pon `alwaysShow` en `true` en la entrada `omarchy.indicators` de `~/.config/omarchy/shell.json` — consulta [la barra superior](05-the-top-bar.md) para saber cómo se configuran los widgets de la barra.
+Pasa el puntero por cualquier parte de la barra para mostrar los indicadores inactivos. Los indicadores inactivos están ocultos. Pasa el cursor por el área a su alrededor y aparecen atenuados, para que puedas hacer clic en uno para activarlo sin saber su atajo. Al hacer clic en uno activo se desactiva. Si prefieres verlos todos siempre, pon `alwaysShow` en `true` en la entrada `omarchy.indicators` de `~/.config/omarchy/shell.json` — consulta [la barra superior](05-the-top-bar.md) para saber cómo se configuran los widgets de la barra.
 
 ### Luz nocturna
 

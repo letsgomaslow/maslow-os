@@ -2,6 +2,8 @@
 
 Omarchy activa la suspensió i la hibernació per defecte, però si tens problemes amb qualsevol de les dues a la teva màquina, pots desactivar-les.
 
+Als equips NVIDIA GB10, com DGX Spark i ASUS Ascent GX10, la suspensió i la hibernació estan desactivades, com a NVIDIA DGX OS, perquè encara no s'ha demostrat que funcionin en aquest maquinari. El commutador de suspensió i la configuració d'hibernació no s'hi apliquen. Elimina `/etc/systemd/sleep.conf.d/omarchy-sleep-disabled.conf` amb `sudo rm` per reactivar-les: Suspèn torna al menú i pots configurar la hibernació normalment. `sudo omarchy apply hardware --install-user "$USER"` torna a crear el fitxer.
+
 ### Perfils d'energia
 
 En un portàtil, Omarchy recorda el teu perfil d'energia per separat per a quan està endollat i per a quan funciona amb bateria, i canvia entre l'un i l'altre a mesura que endolles i desendolles. Des del primer moment, això vol dir rendiment amb corrent altern i equilibrat amb bateria.

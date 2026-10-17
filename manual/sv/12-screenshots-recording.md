@@ -1,10 +1,11 @@
 # Skärmbilder & inspelning
 
-Allt du kan ta från skärmen hänger på Print Screen-tangenten. En tangent på egen hand tar en bild, och modifierarna tar en inspelning, en färg eller texten inuti en region. Om ditt tangentbord inte har någon Print Screen-tangent alls öppnar `Super + Ctrl + C` samma uppsättning som en meny.
+Allt du kan ta från skärmen hänger på Print Screen-tangenten. En tangent på egen hand tar en bild, och modifierarna tar en inspelning, en färg eller texten inuti en region. Om ditt tangentbord inte har någon Print Screen-tangent alls öppnar `Super + Ctrl + C` samma uppsättning som en meny. `Super + Shift + S`: Skärmbild.
 
 | Snabbtangent | Funktion |
 | ------ | -------- |
 | `Print Screen` | Skärmbild |
+| `Super + Shift + S` | Skärmbild |
 | `Alt + Print Screen` | Skärminspelning (eller stoppa den som körs) |
 | `Super + Print Screen` | Färgväljare |
 | `Super + Ctrl + Print Screen` | Extrahera text från en region |
@@ -13,7 +14,7 @@ Allt du kan ta från skärmen hänger på Print Screen-tangenten. En tangent på
 
 ## Skärmbilder
 
-Tryck på `Print Screen` och Omasnap fångar den fokuserade skärmen innan dess overlay visas, så att ingenting flyttar sig under dig medan du siktar. Dra en frihandsregion, klicka på ett fönster för att fånga det eller klicka på öppet utrymme för att fånga hela skärmen. Tryck på `S` innan du ritar för att fånga en rullande region. Ändrat dig? Tryck på `Print Screen` igen för att avvisa Omasnap.
+Tryck på `Print Screen` (`Super + Shift + S`) och Omasnap fångar den fokuserade skärmen innan dess overlay visas, så att ingenting flyttar sig under dig medan du siktar. Dra en frihandsregion, klicka på ett fönster för att fånga det eller klicka på öppet utrymme för att fånga hela skärmen. Tryck på `S` innan du ritar för att fånga en rullande region. Ändrat dig? Tryck på `Print Screen` (`Super + Shift + S`) igen för att avvisa Omasnap.
 
 När du har valt ett område sparar Omasnap fångsten, kopierar den till urklippet och visar en förhandsgranskning i 10 sekunder. Använd förhandsgranskningens fästknapp eller `Ctrl + P` för att hålla kvar den på skärmen, eller välj Edit för att annotera den.
 

@@ -116,7 +116,7 @@ Saad näha kõiki peamisi klaviatuuriseoseid `Super + K` abil (Tmuxi seoseid `Su
 | `Super + Shift + Alt + A`           | AI (Grok)  |
 | `Super + Shift + G`           | Vestlus (Signal)  |
 | `Super + Shift + P`           | Google Photos  |
-| `Super + Shift + S`           | Google Maps  |
+| `Super + Shift + Alt + S`           | Google Maps  |
 | `Super + Shift + Alt + G`           | Vestlus (WhatsApp)  |
 | `Super + Shift + Ctrl + G`           | Vestlus (Google)  |
 | `Super + Shift + O`           | Obsidian  |
@@ -142,8 +142,9 @@ Tavaliselt on Linuxil vaja `Ctrl + Shift + C/V`, et terminalis kopeerida ja klee
 
 | Kiirklahv              | Funktsioon                       |
 | ------------------- | ------------------------------ |
-| `Super + Ctrl + C` | Jäädvusta menüü (klaviatuuridele ilma PrintScr nuputa) |
+| `Super + Ctrl + C` | Jäädvusta menüü |
 | `Print Screen`            | Ekraanitõmmis                      |
+| `Super + Shift + S`            | Ekraanitõmmis                      |
 | `Alt + Print Screen`            | Ekraanisalvestus                     |
 | `Super + Print Screen` | Värvivalija |
 | `Super + Ctrl + Print Screen` | Teksti eraldamine lõikelauale |

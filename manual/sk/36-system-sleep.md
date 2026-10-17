@@ -2,6 +2,8 @@
 
 Omarchy predvolene povoľuje uspanie a hibernáciu, ale ak máte na svojom stroji s niektorým z nich problémy, môžete ich vypnúť.
 
+Na počítačoch NVIDIA GB10, napríklad DGX Spark a ASUS Ascent GX10, sú uspávanie a hibernácia vypnuté rovnako ako v NVIDIA DGX OS, pretože ich fungovanie na tomto hardvéri ešte nebolo preukázané. Prepínač uspávania a nastavenie hibernácie tu neplatia. Odstráňte `/etc/systemd/sleep.conf.d/omarchy-sleep-disabled.conf` pomocou `sudo rm`, aby ste ich znova povolili; uspávanie sa vráti do ponuky a hibernáciu možno nastaviť bežne. `sudo omarchy apply hardware --install-user "$USER"` súbor obnoví.
+
 ### Profily napájania
 
 Na notebooku si Omarchy pamätá váš profil napájania osobitne pre napájanie zo siete a pre prevádzku na batériu a prepína medzi nimi, keď zapájate a odpájate napájanie. Hneď po vybalení to znamená výkon na striedavom napájaní a vyvážený režim na batériu.

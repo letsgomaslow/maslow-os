@@ -116,7 +116,7 @@ Is féidir leat na príomhcheangail méarchláir uile a fheiceáil le `Super + K
 | `Super + Shift + Alt + A`           | AI (Grok)  |
 | `Super + Shift + G`           | Teachtaire (Signal)  |
 | `Super + Shift + P`           | Google Photos  |
-| `Super + Shift + S`           | Google Maps  |
+| `Super + Shift + Alt + S`           | Google Maps  |
 | `Super + Shift + Alt + G`           | Teachtaire (WhatsApp)  |
 | `Super + Shift + Ctrl + G`           | Teachtaire (Google)  |
 | `Super + Shift + O`           | Obsidian  |
@@ -142,8 +142,9 @@ De ghnáth ar Linux, teastaíonn `Ctrl + Shift + C/V` uait chun cóipeáil is gr
 
 | Eochair ghasta              | Feidhm                       |
 | ------------------- | ------------------------------ |
-| `Super + Ctrl + C` | Roghchlár gabhála (do mhéarchláir gan cnaipe PrintScr) |
+| `Super + Ctrl + C` | Roghchlár gabhála |
 | `Print Screen`            | Seat scáileáin                      |
+| `Super + Shift + S`            | Seat scáileáin                      |
 | `Alt + Print Screen`            | Taifead scáileáin                     |
 | `Super + Print Screen` | Roghnóir datha |
 | `Super + Ctrl + Print Screen` | Asbhaint téacs chuig an ngearrthaisce |

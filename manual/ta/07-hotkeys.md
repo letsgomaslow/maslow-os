@@ -116,7 +116,7 @@
 | `Super + Shift + Alt + A`           | AI (Grok)  |
 | `Super + Shift + G`           | Messenger (Signal)  |
 | `Super + Shift + P`           | Google Photos  |
-| `Super + Shift + S`           | Google Maps  |
+| `Super + Shift + Alt + S`           | Google Maps  |
 | `Super + Shift + Alt + G`           | Messenger (WhatsApp)  |
 | `Super + Shift + Ctrl + G`           | Messenger (Google)  |
 | `Super + Shift + O`           | Obsidian  |
@@ -142,8 +142,9 @@
 
 | ஹாட்கீ              | செயல்பாடு                       |
 | ------------------- | ------------------------------ |
-| `Super + Ctrl + C` | பதிவு மெனு (PrintScr பொத்தான் இல்லாத விசைப்பலகைகளுக்கு) |
+| `Super + Ctrl + C` | பதிவு மெனு |
 | `Print Screen`            | திரைப்பிடிப்பு                      |
+| `Super + Shift + S`            | திரைப்பிடிப்பு                      |
 | `Alt + Print Screen`            | திரைப்பதிவு                     |
 | `Super + Print Screen` | நிறம் தேர்வாளர் |
 | `Super + Ctrl + Print Screen` | கிளிப்போர்டுக்கு உரை பிரித்தெடுத்தல் |

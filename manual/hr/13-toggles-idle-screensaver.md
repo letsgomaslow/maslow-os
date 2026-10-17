@@ -38,7 +38,7 @@ Zastave su nazvane po isključenome stanju — `screensaver-off`, `suspend-off`,
 
 Kada je način uključen, dobivate maleni znak u sredini gornje trake pokraj sata. To je widget pokazatelja i nosi diktiranje, snimanje zaslona, podsjetnike na čekanju, noćno svjetlo, ne ometaj i ostani budan.
 
-Neaktivni pokazatelji skriveni su. Lebdite na području oko njih i oni ublijede prigušeno, pa možete kliknuti jednoga da ga uključite bez poznavanja njegova prečaca. Klikom na aktivnoga isključuje se. Ako radije vidite sve njih stalno, postavite `alwaysShow` na `true` na unosu `omarchy.indicators` u `~/.config/omarchy/shell.json` — pogledajte [gornju traku](05-the-top-bar.md) za to kako se widgeti trake konfiguriraju.
+Postavite pokazivač bilo gdje na traci za prikaz neaktivnih pokazatelja. Neaktivni pokazatelji skriveni su. Lebdite na području oko njih i oni ublijede prigušeno, pa možete kliknuti jednoga da ga uključite bez poznavanja njegova prečaca. Klikom na aktivnoga isključuje se. Ako radije vidite sve njih stalno, postavite `alwaysShow` na `true` na unosu `omarchy.indicators` u `~/.config/omarchy/shell.json` — pogledajte [gornju traku](05-the-top-bar.md) za to kako se widgeti trake konfiguriraju.
 
 ### Noćno svjetlo
 

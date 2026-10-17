@@ -1,10 +1,11 @@
 # Captures de pantalla i gravació
 
-Tot el que podeu agafar de la pantalla penja de la tecla Print Screen. Una sola tecla fa una foto, i els modificadors fan una gravació, un color o el text dins d'una regió. Si el vostre teclat no té tecla Print Screen, `Super + Ctrl + C` obre el mateix conjunt com a menú.
+Tot el que podeu agafar de la pantalla penja de la tecla Print Screen. Una sola tecla fa una foto, i els modificadors fan una gravació, un color o el text dins d'una regió. Si el vostre teclat no té tecla Print Screen, `Super + Ctrl + C` obre el mateix conjunt com a menú. `Super + Shift + S`: Captura de pantalla.
 
 | Drecera | Funció |
 | ------ | -------- |
 | `Print Screen` | Captura de pantalla |
+| `Super + Shift + S` | Captura de pantalla |
 | `Alt + Print Screen` | Gravació de pantalla (o atura la que s'està executant) |
 | `Super + Print Screen` | Selector de color |
 | `Super + Ctrl + Print Screen` | Extreu text d'una regió |
@@ -13,7 +14,7 @@ Tot el que podeu agafar de la pantalla penja de la tecla Print Screen. Una sola 
 
 ## Captures de pantalla
 
-Premeu `Print Screen` i Omasnap captura el monitor enfocat abans que aparegui la seva superposició, de manera que res es mou sota vostre mentre apunteu. Arrossegueu una regió lliure, feu clic en una finestra per capturar-la, o feu clic en un espai obert per capturar tot el monitor. Premeu `S` abans de dibuixar per capturar una regió amb desplaçament. Heu canviat d'idea? Torneu a prémer `Print Screen` per descartar Omasnap.
+Premeu `Print Screen` (`Super + Shift + S`) i Omasnap captura el monitor enfocat abans que aparegui la seva superposició, de manera que res es mou sota vostre mentre apunteu. Arrossegueu una regió lliure, feu clic en una finestra per capturar-la, o feu clic en un espai obert per capturar tot el monitor. Premeu `S` abans de dibuixar per capturar una regió amb desplaçament. Heu canviat d'idea? Torneu a prémer `Print Screen` (`Super + Shift + S`) per descartar Omasnap.
 
 Després de seleccionar una àrea, Omasnap desa la captura, la copia al porta-retalls i mostra una previsualització durant 10 segons. Feu servir el botó de fixar de la previsualització o `Ctrl + P` per mantenir-la a la pantalla, o trieu Edita per anotar-la.
 

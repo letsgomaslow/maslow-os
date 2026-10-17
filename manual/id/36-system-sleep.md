@@ -2,6 +2,8 @@
 
 Omarchy mengaktifkan penangguhan dan hibernasi secara bawaan, tetapi jika kamu mengalami masalah dengan salah satunya di mesinmu, kamu bisa mematikannya.
 
+Pada mesin NVIDIA GB10 seperti DGX Spark dan ASUS Ascent GX10, suspend dan hibernasi dimatikan seperti di NVIDIA DGX OS karena belum terbukti bekerja pada perangkat keras ini. Sakelar suspend dan penyiapan hibernasi tidak berlaku di sini. Hapus `/etc/systemd/sleep.conf.d/omarchy-sleep-disabled.conf` dengan `sudo rm` untuk mengaktifkannya kembali; Suspend kembali ke menu dan hibernasi dapat diatur seperti biasa. `sudo omarchy apply hardware --install-user "$USER"` mengembalikan berkas itu.
+
 ### Profil daya
 
 Di laptop, Omarchy mengingat profil dayamu secara terpisah untuk saat terhubung ke listrik dan saat menggunakan baterai, dan beralih di antara keduanya saat kamu mencolokkan dan mencabut. Secara bawaan itu berarti performa saat AC dan seimbang saat baterai.

@@ -38,7 +38,7 @@ Tá na bratacha ainmnithe don stát as — `screensaver-off`, `suspend-off`, `ba
 
 Nuair a bhíonn mód air, faigheann tú glif beag i lár an bharra bharr in aice leis an gclog. Sin giuirléid na dtáscairí, agus iompraíonn sí deachtú, taifeadadh scáileáin, meabhrúcháin ar feitheamh, solas oíche, ná cuir isteach, agus fan i do dhúis.
 
-Tá táscairí neamhghníomhacha i bhfolach. Hover an limistéar timpeall orthu agus maolaíonn siad isteach, mar sin is féidir leat ceann a chliceáil chun é a chur air gan a eochair ghasta a bheith ar eolas agat. Casann cliceáil ar cheann gníomhach é as arís. Más fearr leat iad uile a fheiceáil i gcónaí, socraigh `alwaysShow` go `true` ar an iontráil `omarchy.indicators` i `~/.config/omarchy/shell.json` — féach [an barra barr](05-the-top-bar.md) maidir le conas a chumraítear giuirléidí barra.
+Coinnigh an pointeoir áit ar bith os cionn an bharra chun na táscairí neamhghníomhacha a thaispeáint. Tá táscairí neamhghníomhacha i bhfolach. Hover an limistéar timpeall orthu agus maolaíonn siad isteach, mar sin is féidir leat ceann a chliceáil chun é a chur air gan a eochair ghasta a bheith ar eolas agat. Casann cliceáil ar cheann gníomhach é as arís. Más fearr leat iad uile a fheiceáil i gcónaí, socraigh `alwaysShow` go `true` ar an iontráil `omarchy.indicators` i `~/.config/omarchy/shell.json` — féach [an barra barr](05-the-top-bar.md) maidir le conas a chumraítear giuirléidí barra.
 
 ### Solas oíche
 

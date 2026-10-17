@@ -2,6 +2,8 @@
 
 Omarchy ottaa lepotilan ja horrostilan käyttöön oletuksena, mutta jos sinulla on ongelmia jommankumman kanssa koneellasi, voit kytkeä ne pois päältä.
 
+NVIDIA GB10 -koneissa, kuten DGX Sparkissa ja ASUS Ascent GX10:ssä, valmius- ja lepotila on poistettu käytöstä kuten NVIDIA DGX OS:ssä, koska niiden toimivuutta tällä laitteistolla ei ole vielä osoitettu. Valmiustilan kytkin ja lepotilan määritys eivät koske näitä koneita. Poista `/etc/systemd/sleep.conf.d/omarchy-sleep-disabled.conf` komennolla `sudo rm` ottaaksesi ne käyttöön; valmiustila palaa valikkoon ja lepotilan voi määrittää normaalisti. `sudo omarchy apply hardware --install-user "$USER"` palauttaa tiedoston.
+
 ### Virtaprofiiilit
 
 Kannettavalla Omarchy muistaa virtaprofiilisi erikseen verkkovirralla ja akulla ja vaihtaa niiden välillä kytkiessäsi ja irrottaessasi virtalähteen. Suoraan paketista se tarkoittaa suorituskykyä verkkovirralla ja tasapainotettua tilaa akulla.

@@ -116,7 +116,7 @@ Alle wichtigsten Tastenzuordnungen siehst du mit `Super + K` (Tmux-Zuordnungen m
 | `Super + Shift + Alt + A`           | KI (Grok)  |
 | `Super + Shift + G`           | Messenger (Signal)  |
 | `Super + Shift + P`           | Google Photos  |
-| `Super + Shift + S`           | Google Maps  |
+| `Super + Shift + Alt + S`           | Google Maps  |
 | `Super + Shift + Alt + G`           | Messenger (WhatsApp)  |
 | `Super + Shift + Ctrl + G`           | Messenger (Google)  |
 | `Super + Shift + O`           | Obsidian  |
@@ -142,8 +142,9 @@ Normalerweise braucht man unter Linux `Ctrl + Shift + C/V`, um im Terminal zu ko
 
 | Tastenkürzel              | Funktion                       |
 | ------------------- | ------------------------------ |
-| `Super + Ctrl + C` | Aufnehmen-Menü (für Tastaturen ohne PrintScr-Taste) |
+| `Super + Ctrl + C` | Aufnehmen-Menü |
 | `Print Screen`            | Screenshot                      |
+| `Super + Shift + S`            | Screenshot                      |
 | `Alt + Print Screen`            | Bildschirmaufnahme                     |
 | `Super + Print Screen` | Farbwähler |
 | `Super + Ctrl + Print Screen` | Textextraktion in die Zwischenablage |

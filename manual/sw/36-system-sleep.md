@@ -2,6 +2,8 @@
 
 Omarchy huwezesha kusitisha (suspend) na kusinzia (hibernation) kwa chaguomsingi, lakini kama unapata matatizo na yoyote kati yao kwenye mashine yako, unaweza kuzizima.
 
+Kwenye kompyuta za NVIDIA GB10 kama DGX Spark na ASUS Ascent GX10, kusinzia na hibernesheni zimezimwa kama katika NVIDIA DGX OS, kwa sababu bado hazijathibitishwa kufanya kazi kwenye vifaa hivi. Swichi ya kusinzia na usanidi wa hibernesheni havitumiki hapa. Ondoa `/etc/systemd/sleep.conf.d/omarchy-sleep-disabled.conf` kwa `sudo rm` kuviwasha tena; Kusinzia hurudi kwenye menyu na hibernesheni inaweza kusanidiwa kawaida. `sudo omarchy apply hardware --install-user "$USER"` hurudisha faili hilo.
+
 ### Profaili za nguvu
 
 Kwenye kompyuta mpakato, Omarchy hukumbuka profaili yako ya nguvu kando kwa iliyochomekwa na inayotumia betri, na hubadilisha kati ya hizo mbili unapochomeka na kuchomoa. Mara moja hiyo inamaanisha utendaji kwenye AC na usawaziko kwenye betri.

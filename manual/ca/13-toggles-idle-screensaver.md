@@ -38,7 +38,7 @@ Les marques s'anomenen per l'estat desactivat — `screensaver-off`, `suspend-of
 
 Quan un mode és activat, rebeu un petit glif al mig de la barra superior al costat del rellotge. És el giny d'indicadors, i porta el dictat, la gravació de pantalla, els recordatoris pendents, la llum nocturna, no molesteu i mantenir despert.
 
-Els indicadors inactius són ocults. Passeu el cursor per la zona que els envolta i apareixen atenuats, de manera que en podeu fer clic en un per activar-lo sense saber-ne la drecera. Fer clic en un d'actiu el torna a desactivar. Si preferiu veure'ls tots sempre, definiu `alwaysShow` a `true` a l'entrada `omarchy.indicators` de `~/.config/omarchy/shell.json` — vegeu [la barra superior](05-the-top-bar.md) per saber com es configuren els ginys de la barra.
+Passa el punter per qualsevol punt de la barra per mostrar els indicadors inactius. Els indicadors inactius són ocults. Passeu el cursor per la zona que els envolta i apareixen atenuats, de manera que en podeu fer clic en un per activar-lo sense saber-ne la drecera. Fer clic en un d'actiu el torna a desactivar. Si preferiu veure'ls tots sempre, definiu `alwaysShow` a `true` a l'entrada `omarchy.indicators` de `~/.config/omarchy/shell.json` — vegeu [la barra superior](05-the-top-bar.md) per saber com es configuren els ginys de la barra.
 
 ### Llum nocturna
 

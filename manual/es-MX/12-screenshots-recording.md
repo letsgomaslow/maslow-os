@@ -1,10 +1,11 @@
 # Capturas de pantalla y grabación
 
-Todo lo que puedes tomar de la pantalla cuelga de la tecla Print Screen. Una tecla sola toma una foto, y los modificadores toman una grabación, un color o el texto dentro de una región. Si tu teclado de plano no tiene tecla Print Screen, `Super + Ctrl + C` abre el mismo conjunto como menú.
+Todo lo que puedes tomar de la pantalla cuelga de la tecla Print Screen. Una tecla sola toma una foto, y los modificadores toman una grabación, un color o el texto dentro de una región. Si tu teclado de plano no tiene tecla Print Screen, `Super + Ctrl + C` abre el mismo conjunto como menú. `Super + Shift + S`: Captura de pantalla.
 
 | Atajo | Función |
 | ------ | -------- |
 | `Print Screen` | Captura de pantalla |
+| `Super + Shift + S` | Captura de pantalla |
 | `Alt + Print Screen` | Grabar pantalla (o detener la que está en curso) |
 | `Super + Print Screen` | Selector de color |
 | `Super + Ctrl + Print Screen` | Extraer texto de una región |
@@ -13,7 +14,7 @@ Todo lo que puedes tomar de la pantalla cuelga de la tecla Print Screen. Una tec
 
 ## Capturas de pantalla
 
-Presiona `Print Screen` y Omasnap captura el monitor enfocado antes de que aparezca su capa superpuesta, para que nada se mueva debajo de ti mientras apuntas. Arrastra una región libre, haz clic en una ventana para capturarla o haz clic en un espacio abierto para capturar todo el monitor. Presiona `S` antes de dibujar para capturar una región con desplazamiento. ¿Cambiaste de opinión? Presiona `Print Screen` otra vez para cerrar Omasnap.
+Presiona `Print Screen` (`Super + Shift + S`) y Omasnap captura el monitor enfocado antes de que aparezca su capa superpuesta, para que nada se mueva debajo de ti mientras apuntas. Arrastra una región libre, haz clic en una ventana para capturarla o haz clic en un espacio abierto para capturar todo el monitor. Presiona `S` antes de dibujar para capturar una región con desplazamiento. ¿Cambiaste de opinión? Presiona `Print Screen` (`Super + Shift + S`) otra vez para cerrar Omasnap.
 
 Después de seleccionar un área, Omasnap guarda la captura, la copia al portapapeles y muestra una vista previa durante 10 segundos. Usa el botón de fijar de la vista previa o `Ctrl + P` para mantenerla en pantalla, o elige Editar para anotarla.
 

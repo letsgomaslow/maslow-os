@@ -116,7 +116,7 @@
 | `Super + Shift + Alt + A`           | ИИ (Grok)  |
 | `Super + Shift + G`           | Мессенджер (Signal)  |
 | `Super + Shift + P`           | Google Photos  |
-| `Super + Shift + S`           | Google Maps  |
+| `Super + Shift + Alt + S`           | Google Maps  |
 | `Super + Shift + Alt + G`           | Мессенджер (WhatsApp)  |
 | `Super + Shift + Ctrl + G`           | Мессенджер (Google)  |
 | `Super + Shift + O`           | Obsidian  |
@@ -142,8 +142,9 @@
 
 | Сочетание              | Функция                       |
 | ------------------- | ------------------------------ |
-| `Super + Ctrl + C` | Меню захвата (для клавиатур без кнопки PrintScr) |
+| `Super + Ctrl + C` | Меню захвата |
 | `Print Screen`            | Снимок экрана                      |
+| `Super + Shift + S`            | Снимок экрана                      |
 | `Alt + Print Screen`            | Запись экрана                     |
 | `Super + Print Screen` | Выбор цвета |
 | `Super + Ctrl + Print Screen` | Извлечение текста в буфер обмена |

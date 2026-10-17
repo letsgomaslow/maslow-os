@@ -2,6 +2,8 @@
 
 Omarchy 默认启用挂起和休眠，但如果你的机器在使用其中任一功能时出现问题，你可以将其关闭。
 
+在 DGX Spark、ASUS Ascent GX10 等 NVIDIA GB10 电脑上，挂起和休眠与 NVIDIA DGX OS 一样被禁用，因为尚未证实它们能在此硬件上正常工作。挂起开关和休眠设置在这里不适用。要重新启用，请用 `sudo rm` 删除 `/etc/systemd/sleep.conf.d/omarchy-sleep-disabled.conf`；挂起会重新出现在菜单中，休眠也可按常规设置。运行 `sudo omarchy apply hardware --install-user "$USER"` 会恢复该文件。
+
 ### 电源配置文件
 
 在笔记本电脑上，Omarchy 会分别记住插入电源时和使用电池时的电源配置文件，并随插拔在两者之间切换。开箱即用意味着交流电时使用性能模式，电池时使用平衡模式。

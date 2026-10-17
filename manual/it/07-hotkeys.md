@@ -116,7 +116,7 @@ Puoi vedere tutte le principali combinazioni da tastiera con `Super + K` (combin
 | `Super + Shift + Alt + A`           | AI (Grok)  |
 | `Super + Shift + G`           | Messenger (Signal)  |
 | `Super + Shift + P`           | Google Photos  |
-| `Super + Shift + S`           | Google Maps  |
+| `Super + Shift + Alt + S`           | Google Maps  |
 | `Super + Shift + Alt + G`           | Messenger (WhatsApp)  |
 | `Super + Shift + Ctrl + G`           | Messenger (Google)  |
 | `Super + Shift + O`           | Obsidian  |
@@ -142,8 +142,9 @@ Di solito su Linux, serve `Ctrl + Shift + C/V` per copiare e incollare nel termi
 
 | Scorciatoia              | Funzione                       |
 | ------------------- | ------------------------------ |
-| `Super + Ctrl + C` | Menu Cattura (per tastiere senza tasto PrintScr) |
+| `Super + Ctrl + C` | Menu Cattura |
 | `Print Screen`            | Schermata                      |
+| `Super + Shift + S`            | Schermata                      |
 | `Alt + Print Screen`            | Registra schermo                     |
 | `Super + Print Screen` | Selettore colore |
 | `Super + Ctrl + Print Screen` | Estrazione testo negli appunti |

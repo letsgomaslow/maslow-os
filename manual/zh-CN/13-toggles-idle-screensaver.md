@@ -38,7 +38,7 @@ omarchy-toggle-enabled screensaver-off && echo "screensaver is off"
 
 当某个模式打开时，你会在菜单栏中间、时钟旁边看到一个小字形。这是指示器小组件，它承载听写、录屏、待处理的提醒、夜灯、勿扰和保持唤醒。
 
-非活动的指示器会隐藏。将鼠标悬停在它们周围的区域，它们会变暗地淡入，这样你就可以单击一个将其打开，而无需知道其快捷键。单击活动的指示器会将其关闭。如果你希望始终看到所有指示器，请将 `~/.config/omarchy/shell.json` 中 `omarchy.indicators` 条目上的 `alwaysShow` 设置为 `true`——有关如何配置栏小组件，请参见[菜单栏](05-the-top-bar.md)。
+将指针悬停在栏的任意位置，即可显示未激活的指示器。 非活动的指示器会隐藏。将鼠标悬停在它们周围的区域，它们会变暗地淡入，这样你就可以单击一个将其打开，而无需知道其快捷键。单击活动的指示器会将其关闭。如果你希望始终看到所有指示器，请将 `~/.config/omarchy/shell.json` 中 `omarchy.indicators` 条目上的 `alwaysShow` 设置为 `true`——有关如何配置栏小组件，请参见[菜单栏](05-the-top-bar.md)。
 
 ### 夜灯
 

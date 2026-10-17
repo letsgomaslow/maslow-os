@@ -116,7 +116,7 @@
 | `Super + Shift + Alt + A`           | AI (Grok)  |
 | `Super + Shift + G`           | Skilaboð (Signal)  |
 | `Super + Shift + P`           | Google Photos  |
-| `Super + Shift + S`           | Google Maps  |
+| `Super + Shift + Alt + S`           | Google Maps  |
 | `Super + Shift + Alt + G`           | Skilaboð (WhatsApp)  |
 | `Super + Shift + Ctrl + G`           | Skilaboð (Google)  |
 | `Super + Shift + O`           | Obsidian  |
@@ -142,8 +142,9 @@ Venjulega á Linux þarftu `Ctrl + Shift + C/V` til að afrita og líma í termi
 
 | Flýtilykill              | Virkni                       |
 | ------------------- | ------------------------------ |
-| `Super + Ctrl + C` | Fangvalmynd (fyrir lyklaborð án PrintScr-hnapps) |
+| `Super + Ctrl + C` | Fangvalmynd |
 | `Print Screen`            | Skjámynd                      |
+| `Super + Shift + S`            | Skjámynd                      |
 | `Alt + Print Screen`            | Skjáupptaka                     |
 | `Super + Print Screen` | Litaval |
 | `Super + Ctrl + Print Screen` | Textaútdráttur á klippiborð |

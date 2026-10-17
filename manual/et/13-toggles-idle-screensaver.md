@@ -38,7 +38,7 @@ Märgised on nimetatud väljalülitatud oleku järgi — `screensaver-off`, `sus
 
 Kui režiim on sisse lülitatud, saad väikese glüüfi menüüriba keskel kella kõrval. See on näidikute vidin ja see kannab dikteerimist, ekraanisalvestust, ootel meeldetuletusi, öövalgust, ära sega ja püsi ärkvel.
 
-Passiivsed näidikud on peidetud. Hõlju nende ümbritseva ala kohal ja need tuhmuvad sisse tuhmistatuna, nii et saad ühe sisse lülitamiseks klõpsata, teadmata selle kiirklahvi. Aktiivsel klõpsamine lülitab selle tagasi välja. Kui eelistad neid kogu aeg näha, sea `alwaysShow` väärtuseks `true` kirjel `omarchy.indicators` failis `~/.config/omarchy/shell.json` — vt [menüüriba](05-the-top-bar.md) selle kohta, kuidas riba vidinaid seadistatakse.
+Liiguta kursor riba mis tahes kohale, et näidata mitteaktiivseid indikaatoreid. Passiivsed näidikud on peidetud. Hõlju nende ümbritseva ala kohal ja need tuhmuvad sisse tuhmistatuna, nii et saad ühe sisse lülitamiseks klõpsata, teadmata selle kiirklahvi. Aktiivsel klõpsamine lülitab selle tagasi välja. Kui eelistad neid kogu aeg näha, sea `alwaysShow` väärtuseks `true` kirjel `omarchy.indicators` failis `~/.config/omarchy/shell.json` — vt [menüüriba](05-the-top-bar.md) selle kohta, kuidas riba vidinaid seadistatakse.
 
 ### Öövalgus
 

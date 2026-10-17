@@ -116,7 +116,7 @@ Makikita mo ang lahat ng pangunahing binding ng keyboard gamit ang `Super + K` (
 | `Super + Shift + Alt + A`           | AI (Grok)  |
 | `Super + Shift + G`           | Messenger (Signal)  |
 | `Super + Shift + P`           | Google Photos  |
-| `Super + Shift + S`           | Google Maps  |
+| `Super + Shift + Alt + S`           | Google Maps  |
 | `Super + Shift + Alt + G`           | Messenger (WhatsApp)  |
 | `Super + Shift + Ctrl + G`           | Messenger (Google)  |
 | `Super + Shift + O`           | Obsidian  |
@@ -142,8 +142,9 @@ Karaniwan sa Linux, kailangan mo ng `Ctrl + Shift + C/V` para mag-copy'n'paste s
 
 | Hotkey              | Tungkulin                       |
 | ------------------- | ------------------------------ |
-| `Super + Ctrl + C` | Menu ng kuha (para sa mga keyboard na walang PrintScr button) |
+| `Super + Ctrl + C` | Menu ng kuha |
 | `Print Screen`            | Screenshot                      |
+| `Super + Shift + S`            | Screenshot                      |
 | `Alt + Print Screen`            | Pag-record ng screen                     |
 | `Super + Print Screen` | Tagapili ng kulay |
 | `Super + Ctrl + Print Screen` | Pagkuha ng teksto papunta sa clipboard |

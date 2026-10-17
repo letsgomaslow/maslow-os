@@ -116,7 +116,7 @@ Bạn có thể xem tất cả các phím gán chính trên bàn phím bằng `S
 | `Super + Shift + Alt + A`           | AI (Grok)  |
 | `Super + Shift + G`           | Trình nhắn tin (Signal)  |
 | `Super + Shift + P`           | Google Photos  |
-| `Super + Shift + S`           | Google Maps  |
+| `Super + Shift + Alt + S`           | Google Maps  |
 | `Super + Shift + Alt + G`           | Trình nhắn tin (WhatsApp)  |
 | `Super + Shift + Ctrl + G`           | Trình nhắn tin (Google)  |
 | `Super + Shift + O`           | Obsidian  |
@@ -142,8 +142,9 @@ Thông thường trên Linux, bạn cần `Ctrl + Shift + C/V` để sao chép v
 
 | Phím tắt              | Chức năng                       |
 | ------------------- | ------------------------------ |
-| `Super + Ctrl + C` | Menu chụp/ghi (cho bàn phím không có nút PrintScr) |
+| `Super + Ctrl + C` | Menu chụp/ghi |
 | `Print Screen`            | Ảnh chụp màn hình                      |
+| `Super + Shift + S`            | Ảnh chụp màn hình                      |
 | `Alt + Print Screen`            | Ghi màn hình                     |
 | `Super + Print Screen` | Bộ chọn màu |
 | `Super + Ctrl + Print Screen` | Trích xuất văn bản vào bảng nhớ tạm |

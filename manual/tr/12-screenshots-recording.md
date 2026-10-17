@@ -1,10 +1,11 @@
 # Ekran Görüntüleri ve Kayıt
 
-Ekranda yakalayabileceğiniz her şey Print Screen tuşuna bağlıdır. Tek başına bir tuş bir resim alır ve değiştiriciler bir kayıt, bir renk veya bir bölgenin içindeki metni alır. Klavyenizde hiç Print Screen tuşu yoksa, `Super + Ctrl + C` aynı kümeyi bir menü olarak açar.
+Ekranda yakalayabileceğiniz her şey Print Screen tuşuna bağlıdır. Tek başına bir tuş bir resim alır ve değiştiriciler bir kayıt, bir renk veya bir bölgenin içindeki metni alır. Klavyenizde hiç Print Screen tuşu yoksa, `Super + Ctrl + C` aynı kümeyi bir menü olarak açar. `Super + Shift + S`: Ekran Görüntüsü.
 
 | Kısayol | İşlev |
 | ------ | -------- |
 | `Print Screen` | Ekran Görüntüsü |
+| `Super + Shift + S` | Ekran Görüntüsü |
 | `Alt + Print Screen` | Ekran kaydı (veya çalışmakta olanı durdur) |
 | `Super + Print Screen` | Renk seçici |
 | `Super + Ctrl + Print Screen` | Bir bölgeden metin çıkar |
@@ -13,7 +14,7 @@ Ekranda yakalayabileceğiniz her şey Print Screen tuşuna bağlıdır. Tek baş
 
 ## Ekran Görüntüleri
 
-`Print Screen` tuşuna basın; Omasnap, katmanı görünmeden önce odaklanmış monitörü yakalar, böylece nişan alırken altınızda hiçbir şey kaymaz. Serbest bir bölge sürükleyin, yakalamak için bir pencereye tıklayın veya tüm monitörü yakalamak için açık alana tıklayın. Kayan bir bölge yakalamak için çizmeden önce `S` tuşuna basın. Fikrinizi mi değiştirdiniz? Omasnap'i kapatmak için yine `Print Screen` tuşuna basın.
+`Print Screen` (`Super + Shift + S`) tuşuna basın; Omasnap, katmanı görünmeden önce odaklanmış monitörü yakalar, böylece nişan alırken altınızda hiçbir şey kaymaz. Serbest bir bölge sürükleyin, yakalamak için bir pencereye tıklayın veya tüm monitörü yakalamak için açık alana tıklayın. Kayan bir bölge yakalamak için çizmeden önce `S` tuşuna basın. Fikrinizi mi değiştirdiniz? Omasnap'i kapatmak için yine `Print Screen` (`Super + Shift + S`) tuşuna basın.
 
 Bir alan seçtikten sonra, Omasnap yakalamayı kaydeder, panoya kopyalar ve 10 saniye boyunca bir önizleme gösterir. Onu ekranda tutmak için önizlemenin sabitle düğmesini veya `Ctrl + P` tuşunu kullanın veya açıklamak için Düzenle'yi seçin.
 

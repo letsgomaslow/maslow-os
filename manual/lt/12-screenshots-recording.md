@@ -1,10 +1,11 @@
 # Ekrano nuotraukos ir įrašymas
 
-Viskas, ką galite paimti iš ekrano, kabo ant Print Screen klavišo. Vienas klavišas pats daro nuotrauką, o modifikatoriai daro įrašą, spalvą arba tekstą srities viduje. Jei jūsų klaviatūra visai neturi Print Screen klavišo, `Super + Ctrl + C` atidaro tą patį rinkinį kaip meniu.
+Viskas, ką galite paimti iš ekrano, kabo ant Print Screen klavišo. Vienas klavišas pats daro nuotrauką, o modifikatoriai daro įrašą, spalvą arba tekstą srities viduje. Jei jūsų klaviatūra visai neturi Print Screen klavišo, `Super + Ctrl + C` atidaro tą patį rinkinį kaip meniu. `Super + Shift + S`: Ekrano nuotrauka.
 
 | Spartusis klavišas | Funkcija |
 | ------ | -------- |
 | `Print Screen` | Ekrano nuotrauka |
+| `Super + Shift + S` | Ekrano nuotrauka |
 | `Alt + Print Screen` | Ekrano įrašas (arba sustabdyti veikiantį) |
 | `Super + Print Screen` | Spalvos parinkiklis |
 | `Super + Ctrl + Print Screen` | Išgauti tekstą iš srities |
@@ -13,7 +14,7 @@ Viskas, ką galite paimti iš ekrano, kabo ant Print Screen klavišo. Vienas kla
 
 ## Ekrano nuotraukos
 
-Paspauskite `Print Screen` ir Omasnap užfiksuoja sufokusuotą monitorių prieš pasirodant jo perdangai, todėl niekas po jumis nepasislenka, kol taikotės. Vilkite laisvos formos sritį, spustelėkite langą, kad jį užfiksuotumėte, arba spustelėkite atvirą vietą, kad užfiksuotumėte visą monitorių. Prieš braižydami paspauskite `S`, kad užfiksuotumėte slenkančią sritį. Persigalvojote? Paspauskite `Print Screen` dar kartą, kad atšauktumėte Omasnap.
+Paspauskite `Print Screen` (`Super + Shift + S`) ir Omasnap užfiksuoja sufokusuotą monitorių prieš pasirodant jo perdangai, todėl niekas po jumis nepasislenka, kol taikotės. Vilkite laisvos formos sritį, spustelėkite langą, kad jį užfiksuotumėte, arba spustelėkite atvirą vietą, kad užfiksuotumėte visą monitorių. Prieš braižydami paspauskite `S`, kad užfiksuotumėte slenkančią sritį. Persigalvojote? Paspauskite `Print Screen` (`Super + Shift + S`) dar kartą, kad atšauktumėte Omasnap.
 
 Kai pasirenkate sritį, Omasnap išsaugo fiksavimą, nukopijuoja jį į iškarpinę ir 10 sekundžių rodo peržiūrą. Naudokite peržiūros prisegimo mygtuką arba `Ctrl + P`, kad ji liktų ekrane, arba rinkitės Redaguoti, kad ją anotuotumėte.
 

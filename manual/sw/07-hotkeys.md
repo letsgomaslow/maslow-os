@@ -116,7 +116,7 @@ Unaweza kuona ufungaji wote mkuu wa kibodi kwa `Super + K` (ufungaji wa Tmux kwa
 | `Super + Shift + Alt + A`           | AI (Grok)  |
 | `Super + Shift + G`           | Messenger (Signal)  |
 | `Super + Shift + P`           | Google Photos  |
-| `Super + Shift + S`           | Google Maps  |
+| `Super + Shift + Alt + S`           | Google Maps  |
 | `Super + Shift + Alt + G`           | Messenger (WhatsApp)  |
 | `Super + Shift + Ctrl + G`           | Messenger (Google)  |
 | `Super + Shift + O`           | Obsidian  |
@@ -142,8 +142,9 @@ Kwa kawaida kwenye Linux, unahitaji `Ctrl + Shift + C/V` kunakili na kubandika k
 
 | Mkato wa kitufe              | Kazi                       |
 | ------------------- | ------------------------------ |
-| `Super + Ctrl + C` | Menyu ya kunasa (kwa kibodi zisizo na kitufe cha PrintScr) |
+| `Super + Ctrl + C` | Menyu ya kunasa |
 | `Print Screen`            | Picha ya skrini                      |
+| `Super + Shift + S`            | Picha ya skrini                      |
 | `Alt + Print Screen`            | Rekodi skrini                     |
 | `Super + Print Screen` | Kichaguzi cha rangi |
 | `Super + Ctrl + Print Screen` | Uchimbaji wa maandishi kwenda ubao wa kunakili |

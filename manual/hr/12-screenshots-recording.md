@@ -1,10 +1,11 @@
 # Snimke zaslona i snimanje
 
-Sve što možete zgrabiti sa zaslona visi o tipki Print Screen. Jedna tipka sama po sebi snima sliku, a modifikatori snimaju video, boju ili tekst unutar područja. Ako vaša tipkovnica uopće nema tipku Print Screen, `Super + Ctrl + C` otvara isti skup kao izbornik.
+Sve što možete zgrabiti sa zaslona visi o tipki Print Screen. Jedna tipka sama po sebi snima sliku, a modifikatori snimaju video, boju ili tekst unutar područja. Ako vaša tipkovnica uopće nema tipku Print Screen, `Super + Ctrl + C` otvara isti skup kao izbornik. `Super + Shift + S`: Snimka zaslona.
 
 | Prečac | Funkcija |
 | ------ | -------- |
 | `Print Screen` | Snimka zaslona |
+| `Super + Shift + S` | Snimka zaslona |
 | `Alt + Print Screen` | Snimanje zaslona (ili zaustavi ono koje se izvodi) |
 | `Super + Print Screen` | Birač boja |
 | `Super + Ctrl + Print Screen` | Izdvoji tekst iz područja |
@@ -13,7 +14,7 @@ Sve što možete zgrabiti sa zaslona visi o tipki Print Screen. Jedna tipka sama
 
 ## Snimke zaslona
 
-Pritisnite `Print Screen` i Omasnap snima fokusirani monitor prije nego što se pojavi njegov sloj, pa se ništa ne pomiče ispod vas dok ciljate. Povucite slobodno područje, kliknite prozor da ga snimite ili kliknite prazan prostor da snimite cijeli monitor. Pritisnite `S` prije crtanja da snimite pomično područje. Predomislili ste se? Ponovno pritisnite `Print Screen` da odbacite Omasnap.
+Pritisnite `Print Screen` (`Super + Shift + S`) i Omasnap snima fokusirani monitor prije nego što se pojavi njegov sloj, pa se ništa ne pomiče ispod vas dok ciljate. Povucite slobodno područje, kliknite prozor da ga snimite ili kliknite prazan prostor da snimite cijeli monitor. Pritisnite `S` prije crtanja da snimite pomično područje. Predomislili ste se? Ponovno pritisnite `Print Screen` (`Super + Shift + S`) da odbacite Omasnap.
 
 Nakon što odaberete područje, Omasnap sprema snimku, kopira je u međuspremnik i prikazuje pregled 10 sekundi. Upotrijebite tipku za prikvačivanje pregleda ili `Ctrl + P` da ga zadržite na zaslonu ili odaberite Uredi da ga označite.
 

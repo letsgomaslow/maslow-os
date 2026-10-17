@@ -7,3 +7,7 @@ Omarchy utiliza JetBrainsMono Nerd Font como fuente de la terminal y del sistema
 Puedes cambiar esto desde el menú _Estilo > Fuente_ en el menú de Omarchy (`Super + Space`). Eso establece la fuente monoespaciada en todas partes: la terminal, la barra y cualquier otra cosa que la pida.
 
 Puedes instalar otras fuentes populares para programar desde _Instalar > Estilo > Fuente_ en el menú de Omarchy: Cascadia Mono, Meslo LG Mono, Fira Code, Victor Code, Bitstream Vera Mono e Iosevka están a un clic de distancia, en sus versiones Nerd Font para que los glifos de la barra y la terminal sigan funcionando. Después de instalar una, elígela en _Estilo > Fuente_.
+
+## Chino, japonés, coreano
+
+El chino, japonés y coreano comparten muchos caracteres, pero algunos se dibujan distinto. Elegir uno de estos idiomas en _Configurar > Idioma_, o su método de entrada, establece las formas correspondientes. Elígelas en _Estilo > Fuente > Chino, japonés, coreano_ o usa `omarchy font cjk jp`, `kr`, `sc`, `tc` (Taiwán) o `hk` (Hong Kong) en la terminal. `omarchy font cjk default` restaura la opción del sistema: formas japonesas. El texto que una página o documento marca con su propio idioma conserva las formas de ese idioma, al igual que todo el escritorio cuando usa uno de estos idiomas.

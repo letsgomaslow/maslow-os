@@ -116,7 +116,7 @@
 | `Super + Shift + Alt + A`           | AI (Grok)  |
 | `Super + Shift + G`           | Месенджер (Signal)  |
 | `Super + Shift + P`           | Google Photos  |
-| `Super + Shift + S`           | Google Maps  |
+| `Super + Shift + Alt + S`           | Google Maps  |
 | `Super + Shift + Alt + G`           | Месенджер (WhatsApp)  |
 | `Super + Shift + Ctrl + G`           | Месенджер (Google)  |
 | `Super + Shift + O`           | Obsidian  |
@@ -142,8 +142,9 @@
 
 | Гаряча клавіша              | Функція                       |
 | ------------------- | ------------------------------ |
-| `Super + Ctrl + C` | Меню захоплення (для клавіатур без кнопки PrintScr) |
+| `Super + Ctrl + C` | Меню захоплення |
 | `Print Screen`            | Знімок екрана                      |
+| `Super + Shift + S`            | Знімок екрана                      |
 | `Alt + Print Screen`            | Запис екрана                     |
 | `Super + Print Screen` | Вибір кольору |
 | `Super + Ctrl + Print Screen` | Вилучення тексту в буфер обміну |

@@ -38,7 +38,7 @@ Les indicateurs sont nommés pour l'état désactivé — `screensaver-off`, `su
 
 Lorsqu'un mode est activé, vous obtenez un petit glyphe au milieu de la barre supérieure, à côté de l'horloge. C'est le widget indicateurs, et il porte la dictée, l'enregistrement d'écran, les rappels en attente, l'éclairage nocturne, ne pas déranger, et rester éveillé.
 
-Les indicateurs inactifs sont masqués. Survolez la zone autour d'eux et ils apparaissent en fondu atténué, de sorte que vous pouvez en cliquer un pour l'activer sans connaître son raccourci. Cliquer sur un indicateur actif le désactive. Si vous préférez les voir tous en permanence, définissez `alwaysShow` à `true` sur l'entrée `omarchy.indicators` dans `~/.config/omarchy/shell.json` — voir [la barre supérieure](05-the-top-bar.md) pour la façon dont les widgets de la barre sont configurés.
+Survolez n’importe où sur la barre pour afficher les indicateurs inactifs. Les indicateurs inactifs sont masqués. Survolez la zone autour d'eux et ils apparaissent en fondu atténué, de sorte que vous pouvez en cliquer un pour l'activer sans connaître son raccourci. Cliquer sur un indicateur actif le désactive. Si vous préférez les voir tous en permanence, définissez `alwaysShow` à `true` sur l'entrée `omarchy.indicators` dans `~/.config/omarchy/shell.json` — voir [la barre supérieure](05-the-top-bar.md) pour la façon dont les widgets de la barre sont configurés.
 
 ### Éclairage nocturne
 

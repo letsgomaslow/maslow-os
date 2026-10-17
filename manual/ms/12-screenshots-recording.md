@@ -1,10 +1,11 @@
 # Tangkap Skrin & Rakaman
 
-Segala-galanya yang anda boleh ambil dari skrin bergantung pada kekunci Print Screen. Satu kekunci dengan sendirinya mengambil gambar, dan pengubah mengambil Rakaman, warna, atau teks di dalam kawasan. Jika papan kekunci anda tidak mempunyai kekunci Print Screen langsung, `Super + Ctrl + C` membuka set yang sama sebagai menu.
+Segala-galanya yang anda boleh ambil dari skrin bergantung pada kekunci Print Screen. Satu kekunci dengan sendirinya mengambil gambar, dan pengubah mengambil Rakaman, warna, atau teks di dalam kawasan. Jika papan kekunci anda tidak mempunyai kekunci Print Screen langsung, `Super + Ctrl + C` membuka set yang sama sebagai menu. `Super + Shift + S`: Tangkap Skrin.
 
 | Kekunci Panas | Fungsi |
 | ------ | -------- |
 | `Print Screen` | Tangkap Skrin |
+| `Super + Shift + S` | Tangkap Skrin |
 | `Alt + Print Screen` | Rakam Skrin (atau hentikan yang sedang berjalan) |
 | `Super + Print Screen` | Pemilih warna |
 | `Super + Ctrl + Print Screen` | Ekstrak teks dari kawasan |
@@ -13,7 +14,7 @@ Segala-galanya yang anda boleh ambil dari skrin bergantung pada kekunci Print Sc
 
 ## Tangkap Skrin
 
-Tekan `Print Screen` dan Omasnap menangkap monitor yang difokuskan sebelum tindanannya muncul, jadi tiada apa-apa beralih di bawah anda semasa anda menyasar. Seret kawasan bentuk bebas, klik tetingkap untuk menangkapnya, atau klik ruang terbuka untuk menangkap keseluruhan monitor. Tekan `S` sebelum melukis untuk menangkap kawasan menatal. Berubah fikiran? Tekan `Print Screen` sekali lagi untuk menolak Omasnap.
+Tekan `Print Screen` (`Super + Shift + S`) dan Omasnap menangkap monitor yang difokuskan sebelum tindanannya muncul, jadi tiada apa-apa beralih di bawah anda semasa anda menyasar. Seret kawasan bentuk bebas, klik tetingkap untuk menangkapnya, atau klik ruang terbuka untuk menangkap keseluruhan monitor. Tekan `S` sebelum melukis untuk menangkap kawasan menatal. Berubah fikiran? Tekan `Print Screen` (`Super + Shift + S`) sekali lagi untuk menolak Omasnap.
 
 Selepas anda memilih kawasan, Omasnap menyimpan tangkapan, menyalinnya ke papan keratan, dan memaparkan pratonton selama 10 saat. Gunakan butang pin pratonton atau `Ctrl + P` untuk mengekalkannya pada skrin, atau pilih Sunting untuk menganotasikannya.
 

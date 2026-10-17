@@ -38,7 +38,7 @@ Flaggene er navngitt etter av-tilstanden — `screensaver-off`, `suspend-off`, `
 
 Når en modus er på, får du et lite tegn midt i menylinjen ved siden av klokken. Det er indikatorwidgeten, og den bærer diktering, skjermopptak, ventende påminnelser, nattlys, ikke forstyrr og hold våken.
 
-Inaktive indikatorer er skjult. Hold over området rundt dem, og de toner seg inn dempet, slik at du kan klikke én for å slå den på uten å kjenne snarveien dens. Å klikke en aktiv én slår den av igjen. Hvis du heller vil se alle hele tiden, setter du `alwaysShow` til `true` på oppføringen `omarchy.indicators` i `~/.config/omarchy/shell.json` — se [menylinjen](05-the-top-bar.md) for hvordan linjewidgeter konfigureres.
+Hold pekeren hvor som helst på linjen for å vise de inaktive indikatorene. Inaktive indikatorer er skjult. Hold over området rundt dem, og de toner seg inn dempet, slik at du kan klikke én for å slå den på uten å kjenne snarveien dens. Å klikke en aktiv én slår den av igjen. Hvis du heller vil se alle hele tiden, setter du `alwaysShow` til `true` på oppføringen `omarchy.indicators` i `~/.config/omarchy/shell.json` — se [menylinjen](05-the-top-bar.md) for hvordan linjewidgeter konfigureres.
 
 ### Nattlys
 

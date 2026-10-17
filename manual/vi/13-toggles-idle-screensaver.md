@@ -38,7 +38,7 @@ Các cờ được đặt tên theo trạng thái tắt — `screensaver-off`, `
 
 Khi một chế độ đang bật, bạn nhận được một ký tự nhỏ ở giữa thanh trên cùng bên cạnh đồng hồ. Đó là tiện ích chỉ báo, và nó mang theo đọc chính tả, ghi màn hình, lời nhắc đang chờ, đèn đêm, không làm phiền và giữ thức.
 
-Các chỉ báo không hoạt động bị ẩn. Di chuột vào khu vực xung quanh chúng và chúng hiện ra mờ, vì vậy bạn có thể nhấp vào một chỉ báo để bật nó mà không cần biết phím tắt của nó. Nhấp vào một chỉ báo đang hoạt động sẽ tắt nó. Nếu bạn muốn thấy tất cả chúng mọi lúc, đặt `alwaysShow` thành `true` trên mục `omarchy.indicators` trong `~/.config/omarchy/shell.json` — xem [thanh trên cùng](05-the-top-bar.md) để biết cách các tiện ích thanh được cấu hình.
+Di con trỏ đến bất kỳ đâu trên thanh để hiện các chỉ báo không hoạt động. Các chỉ báo không hoạt động bị ẩn. Di chuột vào khu vực xung quanh chúng và chúng hiện ra mờ, vì vậy bạn có thể nhấp vào một chỉ báo để bật nó mà không cần biết phím tắt của nó. Nhấp vào một chỉ báo đang hoạt động sẽ tắt nó. Nếu bạn muốn thấy tất cả chúng mọi lúc, đặt `alwaysShow` thành `true` trên mục `omarchy.indicators` trong `~/.config/omarchy/shell.json` — xem [thanh trên cùng](05-the-top-bar.md) để biết cách các tiện ích thanh được cấu hình.
 
 ### Đèn đêm
 

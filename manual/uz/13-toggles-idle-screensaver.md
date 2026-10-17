@@ -38,7 +38,7 @@ Bayroqlar oʻchiq holat uchun nomlangan — `screensaver-off`, `suspend-off`, `b
 
 Rejim yoqiq boʻlganda, soat yonidagi yuqori panelning oʻrtasida kichik glif olasiz. Bu koʻrsatkichlar vidjeti boʻlib, u diktovka, ekran yozuvi, kutilayotgan eslatmalar, tungi yorugʻlik, bezovta qilmang va uygʻoq qolishni tashiydi.
 
-Faol boʻlmagan koʻrsatkichlar yashirilgan. Ular atrofidagi maydonni ustiga olib boring va ular xiralashib paydo boʻladi, shuning uchun uning hotkeyini bilmasdan uni yoqish uchun birini bosishingiz mumkin. Faol birini bosish uni orqaga oʻchiradi. Agar ularning hammasini har doim koʻrishni afzal koʻrsangiz, `~/.config/omarchy/shell.json` dagi `omarchy.indicators` yozuvida `alwaysShow` ni `true` ga oʻrnating — panel vidjetlari qanday sozlanishi haqida [yuqori panel](05-the-top-bar.md) ga qarang.
+Faol boʻlmagan koʻrsatkichlarni koʻrish uchun kursorni panelning istalgan joyiga olib boring. Faol boʻlmagan koʻrsatkichlar yashirilgan. Ular atrofidagi maydonni ustiga olib boring va ular xiralashib paydo boʻladi, shuning uchun uning hotkeyini bilmasdan uni yoqish uchun birini bosishingiz mumkin. Faol birini bosish uni orqaga oʻchiradi. Agar ularning hammasini har doim koʻrishni afzal koʻrsangiz, `~/.config/omarchy/shell.json` dagi `omarchy.indicators` yozuvida `alwaysShow` ni `true` ga oʻrnating — panel vidjetlari qanday sozlanishi haqida [yuqori panel](05-the-top-bar.md) ga qarang.
 
 ### Tungi yorugʻlik
 

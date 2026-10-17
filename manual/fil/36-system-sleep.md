@@ -2,6 +2,8 @@
 
 Pinagagana ng Omarchy ang suspend at hibernation bilang default, pero kung may problema ka sa alinman sa dalawa sa makina mo, maaari mo silang i-toggle off.
 
+Sa mga NVIDIA GB10 na computer gaya ng DGX Spark at ASUS Ascent GX10, naka-off ang suspend at hibernation, tulad sa NVIDIA DGX OS, dahil hindi pa napatunayang gumagana ang mga ito sa hardware na ito. Hindi naaangkop dito ang suspend switch at pag-setup ng hibernation. Alisin ang `/etc/systemd/sleep.conf.d/omarchy-sleep-disabled.conf` gamit ang `sudo rm` upang paganahin muli; babalik ang Suspend sa menu at maaaring i-setup ang hibernation nang normal. Ibinabalik ng `sudo omarchy apply hardware --install-user "$USER"` ang file.
+
 ### Mga profile ng kuryente
 
 Sa isang laptop, naaalala ng Omarchy ang profile ng kuryente mo nang hiwalay para sa nakasaksak at tumatakbo sa baterya, at nagpapalit sa pagitan ng dalawa habang nagsasaksak at nagbubunot ka. Agad-agad, ibig sabihin niyon ay performance sa AC at balanced sa baterya.

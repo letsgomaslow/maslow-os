@@ -38,7 +38,7 @@ Ang mga flag ay pinapangalanan para sa off state — `screensaver-off`, `suspend
 
 Kapag naka-on ang isang mode, makakakuha ka ng isang maliit na glyph sa gitna ng top bar sa tabi ng orasan. Iyon ang widget ng mga indikator, at dala nito ang diktasyon, pag-record ng screen, mga nakabinbing paalala, ilaw-panggabi, do not disturb, at manatiling gising.
 
-Nakatago ang mga hindi aktibong indikator. I-hover ang lugar sa paligid ng mga ito at lalabo silang lalabas, kaya maaari mong i-click ang isa para i-on ito nang hindi alam ang hotkey nito. Ang pag-click sa isang aktibo ay ini-off ito ulit. Kung mas gusto mong makita silang lahat sa lahat ng oras, itakda ang `alwaysShow` sa `true` sa entry na `omarchy.indicators` sa `~/.config/omarchy/shell.json` — tingnan ang [top bar](05-the-top-bar.md) para sa kung paano nako-configure ang mga widget ng bar.
+Itapat ang pointer saanman sa bar upang ipakita ang mga hindi aktibong indicator. Nakatago ang mga hindi aktibong indikator. I-hover ang lugar sa paligid ng mga ito at lalabo silang lalabas, kaya maaari mong i-click ang isa para i-on ito nang hindi alam ang hotkey nito. Ang pag-click sa isang aktibo ay ini-off ito ulit. Kung mas gusto mong makita silang lahat sa lahat ng oras, itakda ang `alwaysShow` sa `true` sa entry na `omarchy.indicators` sa `~/.config/omarchy/shell.json` — tingnan ang [top bar](05-the-top-bar.md) para sa kung paano nako-configure ang mga widget ng bar.
 
 ### Ilaw-panggabi
 

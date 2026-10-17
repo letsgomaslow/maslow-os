@@ -1,10 +1,11 @@
 # Ekraanitõmmised ja salvestamine
 
-Kõik, mida saad ekraanilt haarata, sõltub Print Screen klahvist. Üks klahv omaette teeb pildi ja modifikaatorid teevad salvestuse, värvi või piirkonna sees oleva teksti. Kui su klaviatuuril pole Print Screen klahvi üldse, avab `Super + Ctrl + C` sama kogumi menüüna.
+Kõik, mida saad ekraanilt haarata, sõltub Print Screen klahvist. Üks klahv omaette teeb pildi ja modifikaatorid teevad salvestuse, värvi või piirkonna sees oleva teksti. Kui su klaviatuuril pole Print Screen klahvi üldse, avab `Super + Ctrl + C` sama kogumi menüüna. `Super + Shift + S`: Ekraanitõmmis.
 
 | Kiirklahv | Funktsioon |
 | ------ | -------- |
 | `Print Screen` | Ekraanitõmmis |
+| `Super + Shift + S` | Ekraanitõmmis |
 | `Alt + Print Screen` | Ekraanisalvestus (või peatab töötava) |
 | `Super + Print Screen` | Värvivalija |
 | `Super + Ctrl + Print Screen` | Eralda tekst piirkonnast |
@@ -13,7 +14,7 @@ Kõik, mida saad ekraanilt haarata, sõltub Print Screen klahvist. Üks klahv om
 
 ## Ekraanitõmmised
 
-Vajuta `Print Screen` ja Omasnap jäädvustab fookuses oleva kuvari enne, kui selle pealiskiht ilmub, nii et miski ei nihku su all sihtides. Lohista vabakäelise piirkonna, klõpsa akent selle jäädvustamiseks või klõpsa tühja ruumi kogu kuvari jäädvustamiseks. Vajuta `S` enne joonistamist, et jäädvustada keriv piirkond. Muutsid meelt? Vajuta `Print Screen` uuesti, et Omasnap sulgeda.
+Vajuta `Print Screen` (`Super + Shift + S`) ja Omasnap jäädvustab fookuses oleva kuvari enne, kui selle pealiskiht ilmub, nii et miski ei nihku su all sihtides. Lohista vabakäelise piirkonna, klõpsa akent selle jäädvustamiseks või klõpsa tühja ruumi kogu kuvari jäädvustamiseks. Vajuta `S` enne joonistamist, et jäädvustada keriv piirkond. Muutsid meelt? Vajuta `Print Screen` (`Super + Shift + S`) uuesti, et Omasnap sulgeda.
 
 Pärast ala valimist salvestab Omasnap jäädvustuse, kopeerib selle lõikelauale ja näitab eelvaadet 10 sekundi jooksul. Kasuta eelvaate kinnitusnuppu või `Ctrl + P`, et see ekraanile jätta, või vali Edit selle annoteerimiseks.
 

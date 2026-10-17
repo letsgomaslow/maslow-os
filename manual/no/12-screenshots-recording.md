@@ -1,10 +1,11 @@
 # Skjermbilder og opptak
 
-Alt du kan hente av skjermen henger på Print Screen-tasten. Én tast alene tar et bilde, og modifikatorene tar et opptak, en farge eller teksten inne i et område. Hvis tastaturet ditt ikke har noen Print Screen-tast i det hele tatt, åpner `Super + Ctrl + C` det samme settet som en meny.
+Alt du kan hente av skjermen henger på Print Screen-tasten. Én tast alene tar et bilde, og modifikatorene tar et opptak, en farge eller teksten inne i et område. Hvis tastaturet ditt ikke har noen Print Screen-tast i det hele tatt, åpner `Super + Ctrl + C` det samme settet som en meny. `Super + Shift + S`: Skjermbilde.
 
 | Snarvei | Funksjon |
 | ------ | -------- |
 | `Print Screen` | Skjermbilde |
+| `Super + Shift + S` | Skjermbilde |
 | `Alt + Print Screen` | Skjermopptak (eller stopp det som kjører) |
 | `Super + Print Screen` | Fargevelger |
 | `Super + Ctrl + Print Screen` | Trekk tekst ut av et område |
@@ -13,7 +14,7 @@ Alt du kan hente av skjermen henger på Print Screen-tasten. Én tast alene tar 
 
 ## Skjermbilder
 
-Trykk `Print Screen`, og Omasnap fanger den fokuserte skjermen før overlegget dens dukker opp, slik at ingenting skifter under deg mens du sikter. Dra et frittformet område, klikk et vindu for å fange det, eller klikk åpen plass for å fange hele skjermen. Trykk `S` før du tegner for å fange et rullende område. Angret deg? Trykk `Print Screen` igjen for å avbryte Omasnap.
+Trykk `Print Screen` (`Super + Shift + S`), og Omasnap fanger den fokuserte skjermen før overlegget dens dukker opp, slik at ingenting skifter under deg mens du sikter. Dra et frittformet område, klikk et vindu for å fange det, eller klikk åpen plass for å fange hele skjermen. Trykk `S` før du tegner for å fange et rullende område. Angret deg? Trykk `Print Screen` (`Super + Shift + S`) igjen for å avbryte Omasnap.
 
 Etter at du har valgt et område, lagrer Omasnap fangsten, kopierer den til utklippstavlen og viser en forhåndsvisning i 10 sekunder. Bruk forhåndsvisningens festeknapp eller `Ctrl + P` for å beholde den på skjermen, eller velg Rediger for å annotere den.
 

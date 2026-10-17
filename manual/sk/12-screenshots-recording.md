@@ -1,10 +1,11 @@
 # Snímky obrazovky a nahrávanie
 
-Všetko, čo môžete uchmatnúť z obrazovky, visí na klávese Print Screen. Jeden kláves sám urobí obrázok a modifikátory urobia nahrávku, farbu alebo text vnútri oblasti. Ak vaša klávesnica nemá vôbec kláves Print Screen, `Super + Ctrl + C` otvára tú istú sadu ako menu.
+Všetko, čo môžete uchmatnúť z obrazovky, visí na klávese Print Screen. Jeden kláves sám urobí obrázok a modifikátory urobia nahrávku, farbu alebo text vnútri oblasti. Ak vaša klávesnica nemá vôbec kláves Print Screen, `Super + Ctrl + C` otvára tú istú sadu ako menu. `Super + Shift + S`: Snímka obrazovky.
 
 | Skratka | Funkcia |
 | ------ | -------- |
 | `Print Screen` | Snímka obrazovky |
+| `Super + Shift + S` | Snímka obrazovky |
 | `Alt + Print Screen` | Nahrať obrazovku (alebo zastaviť bežiace nahrávanie) |
 | `Super + Print Screen` | Kvapkadlo na farby |
 | `Super + Ctrl + Print Screen` | Extrahovať text z oblasti |
@@ -13,7 +14,7 @@ Všetko, čo môžete uchmatnúť z obrazovky, visí na klávese Print Screen. J
 
 ## Snímky obrazovky
 
-Stlačte `Print Screen` a Omasnap zachytí zameraný monitor skôr, než sa objaví jeho prekrytie, takže sa pod vami nič neposunie, kým mierite. Potiahnite voľnú oblasť, kliknite na okno, aby ste ho zachytili, alebo kliknite na voľné miesto, aby ste zachytili celý monitor. Stlačte `S` pred kreslením, aby ste zachytili rolujúcu oblasť. Zmenili ste názor? Znova stlačte `Print Screen`, aby ste Omasnap zrušili.
+Stlačte `Print Screen` (`Super + Shift + S`) a Omasnap zachytí zameraný monitor skôr, než sa objaví jeho prekrytie, takže sa pod vami nič neposunie, kým mierite. Potiahnite voľnú oblasť, kliknite na okno, aby ste ho zachytili, alebo kliknite na voľné miesto, aby ste zachytili celý monitor. Stlačte `S` pred kreslením, aby ste zachytili rolujúcu oblasť. Zmenili ste názor? Znova stlačte `Print Screen` (`Super + Shift + S`), aby ste Omasnap zrušili.
 
 Po výbere oblasti Omasnap uloží zábery, skopíruje ho do schránky a ukáže ukážku na 10 sekúnd. Použite tlačidlo na pripnutie ukážky alebo `Ctrl + P`, aby ste ho nechali na obrazovke, alebo vyberte Upraviť, aby ste ho okomentovali.
 

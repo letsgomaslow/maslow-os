@@ -116,7 +116,7 @@ Je kunt alle belangrijkste toetsenbordbindingen zien met `Super + K` (Tmux-bindi
 | `Super + Shift + Alt + A`           | AI (Grok)  |
 | `Super + Shift + G`           | Messenger (Signal)  |
 | `Super + Shift + P`           | Google Photos  |
-| `Super + Shift + S`           | Google Maps  |
+| `Super + Shift + Alt + S`           | Google Maps  |
 | `Super + Shift + Alt + G`           | Messenger (WhatsApp)  |
 | `Super + Shift + Ctrl + G`           | Messenger (Google)  |
 | `Super + Shift + O`           | Obsidian  |
@@ -142,8 +142,9 @@ Meestal heb je op Linux `Ctrl + Shift + C/V` nodig om te kopiëren en plakken in
 
 | Sneltoets              | Functie                       |
 | ------------------- | ------------------------------ |
-| `Super + Ctrl + C` | Vastleg-menu (voor toetsenborden zonder PrintScr-knop) |
+| `Super + Ctrl + C` | Vastleg-menu |
 | `Print Screen`            | Schermafbeelding                      |
+| `Super + Shift + S`            | Schermafbeelding                      |
 | `Alt + Print Screen`            | Schermopname                     |
 | `Super + Print Screen` | Kleurkiezer |
 | `Super + Ctrl + Print Screen` | Tekstextractie naar klembord |

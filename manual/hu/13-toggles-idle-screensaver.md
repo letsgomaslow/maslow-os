@@ -38,7 +38,7 @@ A jelzők a kikapcsolt államról vannak elnevezve — `screensaver-off`, `suspe
 
 Ha egy mód aktív, kis jelet kapsz a felső sáv közepén, az óra mellett. Ez az indicators widget, és hordozza a diktálást, a képernyőfelvételt, a függőben lévő emlékeztetőket, az éjszakai fényt, a ne zavarjanak módot és az ébren maradást.
 
-Az inaktív jelzők rejtve vannak. Vidd az egeret a körülöttük lévő területre, és elhalványodva előjönnek, így rákattinthatsz egyre, hogy bekapcsold anélkül, hogy tudnád a billentyűparancsát. Aktív jelzőre kattintva kikapcsolod azt. Ha inkább mindet mindig látni szeretnéd, állítsd az `alwaysShow` értékét `true`-ra a `~/.config/omarchy/shell.json` fájlban lévő `omarchy.indicators` bejegyzésen — hogy hogyan konfigurálódnak a sávwidgetek, abban [a felső sáv](05-the-top-bar.md) fejezet segít.
+Vidd a mutatót a sáv bármely pontjára az inaktív jelzők megjelenítéséhez. Az inaktív jelzők rejtve vannak. Vidd az egeret a körülöttük lévő területre, és elhalványodva előjönnek, így rákattinthatsz egyre, hogy bekapcsold anélkül, hogy tudnád a billentyűparancsát. Aktív jelzőre kattintva kikapcsolod azt. Ha inkább mindet mindig látni szeretnéd, állítsd az `alwaysShow` értékét `true`-ra a `~/.config/omarchy/shell.json` fájlban lévő `omarchy.indicators` bejegyzésen — hogy hogyan konfigurálódnak a sávwidgetek, abban [a felső sáv](05-the-top-bar.md) fejezet segít.
 
 ### Éjszakai fény
 

@@ -38,7 +38,7 @@ Indicatoarele sunt numite după starea dezactivată — `screensaver-off`, `susp
 
 Atunci când un mod este activat, primești o mică glifă în mijlocul barei de sus, lângă ceas. Acesta este widgetul de indicatori și poartă dictarea, înregistrarea ecranului, memento-urile în așteptare, lumina de noapte, nu deranja și rămâi treaz.
 
-Indicatorii inactivi sunt ascunși. Trece cu indicatorul peste zona din jurul lor și apar estompați, astfel încât să poți face clic pe unul ca să-l activezi fără să-i știi scurtătura. Clicul pe unul activ îl dezactivează din nou. Dacă preferi să le vezi pe toate tot timpul, setează `alwaysShow` la `true` pe intrarea `omarchy.indicators` din `~/.config/omarchy/shell.json` — vezi [bara de sus](05-the-top-bar.md) pentru modul în care sunt configurate widgeturile barei.
+Ține indicatorul oriunde deasupra barei pentru a afișa indicatorii inactivi. Indicatorii inactivi sunt ascunși. Trece cu indicatorul peste zona din jurul lor și apar estompați, astfel încât să poți face clic pe unul ca să-l activezi fără să-i știi scurtătura. Clicul pe unul activ îl dezactivează din nou. Dacă preferi să le vezi pe toate tot timpul, setează `alwaysShow` la `true` pe intrarea `omarchy.indicators` din `~/.config/omarchy/shell.json` — vezi [bara de sus](05-the-top-bar.md) pentru modul în care sunt configurate widgeturile barei.
 
 ### Lumina de noapte
 

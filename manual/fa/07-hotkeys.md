@@ -116,7 +116,7 @@
 | `Super + Shift + Alt + A`           | هوش مصنوعی (Grخوب)  |
 | `Super + Shift + G`           | پیام‌رسان (Signal)  |
 | `Super + Shift + P`           | Google Photos  |
-| `Super + Shift + S`           | Google Maps  |
+| `Super + Shift + Alt + S`           | Google Maps  |
 | `Super + Shift + Alt + G`           | پیام‌رسان (WhatsApp)  |
 | `Super + Shift + Ctrl + G`           | پیام‌رسان (Google)  |
 | `Super + Shift + O`           | Obsidian  |
@@ -142,8 +142,9 @@
 
 | کلید میانبر | عملکرد |
 | ------------------- | ------------------------------ |
-| `Super + Ctrl + C` | منوی ضبط (برای صفحه‌کلیدهای بدون دکمهٔ PrintScr) |
+| `Super + Ctrl + C` | منوی ضبط |
 | `Print Screen`            | عکس صفحه                      |
+| `Super + Shift + S`            | عکس صفحه                      |
 | `Alt + Print Screen`            | ضبط صفحه                     |
 | `Super + Print Screen` | انتخاب‌گر رنگ |
 | `Super + Ctrl + Print Screen` | استخراج متن به کلیپ‌بورد |

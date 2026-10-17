@@ -116,7 +116,7 @@ Všechny hlavní klávesové zkratky uvidíte pomocí `Super + K` (zkratky Tmuxu
 | `Super + Shift + Alt + A`           | AI (Grok)  |
 | `Super + Shift + G`           | Messenger (Signal)  |
 | `Super + Shift + P`           | Google Photos  |
-| `Super + Shift + S`           | Google Maps  |
+| `Super + Shift + Alt + S`           | Google Maps  |
 | `Super + Shift + Alt + G`           | Messenger (WhatsApp)  |
 | `Super + Shift + Ctrl + G`           | Messenger (Google)  |
 | `Super + Shift + O`           | Obsidian  |
@@ -142,8 +142,9 @@ Obvykle na Linuxu potřebujete `Ctrl + Shift + C/V` pro kopírování a vkládá
 
 | Klávesová zkratka              | Funkce                       |
 | ------------------- | ------------------------------ |
-| `Super + Ctrl + C` | Nabídka Zachytit (pro klávesnice bez tlačítka PrintScr) |
+| `Super + Ctrl + C` | Nabídka Zachytit |
 | `Print Screen`            | Snímek obrazovky                      |
+| `Super + Shift + S`            | Snímek obrazovky                      |
 | `Alt + Print Screen`            | Nahrávání obrazovky                     |
 | `Super + Print Screen` | Výběr barvy |
 | `Super + Ctrl + Print Screen` | Extrakce textu do schránky |

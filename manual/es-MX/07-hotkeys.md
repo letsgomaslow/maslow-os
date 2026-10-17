@@ -116,7 +116,7 @@ Puedes ver todas las asignaciones principales de teclado con `Super + K` (las de
 | `Super + Shift + Alt + A`           | IA (Grok)  |
 | `Super + Shift + G`           | Mensajería (Signal)  |
 | `Super + Shift + P`           | Google Photos  |
-| `Super + Shift + S`           | Google Maps  |
+| `Super + Shift + Alt + S`           | Google Maps  |
 | `Super + Shift + Alt + G`           | Mensajería (WhatsApp)  |
 | `Super + Shift + Ctrl + G`           | Mensajería (Google)  |
 | `Super + Shift + O`           | Obsidian  |
@@ -142,8 +142,9 @@ Normalmente en Linux necesitas `Ctrl + Shift + C/V` para copiar y pegar en la te
 
 | Atajo              | Función                       |
 | ------------------- | ------------------------------ |
-| `Super + Ctrl + C` | Menú de captura (para teclados sin botón PrintScr) |
+| `Super + Ctrl + C` | Menú de captura |
 | `Print Screen`            | Captura de pantalla                      |
+| `Super + Shift + S`            | Captura de pantalla                      |
 | `Alt + Print Screen`            | Grabar pantalla                     |
 | `Super + Print Screen` | Selector de color |
 | `Super + Ctrl + Print Screen` | Extracción de texto al portapapeles |

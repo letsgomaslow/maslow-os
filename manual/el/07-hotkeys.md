@@ -116,7 +116,7 @@
 | `Super + Shift + Alt + A`           | AI (Grok)  |
 | `Super + Shift + G`           | Μηνύματα (Signal)  |
 | `Super + Shift + P`           | Google Photos  |
-| `Super + Shift + S`           | Google Maps  |
+| `Super + Shift + Alt + S`           | Google Maps  |
 | `Super + Shift + Alt + G`           | Μηνύματα (WhatsApp)  |
 | `Super + Shift + Ctrl + G`           | Μηνύματα (Google)  |
 | `Super + Shift + O`           | Obsidian  |
@@ -142,8 +142,9 @@
 
 | Συντόμευση              | Λειτουργία                       |
 | ------------------- | ------------------------------ |
-| `Super + Ctrl + C` | Μενού καταγραφής (για πληκτρολόγια χωρίς κουμπί PrintScr) |
+| `Super + Ctrl + C` | Μενού καταγραφής |
 | `Print Screen`            | Στιγμιότυπο                      |
+| `Super + Shift + S`            | Στιγμιότυπο                      |
 | `Alt + Print Screen`            | Εγγραφή οθόνης                     |
 | `Super + Print Screen` | Επιλογέας χρώματος |
 | `Super + Ctrl + Print Screen` | Εξαγωγή κειμένου στο πρόχειρο |

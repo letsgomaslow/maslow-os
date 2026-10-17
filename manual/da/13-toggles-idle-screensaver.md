@@ -38,7 +38,7 @@ Flaggene er navngivet efter fra-tilstanden — `screensaver-off`, `suspend-off`,
 
 Når en tilstand er slået til, får du et lille tegn i midten af menulinjen ved siden af uret. Det er indikatorwidget'en, og den bærer diktering, skærmoptagelse, ventende påmindelser, natlys, forstyr ikke og hold vågen.
 
-Inaktive indikatorer er skjulte. Hold musen over området omkring dem, og de toner frem nedtonet, så du kan klikke på én for at slå den til uden at kende dens genvejstast. Et klik på en aktiv slår den fra igen. Hvis du hellere vil se dem alle hele tiden, skal du sætte `alwaysShow` til `true` på posten `omarchy.indicators` i `~/.config/omarchy/shell.json` — se [menulinjen](05-the-top-bar.md) for, hvordan linjewidgets konfigureres.
+Hold musen hvor som helst på linjen for at vise de inaktive indikatorer. Inaktive indikatorer er skjulte. Hold musen over området omkring dem, og de toner frem nedtonet, så du kan klikke på én for at slå den til uden at kende dens genvejstast. Et klik på en aktiv slår den fra igen. Hvis du hellere vil se dem alle hele tiden, skal du sætte `alwaysShow` til `true` på posten `omarchy.indicators` i `~/.config/omarchy/shell.json` — se [menulinjen](05-the-top-bar.md) for, hvordan linjewidgets konfigureres.
 
 ### Natlys
 

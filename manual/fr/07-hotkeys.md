@@ -116,7 +116,7 @@ Vous pouvez voir tous les principaux raccourcis clavier avec `Super + K` (raccou
 | `Super + Shift + Alt + A`           | AI (Grok)  |
 | `Super + Shift + G`           | Messenger (Signal)  |
 | `Super + Shift + P`           | Google Photos  |
-| `Super + Shift + S`           | Google Maps  |
+| `Super + Shift + Alt + S`           | Google Maps  |
 | `Super + Shift + Alt + G`           | Messenger (WhatsApp)  |
 | `Super + Shift + Ctrl + G`           | Messenger (Google)  |
 | `Super + Shift + O`           | Obsidian  |
@@ -142,8 +142,9 @@ Habituellement sous Linux, vous avez besoin de `Ctrl + Shift + C/V` pour copier-
 
 | Raccourci | Fonction |
 | ------------------- | ------------------------------ |
-| `Super + Ctrl + C` | Menu de capture (pour claviers sans bouton PrintScr) |
+| `Super + Ctrl + C` | Menu de capture |
 | `Print Screen`            | Capture d'écran |
+| `Super + Shift + S`            | Capture d'écran |
 | `Alt + Print Screen`            | Enregistrement d'écran |
 | `Super + Print Screen` | Sélecteur de couleur |
 | `Super + Ctrl + Print Screen` | Extraction de texte vers le presse-papiers |

@@ -2,6 +2,8 @@
 
 Az Omarchy alapértelmezetten engedélyezi a felfüggesztést és a hibernálást, de ha bármelyikkel problémád van a gépeden, kikapcsolhatod őket.
 
+Az NVIDIA GB10 gépeken, például a DGX Sparkon és az ASUS Ascent GX10-en az alvó állapot és a hibernálás ki van kapcsolva, ahogy az NVIDIA DGX OS-ben is, mert működésük ezen a hardveren még nem bizonyított. Az alvó állapot kapcsolója és a hibernálás beállítása itt nem alkalmazható. Töröld az `/etc/systemd/sleep.conf.d/omarchy-sleep-disabled.conf` fájlt a `sudo rm` paranccsal az újraengedélyezéshez; az alvó állapot visszatér a menübe, a hibernálás szokásosan beállítható. A `sudo omarchy apply hardware --install-user "$USER"` visszaállítja a fájlt.
+
 ### Energiaprofilok
 
 Laptopon az Omarchy külön megjegyzi az energiaprofilod a hálózati tápláláshoz és az akkumulátoros működéshez, és a kettő között vált, ahogy bedugod és kihúzod. Alapból ez teljesítményt jelent hálózatról, és kiegyensúlyozott módot akkumulátorról.

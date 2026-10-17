@@ -116,7 +116,7 @@ Sve glavne poveznice tipkovnice možete vidjeti prečacom `Super + K` (poveznice
 | `Super + Shift + Alt + A`           | AI (Grok)  |
 | `Super + Shift + G`           | Glasnik (Signal)  |
 | `Super + Shift + P`           | Google Photos  |
-| `Super + Shift + S`           | Google Maps  |
+| `Super + Shift + Alt + S`           | Google Maps  |
 | `Super + Shift + Alt + G`           | Glasnik (WhatsApp)  |
 | `Super + Shift + Ctrl + G`           | Glasnik (Google)  |
 | `Super + Shift + O`           | Obsidian  |
@@ -142,8 +142,9 @@ Obično na Linuxu trebate `Ctrl + Shift + C/V` za kopiranje i lijepljenje u term
 
 | Prečac              | Funkcija                       |
 | ------------------- | ------------------------------ |
-| `Super + Ctrl + C` | Izbornik snimanja (za tipkovnice bez tipke PrintScr) |
+| `Super + Ctrl + C` | Izbornik snimanja |
 | `Print Screen`            | Snimka zaslona                      |
+| `Super + Shift + S`            | Snimka zaslona                      |
 | `Alt + Print Screen`            | Snimanje zaslona                     |
 | `Super + Print Screen` | Birač boja |
 | `Super + Ctrl + Print Screen` | Izdvajanje teksta u međuspremnik |

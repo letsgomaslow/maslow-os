@@ -38,7 +38,7 @@ Bayraklar kapalı duruma göre adlandırılır — `screensaver-off`, `suspend-o
 
 Bir mod açıkken, saatin yanında üst çubuğun ortasında küçük bir simge alırsınız. Bu, göstergeler widget'ıdır ve dikte, ekran kaydı, bekleyen hatırlatıcılar, gece ışığı, rahatsız etme ve uyanık tutu taşır.
 
-Aktif olmayan göstergeler gizlidir. Etraflarındaki alana gelin, soluk bir şekilde belirirler, böylece kısayolunu bilmeden birini açmak için tıklayabilirsiniz. Aktif birine tıklamak onu tekrar kapatır. Hepsini her zaman görmeyi tercih ederseniz, `~/.config/omarchy/shell.json` içindeki `omarchy.indicators` girdisinde `alwaysShow` seçeneğini `true` olarak ayarlayın — çubuk widget'larının nasıl yapılandırılacağı için bkz. [üst çubuk](05-the-top-bar.md).
+Etkin olmayan göstergeleri görmek için imleci çubuğun herhangi bir yerine getirin. Aktif olmayan göstergeler gizlidir. Etraflarındaki alana gelin, soluk bir şekilde belirirler, böylece kısayolunu bilmeden birini açmak için tıklayabilirsiniz. Aktif birine tıklamak onu tekrar kapatır. Hepsini her zaman görmeyi tercih ederseniz, `~/.config/omarchy/shell.json` içindeki `omarchy.indicators` girdisinde `alwaysShow` seçeneğini `true` olarak ayarlayın — çubuk widget'larının nasıl yapılandırılacağı için bkz. [üst çubuk](05-the-top-bar.md).
 
 ### Gece Işığı
 

@@ -2,6 +2,8 @@
 
 Omarchy bật tạm dừng và ngủ đông theo mặc định, nhưng nếu bạn gặp vấn đề với một trong hai tính năng trên máy của mình, bạn có thể tắt chúng.
 
+Trên máy NVIDIA GB10 như DGX Spark và ASUS Ascent GX10, chế độ ngủ và ngủ đông bị tắt như trong NVIDIA DGX OS vì chưa được chứng minh hoạt động trên phần cứng này. Nút bật tắt chế độ ngủ và thiết lập ngủ đông không áp dụng ở đây. Xóa `/etc/systemd/sleep.conf.d/omarchy-sleep-disabled.conf` bằng `sudo rm` để bật lại; chế độ ngủ trở lại menu và có thể thiết lập ngủ đông như thường. `sudo omarchy apply hardware --install-user "$USER"` tạo lại tệp đó.
+
 ### Cấu hình năng lượng
 
 Trên laptop, Omarchy ghi nhớ cấu hình năng lượng của bạn riêng cho lúc cắm điện và lúc dùng pin, và chuyển đổi giữa hai trạng thái khi bạn cắm và rút điện. Ngay khi cài đặt, điều đó có nghĩa là hiệu năng khi dùng điện AC và cân bằng khi dùng pin.

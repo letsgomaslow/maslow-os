@@ -116,7 +116,7 @@
 | `Super + Shift + Alt + A`           | AI (Grok)  |
 | `Super + Shift + G`           | Месинџер (Signal)  |
 | `Super + Shift + P`           | Google Photos  |
-| `Super + Shift + S`           | Google Maps  |
+| `Super + Shift + Alt + S`           | Google Maps  |
 | `Super + Shift + Alt + G`           | Месинџер (WhatsApp)  |
 | `Super + Shift + Ctrl + G`           | Месинџер (Google)  |
 | `Super + Shift + O`           | Obsidian  |
@@ -142,8 +142,9 @@
 
 | Пречица              | Функција                       |
 | ------------------- | ------------------------------ |
-| `Super + Ctrl + C` | Мени снимања (за тастатуре без дугмета PrintScr) |
+| `Super + Ctrl + C` | Мени снимања |
 | `Print Screen`            | Снимак екрана                      |
+| `Super + Shift + S`            | Снимак екрана                      |
 | `Alt + Print Screen`            | Снимање екрана                     |
 | `Super + Print Screen` | Бирач боја |
 | `Super + Ctrl + Print Screen` | Извлачење текста на клипборд |

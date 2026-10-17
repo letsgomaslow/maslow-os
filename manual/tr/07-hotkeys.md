@@ -116,7 +116,7 @@ Tüm ana klavye bağlamalarını `Super + K` ile görebilirsiniz (Tmux bağlamal
 | `Super + Shift + Alt + A`           | AI (Grok)  |
 | `Super + Shift + G`           | Mesajlaşma (Signal)  |
 | `Super + Shift + P`           | Google Photos  |
-| `Super + Shift + S`           | Google Maps  |
+| `Super + Shift + Alt + S`           | Google Maps  |
 | `Super + Shift + Alt + G`           | Mesajlaşma (WhatsApp)  |
 | `Super + Shift + Ctrl + G`           | Mesajlaşma (Google)  |
 | `Super + Shift + O`           | Obsidian  |
@@ -142,8 +142,9 @@ Genellikle Linux'ta, terminalde kopyalayapıştır için `Ctrl + Shift + C/V` ve
 
 | Kısayol              | İşlev                       |
 | ------------------- | ------------------------------ |
-| `Super + Ctrl + C` | Yakala menüsü (PrintScr düğmesi olmayan klavyeler için) |
+| `Super + Ctrl + C` | Yakalama menüsü |
 | `Print Screen`            | Ekran Görüntüsü                      |
+| `Super + Shift + S`            | Ekran Görüntüsü                      |
 | `Alt + Print Screen`            | Ekran kaydı                     |
 | `Super + Print Screen` | Renk seçici |
 | `Super + Ctrl + Print Screen` | Pahayırya metin çıkkola |

@@ -2,6 +2,8 @@
 
 Omarchy schakelt suspend en sluimerstand standaard in, maar als je met een van beide problemen hebt op je machine, kun je ze uitschakelen.
 
+Op NVIDIA GB10-computers, zoals DGX Spark en ASUS Ascent GX10, zijn slaapstand en sluimerstand uitgeschakeld, net als in NVIDIA DGX OS, omdat nog niet is aangetoond dat ze op deze hardware werken. De slaapstandschakelaar en sluimerstandinstellingen gelden hier niet. Verwijder `/etc/systemd/sleep.conf.d/omarchy-sleep-disabled.conf` met `sudo rm` om ze weer in te schakelen; Slaapstand keert terug in het menu en sluimerstand kan normaal worden ingesteld. `sudo omarchy apply hardware --install-user "$USER"` zet het bestand terug.
+
 ### Energieprofielen
 
 Op een laptop onthoudt Omarchy je energieprofiel apart voor aangesloten op netstroom en draaiend op batterij, en schakelt het tussen de twee als je de stekker in- en uitplugt. Uit de doos betekent dat performance op netstroom en balanced op batterij.

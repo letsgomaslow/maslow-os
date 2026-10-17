@@ -38,7 +38,7 @@ Fánarnir eru nefndir fyrir slökkt ástand — `screensaver-off`, `suspend-off`
 
 Þegar hamur er á færðu lítið tákn í miðju valmyndastikunnar við hlið klukkunnar. Það er vísagræjan, og hún ber upplesningu, skjáupptöku, áminningar í bið, næturljós, ekki trufla og halda vakandi.
 
-Óvirkir vísar eru huldir. Sveimðu yfir svæðið í kringum þá og þeir dofna inn daufir, svo þú getur smellt á einn til að kveikja á honum án þess að vita flýtilykilinn hans. Að smella á virkan slekkur á honum aftur. Ef þú vilt frekar sjá þá alla alltaf skaltu stilla `alwaysShow` á `true` á `omarchy.indicators`-færslunni í `~/.config/omarchy/shell.json` — sjá [valmyndastikuna](05-the-top-bar.md) um hvernig stikugræjur eru stilltar.
+Haltu bendlinum hvar sem er yfir stikunni til að sýna óvirka vísa. Óvirkir vísar eru huldir. Sveimðu yfir svæðið í kringum þá og þeir dofna inn daufir, svo þú getur smellt á einn til að kveikja á honum án þess að vita flýtilykilinn hans. Að smella á virkan slekkur á honum aftur. Ef þú vilt frekar sjá þá alla alltaf skaltu stilla `alwaysShow` á `true` á `omarchy.indicators`-færslunni í `~/.config/omarchy/shell.json` — sjá [valmyndastikuna](05-the-top-bar.md) um hvernig stikugræjur eru stilltar.
 
 ### Næturljós
 

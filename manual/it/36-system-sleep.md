@@ -2,6 +2,8 @@
 
 Omarchy attiva sospensione e ibernazione per impostazione predefinita, ma se hai problemi con una delle due sulla tua macchina, puoi disattivarle.
 
+Sui computer NVIDIA GB10, come DGX Spark e ASUS Ascent GX10, sospensione e ibernazione sono disattivate, come in NVIDIA DGX OS, perché non ne è ancora stato dimostrato il funzionamento su questo hardware. Il comando di sospensione e la configurazione dell'ibernazione non si applicano qui. Elimina `/etc/systemd/sleep.conf.d/omarchy-sleep-disabled.conf` con `sudo rm` per riattivarle: Sospendi torna nel menu e l'ibernazione si configura normalmente. `sudo omarchy apply hardware --install-user "$USER"` ricrea il file.
+
 ### Profili energetici
 
 Su un portatile, Omarchy ricorda il tuo profilo energetico separatamente per quando è collegato alla corrente e quando va a batteria, e passa dall'uno all'altro quando colleghi e scolleghi l'alimentazione. Di serie significa prestazioni con la corrente e bilanciato a batteria.

@@ -38,7 +38,7 @@ Karogi ir nosaukti izslēgtam stāvoklim — `screensaver-off`, `suspend-off`, `
 
 Kad režīms ir ieslēgts, tu iegūsti mazu zīmi augšējās joslas vidū blakus pulkstenim. Tas ir rādītāju logrīks, un tas satur diktēšanu, ekrāna ierakstīšanu, gaidošos atgādinājumus, nakts apgaismojumu, netraucēt un palikt nomodā.
 
-Neaktīvie rādītāji ir paslēpti. Novieto kursoru apgabalā ap tiem, un tie izbalē blāvi, tāpēc tu vari noklikšķināt uz viena, lai to ieslēgtu, nezinot tā karsto taustiņa kombināciju. Noklikšķinot uz aktīva, tas tiek izslēgts. Ja tu labāk vēlētos tos visus redzēt vienmēr, iestati `alwaysShow` uz `true` ierakstā `omarchy.indicators` failā `~/.config/omarchy/shell.json` — skat. [augšējā josla](05-the-top-bar.md), kā joslas logrīki tiek konfigurēti.
+Novietojiet rādītāju jebkurā joslas vietā, lai parādītu neaktīvos indikatorus. Neaktīvie rādītāji ir paslēpti. Novieto kursoru apgabalā ap tiem, un tie izbalē blāvi, tāpēc tu vari noklikšķināt uz viena, lai to ieslēgtu, nezinot tā karsto taustiņa kombināciju. Noklikšķinot uz aktīva, tas tiek izslēgts. Ja tu labāk vēlētos tos visus redzēt vienmēr, iestati `alwaysShow` uz `true` ierakstā `omarchy.indicators` failā `~/.config/omarchy/shell.json` — skat. [augšējā josla](05-the-top-bar.md), kā joslas logrīki tiek konfigurēti.
 
 ### Nakts apgaismojums
 

@@ -116,7 +116,7 @@
 | `Super + Shift + Alt + A`           | AI (Grok)  |
 | `Super + Shift + G`           | میسنجر (Signal)  |
 | `Super + Shift + P`           | Google Photos  |
-| `Super + Shift + S`           | Google Maps  |
+| `Super + Shift + Alt + S`           | Google Maps  |
 | `Super + Shift + Alt + G`           | میسنجر (WhatsApp)  |
 | `Super + Shift + Ctrl + G`           | میسنجر (Google)  |
 | `Super + Shift + O`           | Obsidian  |
@@ -142,8 +142,9 @@
 
 | ہاٹ کی              | فنکشن                       |
 | ------------------- | ------------------------------ |
-| `Super + Ctrl + C` | کیپچر مینیُو (PrintScr بٹن کے بغیر کی بورڈز کے لیے) |
+| `Super + Ctrl + C` | کیپچر مینیو |
 | `Print Screen`            | اسکرین شاٹ                      |
+| `Super + Shift + S`            | اسکرین شاٹ                      |
 | `Alt + Print Screen`            | اسکرین ریکارڈ                     |
 | `Super + Print Screen` | رنگ منتخب کنندہ |
 | `Super + Ctrl + Print Screen` | متن نکال کر کلپ بورڈ پر |

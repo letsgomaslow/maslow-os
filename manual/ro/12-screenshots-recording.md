@@ -1,10 +1,11 @@
 # Capturi de ecran și înregistrare
 
-Tot ce poți lua de pe ecran atârnă de tasta Print Screen. O singură tastă face o fotografie, iar modificatorii fac o înregistrare, iau o culoare sau textul din interiorul unei regiuni. Dacă tastatura ta nu are deloc o tastă Print Screen, `Super + Ctrl + C` deschide același set ca meniu.
+Tot ce poți lua de pe ecran atârnă de tasta Print Screen. O singură tastă face o fotografie, iar modificatorii fac o înregistrare, iau o culoare sau textul din interiorul unei regiuni. Dacă tastatura ta nu are deloc o tastă Print Screen, `Super + Ctrl + C` deschide același set ca meniu. `Super + Shift + S`: Captură de ecran.
 
 | Scurtătură | Funcție |
 | ------ | -------- |
 | `Print Screen` | Captură de ecran |
+| `Super + Shift + S` | Captură de ecran |
 | `Alt + Print Screen` | Înregistrare ecran (sau oprește-o pe cea care rulează) |
 | `Super + Print Screen` | Selector de culoare |
 | `Super + Ctrl + Print Screen` | Extrage text dintr-o regiune |
@@ -13,7 +14,7 @@ Tot ce poți lua de pe ecran atârnă de tasta Print Screen. O singură tastă f
 
 ## Capturi de ecran
 
-Apasă `Print Screen` și Omasnap capturează monitorul focalizat înainte să apară suprapunerea lui, astfel încât nimic nu se mișcă sub tine cât țintești. Trage o regiune liberă, fă clic pe o fereastră ca să o capturezi sau fă clic pe spațiul deschis ca să capturezi întregul monitor. Apasă `S` înainte să desenezi ca să capturezi o regiune defilantă. Te-ai răzgândit? Apasă din nou `Print Screen` ca să închizi Omasnap.
+Apasă `Print Screen` (`Super + Shift + S`) și Omasnap capturează monitorul focalizat înainte să apară suprapunerea lui, astfel încât nimic nu se mișcă sub tine cât țintești. Trage o regiune liberă, fă clic pe o fereastră ca să o capturezi sau fă clic pe spațiul deschis ca să capturezi întregul monitor. Apasă `S` înainte să desenezi ca să capturezi o regiune defilantă. Te-ai răzgândit? Apasă din nou `Print Screen` (`Super + Shift + S`) ca să închizi Omasnap.
 
 După ce selectezi o zonă, Omasnap salvează captura, o copiază pe clipboard și arată o previzualizare timp de 10 secunde. Folosește butonul de fixare al previzualizării sau `Ctrl + P` ca să o păstrezi pe ecran sau alege Edit ca să o adnotezi.
 

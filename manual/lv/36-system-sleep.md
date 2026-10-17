@@ -2,6 +2,8 @@
 
 Omarchy pēc noklusējuma iespējo apturēšanu un ziemas miegu, bet, ja jūsu iekārtā ar kādu no tiem ir problēmas, varat tos izslēgt.
 
+NVIDIA GB10 datoros, piemēram, DGX Spark un ASUS Ascent GX10, miega režīms un hibernācija ir izslēgti tāpat kā NVIDIA DGX OS, jo vēl nav pierādīts, ka tie darbojas šajā aparatūrā. Miega režīma slēdzis un hibernācijas iestatīšana uz tiem neattiecas. Dzēsiet `/etc/systemd/sleep.conf.d/omarchy-sleep-disabled.conf` ar `sudo rm`, lai tos atkal ieslēgtu; miega režīms atgriežas izvēlnē, un hibernāciju var iestatīt kā parasti. `sudo omarchy apply hardware --install-user "$USER"` atjauno failu.
+
 ### Jaudas profili
 
 Klēpjdatorā Omarchy atsevišķi atceras jūsu jaudas profilu pie strāvas un uz akumulatora un pārslēdzas starp tiem, kad pievienojat un atvienojat lādētāju. Pēc noklusējuma tas nozīmē veiktspēju pie maiņstrāvas un līdzsvarotu režīmu uz akumulatora.

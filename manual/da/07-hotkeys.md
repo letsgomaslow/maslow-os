@@ -116,7 +116,7 @@ Du kan se alle de vigtigste tastaturbindinger med `Super + K` (Tmux-bindinger me
 | `Super + Shift + Alt + A`           | AI (Grok)  |
 | `Super + Shift + G`           | Beskeder (Signal)  |
 | `Super + Shift + P`           | Google Photos  |
-| `Super + Shift + S`           | Google Maps  |
+| `Super + Shift + Alt + S`           | Google Maps  |
 | `Super + Shift + Alt + G`           | Beskeder (WhatsApp)  |
 | `Super + Shift + Ctrl + G`           | Beskeder (Google)  |
 | `Super + Shift + O`           | Obsidian  |
@@ -142,8 +142,9 @@ Normalt på Linux skal du bruge `Ctrl + Shift + C/V` til at kopiér-og-indsætte
 
 | Genvejstast              | Funktion                       |
 | ------------------- | ------------------------------ |
-| `Super + Ctrl + C` | Optagelsesmenu (til tastaturer uden PrintScr-knap) |
+| `Super + Ctrl + C` | Optagelsesmenu |
 | `Print Screen`            | Skærmbillede                      |
+| `Super + Shift + S`            | Skærmbillede                      |
 | `Alt + Print Screen`            | Skærmoptagelse                     |
 | `Super + Print Screen` | Farvevælger |
 | `Super + Ctrl + Print Screen` | Tekstudtræk til udklipsholderen |

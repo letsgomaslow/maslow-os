@@ -116,7 +116,7 @@ Visus pagrindinius klaviatūros susiejimus galite pamatyti su `Super + K` (Tmux 
 | `Super + Shift + Alt + A`           | AI (Grok)  |
 | `Super + Shift + G`           | Susirašinėjimas (Signal)  |
 | `Super + Shift + P`           | Google Photos  |
-| `Super + Shift + S`           | Google Maps  |
+| `Super + Shift + Alt + S`           | Google Maps  |
 | `Super + Shift + Alt + G`           | Susirašinėjimas (WhatsApp)  |
 | `Super + Shift + Ctrl + G`           | Susirašinėjimas (Google)  |
 | `Super + Shift + O`           | Obsidian  |
@@ -142,8 +142,9 @@ Paprastai Linux jums reikia `Ctrl + Shift + C/V`, kad kopijuotumėte ir įklijuo
 
 | Spartusis klavišas              | Funkcija                       |
 | ------------------- | ------------------------------ |
-| `Super + Ctrl + C` | Fiksavimo meniu (klaviatūroms be PrintScr mygtuko) |
+| `Super + Ctrl + C` | Fiksavimo meniu |
 | `Print Screen`            | Ekrano nuotrauka                      |
+| `Super + Shift + S`            | Ekrano nuotrauka                      |
 | `Alt + Print Screen`            | Ekrano įrašas                     |
 | `Super + Print Screen` | Spalvos parinkiklis |
 | `Super + Ctrl + Print Screen` | Teksto išgavimas į iškarpinę |

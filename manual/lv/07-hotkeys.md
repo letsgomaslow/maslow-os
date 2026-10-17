@@ -116,7 +116,7 @@ Tu vari redzēt visas galvenās tastatūras piesaistes ar `Super + K` (Tmux pies
 | `Super + Shift + Alt + A`           | AI (Grok)  |
 | `Super + Shift + G`           | Kurjers (Signal)  |
 | `Super + Shift + P`           | Google Photos  |
-| `Super + Shift + S`           | Google Maps  |
+| `Super + Shift + Alt + S`           | Google Maps  |
 | `Super + Shift + Alt + G`           | Kurjers (WhatsApp)  |
 | `Super + Shift + Ctrl + G`           | Kurjers (Google)  |
 | `Super + Shift + O`           | Obsidian  |
@@ -142,8 +142,9 @@ Parasti Linux tev ir nepieciešams `Ctrl + Shift + C/V`, lai kopētu un ielīmē
 
 | Karstā taustiņa kombinācija              | Funkcija                       |
 | ------------------- | ------------------------------ |
-| `Super + Ctrl + C` | Uzņemšanas izvēlne (tastatūrām bez pogas PrintScr) |
+| `Super + Ctrl + C` | Uzņemšanas izvēlne |
 | `Print Screen`            | Ekrānuzņēmums                      |
+| `Super + Shift + S`            | Ekrānuzņēmums                      |
 | `Alt + Print Screen`            | Ekrāna ieraksts                     |
 | `Super + Print Screen` | Krāsu atlasītājs |
 | `Super + Ctrl + Print Screen` | Teksta iegūšana starpliktuvē |

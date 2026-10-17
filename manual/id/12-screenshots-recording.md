@@ -1,10 +1,11 @@
 # Tangkapan Layar & Perekaman
 
-Segala sesuatu yang dapat Anda ambil dari layar bergantung pada tombol Print Screen. Satu tombol sendiri mengambil gambar, dan modifier mengambil rekaman, warna, atau teks di dalam sebuah wilayah. Jika keyboard Anda tidak memiliki tombol Print Screen sama sekali, `Super + Ctrl + C` membuka set yang sama sebagai menu.
+Segala sesuatu yang dapat Anda ambil dari layar bergantung pada tombol Print Screen. Satu tombol sendiri mengambil gambar, dan modifier mengambil rekaman, warna, atau teks di dalam sebuah wilayah. Jika keyboard Anda tidak memiliki tombol Print Screen sama sekali, `Super + Ctrl + C` membuka set yang sama sebagai menu. `Super + Shift + S`: Tangkapan layar.
 
 | Hotkey | Fungsi |
 | ------ | -------- |
 | `Print Screen` | Tangkapan layar |
+| `Super + Shift + S` | Tangkapan layar |
 | `Alt + Print Screen` | Rekam layar (atau hentikan yang sedang berjalan) |
 | `Super + Print Screen` | Pemilih warna |
 | `Super + Ctrl + Print Screen` | Ekstrak teks dari sebuah wilayah |
@@ -13,7 +14,7 @@ Segala sesuatu yang dapat Anda ambil dari layar bergantung pada tombol Print Scr
 
 ## Tangkapan layar
 
-Tekan `Print Screen` dan Omasnap menangkap monitor yang fokus sebelum overlay-nya muncul, sehingga tidak ada yang bergeser di bawah Anda saat Anda membidik. Seret wilayah bentuk bebas, klik jendela untuk menangkapnya, atau klik ruang terbuka untuk menangkap seluruh monitor. Tekan `S` sebelum menggambar untuk menangkap wilayah bergulir. Berubah pikiran? Tekan `Print Screen` lagi untuk menutup Omasnap.
+Tekan `Print Screen` (`Super + Shift + S`) dan Omasnap menangkap monitor yang fokus sebelum overlay-nya muncul, sehingga tidak ada yang bergeser di bawah Anda saat Anda membidik. Seret wilayah bentuk bebas, klik jendela untuk menangkapnya, atau klik ruang terbuka untuk menangkap seluruh monitor. Tekan `S` sebelum menggambar untuk menangkap wilayah bergulir. Berubah pikiran? Tekan `Print Screen` (`Super + Shift + S`) lagi untuk menutup Omasnap.
 
 Setelah Anda memilih area, Omasnap menyimpan tangkapan, menyalinnya ke papan klip, dan menunjukkan pratinjau selama 10 detik. Gunakan tombol sematkan pratinjau atau `Ctrl + P` untuk menjaganya tetap di layar, atau pilih Edit untuk memberi anotasi.
 

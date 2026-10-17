@@ -116,7 +116,7 @@ Poți vedea toate mapările principale de tastatură cu `Super + K` (mapările T
 | `Super + Shift + Alt + A`           | AI (Grok)  |
 | `Super + Shift + G`           | Messenger (Signal)  |
 | `Super + Shift + P`           | Google Photos  |
-| `Super + Shift + S`           | Google Maps  |
+| `Super + Shift + Alt + S`           | Google Maps  |
 | `Super + Shift + Alt + G`           | Messenger (WhatsApp)  |
 | `Super + Shift + Ctrl + G`           | Messenger (Google)  |
 | `Super + Shift + O`           | Obsidian  |
@@ -142,8 +142,9 @@ De obicei, pe Linux, ai nevoie de `Ctrl + Shift + C/V` ca să copiezi și să li
 
 | Scurtătură              | Funcție                       |
 | ------------------- | ------------------------------ |
-| `Super + Ctrl + C` | Meniu Captură (pentru tastaturi fără buton PrintScr) |
+| `Super + Ctrl + C` | Meniu Captură |
 | `Print Screen`            | Captură de ecran                      |
+| `Super + Shift + S`            | Captură de ecran                      |
 | `Alt + Print Screen`            | Înregistrare ecran                     |
 | `Super + Print Screen` | Selector de culoare |
 | `Super + Ctrl + Print Screen` | Extragerea textului pe clipboard |

@@ -116,7 +116,7 @@ Podeu veure totes les assignacions principals de teclat amb `Super + K` (les de 
 | `Super + Shift + Alt + A`           | IA (Grok)  |
 | `Super + Shift + G`           | Missatgeria (Signal)  |
 | `Super + Shift + P`           | Google Photos  |
-| `Super + Shift + S`           | Google Maps  |
+| `Super + Shift + Alt + S`           | Google Maps  |
 | `Super + Shift + Alt + G`           | Missatgeria (WhatsApp)  |
 | `Super + Shift + Ctrl + G`           | Missatgeria (Google)  |
 | `Super + Shift + O`           | Obsidian  |
@@ -142,8 +142,9 @@ Normalment a Linux necessiteu `Ctrl + Shift + C/V` per copiar i enganxar al term
 
 | Drecera              | Funció                       |
 | ------------------- | ------------------------------ |
-| `Super + Ctrl + C` | Menú de captura (per a teclats sense botó PrintScr) |
+| `Super + Ctrl + C` | Menú de captura |
 | `Print Screen`            | Captura de pantalla                      |
+| `Super + Shift + S`            | Captura de pantalla                      |
 | `Alt + Print Screen`            | Gravació de pantalla                     |
 | `Super + Print Screen` | Selector de color |
 | `Super + Ctrl + Print Screen` | Extracció de text al porta-retalls |

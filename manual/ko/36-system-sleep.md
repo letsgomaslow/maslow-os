@@ -2,6 +2,8 @@
 
 Omarchy는 기본으로 일시 중단(suspend)과 최대 절전을 활성화하지만, 사용하는 컴퓨터에서 둘 중 하나에 문제가 있다면 끌 수 있습니다.
 
+DGX Spark와 ASUS Ascent GX10 같은 NVIDIA GB10 컴퓨터에서는 이 하드웨어의 절전 동작이 아직 입증되지 않아 NVIDIA DGX OS처럼 절전 모드와 최대 절전 모드가 꺼져 있습니다. 여기에는 절전 전환과 최대 절전 설정이 적용되지 않습니다. 다시 켜려면 `sudo rm`으로 `/etc/systemd/sleep.conf.d/omarchy-sleep-disabled.conf`를 삭제하세요. 절전 항목이 메뉴에 돌아오고 최대 절전도 일반적으로 설정할 수 있습니다. `sudo omarchy apply hardware --install-user "$USER"`는 파일을 복원합니다.
+
 ### 전원 프로필
 
 노트북에서 Omarchy는 전원에 연결했을 때와 배터리로 실행 중일 때의 전원 프로필을 따로 기억하고, 꽂고 뽑을 때 두 상태 사이를 전환합니다. 기본 설정에서는 AC 전원에서는 성능 모드, 배터리에서는 균형 모드를 뜻합니다.

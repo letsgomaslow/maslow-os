@@ -116,7 +116,7 @@ Anda boleh melihat semua ikatan papan kekunci utama dengan `Super + K` (ikatan T
 | `Super + Shift + Alt + A`           | AI (Grok)  |
 | `Super + Shift + G`           | Pengutus (Signal)  |
 | `Super + Shift + P`           | Google Photos  |
-| `Super + Shift + S`           | Google Maps  |
+| `Super + Shift + Alt + S`           | Google Maps  |
 | `Super + Shift + Alt + G`           | Pengutus (WhatsApp)  |
 | `Super + Shift + Ctrl + G`           | Pengutus (Google)  |
 | `Super + Shift + O`           | Obsidian  |
@@ -142,8 +142,9 @@ Biasanya pada Linux, anda memerlukan `Ctrl + Shift + C/V` untuk salin dan tampal
 
 | Kekunci Panas              | Fungsi                       |
 | ------------------- | ------------------------------ |
-| `Super + Ctrl + C` | Menu tangkap (untuk papan kekunci tanpa butang PrintScr) |
+| `Super + Ctrl + C` | Menu tangkap |
 | `Print Screen`            | Tangkap Skrin                      |
+| `Super + Shift + S`            | Tangkap Skrin                      |
 | `Alt + Print Screen`            | Rakam Skrin                     |
 | `Super + Print Screen` | Pemilih warna |
 | `Super + Ctrl + Print Screen` | Pengekstrakan teks ke papan keratan |

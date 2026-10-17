@@ -116,7 +116,7 @@
 | `Super + Shift + Alt + A`           | AI (Grok)  |
 | `Super + Shift + G`           | מסנג'ר (Signal)  |
 | `Super + Shift + P`           | Google Photos  |
-| `Super + Shift + S`           | Google Maps  |
+| `Super + Shift + Alt + S`           | Google Maps  |
 | `Super + Shift + Alt + G`           | מסנג'ר (WhatsApp)  |
 | `Super + Shift + Ctrl + G`           | מסנג'ר (Google)  |
 | `Super + Shift + O`           | Obsidian  |
@@ -142,8 +142,9 @@
 
 | קיצור מקלדת              | פונקציה                       |
 | ------------------- | ------------------------------ |
-| `Super + Ctrl + C` | תפריט לכידה (למקלדות בלי כפתור PrintScr) |
+| `Super + Ctrl + C` | תפריט לכידה |
 | `Print Screen`            | צילום מסך                      |
+| `Super + Shift + S`            | צילום מסך                      |
 | `Alt + Print Screen`            | הקלטת מסך                     |
 | `Super + Print Screen` | בורר צבע |
 | `Super + Ctrl + Print Screen` | חילוץ טקסט ללוח |

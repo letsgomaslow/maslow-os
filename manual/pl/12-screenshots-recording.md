@@ -1,10 +1,11 @@
 # Zrzuty ekranu i nagrywanie
 
-Wszystko, co da się zgarnąć z ekranu, wisi na klawiszu Print Screen. Sam klawisz robi zrzut, a modyfikatory robią nagranie, pobierają kolor albo tekst wewnątrz obszaru. Jeśli twoja klawiatura w ogóle nie ma klawisza Print Screen, `Super + Ctrl + C` otwiera ten sam zestaw jako menu.
+Wszystko, co da się zgarnąć z ekranu, wisi na klawiszu Print Screen. Sam klawisz robi zrzut, a modyfikatory robią nagranie, pobierają kolor albo tekst wewnątrz obszaru. Jeśli twoja klawiatura w ogóle nie ma klawisza Print Screen, `Super + Ctrl + C` otwiera ten sam zestaw jako menu. `Super + Shift + S`: Zrzut ekranu.
 
 | Skrót | Funkcja |
 | ------ | -------- |
 | `Print Screen` | Zrzut ekranu |
+| `Super + Shift + S` | Zrzut ekranu |
 | `Alt + Print Screen` | Nagrywanie ekranu (albo zatrzymanie trwającego) |
 | `Super + Print Screen` | Wybór koloru |
 | `Super + Ctrl + Print Screen` | Wyciąganie tekstu z obszaru |
@@ -13,7 +14,7 @@ Wszystko, co da się zgarnąć z ekranu, wisi na klawiszu Print Screen. Sam klaw
 
 ## Zrzuty ekranu
 
-Naciśnij `Print Screen`, a Omasnap przechwytuje skupiony monitor, zanim pojawi się jego nakładka, więc nic nie przesuwa się pod tobą, gdy celujesz. Przeciągnij dowolny obszar, kliknij okno, żeby je przechwycić, albo kliknij otwartą przestrzeń, żeby przechwycić cały monitor. Naciśnij `S` przed rysowaniem, żeby przechwycić przewijany obszar. Zmieniłeś zdanie? Naciśnij `Print Screen` ponownie, żeby odrzucić Omasnap.
+Naciśnij `Print Screen` (`Super + Shift + S`), a Omasnap przechwytuje skupiony monitor, zanim pojawi się jego nakładka, więc nic nie przesuwa się pod tobą, gdy celujesz. Przeciągnij dowolny obszar, kliknij okno, żeby je przechwycić, albo kliknij otwartą przestrzeń, żeby przechwycić cały monitor. Naciśnij `S` przed rysowaniem, żeby przechwycić przewijany obszar. Zmieniłeś zdanie? Naciśnij `Print Screen` (`Super + Shift + S`) ponownie, żeby odrzucić Omasnap.
 
 Po wybraniu obszaru Omasnap zapisuje zrzut, kopiuje go do schowka i pokazuje podgląd na 10 sekund. Użyj przycisku przypinania podglądu lub `Ctrl + P`, żeby trzymać go na ekranie, albo wybierz Edit, żeby go opatrzeć adnotacjami.
 

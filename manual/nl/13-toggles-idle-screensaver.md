@@ -38,7 +38,7 @@ De vlaggen zijn vernoemd naar de uit-staat — `screensaver-off`, `suspend-off`,
 
 Wanneer een modus aan staat, krijg je een kleine glyph in het midden van de bovenbalk naast de klok. Dat is de indicatoren-widget, en hij draagt dicteren, schermopname, openstaande herinneringen, nachtlicht, niet storen en wakker blijven.
 
-Inactieve indicatoren zijn verborgen. Zweef over het gebied eromheen en ze vervagen gedimd in beeld, zodat je er een kunt aanklikken om hem in te schakelen zonder zijn sneltoets te kennen. Op een actieve klikken schakelt hem weer uit. Als je ze liever allemaal altijd ziet, stel je `alwaysShow` in op `true` op het `omarchy.indicators`-item in `~/.config/omarchy/shell.json` — zie [de bovenbalk](05-the-top-bar.md) voor hoe balkwidgets worden geconfigureerd.
+Beweeg de aanwijzer over een willekeurige plek op de balk om de inactieve indicatoren te tonen. Inactieve indicatoren zijn verborgen. Zweef over het gebied eromheen en ze vervagen gedimd in beeld, zodat je er een kunt aanklikken om hem in te schakelen zonder zijn sneltoets te kennen. Op een actieve klikken schakelt hem weer uit. Als je ze liever allemaal altijd ziet, stel je `alwaysShow` in op `true` op het `omarchy.indicators`-item in `~/.config/omarchy/shell.json` — zie [de bovenbalk](05-the-top-bar.md) voor hoe balkwidgets worden geconfigureerd.
 
 ### Nachtlicht
 

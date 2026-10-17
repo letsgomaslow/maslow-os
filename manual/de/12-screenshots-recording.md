@@ -1,10 +1,11 @@
 # Screenshots & Aufnahme
 
-Alles, was du vom Bildschirm greifen kannst, hängt an der Taste Print Screen. Eine Taste allein macht ein Bild, und die Modifikatoren machen eine Aufnahme, eine Farbe oder den Text innerhalb eines Bereichs. Wenn deine Tastatur überhaupt keine Taste Print Screen hat, öffnet `Super + Ctrl + C` dieselbe Auswahl als Menü.
+Alles, was du vom Bildschirm greifen kannst, hängt an der Taste Print Screen. Eine Taste allein macht ein Bild, und die Modifikatoren machen eine Aufnahme, eine Farbe oder den Text innerhalb eines Bereichs. Wenn deine Tastatur überhaupt keine Taste Print Screen hat, öffnet `Super + Ctrl + C` dieselbe Auswahl als Menü. `Super + Shift + S`: Screenshot.
 
 | Tastenkürzel | Funktion |
 | ------ | -------- |
 | `Print Screen` | Screenshot |
+| `Super + Shift + S` | Screenshot |
 | `Alt + Print Screen` | Bildschirmaufnahme (oder die laufende stoppen) |
 | `Super + Print Screen` | Farbwähler |
 | `Super + Ctrl + Print Screen` | Text aus einem Bereich extrahieren |
@@ -13,7 +14,7 @@ Alles, was du vom Bildschirm greifen kannst, hängt an der Taste Print Screen. E
 
 ## Screenshots
 
-Drücke `Print Screen`, und Omasnap nimmt den fokussierten Monitor auf, bevor sein Overlay erscheint, sodass sich nichts unter dir verschiebt, während du zielst. Ziehe einen Freiform-Bereich, klicke auf ein Fenster, um es aufzunehmen, oder klicke auf freien Raum, um den ganzen Monitor aufzunehmen. Drücke `S` vor dem Zeichnen, um einen Scroll-Bereich aufzunehmen. Hast du es dir anders überlegt? Drücke `Print Screen` erneut, um Omasnap zu schließen.
+Drücke `Print Screen` (`Super + Shift + S`), und Omasnap nimmt den fokussierten Monitor auf, bevor sein Overlay erscheint, sodass sich nichts unter dir verschiebt, während du zielst. Ziehe einen Freiform-Bereich, klicke auf ein Fenster, um es aufzunehmen, oder klicke auf freien Raum, um den ganzen Monitor aufzunehmen. Drücke `S` vor dem Zeichnen, um einen Scroll-Bereich aufzunehmen. Hast du es dir anders überlegt? Drücke `Print Screen` (`Super + Shift + S`) erneut, um Omasnap zu schließen.
 
 Nachdem du einen Bereich ausgewählt hast, speichert Omasnap die Aufnahme, kopiert sie in die Zwischenablage und zeigt 10 Sekunden lang eine Vorschau. Verwende die Anheft-Schaltfläche der Vorschau oder `Ctrl + P`, um sie auf dem Bildschirm zu behalten, oder wähle Bearbeiten, um sie zu kommentieren.
 

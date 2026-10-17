@@ -1,10 +1,11 @@
 # Picha za Skrini na Kurekodi
 
-Kila kitu unachoweza kunyakua kutoka skrini hutegemea kitufe cha Print Screen. Kitufe kimoja peke yake huchukua picha, na virekebishaji huchukua rekodi, rangi, au maandishi ndani ya eneo. Ikiwa kibodi yako haina kitufe cha Print Screen kabisa, `Super + Ctrl + C` hufungua seti hiyo hiyo kama menyu.
+Kila kitu unachoweza kunyakua kutoka skrini hutegemea kitufe cha Print Screen. Kitufe kimoja peke yake huchukua picha, na virekebishaji huchukua rekodi, rangi, au maandishi ndani ya eneo. Ikiwa kibodi yako haina kitufe cha Print Screen kabisa, `Super + Ctrl + C` hufungua seti hiyo hiyo kama menyu. `Super + Shift + S`: Picha ya skrini.
 
 | Mkato wa kitufe | Kazi |
 | ------ | -------- |
 | `Print Screen` | Picha ya skrini |
+| `Super + Shift + S` | Picha ya skrini |
 | `Alt + Print Screen` | Rekodi skrini (au simamisha inayoendeshwa) |
 | `Super + Print Screen` | Kichaguzi cha rangi |
 | `Super + Ctrl + Print Screen` | Chimba maandishi kutoka eneo |
@@ -13,7 +14,7 @@ Kila kitu unachoweza kunyakua kutoka skrini hutegemea kitufe cha Print Screen. K
 
 ## Picha za skrini
 
-Bonyeza `Print Screen` na Omasnap hunasa skrini iliyozingatiwa kabla ya kiwekeleo chake kuonekana, hivyo hakuna kinachohamahamia chini yako unapolenga. Buruta eneo huru, bofya dirisha kulinasa, au bofya nafasi wazi kunasa skrini yote. Bonyeza `S` kabla ya kuchora kunasa eneo linalosogeza. Umebadili mawazo? Bonyeza `Print Screen` tena kuondoa Omasnap.
+Bonyeza `Print Screen` (`Super + Shift + S`) na Omasnap hunasa skrini iliyozingatiwa kabla ya kiwekeleo chake kuonekana, hivyo hakuna kinachohamahamia chini yako unapolenga. Buruta eneo huru, bofya dirisha kulinasa, au bofya nafasi wazi kunasa skrini yote. Bonyeza `S` kabla ya kuchora kunasa eneo linalosogeza. Umebadili mawazo? Bonyeza `Print Screen` (`Super + Shift + S`) tena kuondoa Omasnap.
 
 Baada ya kuchagua eneo, Omasnap huhifadhi nasa, huinakili kwenye ubao wa kunakili, na huonyesha onyesho la kukagua kwa sekunde 10. Tumia kitufe cha kubana cha onyesho la kukagua au `Ctrl + P` kuliweka kwenye skrini, au chagua Hariri kuliandikia maelezo.
 

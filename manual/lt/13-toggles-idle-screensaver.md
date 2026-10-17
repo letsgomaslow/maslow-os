@@ -38,7 +38,7 @@ omarchy-toggle-enabled screensaver-off && echo "screensaver is off"
 
 Kai režimas įjungtas, viršutinės juostos viduryje šalia laikrodžio gaunate mažą glifą. Tai indikatorių valdiklis ir jame yra diktavimas, ekrano įrašas, laukiantys priminimai, naktinė šviesa, netrukdyti ir nemiegoti.
 
-Neaktyvūs indikatoriai yra paslėpti. Užveskite ant srities aplink juos ir jie blankiai pasirodo, todėl galite spustelėti vieną, kad jį įjungtumėte, nežinodami jo sparčiojo klavišo. Spustelėjus aktyvų, jis vėl išjungiamas. Jei mieliau norėtumėte juos visus matyti visą laiką, nustatykite `alwaysShow` į `true` ant `omarchy.indicators` įrašo `~/.config/omarchy/shell.json` — kaip konfigūruojami juostos valdikliai, žr. [viršutinę juostą](05-the-top-bar.md).
+Užveskite žymeklį bet kurioje juostos vietoje, kad matytumėte neaktyvius indikatorius. Neaktyvūs indikatoriai yra paslėpti. Užveskite ant srities aplink juos ir jie blankiai pasirodo, todėl galite spustelėti vieną, kad jį įjungtumėte, nežinodami jo sparčiojo klavišo. Spustelėjus aktyvų, jis vėl išjungiamas. Jei mieliau norėtumėte juos visus matyti visą laiką, nustatykite `alwaysShow` į `true` ant `omarchy.indicators` įrašo `~/.config/omarchy/shell.json` — kaip konfigūruojami juostos valdikliai, žr. [viršutinę juostą](05-the-top-bar.md).
 
 ### Naktinė šviesa
 

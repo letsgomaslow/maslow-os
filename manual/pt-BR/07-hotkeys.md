@@ -116,7 +116,7 @@ Você pode ver todos os principais atalhos de teclado com `Super + K` (atalhos d
 | `Super + Shift + Alt + A`           | IA (Grok)  |
 | `Super + Shift + G`           | Mensagens (Signal)  |
 | `Super + Shift + P`           | Google Photos  |
-| `Super + Shift + S`           | Google Maps  |
+| `Super + Shift + Alt + S`           | Google Maps  |
 | `Super + Shift + Alt + G`           | Mensagens (WhatsApp)  |
 | `Super + Shift + Ctrl + G`           | Mensagens (Google)  |
 | `Super + Shift + O`           | Obsidian  |
@@ -142,8 +142,9 @@ Normalmente no Linux, você precisa de `Ctrl + Shift + C/V` para copiar e colar 
 
 | Atalho              | Função                       |
 | ------------------- | ------------------------------ |
-| `Super + Ctrl + C` | Menu de captura (para teclados sem botão PrintScr) |
+| `Super + Ctrl + C` | Menu de captura |
 | `Print Screen`            | Captura de tela                      |
+| `Super + Shift + S`            | Captura de tela                      |
 | `Alt + Print Screen`            | Gravação de tela                     |
 | `Super + Print Screen` | Seletor de cor |
 | `Super + Ctrl + Print Screen` | Extração de texto para a área de transferência |

@@ -2,6 +2,8 @@
 
 Omarchy pagal numatytuosius įjungia pristabdymą ir užmigdymą, bet jei tavo kompiuteryje su kuriuo nors kyla problemų, gali juos išjungti.
 
+NVIDIA GB10 kompiuteriuose, pavyzdžiui, DGX Spark ir ASUS Ascent GX10, miego režimas ir užmigdymas išjungti kaip NVIDIA DGX OS, nes dar neįrodyta, kad jie veikia šioje aparatinėje įrangoje. Miego jungiklis ir užmigdymo sąranka jiems netaikomi. Pašalinkite `/etc/systemd/sleep.conf.d/omarchy-sleep-disabled.conf` naudodami `sudo rm`, kad juos įjungtumėte; miego režimas grįš į meniu, o užmigdymą galėsite nustatyti įprastai. `sudo omarchy apply hardware --install-user "$USER"` atkuria failą.
+
 ### Maitinimo profiliai
 
 Nešiojamajame kompiuteryje Omarchy tavo maitinimo profilį prisimena atskirai prijungtam prie tinklo ir veikiančiam nuo akumuliatoriaus, ir persijungia tarp jų, kai įjungi ir atjungi laidą. Iš karto tai reiškia našumą nuo tinklo ir subalansuotą nuo akumuliatoriaus.

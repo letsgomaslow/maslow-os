@@ -2,6 +2,8 @@
 
 Omarchy aktiverer hvile og dvale som standard, men hvis du har problemer med en af dem på din maskine, kan du slå dem fra.
 
+På NVIDIA GB10-maskiner som DGX Spark og ASUS Ascent GX10 er dvale og slumring slået fra, ligesom i NVIDIA DGX OS, fordi søvn endnu ikke er påvist at virke på denne hardware. Dvaleomskifteren og opsætning af slumring gælder ikke her. Fjern `/etc/systemd/sleep.conf.d/omarchy-sleep-disabled.conf` med `sudo rm` for at slå søvn til igen; Dvale vender tilbage til menuen, og slumring kan sættes op normalt. `sudo omarchy apply hardware --install-user "$USER"` opretter filen igen.
+
 ### Strømprofiler
 
 På en bærbar husker Omarchy din strømprofil separat for tilsluttet strøm og batteridrift og skifter mellem de to, efterhånden som du sætter stikket i og tager det ud. Ud af boksen betyder det ydeevne på AC og balanceret på batteri.

@@ -2,6 +2,8 @@
 
 Omarchy aktiviert Standby und Ruhezustand standardmäßig, aber wenn du auf deinem Rechner Probleme damit hast, kannst du sie ausschalten.
 
+Auf NVIDIA GB10-Rechnern wie DGX Spark und ASUS Ascent GX10 sind Standby und Ruhezustand wie in NVIDIA DGX OS deaktiviert, da Schlafmodi auf dieser Hardware noch nicht nachweislich funktionieren. Standby-Umschalter und Ruhezustand-Einrichtung greifen dort nicht. Entferne `/etc/systemd/sleep.conf.d/omarchy-sleep-disabled.conf` mit `sudo rm`, um Schlafmodi wieder zu aktivieren; Standby erscheint wieder im Menü, und der Ruhezustand lässt sich normal einrichten. `sudo omarchy apply hardware --install-user "$USER"` stellt die Datei wieder her.
+
 ### Energieprofile
 
 Auf einem Laptop merkt sich Omarchy dein Energieprofil getrennt für Netzbetrieb und Akkubetrieb und wechselt beim Ein- und Ausstecken zwischen beiden. Von Anfang an bedeutet das Leistung am Netz und Ausgewogen im Akkubetrieb.

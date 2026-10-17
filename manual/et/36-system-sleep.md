@@ -2,6 +2,8 @@
 
 Omarchy lubab vaikimisi uinaku ja talveune, aga kui sul on oma masinal kummagagi probleeme, saad need välja lülitada.
 
+NVIDIA GB10 arvutites, nagu DGX Spark ja ASUS Ascent GX10, on une- ja talveunerežiim välja lülitatud nagu NVIDIA DGX OS-is, sest nende toimimist sellel riistvaral pole veel tõestatud. Unerežiimi lüliti ja talveune seadistamine seal ei kehti. Kustuta `/etc/systemd/sleep.conf.d/omarchy-sleep-disabled.conf` käsuga `sudo rm`, et need uuesti lubada; unerežiim naaseb menüüsse ja talveune saab tavaliselt seadistada. `sudo omarchy apply hardware --install-user "$USER"` taastab faili.
+
 ### Toiteprofiilid
 
 Sülearvutil jätab Omarchy sinu toiteprofiili eraldi meelde nii võrku ühendatuna kui ka akutoitel ja vahetab neid, kui ühendad toite külge või lahti. Karbist võttes tähendab see võrgutoitel jõudlust ja akutoitel tasakaalustatud režiimi.

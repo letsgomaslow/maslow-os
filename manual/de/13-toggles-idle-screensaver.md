@@ -38,7 +38,7 @@ Die Flags sind nach dem Aus-Zustand benannt — `screensaver-off`, `suspend-off`
 
 Wenn ein Modus eingeschaltet ist, bekommst du eine kleine Glyphe in der Mitte der Menüleiste neben der Uhr. Das ist das Anzeigen-Widget, und es trägt Diktat, Bildschirmaufnahme, ausstehende Erinnerungen, Nachtlicht, Nicht stören und Wach bleiben.
 
-Inaktive Anzeigen sind ausgeblendet. Fahre mit der Maus über den Bereich um sie herum, und sie blenden gedimmt ein, sodass du auf eine klicken kannst, um sie einzuschalten, ohne ihr Tastenkürzel zu kennen. Ein Klick auf eine aktive schaltet sie wieder aus. Wenn du sie lieber die ganze Zeit alle sehen willst, setze `alwaysShow` auf dem Eintrag `omarchy.indicators` in `~/.config/omarchy/shell.json` auf `true` — siehe [die Menüleiste](05-the-top-bar.md), um zu erfahren, wie Leisten-Widgets konfiguriert werden.
+Bewege den Zeiger an eine beliebige Stelle der Leiste, um die inaktiven Anzeigen einzublenden. Inaktive Anzeigen sind ausgeblendet. Fahre mit der Maus über den Bereich um sie herum, und sie blenden gedimmt ein, sodass du auf eine klicken kannst, um sie einzuschalten, ohne ihr Tastenkürzel zu kennen. Ein Klick auf eine aktive schaltet sie wieder aus. Wenn du sie lieber die ganze Zeit alle sehen willst, setze `alwaysShow` auf dem Eintrag `omarchy.indicators` in `~/.config/omarchy/shell.json` auf `true` — siehe [die Menüleiste](05-the-top-bar.md), um zu erfahren, wie Leisten-Widgets konfiguriert werden.
 
 ### Nachtlicht
 

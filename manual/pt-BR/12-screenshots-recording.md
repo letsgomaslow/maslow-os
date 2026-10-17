@@ -1,10 +1,11 @@
 # Capturas de Tela e Gravação
 
-Tudo o que você pode pegar da tela depende da tecla Print Screen. Uma tecla sozinha tira uma foto, e os modificadores fazem uma gravação, pegam uma cor ou o texto dentro de uma região. Se o seu teclado não tem tecla Print Screen, `Super + Ctrl + C` abre o mesmo conjunto como um menu.
+Tudo o que você pode pegar da tela depende da tecla Print Screen. Uma tecla sozinha tira uma foto, e os modificadores fazem uma gravação, pegam uma cor ou o texto dentro de uma região. Se o seu teclado não tem tecla Print Screen, `Super + Ctrl + C` abre o mesmo conjunto como um menu. `Super + Shift + S`: Captura de tela.
 
 | Atalho | Função |
 | ------ | -------- |
 | `Print Screen` | Captura de tela |
+| `Super + Shift + S` | Captura de tela |
 | `Alt + Print Screen` | Gravação de tela (ou interromper a que está em andamento) |
 | `Super + Print Screen` | Seletor de cor |
 | `Super + Ctrl + Print Screen` | Extrair texto de uma região |
@@ -13,7 +14,7 @@ Tudo o que você pode pegar da tela depende da tecla Print Screen. Uma tecla soz
 
 ## Capturas de tela
 
-Pressione `Print Screen` e o Omasnap captura o monitor focado antes que sua sobreposição apareça, para que nada se mova sob você enquanto mira. Arraste uma região livre, clique em uma janela para capturá-la ou clique em espaço aberto para capturar o monitor inteiro. Pressione `S` antes de desenhar para capturar uma região com rolagem. Mudou de ideia? Pressione `Print Screen` novamente para dispensar o Omasnap.
+Pressione `Print Screen` (`Super + Shift + S`) e o Omasnap captura o monitor focado antes que sua sobreposição apareça, para que nada se mova sob você enquanto mira. Arraste uma região livre, clique em uma janela para capturá-la ou clique em espaço aberto para capturar o monitor inteiro. Pressione `S` antes de desenhar para capturar uma região com rolagem. Mudou de ideia? Pressione `Print Screen` (`Super + Shift + S`) novamente para dispensar o Omasnap.
 
 Depois que você seleciona uma área, o Omasnap salva a captura, copia-a para a área de transferência e mostra uma pré-visualização por 10 segundos. Use o botão de fixar da pré-visualização ou `Ctrl + P` para mantê-la na tela, ou escolha Editar para anotá-la.
 

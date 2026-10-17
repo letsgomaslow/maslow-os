@@ -1,10 +1,11 @@
 # 截图与录屏
 
-你能从屏幕上抓取的一切都离不开 Print Screen 键。单独按这个键可以拍照，配合修饰键可以录屏、取色，或提取区域内的文本。如果你的键盘根本没有 Print Screen 键，`Super + Ctrl + C` 会以菜单形式打开同一组功能。
+你能从屏幕上抓取的一切都离不开 Print Screen 键。单独按这个键可以拍照，配合修饰键可以录屏、取色，或提取区域内的文本。如果你的键盘根本没有 Print Screen 键，`Super + Ctrl + C` 会以菜单形式打开同一组功能。 `Super + Shift + S`: 截图.
 
 | 快捷键 | 功能 |
 | ------ | -------- |
 | `Print Screen` | 截图 |
+| `Super + Shift + S` | 截图 |
 | `Alt + Print Screen` | 录屏（或停止正在进行的录屏） |
 | `Super + Print Screen` | 取色器 |
 | `Super + Ctrl + Print Screen` | 从区域中提取文本 |
@@ -13,7 +14,7 @@
 
 ## 截图
 
-按 `Print Screen`，Omasnap 会在其叠加层出现之前捕获聚焦的显示器，这样在你瞄准时，任何东西都不会在你下面移动。拖动自由区域，单击窗口以捕获它，或单击空白处以捕获整个显示器。在绘制之前按 `S` 可捕获滚动区域。改变主意了？再次按 `Print Screen` 可关闭 Omasnap。
+按 `Print Screen` (`Super + Shift + S`)，Omasnap 会在其叠加层出现之前捕获聚焦的显示器，这样在你瞄准时，任何东西都不会在你下面移动。拖动自由区域，单击窗口以捕获它，或单击空白处以捕获整个显示器。在绘制之前按 `S` 可捕获滚动区域。改变主意了？再次按 `Print Screen` (`Super + Shift + S`) 可关闭 Omasnap。
 
 选择区域后，Omasnap 会保存捕获，将其复制到剪贴板，并显示预览 10 秒。使用预览的图钉按钮或 `Ctrl + P` 可将其保留在屏幕上，或者选择“编辑”对其进行注释。
 

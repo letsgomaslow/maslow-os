@@ -1,10 +1,11 @@
 # Képernyőképek és felvétel
 
-Minden, amit a képernyőről lekapni tudsz, a Print Screen billentyűn lóg. Ez az egy billentyű önmagában képet készít, a módosítók pedig felvételt, színt vagy egy területen belüli szöveget. Ha a billentyűzetednek egyáltalán nincs Print Screen billentyűje, a `Super + Ctrl + C` ugyanazt a készletet nyitja meg menüként.
+Minden, amit a képernyőről lekapni tudsz, a Print Screen billentyűn lóg. Ez az egy billentyű önmagában képet készít, a módosítók pedig felvételt, színt vagy egy területen belüli szöveget. Ha a billentyűzetednek egyáltalán nincs Print Screen billentyűje, a `Super + Ctrl + C` ugyanazt a készletet nyitja meg menüként. `Super + Shift + S`: Képernyőkép.
 
 | Billentyűparancs | Funkció |
 | ------ | -------- |
 | `Print Screen` | Képernyőkép |
+| `Super + Shift + S` | Képernyőkép |
 | `Alt + Print Screen` | Képernyőfelvétel (vagy a futó leállítása) |
 | `Super + Print Screen` | Színválasztó |
 | `Super + Ctrl + Print Screen` | Szövegkinyerés egy területről |
@@ -13,7 +14,7 @@ Minden, amit a képernyőről lekapni tudsz, a Print Screen billentyűn lóg. Ez
 
 ## Képernyőképek
 
-Nyomd meg a `Print Screen` billentyűt, és az Omasnap még a fedvényének megjelenése előtt rögzíti a fókuszált monitort, így semmi sem mozdul el alattad, miközben célzol. Húzz egy szabad formájú területet, kattints egy ablakra annak rögzítéséhez, vagy kattints üres térre az egész monitor rögzítéséhez. Nyomd meg az `S` billentyűt rajzolás előtt görgetődő terület rögzítéséhez. Meggondoltad magad? Nyomd meg újra a `Print Screen` billentyűt az Omasnap elvetéséhez.
+Nyomd meg a `Print Screen` (`Super + Shift + S`) billentyűt, és az Omasnap még a fedvényének megjelenése előtt rögzíti a fókuszált monitort, így semmi sem mozdul el alattad, miközben célzol. Húzz egy szabad formájú területet, kattints egy ablakra annak rögzítéséhez, vagy kattints üres térre az egész monitor rögzítéséhez. Nyomd meg az `S` billentyűt rajzolás előtt görgetődő terület rögzítéséhez. Meggondoltad magad? Nyomd meg újra a `Print Screen` (`Super + Shift + S`) billentyűt az Omasnap elvetéséhez.
 
 Miután kiválasztottál egy területet, az Omasnap menti a rögzítést, a vágólapra másolja, és 10 másodpercig előnézetet mutat. Az előnézet rögzítés gombjával vagy a `Ctrl + P` kombinációval a képernyőn tarthatod, vagy válaszd az Edit lehetőséget a jegyzeteléshez.
 

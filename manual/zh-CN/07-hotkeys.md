@@ -116,7 +116,7 @@
 | `Super + Shift + Alt + A`           | AI（Grok）  |
 | `Super + Shift + G`           | 消息（Signal）  |
 | `Super + Shift + P`           | Google 相册  |
-| `Super + Shift + S`           | Google 地图  |
+| `Super + Shift + Alt + S`           | Google 地图  |
 | `Super + Shift + Alt + G`           | 消息（WhatsApp）  |
 | `Super + Shift + Ctrl + G`           | 消息（Google）  |
 | `Super + Shift + O`           | Obsidian  |
@@ -142,8 +142,9 @@
 
 | 快捷键              | 功能                       |
 | ------------------- | ------------------------------ |
-| `Super + Ctrl + C` | 捕获菜单（适用于没有 PrintScr 按钮的键盘） |
+| `Super + Ctrl + C` | 捕获菜单 |
 | `Print Screen`            | 截图                      |
+| `Super + Shift + S`            | 截图                      |
 | `Alt + Print Screen`            | 录屏                     |
 | `Super + Print Screen` | 取色器 |
 | `Super + Ctrl + Print Screen` | 将文本提取到剪贴板 |

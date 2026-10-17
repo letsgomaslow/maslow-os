@@ -116,7 +116,7 @@
 | `Super + Shift + Alt + A`           | AI (Grok)  |
 | `Super + Shift + G`           | مراسلة (Signal)  |
 | `Super + Shift + P`           | Google Photos  |
-| `Super + Shift + S`           | Google Maps  |
+| `Super + Shift + Alt + S`           | Google Maps  |
 | `Super + Shift + Alt + G`           | مراسلة (WhatsApp)  |
 | `Super + Shift + Ctrl + G`           | مراسلة (Google)  |
 | `Super + Shift + O`           | Obsidian  |
@@ -142,8 +142,9 @@
 
 | المفتاح السريع              | الوظيفة                       |
 | ------------------- | ------------------------------ |
-| `Super + Ctrl + C` | قائمة الالتقاط (للوحات المفاتيح بدون زر PrintScr) |
+| `Super + Ctrl + C` | قائمة الالتقاط |
 | `Print Screen`            | لقطة شاشة                      |
+| `Super + Shift + S`            | لقطة شاشة                      |
 | `Alt + Print Screen`            | تسجيل شاشة                     |
 | `Super + Print Screen` | منتقي الألوان |
 | `Super + Ctrl + Print Screen` | استخراج النص إلى الحافظة |

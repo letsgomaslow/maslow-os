@@ -116,7 +116,7 @@ Näet kaikki tärkeimmät näppäimistösidokset yhdistelmällä `Super + K` (Tm
 | `Super + Shift + Alt + A`           | AI (Grok)  |
 | `Super + Shift + G`           | Viestin (Signal)  |
 | `Super + Shift + P`           | Google Photos  |
-| `Super + Shift + S`           | Google Maps  |
+| `Super + Shift + Alt + S`           | Google Maps  |
 | `Super + Shift + Alt + G`           | Viestin (WhatsApp)  |
 | `Super + Shift + Ctrl + G`           | Viestin (Google)  |
 | `Super + Shift + O`           | Obsidian  |
@@ -142,8 +142,9 @@ Linuxissa tarvitset yleensä pääätteessä kopiointiin ja liittämiseen yhdist
 
 | Pikanäppäin              | Toiminto                       |
 | ------------------- | ------------------------------ |
-| `Super + Ctrl + C` | Kaappausvalikko (näppäimistöille ilman PrintScr-painiketta) |
+| `Super + Ctrl + C` | Kaappausvalikko |
 | `Print Screen`            | Kuvakaappaus                      |
+| `Super + Shift + S`            | Kuvakaappaus                      |
 | `Alt + Print Screen`            | Ruuduntallennus                     |
 | `Super + Print Screen` | Värinvalitsin |
 | `Super + Ctrl + Print Screen` | Tekstin poiminta leikepöydälle |

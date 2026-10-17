@@ -2,6 +2,8 @@
 
 Omarchy privzeto omogoča Spanje in Mirovanje, če pa imate s katerim od njiju na vašem računalniku težave, ju lahko izklopite.
 
+Na računalnikih NVIDIA GB10, kot sta DGX Spark in ASUS Ascent GX10, sta pripravljenost in mirovanje izklopljena tako kot v NVIDIA DGX OS, saj njuno delovanje na tej strojni opremi še ni dokazano. Stikalo pripravljenosti in nastavitev mirovanja tam ne veljata. Odstrani `/etc/systemd/sleep.conf.d/omarchy-sleep-disabled.conf` z `sudo rm`, da ju znova omogočiš; pripravljenost se vrne v meni, mirovanje pa lahko nastaviš običajno. `sudo omarchy apply hardware --install-user "$USER"` obnovi datoteko.
+
 ### Profili porabe energije
 
 Na prenosniku si Omarchy zapomni vaš profil porabe energije posebej za priklopljenost na napajanje in delovanje na baterijo ter med njima preklaplja, ko priklopite in odklopite. Takoj po namestitvi to pomeni zmogljivost na AC in uravnoteženo na baterijo.

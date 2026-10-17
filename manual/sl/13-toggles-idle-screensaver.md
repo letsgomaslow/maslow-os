@@ -38,7 +38,7 @@ Zastavice so poimenovane po izklopljenem stanju — `screensaver-off`, `suspend-
 
 Ko je način vklopljen, dobite majhen glif na sredini menijske vrstice poleg ure. To je gradnik kazalnikov in nosi narekovanje, snemanje zaslona, čakajoče opomnike, nočno svetlobo, ne moti in ostanek budnosti.
 
-Nedejavni kazalniki so skriti. Z miško se premaknite okoli njih in zbledijo zatemnjeni, tako da enega kliknete, da ga vklopite, ne da bi poznali njegovo bližnjico. Klik aktivnega ga izklopi. Če želite vse ves čas, nastavite `alwaysShow` na `true` na vnos `omarchy.indicators` v `~/.config/omarchy/shell.json` — glejte [menijska vrstica](05-the-top-bar.md) za to, kako se gradniki vrstice konfigurirajo.
+Premakni kazalec kamor koli nad vrstico, da se prikažejo neaktivni kazalniki. Nedejavni kazalniki so skriti. Z miško se premaknite okoli njih in zbledijo zatemnjeni, tako da enega kliknete, da ga vklopite, ne da bi poznali njegovo bližnjico. Klik aktivnega ga izklopi. Če želite vse ves čas, nastavite `alwaysShow` na `true` na vnos `omarchy.indicators` v `~/.config/omarchy/shell.json` — glejte [menijska vrstica](05-the-top-bar.md) za to, kako se gradniki vrstice konfigurirajo.
 
 ### Nočna svetloba
 

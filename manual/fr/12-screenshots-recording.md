@@ -1,10 +1,11 @@
 # Captures d'écran et enregistrement
 
-Tout ce que vous pouvez récupérer de l'écran dépend de la touche Print Screen. Une touche seule prend une image, et les modificateurs prennent un enregistrement, une couleur, ou le texte à l'intérieur d'une région. Si votre clavier n'a pas du tout de touche Print Screen, `Super + Ctrl + C` ouvre le même ensemble sous forme de menu.
+Tout ce que vous pouvez récupérer de l'écran dépend de la touche Print Screen. Une touche seule prend une image, et les modificateurs prennent un enregistrement, une couleur, ou le texte à l'intérieur d'une région. Si votre clavier n'a pas du tout de touche Print Screen, `Super + Ctrl + C` ouvre le même ensemble sous forme de menu. `Super + Shift + S`: Capture d'écran.
 
 | Raccourci | Fonction |
 | ------ | -------- |
 | `Print Screen` | Capture d'écran |
+| `Super + Shift + S` | Capture d'écran |
 | `Alt + Print Screen` | Enregistrement d'écran (ou arrêter celui en cours) |
 | `Super + Print Screen` | Sélecteur de couleur |
 | `Super + Ctrl + Print Screen` | Extraire le texte d'une région |
@@ -13,7 +14,7 @@ Tout ce que vous pouvez récupérer de l'écran dépend de la touche Print Scree
 
 ## Captures d'écran
 
-Appuyez sur `Print Screen` et Omasnap capture l'écran actif avant que son overlay n'apparaisse, de sorte que rien ne bouge sous vous pendant que vous visez. Faites glisser une région libre, cliquez sur une fenêtre pour la capturer, ou cliquez sur un espace libre pour capturer tout l'écran. Appuyez sur `S` avant de dessiner pour capturer une région défilante. Vous avez changé d'avis ? Réappuyez sur `Print Screen` pour fermer Omasnap.
+Appuyez sur `Print Screen` (`Super + Shift + S`) et Omasnap capture l'écran actif avant que son overlay n'apparaisse, de sorte que rien ne bouge sous vous pendant que vous visez. Faites glisser une région libre, cliquez sur une fenêtre pour la capturer, ou cliquez sur un espace libre pour capturer tout l'écran. Appuyez sur `S` avant de dessiner pour capturer une région défilante. Vous avez changé d'avis ? Réappuyez sur `Print Screen` (`Super + Shift + S`) pour fermer Omasnap.
 
 Après avoir sélectionné une zone, Omasnap enregistre la capture, la copie dans le presse-papiers et affiche un aperçu pendant 10 secondes. Utilisez le bouton épingle de l'aperçu ou `Ctrl + P` pour le garder à l'écran, ou choisissez Modifier pour l'annoter.
 

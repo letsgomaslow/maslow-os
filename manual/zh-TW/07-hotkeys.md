@@ -116,7 +116,7 @@
 | `Super + Shift + Alt + A`           | AI (Grok)  |
 | `Super + Shift + G`           | 即時通訊（Signal）  |
 | `Super + Shift + P`           | Google Photos  |
-| `Super + Shift + S`           | Google Maps  |
+| `Super + Shift + Alt + S`           | Google Maps  |
 | `Super + Shift + Alt + G`           | 即時通訊（WhatsApp）  |
 | `Super + Shift + Ctrl + G`           | 即時通訊（Google）  |
 | `Super + Shift + O`           | Obsidian  |
@@ -142,8 +142,9 @@
 
 | 快捷鍵              | 功能                       |
 | ------------------- | ------------------------------ |
-| `Super + Ctrl + C` | 擷取選單（用於沒有 PrintScr 按鈕的鍵盤） |
+| `Super + Ctrl + C` | 擷取選單 |
 | `Print Screen`            | 螢幕截圖                      |
+| `Super + Shift + S`            | 螢幕截圖                      |
 | `Alt + Print Screen`            | 螢幕錄影                     |
 | `Super + Print Screen` | 色彩選擇器 |
 | `Super + Ctrl + Print Screen` | 將文字擷取至剪貼簿 |

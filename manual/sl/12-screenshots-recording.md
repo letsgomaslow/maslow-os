@@ -1,10 +1,11 @@
 # Posnetki zaslona in snemanje
 
-Vse, kar lahko vzamete z zaslona, visi na tipki Print Screen. Ena tipka sama posname sliko, modifikatorji pa posnamejo posnetek, barvo ali besedilo znotraj območja. Če vaša tipkovnica sploh nima tipke Print Screen, `Super + Ctrl + C` odpre enak nabor kot meni.
+Vse, kar lahko vzamete z zaslona, visi na tipki Print Screen. Ena tipka sama posname sliko, modifikatorji pa posnamejo posnetek, barvo ali besedilo znotraj območja. Če vaša tipkovnica sploh nima tipke Print Screen, `Super + Ctrl + C` odpre enak nabor kot meni. `Super + Shift + S`: Posnetek zaslona.
 
 | Bližnjica | Funkcija |
 | ------ | -------- |
 | `Print Screen` | Posnetek zaslona |
+| `Super + Shift + S` | Posnetek zaslona |
 | `Alt + Print Screen` | Snemanje zaslona (ali ustavi tisto, ki teče) |
 | `Super + Print Screen` | Izbirnik barve |
 | `Super + Ctrl + Print Screen` | Izvleči besedilo iz območja |
@@ -13,7 +14,7 @@ Vse, kar lahko vzamete z zaslona, visi na tipki Print Screen. Ena tipka sama pos
 
 ## Posnetki zaslona
 
-Pritisnite `Print Screen` in Omasnap zajame osredotočeni zaslon, preden se pojavi njegovo prekrivanje, tako da se nič ne premakne pod vami, medtem ko merite. Povlecite prosto obliko, kliknite okno, da ga zajamete, ali kliknite prazen prostor, da zajamete celoten zaslon. Pred risanjem pritisnite `S`, da zajamete drseče območje. Premislili ste si? Znova pritisnite `Print Screen`, da Omasnap odpustite.
+Pritisnite `Print Screen` (`Super + Shift + S`) in Omasnap zajame osredotočeni zaslon, preden se pojavi njegovo prekrivanje, tako da se nič ne premakne pod vami, medtem ko merite. Povlecite prosto obliko, kliknite okno, da ga zajamete, ali kliknite prazen prostor, da zajamete celoten zaslon. Pred risanjem pritisnite `S`, da zajamete drseče območje. Premislili ste si? Znova pritisnite `Print Screen` (`Super + Shift + S`), da Omasnap odpustite.
 
 Ko izberete območje, Omasnap zajem shrani, ga kopira v odložišče in 10 sekund prikaže predogled. Uporabite gumb za pripono v predogledu ali `Ctrl + P`, da ga obdržite na zaslonu, ali izberite Edit, da ga opremite z obvestili.
 

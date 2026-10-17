@@ -116,7 +116,7 @@ Du kan se alla huvudsakliga tangentbindningar med `Super + K` (Tmux-bindningar m
 | `Super + Shift + Alt + A`           | AI (Grok)  |
 | `Super + Shift + G`           | Messenger (Signal)  |
 | `Super + Shift + P`           | Google Photos  |
-| `Super + Shift + S`           | Google Maps  |
+| `Super + Shift + Alt + S`           | Google Maps  |
 | `Super + Shift + Alt + G`           | Messenger (WhatsApp)  |
 | `Super + Shift + Ctrl + G`           | Messenger (Google)  |
 | `Super + Shift + O`           | Obsidian  |
@@ -142,8 +142,9 @@ Vanligtvis på Linux behöver du `Ctrl + Shift + C/V` för att kopiera och klist
 
 | Snabbtangent              | Funktion                       |
 | ------------------- | ------------------------------ |
-| `Super + Ctrl + C` | Fångstmeny (för tangentbord utan PrintScr-knapp) |
+| `Super + Ctrl + C` | Fångstmeny |
 | `Print Screen`            | Skärmbild                      |
+| `Super + Shift + S`            | Skärmbild                      |
 | `Alt + Print Screen`            | Skärminspelning                     |
 | `Super + Print Screen` | Färgväljare |
 | `Super + Ctrl + Print Screen` | Textextrahering till urklippet |

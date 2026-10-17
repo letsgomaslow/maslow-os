@@ -38,7 +38,7 @@ Bendera dinamakan untuk keadaan mati — `screensaver-off`, `suspend-off`, `bar-
 
 Apabila mod dihidupkan, anda mendapat glif kecil di tengah bar atas di sebelah jam. Itulah widget Penunjuk, dan ia membawa pendiktean, rakaman skrin, Peringatan yang belum selesai, Cahaya Malam, jangan ganggu, dan Kekal Jaga.
 
-Penunjuk tidak aktif disembunyikan. Layangkan kawasan di sekelilingnya dan ia pudar masuk dalam keadaan malap, jadi anda boleh mengklik satu untuk menghidupkannya tanpa mengetahui kekunci panasnya. Mengklik yang aktif mematikannya kembali. Jika anda lebih suka melihat kesemuanya pada setiap masa, tetapkan `alwaysShow` kepada `true` pada entri `omarchy.indicators` dalam `~/.config/omarchy/shell.json` — lihat [bar atas](05-the-top-bar.md) untuk cara widget bar dikonfigurasikan.
+Letakkan penuding di mana-mana pada bar untuk menunjukkan penunjuk yang tidak aktif. Penunjuk tidak aktif disembunyikan. Layangkan kawasan di sekelilingnya dan ia pudar masuk dalam keadaan malap, jadi anda boleh mengklik satu untuk menghidupkannya tanpa mengetahui kekunci panasnya. Mengklik yang aktif mematikannya kembali. Jika anda lebih suka melihat kesemuanya pada setiap masa, tetapkan `alwaysShow` kepada `true` pada entri `omarchy.indicators` dalam `~/.config/omarchy/shell.json` — lihat [bar atas](05-the-top-bar.md) untuk cara widget bar dikonfigurasikan.
 
 ### Cahaya Malam
 

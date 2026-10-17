@@ -38,7 +38,7 @@ Príznaky sú pomenované podľa vypnutého stavu — `screensaver-off`, `suspen
 
 Keď je režim zapnutý, dostanete malý glyf v strede hornej lišty vedľa hodín. Je to widget indikátorov a nesie diktovanie, nahrávanie obrazovky, čakajúce pripomienky, nočné svetlo, nerušiť a zostať hore.
 
-Neaktívne indikátory sú skryté. Prejdite kurzorom cez oblasť okolo nich a vyblednuto sa objavia, takže môžete kliknúť na jeden, aby ste ho zapli, bez toho, aby ste poznali jeho klávesovú skratku. Kliknutie na aktívny ho znova vypne. Ak by ste ich radšej videli všetky stále, nastavte `alwaysShow` na `true` na položke `omarchy.indicators` v `~/.config/omarchy/shell.json` — pozrite si [hornú lištu](05-the-top-bar.md), ako sa widgety lišty konfigurujú.
+Prejdite ukazovateľom kamkoľvek na panel a zobrazia sa neaktívne indikátory. Neaktívne indikátory sú skryté. Prejdite kurzorom cez oblasť okolo nich a vyblednuto sa objavia, takže môžete kliknúť na jeden, aby ste ho zapli, bez toho, aby ste poznali jeho klávesovú skratku. Kliknutie na aktívny ho znova vypne. Ak by ste ich radšej videli všetky stále, nastavte `alwaysShow` na `true` na položke `omarchy.indicators` v `~/.config/omarchy/shell.json` — pozrite si [hornú lištu](05-the-top-bar.md), ako sa widgety lišty konfigurujú.
 
 ### Nočné svetlo
 

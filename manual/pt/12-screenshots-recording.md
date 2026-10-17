@@ -1,10 +1,11 @@
 # Capturas de ecrã e gravação
 
-Tudo o que consegues agarrar do ecrã pendura da tecla Print Screen. Uma tecla sozinha tira uma fotografia, e os modificadores tiram uma gravação, uma cor, ou o texto dentro de uma região. Se o teu teclado não tiver nenhuma tecla Print Screen, `Super + Ctrl + C` abre o mesmo conjunto como um menu.
+Tudo o que consegues agarrar do ecrã pendura da tecla Print Screen. Uma tecla sozinha tira uma fotografia, e os modificadores tiram uma gravação, uma cor, ou o texto dentro de uma região. Se o teu teclado não tiver nenhuma tecla Print Screen, `Super + Ctrl + C` abre o mesmo conjunto como um menu. `Super + Shift + S`: Captura de ecrã.
 
 | Atalho | Função |
 | ------ | -------- |
 | `Print Screen` | Captura de ecrã |
+| `Super + Shift + S` | Captura de ecrã |
 | `Alt + Print Screen` | Gravar ecrã (ou parar a gravação em curso) |
 | `Super + Print Screen` | Seletor de cores |
 | `Super + Ctrl + Print Screen` | Extrair texto de uma região |
@@ -13,7 +14,7 @@ Tudo o que consegues agarrar do ecrã pendura da tecla Print Screen. Uma tecla s
 
 ## Capturas de ecrã
 
-Prime `Print Screen` e o Omasnap captura o monitor em foco antes de a sua sobreposição aparecer, para nada se deslocar debaixo de ti enquanto apontas. Arrasta uma região livre, clica numa janela para a capturares, ou clica em espaço aberto para capturares o monitor inteiro. Prime `S` antes de desenhares para capturares uma região com deslocamento. Mudaste de ideias? Prime `Print Screen` outra vez para fechares o Omasnap.
+Prime `Print Screen` (`Super + Shift + S`) e o Omasnap captura o monitor em foco antes de a sua sobreposição aparecer, para nada se deslocar debaixo de ti enquanto apontas. Arrasta uma região livre, clica numa janela para a capturares, ou clica em espaço aberto para capturares o monitor inteiro. Prime `S` antes de desenhares para capturares uma região com deslocamento. Mudaste de ideias? Prime `Print Screen` (`Super + Shift + S`) outra vez para fechares o Omasnap.
 
 Depois de selecionares uma área, o Omasnap guarda a captura, copia-a para a área de transferência e mostra uma pré-visualização durante 10 segundos. Usa o botão de fixar da pré-visualização ou `Ctrl + P` para a manteres no ecrã, ou escolhe Editar para a anotares.
 

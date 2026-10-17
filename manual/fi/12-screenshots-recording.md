@@ -1,10 +1,11 @@
 # Kuvakaappaukset ja tallennus
 
-Kaikki, mitä voit kaapata ruudulta, roikkuu Print Screen -näppäimestä. Yksi näppäin yksinään ottaa kuvan, ja muokkaimet ottavat tallenteen, värin tai tekstin alueen sisältä. Jos näppäimistössäsi ei ole lainkaan Print Screen -näppäintä, `Super + Ctrl + C` avaa saman valikoiman valikkona.
+Kaikki, mitä voit kaapata ruudulta, roikkuu Print Screen -näppäimestä. Yksi näppäin yksinään ottaa kuvan, ja muokkaimet ottavat tallenteen, värin tai tekstin alueen sisältä. Jos näppäimistössäsi ei ole lainkaan Print Screen -näppäintä, `Super + Ctrl + C` avaa saman valikoiman valikkona. `Super + Shift + S`: Kuvakaappaus.
 
 | Pikanäppäin | Toiminto |
 | ------ | -------- |
 | `Print Screen` | Kuvakaappaus |
+| `Super + Shift + S` | Kuvakaappaus |
 | `Alt + Print Screen` | Ruuduntallennus (tai pysäytä käynnissä oleva) |
 | `Super + Print Screen` | Värinvalitsin |
 | `Super + Ctrl + Print Screen` | Poimi teksti alueelta |
@@ -13,7 +14,7 @@ Kaikki, mitä voit kaapata ruudulta, roikkuu Print Screen -näppäimestä. Yksi 
 
 ## Kuvakaappaukset
 
-Paina `Print Screen`, ja Omasnap kaappaa kohdistetun näytön ennen peiton ilmestymistä, joten mikään ei siirry allasi tähtäillessäsi. Vedä vapaamuotoinen alue, napsauta ikkunaa kaapataksesi sen tai napsauta avointa tilaa kaapataksesi koko näytön. Paina `S` ennen piirtämistä kaapataksesi vierivän alueen. Muutitko mielesi? Paina uudelleen `Print Screen` sulkeaksesi Omasnapin.
+Paina `Print Screen` (`Super + Shift + S`), ja Omasnap kaappaa kohdistetun näytön ennen peiton ilmestymistä, joten mikään ei siirry allasi tähtäillessäsi. Vedä vapaamuotoinen alue, napsauta ikkunaa kaapataksesi sen tai napsauta avointa tilaa kaapataksesi koko näytön. Paina `S` ennen piirtämistä kaapataksesi vierivän alueen. Muutitko mielesi? Paina uudelleen `Print Screen` (`Super + Shift + S`) sulkeaksesi Omasnapin.
 
 Kun olet valinnut alueen, Omasnap tallentaa kaappauksen, kopioi sen leikepöydälle ja näyttää esikatselun 10 sekunnin ajan. Käytä esikatselun kiinnityspainiketta tai yhdistelmää `Ctrl + P` pitääksesi sen ruudulla, tai valitse Muokkaa kommentoidaksesi sitä.
 

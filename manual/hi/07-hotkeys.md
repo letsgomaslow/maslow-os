@@ -116,7 +116,7 @@
 | `Super + Shift + Alt + A`           | AI (Grok)  |
 | `Super + Shift + G`           | मैसेंजर (Signal)  |
 | `Super + Shift + P`           | Google Photos  |
-| `Super + Shift + S`           | Google Maps  |
+| `Super + Shift + Alt + S`           | Google Maps  |
 | `Super + Shift + Alt + G`           | मैसेंजर (WhatsApp)  |
 | `Super + Shift + Ctrl + G`           | मैसेंजर (Google)  |
 | `Super + Shift + O`           | Obsidian  |
@@ -142,8 +142,9 @@
 
 | हॉटकी              | कार्य                       |
 | ------------------- | ------------------------------ |
-| `Super + Ctrl + C` | कैप्चर मेनू (बिना PrintScr बटन वाले कीबोर्ड के लिए) |
+| `Super + Ctrl + C` | कैप्चर मेनू |
 | `Print Screen`            | स्क्रीनशॉट                      |
+| `Super + Shift + S`            | स्क्रीनशॉट                      |
 | `Alt + Print Screen`            | स्क्रीन रिकॉर्ड                     |
 | `Super + Print Screen` | रंग चयनकर्ता |
 | `Super + Ctrl + Print Screen` | क्लिपबोर्ड पर टेक्स्ट निष्कर्षण |

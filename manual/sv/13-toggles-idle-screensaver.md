@@ -38,7 +38,7 @@ Flaggorna är namngivna för av-tillståndet — `screensaver-off`, `suspend-off
 
 När ett läge är på får du en liten symbol i mitten av menyfältet bredvid klockan. Det är indikatorwidgeten, och den bär diktering, skärminspelning, väntande påminnelser, nattljus, stör ej och håll vaken.
 
-Inaktiva indikatorer är dolda. Hovra området runt dem så tonas de in nedtonade, så att du kan klicka på en för att slå på den utan att känna till dess snabbtangent. Att klicka på en aktiv stänger av den igen. Om du hellre vill se alla hela tiden, ställ in `alwaysShow` till `true` på posten `omarchy.indicators` i `~/.config/omarchy/shell.json` — se [menyfältet](05-the-top-bar.md) för hur fältwidgetar konfigureras.
+Håll pekaren var som helst över fältet för att visa de inaktiva indikatorerna. Inaktiva indikatorer är dolda. Hovra området runt dem så tonas de in nedtonade, så att du kan klicka på en för att slå på den utan att känna till dess snabbtangent. Att klicka på en aktiv stänger av den igen. Om du hellre vill se alla hela tiden, ställ in `alwaysShow` till `true` på posten `omarchy.indicators` i `~/.config/omarchy/shell.json` — se [menyfältet](05-the-top-bar.md) för hur fältwidgetar konfigureras.
 
 ### Nattljus
 

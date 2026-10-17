@@ -38,7 +38,7 @@ I flag sono chiamati per lo stato spento — `screensaver-off`, `suspend-off`, `
 
 Quando una modalità è attiva, ottieni un piccolo glifo al centro della barra superiore accanto all'orologio. Quello è il widget indicatori, e trasporta dettatura, registrazione schermo, promemoria in sospeso, luce notturna, non disturbare e resta attivo.
 
-Gli indicatori inattivi sono nascosti. Passa il mouse nell'area attorno a essi e compaiono attenuati, così puoi cliccarne uno per attivarlo senza conoscerne la scorciatoia. Cliccando uno attivo lo spegne di nuovo. Se preferisci vederli tutti sempre, imposta `alwaysShow` a `true` sulla voce `omarchy.indicators` in `~/.config/omarchy/shell.json` — vedi [la barra superiore](05-the-top-bar.md) per come si configurano i widget della barra.
+Passa il puntatore su un punto qualsiasi della barra per mostrare gli indicatori inattivi. Gli indicatori inattivi sono nascosti. Passa il mouse nell'area attorno a essi e compaiono attenuati, così puoi cliccarne uno per attivarlo senza conoscerne la scorciatoia. Cliccando uno attivo lo spegne di nuovo. Se preferisci vederli tutti sempre, imposta `alwaysShow` a `true` sulla voce `omarchy.indicators` in `~/.config/omarchy/shell.json` — vedi [la barra superiore](05-the-top-bar.md) per come si configurano i widget della barra.
 
 ### Luce notturna
 

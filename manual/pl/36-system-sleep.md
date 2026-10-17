@@ -2,6 +2,8 @@
 
 Omarchy domyślnie włącza wstrzymanie i hibernację, ale jeśli na twoim komputerze masz problemy z jednym albo drugim, możesz je wyłączyć.
 
+Na komputerach NVIDIA GB10, takich jak DGX Spark i ASUS Ascent GX10, uśpienie i hibernacja są wyłączone jak w NVIDIA DGX OS, ponieważ nie potwierdzono jeszcze ich działania na tym sprzęcie. Przełącznik uśpienia i konfiguracja hibernacji nie mają tu zastosowania. Usuń `/etc/systemd/sleep.conf.d/omarchy-sleep-disabled.conf` poleceniem `sudo rm`, aby je włączyć; Uśpij wróci do menu i można będzie normalnie skonfigurować hibernację. `sudo omarchy apply hardware --install-user "$USER"` odtwarza plik.
+
 ### Profile zasilania
 
 Na laptopie Omarchy pamięta profil zasilania osobno dla zasilania sieciowego i pracy na baterii i przełącza się między nimi, gdy podłączasz i odłączasz zasilacz. Od razu po zainstalowaniu oznacza to wydajność na zasilaniu sieciowym i zrównoważony na baterii.

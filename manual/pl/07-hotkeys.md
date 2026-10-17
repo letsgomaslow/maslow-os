@@ -116,7 +116,7 @@ Wszystkie główne przypisania klawiszy zobaczysz przez `Super + K` (przypisania
 | `Super + Shift + Alt + A`           | AI (Grok)  |
 | `Super + Shift + G`           | Komunikator (Signal)  |
 | `Super + Shift + P`           | Google Photos  |
-| `Super + Shift + S`           | Google Maps  |
+| `Super + Shift + Alt + S`           | Google Maps  |
 | `Super + Shift + Alt + G`           | Komunikator (WhatsApp)  |
 | `Super + Shift + Ctrl + G`           | Komunikator (Google)  |
 | `Super + Shift + O`           | Obsidian  |
@@ -142,8 +142,9 @@ Zwykle na Linuksie potrzebujesz `Ctrl + Shift + C/V` do kopiowania i wklejania w
 
 | Skrót              | Funkcja                       |
 | ------------------- | ------------------------------ |
-| `Super + Ctrl + C` | Menu przechwytywania (dla klawiatur bez przycisku PrintScr) |
+| `Super + Ctrl + C` | Menu przechwytywania |
 | `Print Screen`            | Zrzut ekranu                      |
+| `Super + Shift + S`            | Zrzut ekranu                      |
 | `Alt + Print Screen`            | Nagrywanie ekranu                     |
 | `Super + Print Screen` | Wybór koloru |
 | `Super + Ctrl + Print Screen` | Wyciąganie tekstu do schowka |

@@ -1,10 +1,11 @@
 # Ekrānuzņēmumi un ierakstīšana
 
-Viss, ko tu vari paņemt no ekrāna, karājas uz taustiņa Print Screen. Viens taustiņš pats uzņem attēlu, un modifikatori uzņem ierakstu, krāsu vai tekstu reģiona iekšpusē. Ja tavai tastatūrai vispār nav taustiņa Print Screen, `Super + Ctrl + C` atver to pašu kopu kā izvēlni.
+Viss, ko tu vari paņemt no ekrāna, karājas uz taustiņa Print Screen. Viens taustiņš pats uzņem attēlu, un modifikatori uzņem ierakstu, krāsu vai tekstu reģiona iekšpusē. Ja tavai tastatūrai vispār nav taustiņa Print Screen, `Super + Ctrl + C` atver to pašu kopu kā izvēlni. `Super + Shift + S`: Ekrānuzņēmums.
 
 | Karstā taustiņa kombinācija | Funkcija |
 | ------ | -------- |
 | `Print Screen` | Ekrānuzņēmums |
+| `Super + Shift + S` | Ekrānuzņēmums |
 | `Alt + Print Screen` | Ekrāna ieraksts (vai apturēt to, kas darbojas) |
 | `Super + Print Screen` | Krāsu atlasītājs |
 | `Super + Ctrl + Print Screen` | Iegūt tekstu no reģiona |
@@ -13,7 +14,7 @@ Viss, ko tu vari paņemt no ekrāna, karājas uz taustiņa Print Screen. Viens t
 
 ## Ekrānuzņēmumi
 
-Nospied `Print Screen`, un Omasnap uzņem fokusēto monitoru, pirms parādās tā pārklājums, tāpēc nekas zem tevis nepārvietojas, kamēr tu tēmē. Velc brīvas formas reģionu, noklikšķini uz loga, lai to uzņemtu, vai noklikšķini tukšā vietā, lai uzņemtu visu monitoru. Pirms zīmēšanas nospied `S`, lai uzņemtu ritinošu reģionu. Pārdomāji? Nospied `Print Screen` vēlreiz, lai aizvāktu Omasnap.
+Nospied `Print Screen` (`Super + Shift + S`), un Omasnap uzņem fokusēto monitoru, pirms parādās tā pārklājums, tāpēc nekas zem tevis nepārvietojas, kamēr tu tēmē. Velc brīvas formas reģionu, noklikšķini uz loga, lai to uzņemtu, vai noklikšķini tukšā vietā, lai uzņemtu visu monitoru. Pirms zīmēšanas nospied `S`, lai uzņemtu ritinošu reģionu. Pārdomāji? Nospied `Print Screen` (`Super + Shift + S`) vēlreiz, lai aizvāktu Omasnap.
 
 Pēc tam, kad tu atlasi apgabalu, Omasnap saglabā uzņemto, kopē to starpliktuvē un 10 sekundes rāda priekšskatījumu. Izmanto priekšskatījuma piespraušanas pogu vai `Ctrl + P`, lai to paturētu ekrānā, vai izvēlies Rediģēt, lai to anotētu.
 

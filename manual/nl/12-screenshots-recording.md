@@ -1,10 +1,11 @@
 # Schermafbeeldingen & opname
 
-Alles wat je van het scherm kunt pakken hangt aan de Print Screen-toets. Eén toets op zichzelf maakt een foto, en de modifiers maken een opname, een kleur, of de tekst binnen een gebied. Als je toetsenbord helemaal geen Print Screen-toets heeft, opent `Super + Ctrl + C` dezelfde set als een menu.
+Alles wat je van het scherm kunt pakken hangt aan de Print Screen-toets. Eén toets op zichzelf maakt een foto, en de modifiers maken een opname, een kleur, of de tekst binnen een gebied. Als je toetsenbord helemaal geen Print Screen-toets heeft, opent `Super + Ctrl + C` dezelfde set als een menu. `Super + Shift + S`: Schermafbeelding.
 
 | Sneltoets | Functie |
 | ------ | -------- |
 | `Print Screen` | Schermafbeelding |
+| `Super + Shift + S` | Schermafbeelding |
 | `Alt + Print Screen` | Schermopname (of stop degene die draait) |
 | `Super + Print Screen` | Kleurkiezer |
 | `Super + Ctrl + Print Screen` | Tekst uit een gebied extraheren |
@@ -13,7 +14,7 @@ Alles wat je van het scherm kunt pakken hangt aan de Print Screen-toets. Eén to
 
 ## Schermafbeeldingen
 
-Druk op `Print Screen` en Omasnap legt de gefocuste monitor vast voordat zijn overlay verschijnt, zodat niets onder je verschuift terwijl je mikt. Sleep een vrij gebied, klik op een venster om het vast te leggen, of klik op open ruimte om de hele monitor vast te leggen. Druk op `S` voordat je tekent om een scrollend gebied vast te leggen. Van gedachten veranderd? Druk opnieuw op `Print Screen` om Omasnap te sluiten.
+Druk op `Print Screen` (`Super + Shift + S`) en Omasnap legt de gefocuste monitor vast voordat zijn overlay verschijnt, zodat niets onder je verschuift terwijl je mikt. Sleep een vrij gebied, klik op een venster om het vast te leggen, of klik op open ruimte om de hele monitor vast te leggen. Druk op `S` voordat je tekent om een scrollend gebied vast te leggen. Van gedachten veranderd? Druk opnieuw op `Print Screen` (`Super + Shift + S`) om Omasnap te sluiten.
 
 Nadat je een gebied hebt geselecteerd, slaat Omasnap de opname op, kopieert hem naar het klembord en toont een preview voor 10 seconden. Gebruik de pin-knop van de preview of `Ctrl + P` om hem op het scherm te houden, of kies Bewerken om hem te annoteren.
 

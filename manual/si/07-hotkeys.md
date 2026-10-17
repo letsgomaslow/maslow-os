@@ -116,7 +116,7 @@
 | `Super + Shift + Alt + A`           | AI (Grok)  |
 | `Super + Shift + G`           | පණිවිඩකරු (Signal)  |
 | `Super + Shift + P`           | Google Photos  |
-| `Super + Shift + S`           | Google Maps  |
+| `Super + Shift + Alt + S`           | Google Maps  |
 | `Super + Shift + Alt + G`           | පණිවිඩකරු (WhatsApp)  |
 | `Super + Shift + Ctrl + G`           | පණිවිඩකරු (Google)  |
 | `Super + Shift + O`           | Obsidian  |
@@ -142,8 +142,9 @@
 
 | උණුසුම් යතුර              | කාර්යය                       |
 | ------------------- | ------------------------------ |
-| `Super + Ctrl + C` | ග්‍රහණ මෙනුව (PrintScr බොත්තමක් නැති යතුරුපුවරු සඳහා) |
+| `Super + Ctrl + C` | ග්‍රහණ මෙනුව |
 | `Print Screen`            | තිර රුව                      |
+| `Super + Shift + S`            | තිර රුව                      |
 | `Alt + Print Screen`            | තිර පටිගත කිරීම                     |
 | `Super + Print Screen` | වර්ණ තේරීම |
 | `Super + Ctrl + Print Screen` | ක්ලිප්බෝඩයට පෙළ උපුටා ගැනීම |

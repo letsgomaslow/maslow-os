@@ -1,10 +1,11 @@
 # Snímky obrazovky a nahrávání
 
-Všechno, co můžete z obrazovky získat, visí na klávese Print Screen. Jedna klávesa sama o sobě pořídí obrázek a modifikátory pořídí nahrávání, barvu nebo text uvnitř oblasti. Pokud vaše klávesnice vůbec nemá klávesu Print Screen, `Super + Ctrl + C` otevře stejnou sadu jako nabídku.
+Všechno, co můžete z obrazovky získat, visí na klávese Print Screen. Jedna klávesa sama o sobě pořídí obrázek a modifikátory pořídí nahrávání, barvu nebo text uvnitř oblasti. Pokud vaše klávesnice vůbec nemá klávesu Print Screen, `Super + Ctrl + C` otevře stejnou sadu jako nabídku. `Super + Shift + S`: Snímek obrazovky.
 
 | Klávesová zkratka | Funkce |
 | ------ | -------- |
 | `Print Screen` | Snímek obrazovky |
+| `Super + Shift + S` | Snímek obrazovky |
 | `Alt + Print Screen` | Nahrávání obrazovky (nebo zastavit to spuštěné) |
 | `Super + Print Screen` | Výběr barvy |
 | `Super + Ctrl + Print Screen` | Extrahovat text z oblasti |
@@ -13,7 +14,7 @@ Všechno, co můžete z obrazovky získat, visí na klávese Print Screen. Jedna
 
 ## Snímky obrazovky
 
-Stiskněte `Print Screen` a Omasnap zachytí zaměřený monitor dříve, než se objeví jeho překryv, takže se pod vámi nic nepohne, zatímco míříte. Přetáhněte volnou oblast, klikněte na okno a zachyťte ho, nebo klikněte na prázdné místo a zachyťte celý monitor. Před kreslením stiskněte `S` pro zachycení posouvací oblasti. Změnili jste názor? Stiskněte znovu `Print Screen` a Omasnap zavřete.
+Stiskněte `Print Screen` (`Super + Shift + S`) a Omasnap zachytí zaměřený monitor dříve, než se objeví jeho překryv, takže se pod vámi nic nepohne, zatímco míříte. Přetáhněte volnou oblast, klikněte na okno a zachyťte ho, nebo klikněte na prázdné místo a zachyťte celý monitor. Před kreslením stiskněte `S` pro zachycení posouvací oblasti. Změnili jste názor? Stiskněte znovu `Print Screen` (`Super + Shift + S`) a Omasnap zavřete.
 
 Po výběru oblasti Omasnap uloží snímek, zkopíruje ho do schránky a ukáže náhled po dobu 10 sekund. Pomocí tlačítka připnutí v náhledu nebo `Ctrl + P` ho ponecháte na obrazovce, nebo vyberte Upravit a opatřete ho poznámkami.
 

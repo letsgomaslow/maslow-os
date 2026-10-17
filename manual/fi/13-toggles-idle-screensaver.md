@@ -38,7 +38,7 @@ Liput on nimetty pois päältä -tilan mukaan — `screensaver-off`, `suspend-of
 
 Kun tila on päällä, näet pienen merkin yläpalkin keskellä kellon vieressä. Se on ilmaisin-widget, ja se kantaa sanelua, ruuduntallennusta, odottavia muistutuksia, yövaloa, älä häiritse -tilaa ja pysy hereillä -tilaa.
 
-Epäaktiiviset ilmaisimet ovat piilossa. Vie osoitin niiden alueen ylle, ja ne häipyvät esiin himmennettyinä, joten voit napsauttaa yhtä kytkeäksesi sen päälle tietämättä sen pikanäppäintä. Aktiivisen napsauttaminen kytkee sen takaisin pois. Jos mieluummin näet ne kaikki koko ajan, aseta `alwaysShow` arvoon `true` merkinnässä `omarchy.indicators` tiedostossa `~/.config/omarchy/shell.json` — katso [yläpalkki](05-the-top-bar.md), miten palkin widgetit määritetään.
+Vie osoitin mihin tahansa palkin kohtaan näyttääksesi passiiviset ilmaisimet. Epäaktiiviset ilmaisimet ovat piilossa. Vie osoitin niiden alueen ylle, ja ne häipyvät esiin himmennettyinä, joten voit napsauttaa yhtä kytkeäksesi sen päälle tietämättä sen pikanäppäintä. Aktiivisen napsauttaminen kytkee sen takaisin pois. Jos mieluummin näet ne kaikki koko ajan, aseta `alwaysShow` arvoon `true` merkinnässä `omarchy.indicators` tiedostossa `~/.config/omarchy/shell.json` — katso [yläpalkki](05-the-top-bar.md), miten palkin widgetit määritetään.
 
 ### Yövalo
 

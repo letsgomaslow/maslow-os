@@ -1,10 +1,11 @@
 # Schermate e registrazione
 
-Tutto ciò che puoi afferrare dallo schermo dipende dal tasto Print Screen. Un tasto da solo scatta una foto, e i modificatori catturano una registrazione, un colore o il testo dentro una regione. Se la tua tastiera non ha affatto un tasto Print Screen, `Super + Ctrl + C` apre lo stesso insieme come menu.
+Tutto ciò che puoi afferrare dallo schermo dipende dal tasto Print Screen. Un tasto da solo scatta una foto, e i modificatori catturano una registrazione, un colore o il testo dentro una regione. Se la tua tastiera non ha affatto un tasto Print Screen, `Super + Ctrl + C` apre lo stesso insieme come menu. `Super + Shift + S`: Schermata.
 
 | Scorciatoia | Funzione |
 | ------ | -------- |
 | `Print Screen` | Schermata |
+| `Super + Shift + S` | Schermata |
 | `Alt + Print Screen` | Registra schermo (o ferma quella in corso) |
 | `Super + Print Screen` | Selettore colore |
 | `Super + Ctrl + Print Screen` | Estrai testo da una regione |
@@ -13,7 +14,7 @@ Tutto ciò che puoi afferrare dallo schermo dipende dal tasto Print Screen. Un t
 
 ## Schermate
 
-Premi `Print Screen` e Omasnap cattura il monitor focalizzato prima che appaia il suo overlay, così nulla si sposta sotto di te mentre miri. Trascina una regione a forma libera, clicca una finestra per catturarla o clicca spazio aperto per catturare l'intero monitor. Premi `S` prima di disegnare per catturare una regione a scorrimento. Hai cambiato idea? Premi di nuovo `Print Screen` per chiudere Omasnap.
+Premi `Print Screen` (`Super + Shift + S`) e Omasnap cattura il monitor focalizzato prima che appaia il suo overlay, così nulla si sposta sotto di te mentre miri. Trascina una regione a forma libera, clicca una finestra per catturarla o clicca spazio aperto per catturare l'intero monitor. Premi `S` prima di disegnare per catturare una regione a scorrimento. Hai cambiato idea? Premi di nuovo `Print Screen` (`Super + Shift + S`) per chiudere Omasnap.
 
 Dopo aver selezionato un'area, Omasnap salva la cattura, la copia negli appunti e mostra un'anteprima per 10 secondi. Usa il pulsante segnaposto dell'anteprima o `Ctrl + P` per mantenerla sullo schermo, oppure scegli Modifica per annotarla.
 

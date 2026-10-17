@@ -1,10 +1,11 @@
 # Skærmbilleder & optagelse
 
-Alt, hvad du kan hente fra skærmen, hænger på Print Screen-tasten. Én tast for sig tager et billede, og modifikatorerne tager en optagelse, en farve eller teksten inde i et område. Hvis dit tastatur slet ikke har en Print Screen-tast, åbner `Super + Ctrl + C` det samme sæt som en menu.
+Alt, hvad du kan hente fra skærmen, hænger på Print Screen-tasten. Én tast for sig tager et billede, og modifikatorerne tager en optagelse, en farve eller teksten inde i et område. Hvis dit tastatur slet ikke har en Print Screen-tast, åbner `Super + Ctrl + C` det samme sæt som en menu. `Super + Shift + S`: Skærmbillede.
 
 | Genvejstast | Funktion |
 | ------ | -------- |
 | `Print Screen` | Skærmbillede |
+| `Super + Shift + S` | Skærmbillede |
 | `Alt + Print Screen` | Skærmoptagelse (eller stop den, der kører) |
 | `Super + Print Screen` | Farvevælger |
 | `Super + Ctrl + Print Screen` | Udtræk tekst fra et område |
@@ -13,7 +14,7 @@ Alt, hvad du kan hente fra skærmen, hænger på Print Screen-tasten. Én tast f
 
 ## Skærmbilleder
 
-Tryk på `Print Screen`, og Omasnap optager den fokuserede skærm, før dens overlejring vises, så intet flytter sig under dig, mens du sigter. Træk et frit område, klik på et vindue for at optage det, eller klik på åben plads for at optage hele skærmen. Tryk på `S`, før du tegner, for at optage et rullende område. Har du ombestemt dig? Tryk på `Print Screen` igen for at afvise Omasnap.
+Tryk på `Print Screen` (`Super + Shift + S`), og Omasnap optager den fokuserede skærm, før dens overlejring vises, så intet flytter sig under dig, mens du sigter. Træk et frit område, klik på et vindue for at optage det, eller klik på åben plads for at optage hele skærmen. Tryk på `S`, før du tegner, for at optage et rullende område. Har du ombestemt dig? Tryk på `Print Screen` (`Super + Shift + S`) igen for at afvise Omasnap.
 
 Når du har valgt et område, gemmer Omasnap optagelsen, kopierer den til udklipsholderen og viser en forhåndsvisning i 10 sekunder. Brug forhåndsvisningens fastgørelsesknap eller `Ctrl + P` for at beholde den på skærmen, eller vælg Rediger for at annotere den.
 

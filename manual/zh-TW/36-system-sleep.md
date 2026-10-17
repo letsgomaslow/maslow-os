@@ -2,6 +2,8 @@
 
 Omarchy 預設啟用暫停（suspend）和休眠（hibernation），但如果你的機器在使用其中任何一種時遇到問題，可以把它們關閉。
 
+在 DGX Spark、ASUS Ascent GX10 等 NVIDIA GB10 電腦上，暫停和休眠與 NVIDIA DGX OS 一樣停用，因為尚未證實能在這些硬體上正常運作。暫停開關和休眠設定在這裡不適用。要重新啟用，請用 `sudo rm` 刪除 `/etc/systemd/sleep.conf.d/omarchy-sleep-disabled.conf`；暫停會回到選單，休眠也可照常設定。執行 `sudo omarchy apply hardware --install-user "$USER"` 會還原該檔案。
+
 ### 電源設定檔
 
 在筆電上，Omarchy 會分別記住插電時和用電池時的電源設定檔，並在你插拔電源時自動切換。開箱即用的設定是插電時用效能模式，用電池時用平衡模式。

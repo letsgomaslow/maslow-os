@@ -1,10 +1,11 @@
 # Ảnh chụp màn hình & Ghi hình
 
-Mọi thứ bạn có thể lấy ra khỏi màn hình đều treo trên phím Print Screen. Một phím riêng lẻ chụp một bức ảnh, và các phím bổ trợ thực hiện ghi hình, lấy một màu, hoặc lấy văn bản bên trong một vùng. Nếu bàn phím của bạn hoàn toàn không có phím Print Screen, `Super + Ctrl + C` mở cùng bộ đó dưới dạng một menu.
+Mọi thứ bạn có thể lấy ra khỏi màn hình đều treo trên phím Print Screen. Một phím riêng lẻ chụp một bức ảnh, và các phím bổ trợ thực hiện ghi hình, lấy một màu, hoặc lấy văn bản bên trong một vùng. Nếu bàn phím của bạn hoàn toàn không có phím Print Screen, `Super + Ctrl + C` mở cùng bộ đó dưới dạng một menu. `Super + Shift + S`: Ảnh chụp màn hình.
 
 | Phím tắt | Chức năng |
 | ------ | -------- |
 | `Print Screen` | Ảnh chụp màn hình |
+| `Super + Shift + S` | Ảnh chụp màn hình |
 | `Alt + Print Screen` | Ghi màn hình (hoặc dừng bản ghi đang chạy) |
 | `Super + Print Screen` | Bộ chọn màu |
 | `Super + Ctrl + Print Screen` | Trích xuất văn bản từ một vùng |
@@ -13,7 +14,7 @@ Mọi thứ bạn có thể lấy ra khỏi màn hình đều treo trên phím P
 
 ## Ảnh chụp màn hình
 
-Nhấn `Print Screen` và Omasnap chụp màn hình đang được tập trung trước khi lớp phủ của nó xuất hiện, vì vậy không có gì dịch chuyển dưới bạn trong khi bạn nhắm. Kéo một vùng tự do, nhấp vào một cửa sổ để chụp nó, hoặc nhấp vào khoảng trống để chụp toàn bộ màn hình. Nhấn `S` trước khi vẽ để chụp một vùng cuộn. Đã đổi ý? Nhấn `Print Screen` lần nữa để loại bỏ Omasnap.
+Nhấn `Print Screen` (`Super + Shift + S`) và Omasnap chụp màn hình đang được tập trung trước khi lớp phủ của nó xuất hiện, vì vậy không có gì dịch chuyển dưới bạn trong khi bạn nhắm. Kéo một vùng tự do, nhấp vào một cửa sổ để chụp nó, hoặc nhấp vào khoảng trống để chụp toàn bộ màn hình. Nhấn `S` trước khi vẽ để chụp một vùng cuộn. Đã đổi ý? Nhấn `Print Screen` (`Super + Shift + S`) lần nữa để loại bỏ Omasnap.
 
 Sau khi bạn chọn một vùng, Omasnap lưu bản chụp, sao chép nó vào bảng nhớ tạm, và hiển thị một bản xem trước trong 10 giây. Dùng nút ghim của bản xem trước hoặc `Ctrl + P` để giữ nó trên màn hình, hoặc chọn Edit để chú thích nó.
 

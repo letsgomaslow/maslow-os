@@ -1,10 +1,11 @@
 # Mga Screenshot at Pag-record
 
-Lahat ng maaari mong kunin mula sa screen ay nakakabit sa Print Screen key. Ang isang key nang mag-isa ay kumukuha ng larawan, at ang mga modifier ay kumukuha ng recording, isang kulay, o ang tekstong nasa loob ng isang rehiyon. Kung wala talagang Print Screen key ang iyong keyboard, binubuksan ng `Super + Ctrl + C` ang parehong set bilang isang menu.
+Lahat ng maaari mong kunin mula sa screen ay nakakabit sa Print Screen key. Ang isang key nang mag-isa ay kumukuha ng larawan, at ang mga modifier ay kumukuha ng recording, isang kulay, o ang tekstong nasa loob ng isang rehiyon. Kung wala talagang Print Screen key ang iyong keyboard, binubuksan ng `Super + Ctrl + C` ang parehong set bilang isang menu. `Super + Shift + S`: Screenshot.
 
 | Hotkey | Tungkulin |
 | ------ | -------- |
 | `Print Screen` | Screenshot |
+| `Super + Shift + S` | Screenshot |
 | `Alt + Print Screen` | Pag-record ng screen (o itigil ang tumatakbo) |
 | `Super + Print Screen` | Tagapili ng kulay |
 | `Super + Ctrl + Print Screen` | Kunin ang teksto mula sa isang rehiyon |
@@ -13,7 +14,7 @@ Lahat ng maaari mong kunin mula sa screen ay nakakabit sa Print Screen key. Ang 
 
 ## Mga Screenshot
 
-Pindutin ang `Print Screen` at kinukuha ng Omasnap ang naka-focus na monitor bago lumabas ang overlay nito, kaya walang gagalaw sa ilalim mo habang pumupuntirya ka. I-drag ang isang freeform na rehiyon, i-click ang isang bintana para kunin ito, o i-click ang bakanteng espasyo para kunin ang buong monitor. Pindutin ang `S` bago gumuhit para kumuha ng isang scrolling na rehiyon. Nagbago ang isip mo? Pindutin muli ang `Print Screen` para i-dismiss ang Omasnap.
+Pindutin ang `Print Screen` (`Super + Shift + S`) at kinukuha ng Omasnap ang naka-focus na monitor bago lumabas ang overlay nito, kaya walang gagalaw sa ilalim mo habang pumupuntirya ka. I-drag ang isang freeform na rehiyon, i-click ang isang bintana para kunin ito, o i-click ang bakanteng espasyo para kunin ang buong monitor. Pindutin ang `S` bago gumuhit para kumuha ng isang scrolling na rehiyon. Nagbago ang isip mo? Pindutin muli ang `Print Screen` (`Super + Shift + S`) para i-dismiss ang Omasnap.
 
 Pagkatapos mong pumili ng isang lugar, sine-save ng Omasnap ang kuha, kinokopya ito sa clipboard, at nagpapakita ng preview sa loob ng 10 segundo. Gamitin ang pin button ng preview o ang `Ctrl + P` para panatilihin ito sa screen, o piliin ang Edit para i-annotate ito.
 

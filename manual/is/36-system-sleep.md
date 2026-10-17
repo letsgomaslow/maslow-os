@@ -2,6 +2,8 @@
 
 Omarchy virkjar svefn og dvala sjálfgefið, en ef þú átt í vandræðum með annaðhvort á vélinni þinni geturðu slökkt á þeim.
 
+Á NVIDIA GB10-tölvum, svo sem DGX Spark og ASUS Ascent GX10, eru bið og dvali óvirk eins og í NVIDIA DGX OS, því enn hefur ekki verið sýnt fram á að þau virki á þessum vélbúnaði. Biðrofi og uppsetning dvala eiga ekki við þar. Fjarlægðu `/etc/systemd/sleep.conf.d/omarchy-sleep-disabled.conf` með `sudo rm` til að virkja þau aftur; bið birtist aftur í valmyndinni og hægt er að setja upp dvala eins og venjulega. `sudo omarchy apply hardware --install-user "$USER"` endurheimtir skrána.
+
 ### Orkustillingar
 
 Á fartölvu man Omarchy orkustillinguna þína aðskilið fyrir tengingu við rafmagn og keyrslu á rafhlöðu, og skiptir á milli þeirra þegar þú stingur í samband og tekur úr sambandi. Úr kassanum þýðir það afköst á rafmagni og jafnvægi á rafhlöðu.

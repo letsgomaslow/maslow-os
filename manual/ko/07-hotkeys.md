@@ -116,7 +116,7 @@
 | `Super + Shift + Alt + A`           | AI(Grok)  |
 | `Super + Shift + G`           | 메신저(Signal)  |
 | `Super + Shift + P`           | Google Photos  |
-| `Super + Shift + S`           | Google Maps  |
+| `Super + Shift + Alt + S`           | Google Maps  |
 | `Super + Shift + Alt + G`           | 메신저(WhatsApp)  |
 | `Super + Shift + Ctrl + G`           | 메신저(Google)  |
 | `Super + Shift + O`           | Obsidian  |
@@ -142,8 +142,9 @@
 
 | 단축키              | 기능                       |
 | ------------------- | ------------------------------ |
-| `Super + Ctrl + C` | 캡처 메뉴(PrintScr 버튼이 없는 키보드용) |
+| `Super + Ctrl + C` | 캡처 메뉴 |
 | `Print Screen`            | 스크린샷                      |
+| `Super + Shift + S`            | 스크린샷                      |
 | `Alt + Print Screen`            | 화면 녹화                     |
 | `Super + Print Screen` | 색상 선택기 |
 | `Super + Ctrl + Print Screen` | 클립보드로 텍스트 추출 |

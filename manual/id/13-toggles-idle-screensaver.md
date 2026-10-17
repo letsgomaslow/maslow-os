@@ -38,7 +38,7 @@ Bendera dinamai untuk status mati — `screensaver-off`, `suspend-off`, `bar-off
 
 Ketika mode menyala, Anda mendapatkan glif kecil di tengah bilah atas di samping jam. Itu adalah widget indikator, dan ia membawa dikte, perekaman layar, pengingat tertunda, lampu malam, jangan ganggu, dan tetap bangun.
 
-Indikator yang tidak aktif disembunyikan. Arahkan area di sekitar mereka dan mereka memudar dalam keadaan redup, sehingga Anda dapat mengklik satu untuk menyalakannya tanpa mengetahui hotkey-nya. Mengklik yang aktif mematikannya kembali. Jika Anda lebih suka melihat mereka semua sepanjang waktu, atur `alwaysShow` ke `true` pada entri `omarchy.indicators` dalam `~/.config/omarchy/shell.json` — lihat [bilah atas](05-the-top-bar.md) untuk bagaimana widget bilah dikonfigurasi.
+Arahkan penunjuk ke bagian mana pun pada bilah untuk menampilkan indikator yang tidak aktif. Indikator yang tidak aktif disembunyikan. Arahkan area di sekitar mereka dan mereka memudar dalam keadaan redup, sehingga Anda dapat mengklik satu untuk menyalakannya tanpa mengetahui hotkey-nya. Mengklik yang aktif mematikannya kembali. Jika Anda lebih suka melihat mereka semua sepanjang waktu, atur `alwaysShow` ke `true` pada entri `omarchy.indicators` dalam `~/.config/omarchy/shell.json` — lihat [bilah atas](05-the-top-bar.md) untuk bagaimana widget bilah dikonfigurasi.
 
 ### Lampu malam
 

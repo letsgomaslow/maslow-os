@@ -116,7 +116,7 @@
 | `Super + Shift + Alt + A`           | AI (Grok)  |
 | `Super + Shift + G`           | মেসেঞ্জার (Signal)  |
 | `Super + Shift + P`           | Google Photos  |
-| `Super + Shift + S`           | Google Maps  |
+| `Super + Shift + Alt + S`           | Google Maps  |
 | `Super + Shift + Alt + G`           | মেসেঞ্জার (WhatsApp)  |
 | `Super + Shift + Ctrl + G`           | মেসেঞ্জার (Google)  |
 | `Super + Shift + O`           | Obsidian  |
@@ -142,8 +142,9 @@
 
 | হটকি              | কার্যকারিতা                       |
 | ------------------- | ------------------------------ |
-| `Super + Ctrl + C` | ক্যাপচার মেনু (PrintScr বোতাম ছাড়া কিবোর্ডের জন্য) |
+| `Super + Ctrl + C` | ক্যাপচার মেনু |
 | `Print Screen`            | স্ক্রিনশট                      |
+| `Super + Shift + S`            | স্ক্রিনশট                      |
 | `Alt + Print Screen`            | স্ক্রিনরেকর্ড                     |
 | `Super + Print Screen` | রঙ বাছাইকার |
 | `Super + Ctrl + Print Screen` | ক্লিপবোর্ডে টেক্সট নিষ্কাশন |

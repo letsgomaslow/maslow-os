@@ -2,6 +2,8 @@
 
 Omarchy aktiverar viloläge och dvala som standard, men om du har problem med någon av dem på din dator kan du stänga av dem.
 
+På NVIDIA GB10-datorer som DGX Spark och ASUS Ascent GX10 är viloläge och strömsparläge avstängda, som i NVIDIA DGX OS, eftersom de ännu inte visats fungera på denna maskinvara. Strömsparväxeln och inställningen av viloläge gäller inte där. Ta bort `/etc/systemd/sleep.conf.d/omarchy-sleep-disabled.conf` med `sudo rm` för att aktivera dem igen; Strömsparläge återkommer i menyn och viloläge kan ställas in normalt. `sudo omarchy apply hardware --install-user "$USER"` återskapar filen.
+
 ### Effektprofiler
 
 På en bärbar dator minns Omarchy din effektprofil separat för inkopplad och för batteridrift, och växlar mellan de två när du kopplar i och ur. Direkt ur lådan betyder det prestanda på nätström och balanserat på batteri.

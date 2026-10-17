@@ -1,10 +1,11 @@
 # Skjámyndir og upptaka
 
-Allt sem þú getur gripið af skjánum hangir á Print Screen-lyklinum. Einn lykill einn og sér tekur mynd, og breytislyklarnir taka upptöku, lit eða textann inni á svæði. Ef lyklaborðið þitt hefur engan Print Screen-lykil opnar `Super + Ctrl + C` sama safn sem valmynd.
+Allt sem þú getur gripið af skjánum hangir á Print Screen-lyklinum. Einn lykill einn og sér tekur mynd, og breytislyklarnir taka upptöku, lit eða textann inni á svæði. Ef lyklaborðið þitt hefur engan Print Screen-lykil opnar `Super + Ctrl + C` sama safn sem valmynd. `Super + Shift + S`: Skjámynd.
 
 | Flýtilykill | Virkni |
 | ------ | -------- |
 | `Print Screen` | Skjámynd |
+| `Super + Shift + S` | Skjámynd |
 | `Alt + Print Screen` | Skjáupptaka (eða stöðva þá sem er í gangi) |
 | `Super + Print Screen` | Litaval |
 | `Super + Ctrl + Print Screen` | Draga texta út úr svæði |
@@ -13,7 +14,7 @@ Allt sem þú getur gripið af skjánum hangir á Print Screen-lyklinum. Einn ly
 
 ## Skjámyndir
 
-Ýttu á `Print Screen` og Omasnap fangar virka skjáinn áður en yfirlag hans birtist, svo ekkert færist undir þér á meðan þú miðar. Dragðu frjálst svæði, smelltu á glugga til að fanga hann eða smelltu á opið rými til að fanga allan skjáinn. Ýttu á `S` áður en þú teiknar til að fanga skrunsvæði. Breyttirðu um hug? Ýttu á `Print Screen` aftur til að hafna Omasnap.
+Ýttu á `Print Screen` (`Super + Shift + S`) og Omasnap fangar virka skjáinn áður en yfirlag hans birtist, svo ekkert færist undir þér á meðan þú miðar. Dragðu frjálst svæði, smelltu á glugga til að fanga hann eða smelltu á opið rými til að fanga allan skjáinn. Ýttu á `S` áður en þú teiknar til að fanga skrunsvæði. Breyttirðu um hug? Ýttu á `Print Screen` (`Super + Shift + S`) aftur til að hafna Omasnap.
 
 Eftir að þú hefur valið svæði vistar Omasnap fangið, afritar það á klippiborðið og sýnir forskoðun í 10 sekúndur. Notaðu festihnapp forskoðunarinnar eða `Ctrl + P` til að halda henni á skjánum, eða veldu Breyta til að merkja við hana.
 

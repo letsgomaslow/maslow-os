@@ -2,6 +2,8 @@
 
 Omarchy active la suspension et l'hibernation par défaut, mais si l'une ou l'autre pose problème sur votre machine, vous pouvez les désactiver.
 
+Sur les machines NVIDIA GB10 comme DGX Spark et ASUS Ascent GX10, la veille et l’hibernation sont désactivées, comme dans NVIDIA DGX OS, car leur fonctionnement sur ce matériel n’a pas encore été démontré. Le bouton de veille et la configuration de l’hibernation ne s’y appliquent pas. Supprimez `/etc/systemd/sleep.conf.d/omarchy-sleep-disabled.conf` avec `sudo rm` pour les réactiver : la veille revient au menu et l’hibernation se configure normalement. `sudo omarchy apply hardware --install-user "$USER"` recrée le fichier.
+
 ### Profils d'alimentation
 
 Sur un portable, Omarchy mémorise votre profil d'alimentation séparément pour le secteur et pour la batterie, et bascule entre les deux quand vous branchez et débranchez. D'emblée, cela signifie performance sur secteur et équilibré sur batterie.

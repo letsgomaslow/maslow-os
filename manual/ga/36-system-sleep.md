@@ -2,6 +2,8 @@
 
 Cumasaíonn Omarchy fionraí agus geimhriú de réir réamhshocraithe, ach má tá fadhbanna agat le ceachtar acu ar do mheaisín, is féidir leat iad a scoránú as.
 
+Ar ríomhairí NVIDIA GB10, mar DGX Spark agus ASUS Ascent GX10, tá fionraí agus suanú múchta, mar atá in NVIDIA DGX OS, toisc nár léiríodh fós go n-oibríonn siad ar an gcrua-earra seo. Ní bhaineann an lasc fionraí ná socrú an tsuanaithe leo. Bain `/etc/systemd/sleep.conf.d/omarchy-sleep-disabled.conf` le `sudo rm` chun iad a chumasú arís; filleann Fionraigh ar an roghchlár agus is féidir suanú a shocrú mar is gnách. Cuireann `sudo omarchy apply hardware --install-user "$USER"` an comhad ar ais.
+
 ### Próifílí cumhachta
 
 Ar ríomhaire glúine, cuimhníonn Omarchy do phróifíl chumhachta ar leithligh do plugáilte isteach agus do rith ar cheallra, agus athraíonn sé idir an dá cheann de réir mar a phlugálann agus a dhíphlugálann tú. Díreach as an mbosca ciallaíonn sé sin feidhmíocht ar AC agus cothrom ar cheallra.

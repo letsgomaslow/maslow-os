@@ -38,7 +38,7 @@ Flagi są nazywane od stanu wyłączonego — `screensaver-off`, `suspend-off`, 
 
 Gdy tryb jest włączony, dostajesz mały glif pośrodku górnego paska obok zegara. To widget wskaźników, który niesie dyktowanie, nagrywanie ekranu, oczekujące przypomnienia, światło nocne, nie przeszkadzać oraz nieusypianie.
 
-Nieaktywne wskaźniki są ukryte. Najedź na obszar wokół nich, a pojawią się przygaszone, więc możesz kliknąć jeden, żeby go włączyć, nie znając jego skrótu. Kliknięcie aktywnego wyłącza go z powrotem. Jeśli wolisz widzieć je wszystkie przez cały czas, ustaw `alwaysShow` na `true` na wpisie `omarchy.indicators` w `~/.config/omarchy/shell.json` — zob. [górny pasek](05-the-top-bar.md), jak konfigurować widgety paska.
+Najedź wskaźnikiem na dowolne miejsce paska, aby pokazać nieaktywne wskaźniki. Nieaktywne wskaźniki są ukryte. Najedź na obszar wokół nich, a pojawią się przygaszone, więc możesz kliknąć jeden, żeby go włączyć, nie znając jego skrótu. Kliknięcie aktywnego wyłącza go z powrotem. Jeśli wolisz widzieć je wszystkie przez cały czas, ustaw `alwaysShow` na `true` na wpisie `omarchy.indicators` w `~/.config/omarchy/shell.json` — zob. [górny pasek](05-the-top-bar.md), jak konfigurować widgety paska.
 
 ### Światło nocne
 

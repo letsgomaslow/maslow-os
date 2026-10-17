@@ -38,7 +38,7 @@ Bendera zimepewa majina kwa hali ya kuzimwa — `screensaver-off`, `suspend-off`
 
 Hali ikiwa imewashwa, unapata glifu ndogo katikati ya upau wa juu karibu na saa. Hiyo ndiyo wijeti ya viashiria, na hubeba imla, kurekodi skrini, vikumbusho vinavyongoja, taa ya usiku, usinisumbue, na usilale.
 
-Viashiria visivyotumika vimefichwa. Elea eneo linalovizunguka na vinafifia kuonekana, hivyo unaweza kubofya kimoja kukiwashe bila kujua mkato wake wa kitufe. Kubofya kinachotumika hukizima tena. Ikiwa unapendelea kuviona vyote wakati wote, weka `alwaysShow` kuwa `true` kwenye ingizo la `omarchy.indicators` katika `~/.config/omarchy/shell.json` — tazama [upau wa juu](05-the-top-bar.md) kwa jinsi wijeti za upau zinavyosanidiwa.
+Elekeza kishale mahali popote kwenye upau ili kuonyesha viashiria visivyotumika. Viashiria visivyotumika vimefichwa. Elea eneo linalovizunguka na vinafifia kuonekana, hivyo unaweza kubofya kimoja kukiwashe bila kujua mkato wake wa kitufe. Kubofya kinachotumika hukizima tena. Ikiwa unapendelea kuviona vyote wakati wote, weka `alwaysShow` kuwa `true` kwenye ingizo la `omarchy.indicators` katika `~/.config/omarchy/shell.json` — tazama [upau wa juu](05-the-top-bar.md) kwa jinsi wijeti za upau zinavyosanidiwa.
 
 ### Taa ya usiku
 

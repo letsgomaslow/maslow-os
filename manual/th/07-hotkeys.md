@@ -116,7 +116,7 @@
 | `Super + Shift + Alt + A`           | AI (Grok)  |
 | `Super + Shift + G`           | Messenger (Signal)  |
 | `Super + Shift + P`           | Google Photos  |
-| `Super + Shift + S`           | Google Maps  |
+| `Super + Shift + Alt + S`           | Google Maps  |
 | `Super + Shift + Alt + G`           | Messenger (WhatsApp)  |
 | `Super + Shift + Ctrl + G`           | Messenger (Google)  |
 | `Super + Shift + O`           | Obsidian  |
@@ -142,8 +142,9 @@
 
 | ปุ่มลัด              | ฟังก์ชัน                       |
 | ------------------- | ------------------------------ |
-| `Super + Ctrl + C` | เมนูจับภาพ (สำหรับคีย์บอร์ดที่ไม่มีปุ่ม PrintScr) |
+| `Super + Ctrl + C` | เมนูจับภาพ |
 | `Print Screen`            | ภาพหน้าจอ                      |
+| `Super + Shift + S`            | ภาพหน้าจอ                      |
 | `Alt + Print Screen`            | อัดหน้าจอ                     |
 | `Super + Print Screen` | ตัวเลือกสี |
 | `Super + Ctrl + Print Screen` | แยกข้อความไปยังคลิปบอร์ด |

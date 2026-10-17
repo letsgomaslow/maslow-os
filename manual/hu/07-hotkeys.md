@@ -116,7 +116,7 @@ A fő billentyűhozzárendeléseket a `Super + K` (a Tmux-hozzárendeléseket a 
 | `Super + Shift + Alt + A`           | AI (Grok)  |
 | `Super + Shift + G`           | Üzenetküldő (Signal)  |
 | `Super + Shift + P`           | Google Photos  |
-| `Super + Shift + S`           | Google Maps  |
+| `Super + Shift + Alt + S`           | Google Maps  |
 | `Super + Shift + Alt + G`           | Üzenetküldő (WhatsApp)  |
 | `Super + Shift + Ctrl + G`           | Üzenetküldő (Google)  |
 | `Super + Shift + O`           | Obsidian  |
@@ -142,8 +142,9 @@ Linuxon általában `Ctrl + Shift + C/V` kell a másoláshoz-beillesztéshez ter
 
 | Billentyűparancs              | Funkció                       |
 | ------------------- | ------------------------------ |
-| `Super + Ctrl + C` | Rögzítés menü (PrintScr gomb nélküli billentyűzetekhez) |
+| `Super + Ctrl + C` | Rögzítés menü |
 | `Print Screen`            | Képernyőkép                      |
+| `Super + Shift + S`            | Képernyőkép                      |
 | `Alt + Print Screen`            | Képernyőfelvétel                     |
 | `Super + Print Screen` | Színválasztó |
 | `Super + Ctrl + Print Screen` | Szövegkinyerés a vágólapra |

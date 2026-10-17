@@ -116,7 +116,7 @@ Anda dapat melihat semua binding keyboard utama dengan `Super + K` (binding Tmux
 | `Super + Shift + Alt + A`           | AI (Grok)  |
 | `Super + Shift + G`           | Messenger (Signal)  |
 | `Super + Shift + P`           | Google Photos  |
-| `Super + Shift + S`           | Google Maps  |
+| `Super + Shift + Alt + S`           | Google Maps  |
 | `Super + Shift + Alt + G`           | Messenger (WhatsApp)  |
 | `Super + Shift + Ctrl + G`           | Messenger (Google)  |
 | `Super + Shift + O`           | Obsidian  |
@@ -142,8 +142,9 @@ Biasanya di Linux, Anda memerlukan `Ctrl + Shift + C/V` untuk salin-tempel di te
 
 | Hotkey              | Fungsi                       |
 | ------------------- | ------------------------------ |
-| `Super + Ctrl + C` | Menu tangkap (untuk keyboard tanpa tombol PrintScr) |
+| `Super + Ctrl + C` | Menu tangkap |
 | `Print Screen`            | Tangkapan layar                      |
+| `Super + Shift + S`            | Tangkapan layar                      |
 | `Alt + Print Screen`            | Rekam layar                     |
 | `Super + Print Screen` | Pemilih warna |
 | `Super + Ctrl + Print Screen` | Ekstraksi teks ke papan klip |
