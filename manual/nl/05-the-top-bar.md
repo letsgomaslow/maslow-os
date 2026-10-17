@@ -6,7 +6,7 @@ Het is ook het enige stukje van het bureaublad dat altijd op het scherm staat, d
 
 ## Wat er standaard op staat
 
-De balk heeft drie secties. Links zit het Omarchy-logo (de menustarter) en de werkbladindicatoren. In het midden krijg je de statusindicatoren, de klok, Elsewhen (een wereldklok), het weer en een Omarchy-updatebadge. Rechts: de toetsenbordindeling (wanneer er meer dan één is geconfigureerd), het systeemvak, agents, bluetooth, netwerk, audio, display en stroom.
+De balk heeft drie secties. Links zit het Omarchy-logo (de menustarter) en de werkbladindicatoren. In het midden krijg je de statusindicatoren, de klok, Elsewhen (een wereldklok), het weer en een Omarchy-updatebadge. Rechts: het systeemvak, de toetsenbordindeling (wanneer er meer dan één is geconfigureerd), agents, bluetooth, netwerk, audio, display en stroom.
 
 Een paar daarvan verschijnen alleen wanneer ze iets te zeggen hebben. De toetsenbordindeling verschijnt alleen als je meer dan één indeling hebt geconfigureerd. De updatebadge verschijnt alleen wanneer er een Omarchy-update wacht. En het agents-pictogram verschijnt de eerste keer dat Omarchy AI-coderingsgebruik op de machine vindt (zie [AI](17-ai.md)).
 
@@ -73,7 +73,7 @@ Een van beide services verwijderen haalt zijn widget weer van de balk af.
 
 ## Indicatoren
 
-Het kleine cluster in het midden is de indicatoren-widget. Dit zijn statusglyphs voor modi die je hebt ingeschakeld: niet storen, nachtlicht, een in de rij staande [herinnering](09-reminders.md), een actieve schermopname, wakker blijven en [dicteren](11-text-extraction-dictation.md). Ze lichten op wanneer de modus actief is en blijven anders uit de weg — zweef links van de klok (erboven op een verticale balk) om naar de inactieve te gluren. Op een indicator klikken schakelt die modus. Nog een is alleen status: een externe sessie licht rood op terwijl iemand via gliff met deze machine is verbonden.
+Het kleine cluster in het midden is de indicatoren-widget. Dit zijn statusglyphs voor modi die je hebt ingeschakeld: niet storen, nachtlicht, een in de rij staande [herinnering](09-reminders.md), een actieve schermopname, wakker blijven en [dicteren](11-text-extraction-dictation.md). Ze lichten op wanneer de modus actief is en blijven anders uit de weg — zweef met de aanwijzer ergens op de balk om de inactieve indicatoren te zien. Op een indicator klikken schakelt die modus. Nog een is alleen status: een externe sessie licht rood op terwijl iemand via gliff met deze machine is verbonden.
 
 Als je liever hebt dat ze altijd zichtbaar zijn, stel je `alwaysShow` in op `true` op de widget. En als je alleen om sommige geeft, lijst je degene die je wilt in `items`: `["Dnd", "Reminder", "NightLight"]`. Je kunt meer dan één indicatoren-widget hebben, zodat verschillende secties verschillende subsets kunnen tonen.
 
@@ -81,7 +81,9 @@ Als je liever hebt dat ze altijd zichtbaar zijn, stel je `alwaysShow` in op `tru
 
 De balk configureert zichzelf. Je hoeft geen configbestand te openen om dingen te verplaatsen.
 
-Pak een leeg stukje van de balk rond het midden en sleep het naar een andere schermrand, en de balk verplaatst daarheen — links, rechts, boven of onder werken allemaal, en elke widget past zich aan (verticale balken vallen terug op compacte alleen-pictogram vormen). Klikken en vasthouden start dezelfde sleepactie. Dubbel-linksklik op diezelfde lege ruimte om de balkachtergrond te doorlopen van doorzichtig naar glazen naar ondoorzichtig. En sleep elke widget om hem te herschikken of in een andere sectie te gooien.
+Pak een leeg stukje van de balk rond het midden en sleep het naar een andere schermrand, en de balk verplaatst daarheen — links, rechts, boven of onder werken allemaal, en elke widget past zich aan (verticale balken vallen terug op compacte alleen-pictogram vormen). Klikken en vasthouden start dezelfde sleepactie. Dubbel-linksklik op diezelfde lege ruimte om de balkachtergrond te doorlopen van doorzichtig naar glazen naar ondoorzichtig. En sleep elke widget om hem te herschikken of in een andere sectie te gooien; de andere widgets schuiven uit elkaar om ruimte te maken op de plek waar hij terechtkomt.
+
+Het midden van de balk is een vak: de inhoud blijft als groep gecentreerd, en de widgets ernaast hangen aan de randen. Tijdens het slepen zie je de omtrek van het vak, of een lijn over de balk als het leeg is. Je kunt erin of ernaast neerzetten; mik je erin, dan groeit het vak om de widget op te nemen.
 
 Een widget die je wel bij de hand wilt hebben maar niet altijd in beeld, kan in de lade van het systeemvak: sleep hem naar het systeemvak, en de lade opent om hem te ontvangen. Daar zit hij achter de app-pictogrammen, verschijnt hij telkens als de lade dat doet, en houdt hij de lade open zolang zijn paneel openstaat. Sleep hem terug naar buiten op de balk om hem terug te zetten.
 
@@ -92,7 +94,7 @@ Dezelfde dingen hebben commando's, wat is wat je wilt voor een [dotfiles](31-dot
 ```bash
 omarchy bar position bottom
 omarchy bar background glassy  # opaque, glassy, none, or cycle
-omarchy bar move omarchy.clock --section center --index 0
+omarchy bar move omarchy.weather --section centerBegin --index 0
 omarchy bar move omarchy.bluetooth --section tray  # into the tray's drawer
 omarchy bar set omarchy.clock format "HH:mm"
 omarchy bar defaults          # back to the shipped layout
@@ -101,7 +103,7 @@ omarchy bar defaults          # back to the shipped layout
 Om een widget helemaal toe te voegen of te verwijderen, gebruik je de plugin-commando's. `omarchy plugin list` print elke widget die de shell kent met zijn id, en dan:
 
 ```bash
-omarchy plugin enable omarchy.media --section center
+omarchy plugin enable omarchy.media --section centerEnd
 omarchy plugin disable omarchy.weather
 ```
 
@@ -119,19 +121,20 @@ Dit alles wordt opgeslagen in `~/.config/omarchy/shell.json`, onder de `bar`-sle
   "bar": {
     "position": "top",
     "background": "opaque",
-    "centerAnchor": "omarchy.clock",
     "layout": {
       "left": [{ "id": "omarchy.menu" }, { "id": "omarchy.workspaces" }],
+      "centerBegin": [{ "id": "omarchy.indicators" }],
       "center": [{ "id": "omarchy.clock", "format": "HH:mm" }],
+      "centerEnd": [{ "id": "omarchy.weather" }],
       "right": [{ "id": "omarchy.audio" }, { "id": "omarchy.power" }]
     }
   }
 }
 ```
 
-Elke widget is één item in een van de drie layout-arrays, en zijn instellingen zitten inline op dat item — er is geen apart instellingenbestand en geen `config`-sub-object. De `format`, `formatAlt` (waar rechtsklikken naartoe doorloopt) en `verticalFormat` van de klok leven allemaal precies daar op `{ "id": "omarchy.clock" }`.
+Elke widget is één item in een van de vijf layout-arrays, en zijn instellingen zitten inline op dat item — er is geen apart instellingenbestand en geen `config`-sub-object. De `format`, `formatAlt` (waar rechtsklikken naartoe doorloopt) en `verticalFormat` van de klok leven allemaal precies daar op `{ "id": "omarchy.clock" }`.
 
-`centerAnchor` benoemt de ene center-widget die wordt vastgepind op het exacte midden van het scherm, met de anderen ernaast. Zo blijft de klok pal in het midden, zelfs als het weer en de updatebadge komen en gaan. Stel hem in op een lege string en de centerlijst wordt gewoon als groep gecentreerd.
+`center` is het vak midden op de balk: alles erin wordt als groep op het scherm gecentreerd. `centerBegin` en `centerEnd` hangen aan weerszijden, zodat de klok precies in het midden blijft wanneer het weer en de updatebadge verschijnen of verdwijnen. Meerdere widgets in `center` worden samen gecentreerd; is het leeg, dan komen `centerBegin` en `centerEnd` midden op de balk bij elkaar.
 
 Eén regel die het waard is om te internaliseren: **zodra je je eigen `shell.json` hebt, is hij canoniek**. Totdat je iets aanpast, leest de shell Omarchy's standaardbestand. Op het moment dat je een widget sleept, `omarchy bar` uitvoert, of het bestand zelf bewerkt, is hij van jou — er is geen deep merge, dus nieuwe standaardwidgets in toekomstige Omarchy-releases verschijnen niet automatisch op je balk. `omarchy bar defaults` zet de geleverde indeling terug wanneer je een schone lei wilt.
 

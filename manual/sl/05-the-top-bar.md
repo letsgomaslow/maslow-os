@@ -6,7 +6,7 @@ To je tudi edini del namizja, ki je vedno na zaslonu, zato je vredno vedeti, kaj
 
 ## Kaj je na njej privzeto
 
-Vrstica ima tri odseke. Na levi sedita logotip Omarchy (zaganjalnik menija) in kazalniki delovnih prostorov. Na sredini dobite kazalnike stanja, uro, Elsewhen (svetovno uro), vreme in značko za posodobitev Omarchyja. Na desni: razpored tipkovnice (ko je konfiguriranih več), sistemski pladenj, agenti, bluetooth, omrežje, zvok, zaslon in napajanje.
+Vrstica ima tri odseke. Na levi sedita logotip Omarchy (zaganjalnik menija) in kazalniki delovnih prostorov. Na sredini dobite kazalnike stanja, uro, Elsewhen (svetovno uro), vreme in značko za posodobitev Omarchyja. Na desni: sistemski pladenj, razpored tipkovnice (ko je konfiguriranih več), agenti, bluetooth, omrežje, zvok, zaslon in napajanje.
 
 Nekaj od teh se prikaže le, ko imajo kaj za povedati. Razpored tipkovnice se pojavi le, če ste konfigurirali več kot en razpored. Značka za posodobitev se pojavi le, ko čaka posodobitev Omarchyja. Ikona agentov pa se pojavi prvič, ko Omarchy najde uporabo kodiranja z AI na računalniku (glejte [AI](17-ai.md)).
 
@@ -73,7 +73,7 @@ Odstranitev katere koli storitve njen gradnik vzame iz vrstice.
 
 ## Kazalniki
 
-Majhna gruča na sredini je gradnik kazalnikov. To so statusni glifi za načine, ki ste jih vklopili: ne moti, nočna svetloba, [opomnik](09-reminders.md) v vrsti, aktivno snemanje zaslona, ostanek budnega stanja in [narekovanje](11-text-extraction-dictation.md). Svetijo, ko je način aktifven, sicer pa ostanejo stran — z miško pojdite levo od ure (nad njo na navpični vrstici), da pokukate med neaktivne. Klik kazalnika ta način preklopi. Še eden je samo statusni: oddaljena seja sveti rdeče, medtem ko je nekdo povezan s tem računalnikom prek gliffa.
+Majhna gruča na sredini je gradnik kazalnikov. To so statusni glifi za načine, ki ste jih vklopili: ne moti, nočna svetloba, [opomnik](09-reminders.md) v vrsti, aktivno snemanje zaslona, ostanek budnega stanja in [narekovanje](11-text-extraction-dictation.md). Svetijo, ko je način aktifven, sicer pa ostanejo stran — z miško pojdite kjer koli po vrstici, da vidite neaktivne kazalnike. Klik kazalnika ta način preklopi. Še eden je samo statusni: oddaljena seja sveti rdeče, medtem ko je nekdo povezan s tem računalnikom prek gliffa.
 
 Če želite, da bi bili vedno vidni, nastavite `alwaysShow` na `true` na gradniku. In če vas zanimajo samo nekateri od njih, navedite tiste, ki jih želite, v `items`: `["Dnd", "Reminder", "NightLight"]`. Imate lahko več kot en gradnik kazalnikov, tako da različni odseki prikazujejo različne podmnožice.
 
@@ -81,7 +81,9 @@ Majhna gruča na sredini je gradnik kazalnikov. To so statusni glifi za načine,
 
 Vrstica se konfigurira sama. Za premikanje stvari vam ni treba odpirati konfiguracijske datoteke.
 
-Primite prazen košček vrstice okoli sredine in ga povlecite proti drugemu robu zaslona, in vrstica se prestavi tja — levo, desno, zgoraj ali spodaj vse deluje, vsak gradnik pa se prilagodi (navpične vrstice padejo nazaj v kompaktne oblike samo z ikonami). Enako vlečenje začne klik-in-držanje. Dvokliknite z levim na isti prazen prostor, da ozadje vrstice krožite od prosojnega do steklenega in neprosojnega. In povlecite kateri koli gradnik, da ga prerazporedite ali vržete v drug odsek.
+Primite prazen košček vrstice okoli sredine in ga povlecite proti drugemu robu zaslona, in vrstica se prestavi tja — levo, desno, zgoraj ali spodaj vse deluje, vsak gradnik pa se prilagodi (navpične vrstice padejo nazaj v kompaktne oblike samo z ikonami). Enako vlečenje začne klik-in-držanje. Dvokliknite z levim na isti prazen prostor, da ozadje vrstice krožite od prosojnega do steklenega in neprosojnega. In povlecite kateri koli gradnik, da ga prerazporedite ali vržete v drug odsek; drugi gradniki se razmaknejo in naredijo prostor tam, kjer ga boste spustili.
+
+Sredina vrstice je okvir: vsebina ostaja sredinsko poravnana kot skupina, sosednji gradniki pa se držijo njegovih robov. Med vlečenjem se pokaže obris okvirja, ali črta čez vrstico, če je prazen. Spustite lahko vanj ali poleg; ko ciljate vanj, se okvir poveča, da sprejme gradnik.
 
 Gradnik, ki ga želite imeti pri roki, a ne vedno na očeh, lahko spravite v predal pladnja: povlecite ga na pladenj in predal se odpre, da ga sprejme. Tam sedi za ikonami aplikacij, pokaže se ob vsakem odprtju predala in predal drži odprt, dokler je odprta njegova plošča. Povlecite ga nazaj na vrstico, da ga vrnete.
 
@@ -92,7 +94,7 @@ Enake stvari imajo ukaze, kar je tisto, kar želite za namestitev z [dotfiles](3
 ```bash
 omarchy bar position bottom
 omarchy bar background glassy  # opaque, glassy, none, or cycle
-omarchy bar move omarchy.clock --section center --index 0
+omarchy bar move omarchy.weather --section centerBegin --index 0
 omarchy bar move omarchy.bluetooth --section tray  # into the tray's drawer
 omarchy bar set omarchy.clock format "HH:mm"
 omarchy bar defaults          # back to the shipped layout
@@ -101,7 +103,7 @@ omarchy bar defaults          # back to the shipped layout
 Za dodajanje ali odstranjevanje gradnika v celoti uporabite ukaze za vtičnike. `omarchy plugin list` izpiše vsak gradnik, ki ga lupina pozna, z njegovim id-jem, nato pa:
 
 ```bash
-omarchy plugin enable omarchy.media --section center
+omarchy plugin enable omarchy.media --section centerEnd
 omarchy plugin disable omarchy.weather
 ```
 
@@ -119,19 +121,20 @@ Vse se shrani v `~/.config/omarchy/shell.json` pod tipko `bar`. Tu je okrajšana
   "bar": {
     "position": "top",
     "background": "opaque",
-    "centerAnchor": "omarchy.clock",
     "layout": {
       "left": [{ "id": "omarchy.menu" }, { "id": "omarchy.workspaces" }],
+      "centerBegin": [{ "id": "omarchy.indicators" }],
       "center": [{ "id": "omarchy.clock", "format": "HH:mm" }],
+      "centerEnd": [{ "id": "omarchy.weather" }],
       "right": [{ "id": "omarchy.audio" }, { "id": "omarchy.power" }]
     }
   }
 }
 ```
 
-Vsak gradnik je en vnos v eni od treh tabel postavitve, njegove nastavitve pa sedijo vdelano na tem vnosu — ni ločene datoteke z nastavitvami in ni podobiekta `config`. Ure `format`, `formatAlt` (v kar kroži desni klik) in `verticalFormat` vsi živijo prav tam na `{ "id": "omarchy.clock" }`.
+Vsak gradnik je en vnos v eni od petih tabel postavitve, njegove nastavitve pa sedijo vdelano na tem vnosu — ni ločene datoteke z nastavitvami in ni podobiekta `config`. Ure `format`, `formatAlt` (v kar kroži desni klik) in `verticalFormat` vsi živijo prav tam na `{ "id": "omarchy.clock" }`.
 
-`centerAnchor` imenuje edini sredinski gradnik, ki se pripne na natančno sredino zaslona, drugi pa ga obdajo. Tako ura ostane točno na sredini, tudi ko vreme in značka za posodobitev prihajata in odhajata. Če ga nastavite na prazen niz, je seznam na sredini samo usredinjen kot skupina.
+`center` je okvir sredi vrstice: vsa vsebina je na zaslonu sredinsko poravnana kot skupina. `centerBegin` in `centerEnd` sta ob straneh, zato ura ostaja točno na sredini, ko se vreme in značka posodobitve pojavita ali izgineta. Več gradnikov v `center` je poravnanih skupaj; če je prazen, se `centerBegin` in `centerEnd` srečata sredi vrstice.
 
 Eno pravilo, ki si ga je vredno zapomniti: **ko imate svoj `shell.json`, je kanoničen**. Dokler ničesar ne prilagodite, lupina bere Omarchyjevo privzeto datoteko. Trenutek, ko povlečete gradnik, zaženete `omarchy bar` ali datoteko uredite sami, postane vaša — ni globokega združevanja, zato novi privzeti gradniki v prihodnjih izdajah Omarchyja ne bodo samodejno prikazani v vaši vrstici. `omarchy bar defaults` dobavljeno postavitev vrne, kadar koli želite čist list.
 

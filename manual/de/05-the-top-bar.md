@@ -6,7 +6,7 @@ Sie ist auch das eine Stück des Desktops, das immer auf dem Bildschirm ist, als
 
 ## Was standardmäßig darauf ist
 
-Die Leiste hat drei Abschnitte. Auf der linken Seite sitzen das Omarchy-Logo (der Menü-Launcher) und die Arbeitsflächenanzeigen. In der Mitte bekommst du die Statusanzeigen, die Uhr, Elsewhen (eine Weltuhr), das Wetter und ein Omarchy-Aktualisierungsabzeichen. Auf der rechten Seite: das Tastaturlayout (wenn mehr als eines konfiguriert ist), die Taskleiste, Agenten, Bluetooth, Netzwerk, Audio, Display und Stromversorgung.
+Die Leiste hat drei Abschnitte. Auf der linken Seite sitzen das Omarchy-Logo (der Menü-Launcher) und die Arbeitsflächenanzeigen. In der Mitte bekommst du die Statusanzeigen, die Uhr, Elsewhen (eine Weltuhr), das Wetter und ein Omarchy-Aktualisierungsabzeichen. Auf der rechten Seite: die Taskleiste, das Tastaturlayout (wenn mehr als eines konfiguriert ist), Agenten, Bluetooth, Netzwerk, Audio, Display und Stromversorgung.
 
 Einige davon erscheinen nur, wenn sie etwas zu sagen haben. Das Tastaturlayout erscheint nur, wenn du mehr als ein Layout konfiguriert hast. Das Aktualisierungsabzeichen erscheint nur, wenn eine Omarchy-Aktualisierung wartet. Und das Agenten-Symbol erscheint das erste Mal, wenn Omarchy KI-Coding-Nutzung auf der Maschine findet (siehe [KI](17-ai.md)).
 
@@ -73,7 +73,7 @@ Das Entfernen eines der beiden Dienste nimmt sein Widget wieder von der Leiste.
 
 ## Anzeigen
 
-Der kleine Cluster in der Mitte ist das Anzeigen-Widget. Das sind Status-Glyphen für Modi, die du eingeschaltet hast: Nicht stören, Nachtlicht, eine ausstehende [Erinnerung](09-reminders.md), eine aktive Bildschirmaufnahme, Wach bleiben und [Diktat](11-text-extraction-dictation.md). Sie leuchten auf, wenn der Modus aktiv ist, und bleiben sonst aus dem Weg — fahre links von der Uhr (bei einer vertikalen Leiste darüber) darüber, um einen Blick auf die inaktiven zu werfen. Ein Klick auf eine Anzeige schaltet diesen Modus um. Eine weitere ist nur Status: Eine Remote-Sitzung leuchtet rot, während jemand über gliff mit dieser Maschine verbunden ist.
+Der kleine Cluster in der Mitte ist das Anzeigen-Widget. Das sind Status-Glyphen für Modi, die du eingeschaltet hast: Nicht stören, Nachtlicht, eine ausstehende [Erinnerung](09-reminders.md), eine aktive Bildschirmaufnahme, Wach bleiben und [Diktat](11-text-extraction-dictation.md). Sie leuchten auf, wenn der Modus aktiv ist, und bleiben sonst aus dem Weg — fahre mit dem Mauszeiger über eine beliebige Stelle der Leiste, um die inaktiven Anzeigen einzublenden. Ein Klick auf eine Anzeige schaltet diesen Modus um. Eine weitere ist nur Status: Eine Remote-Sitzung leuchtet rot, während jemand über gliff mit dieser Maschine verbunden ist.
 
 Wenn du lieber hättest, dass sie immer sichtbar sind, setze `alwaysShow` auf dem Widget auf `true`. Und wenn dich nur einige von ihnen interessieren, liste die gewünschten in `items`: `["Dnd", "Reminder", "NightLight"]`. Du kannst mehr als ein Anzeigen-Widget haben, sodass verschiedene Abschnitte verschiedene Teilmengen zeigen können.
 
@@ -81,7 +81,9 @@ Wenn du lieber hättest, dass sie immer sichtbar sind, setze `alwaysShow` auf de
 
 Die Leiste konfiguriert sich selbst. Du musst keine Konfigurationsdatei öffnen, um Dinge zu verschieben.
 
-Greife eine leere Stelle der Leiste rund um die Mitte und ziehe sie zu einer anderen Bildschirmkante, und die Leiste bewegt sich dorthin — links, rechts, oben oder unten funktionieren alle, und jedes Widget passt sich an (vertikale Leisten fallen auf kompakte Nur-Symbol-Formen zurück). Ein Klicken und Halten startet dasselbe Ziehen. Doppel-Linksklicke auf denselben leeren Bereich, um den Leistenhintergrund von klar zu glasig zu deckend zu wechseln. Und ziehe ein beliebiges Widget, um es neu anzuordnen oder in einen anderen Abschnitt zu werfen.
+Greife eine leere Stelle der Leiste rund um die Mitte und ziehe sie zu einer anderen Bildschirmkante, und die Leiste bewegt sich dorthin — links, rechts, oben oder unten funktionieren alle, und jedes Widget passt sich an (vertikale Leisten fallen auf kompakte Nur-Symbol-Formen zurück). Ein Klicken und Halten startet dasselbe Ziehen. Doppel-Linksklicke auf denselben leeren Bereich, um den Leistenhintergrund von klar zu glasig zu deckend zu wechseln. Und ziehe ein beliebiges Widget, um es neu anzuordnen oder in einen anderen Abschnitt zu werfen; die anderen Widgets rücken auseinander und schaffen Platz an der Ablagestelle.
+
+Die Mitte der Leiste ist ein Kasten: Sein Inhalt bleibt als Gruppe zentriert, die benachbarten Widgets hängen an seinen Rändern. Beim Ziehen erscheint sein Umriss, bei leerem Kasten eine Linie quer über die Leiste. Du kannst darin oder daneben ablegen; zielst du hinein, wächst der Kasten für das Widget.
 
 Ein Widget, das du griffbereit haben willst, aber nicht immer im Blick, kann in die Schublade des Trays: Ziehe es auf den Tray, und die Schublade öffnet sich, um es aufzunehmen. Es sitzt dort hinter den App-Symbolen, erscheint, wann immer die Schublade erscheint, und hält die Schublade offen, solange sein Panel geöffnet ist. Ziehe es wieder heraus auf die Leiste, um es zurückzubringen.
 
@@ -92,7 +94,7 @@ Dieselben Dinge haben Befehle, was du für ein [Dotfiles](31-dotfiles.md)-Setup 
 ```bash
 omarchy bar position bottom
 omarchy bar background glassy  # opaque, glassy, none, or cycle
-omarchy bar move omarchy.clock --section center --index 0
+omarchy bar move omarchy.weather --section centerBegin --index 0
 omarchy bar move omarchy.bluetooth --section tray  # into the tray's drawer
 omarchy bar set omarchy.clock format "HH:mm"
 omarchy bar defaults          # back to the shipped layout
@@ -101,7 +103,7 @@ omarchy bar defaults          # back to the shipped layout
 Um ein Widget vollständig hinzuzufügen oder zu entfernen, verwende die Plugin-Befehle. `omarchy plugin list` gibt jedes Widget aus, das die Shell kennt, mit seiner ID, und dann:
 
 ```bash
-omarchy plugin enable omarchy.media --section center
+omarchy plugin enable omarchy.media --section centerEnd
 omarchy plugin disable omarchy.weather
 ```
 
@@ -119,19 +121,20 @@ All das wird in `~/.config/omarchy/shell.json` unter dem Schlüssel `bar` gespei
   "bar": {
     "position": "top",
     "background": "opaque",
-    "centerAnchor": "omarchy.clock",
     "layout": {
       "left": [{ "id": "omarchy.menu" }, { "id": "omarchy.workspaces" }],
+      "centerBegin": [{ "id": "omarchy.indicators" }],
       "center": [{ "id": "omarchy.clock", "format": "HH:mm" }],
+      "centerEnd": [{ "id": "omarchy.weather" }],
       "right": [{ "id": "omarchy.audio" }, { "id": "omarchy.power" }]
     }
   }
 }
 ```
 
-Jedes Widget ist ein Eintrag in einem der drei Layout-Arrays, und seine Einstellungen sitzen inline auf diesem Eintrag — es gibt keine separate Einstellungsdatei und kein `config`-Unterobjekt. Das `format`, `formatAlt` (wohin der Rechtsklick wechselt) und `verticalFormat` der Uhr leben alle direkt dort auf `{ "id": "omarchy.clock" }`.
+Jedes Widget ist ein Eintrag in einem der fünf Layout-Arrays, und seine Einstellungen sitzen inline auf diesem Eintrag — es gibt keine separate Einstellungsdatei und kein `config`-Unterobjekt. Das `format`, `formatAlt` (wohin der Rechtsklick wechselt) und `verticalFormat` der Uhr leben alle direkt dort auf `{ "id": "omarchy.clock" }`.
 
-`centerAnchor` benennt das eine mittlere Widget, das an der exakten Mitte des Bildschirms angeheftet wird, während die anderen es flankieren. So bleibt die Uhr genau in der Mitte, selbst wenn das Wetter und das Aktualisierungsabzeichen kommen und gehen. Setze es auf einen leeren String, und die mittlere Liste wird stattdessen einfach als Gruppe zentriert.
+`center` ist der Kasten in der Leistenmitte: Sein Inhalt wird als Gruppe auf dem Bildschirm zentriert. `centerBegin` und `centerEnd` hängen an beiden Seiten, sodass die Uhr genau mittig bleibt, wenn Wetter und Aktualisierungsabzeichen erscheinen oder verschwinden. Mehrere Widgets in `center` werden gemeinsam zentriert; ist es leer, treffen sich `centerBegin` und `centerEnd` in der Leistenmitte.
 
 Eine Regel, die es wert ist, verinnerlicht zu werden: **Sobald du deine eigene `shell.json` hast, ist sie kanonisch**. Bis du irgendetwas anpasst, liest die Shell Omarchys Standarddatei. In dem Moment, in dem du ein Widget ziehst, `omarchy bar` ausführst oder die Datei selbst bearbeitest, gehört sie dir — es gibt kein tiefes Zusammenführen, sodass neue Standard-Widgets in zukünftigen Omarchy-Versionen nicht automatisch auf deiner Leiste erscheinen werden. `omarchy bar defaults` stellt das ausgelieferte Layout wieder her, wann immer du einen sauberen Start willst.
 

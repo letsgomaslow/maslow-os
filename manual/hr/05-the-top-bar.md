@@ -6,7 +6,7 @@ To je i jedini dio radne površine koji je uvijek na zaslonu, pa vrijedi znati �
 
 ## Što je na njoj prema zadanim postavkama
 
-Traka ima tri odjeljka. Na lijevoj strani nalaze se Omarchy logotip (pokretač izbornika) i pokazatelji radnih prostora. U sredini dobivate pokazatelje statusa, sat, Elsewhen (svjetski sat), vrijeme i značku za Omarchy ažuriranje. Na desnoj strani: raspored tipkovnice (kada je konfigurirano više od jednoga), paleta sustava, agenti, bluetooth, mreža, zvuk, zaslon i napajanje.
+Traka ima tri odjeljka. Na lijevoj strani nalaze se Omarchy logotip (pokretač izbornika) i pokazatelji radnih prostora. U sredini dobivate pokazatelje statusa, sat, Elsewhen (svjetski sat), vrijeme i značku za Omarchy ažuriranje. Na desnoj strani: paleta sustava, raspored tipkovnice (kada je konfigurirano više od jednoga), agenti, bluetooth, mreža, zvuk, zaslon i napajanje.
 
 Nekoliko njih pojavljuje se samo kada imaju što reći. Raspored tipkovnice pojavljuje se samo ako ste konfigurirali više od jednoga rasporeda. Značka za ažuriranje pojavljuje se samo kada čeka Omarchy ažuriranje. A ikona agenata pojavljuje se prvi put kada Omarchy pronađe upotrebu AI kodiranja na stroju (pogledajte [AI](17-ai.md)).
 
@@ -73,7 +73,7 @@ Uklanjanjem bilo koje usluge njezin widget nestaje s trake.
 
 ## Pokazatelji
 
-Maleni skup u sredini widget je pokazatelja. To su statusni znakovi za načine koje ste uključili: ne ometaj, noćno svjetlo, [podsjetnik](09-reminders.md) na čekanju, aktivno snimanje zaslona, ostani budan i [diktiranje](11-text-extraction-dictation.md). Svijetle kada je način aktivan i inače ostaju izvan puta — lebdite lijevo od sata (iznad njega na okomitoj traci) da zavirite u neaktivne. Klikom na pokazatelj prebacuje se taj način. Još jedan je samo statusni: udaljena sesija svijetli crveno dok je netko povezan s ovim strojem putem gliffa.
+Maleni skup u sredini widget je pokazatelja. To su statusni znakovi za načine koje ste uključili: ne ometaj, noćno svjetlo, [podsjetnik](09-reminders.md) na čekanju, aktivno snimanje zaslona, ostani budan i [diktiranje](11-text-extraction-dictation.md). Svijetle kada je način aktivan i inače ostaju izvan puta — zadržite pokazivač bilo gdje na traci da vidite neaktivne pokazatelje. Klikom na pokazatelj prebacuje se taj način. Još jedan je samo statusni: udaljena sesija svijetli crveno dok je netko povezan s ovim strojem putem gliffa.
 
 Ako biste radije da su uvijek vidljivi, postavite `alwaysShow` na `true` na widgetu. A ako vam je stalo samo do nekih od njih, navedite one koje želite u `items`: `["Dnd", "Reminder", "NightLight"]`. Možete imati više od jednoga widgeta pokazatelja, pa različiti odjeljci mogu prikazivati različite podskupove.
 
@@ -81,7 +81,9 @@ Ako biste radije da su uvijek vidljivi, postavite `alwaysShow` na `true` na widg
 
 Traka se sama konfigurira. Ne morate otvarati konfiguracijsku datoteku da biste premještali stvari.
 
-Uhvatite prazan komad trake oko sredine i povucite ga prema drugome rubu zaslona i traka se tamo pomiče — lijevo, desno, gore ili dolje sve radi, a svaki widget se prilagođava (okomite trake vraćaju se na kompaktne oblike samo s ikonama). Klik-i-držanje započinje isto povlačenje. Dvaput lijevom tipkom kliknite taj isti prazan prostor da kružite pozadinom trake od prozirne do staklene do neprozirne. I povucite bilo koji widget da ga preuredite ili bacite u drugi odjeljak.
+Uhvatite prazan komad trake oko sredine i povucite ga prema drugome rubu zaslona i traka se tamo pomiče — lijevo, desno, gore ili dolje sve radi, a svaki widget se prilagođava (okomite trake vraćaju se na kompaktne oblike samo s ikonama). Klik-i-držanje započinje isto povlačenje. Dvaput lijevom tipkom kliknite taj isti prazan prostor da kružite pozadinom trake od prozirne do staklene do neprozirne. I povucite bilo koji widget da ga preuredite ili bacite u drugi odjeljak; ostali se widgeti razmiču kako bi oslobodili mjesto za ispuštanje.
+
+Sredina trake je okvir: sadržaj ostaje centriran kao skupina, a susjedni widgeti pričvršćeni su uz njegove rubove. Tijekom povlačenja prikazuje se obris okvira, ili crta preko trake ako je prazan. Možete ispustiti unutra ili pokraj; kada ciljate unutra, okvir se povećava za widget.
 
 Widget koji želite imati pri ruci, ali ne uvijek na vidiku, može ići u ladicu palete: povucite ga na paletu i ladica će se otvoriti da ga primi. Sjedi ondje iza ikona aplikacija, pojavljuje se kad god se ladica pojavi i drži ladicu otvorenom dok mu je ploča otvorena. Povucite ga natrag na traku da ga vratite.
 
@@ -92,7 +94,7 @@ Iste stvari imaju naredbe, što je ono što želite za postavku [dotfiles](31-do
 ```bash
 omarchy bar position bottom
 omarchy bar background glassy  # opaque, glassy, none, or cycle
-omarchy bar move omarchy.clock --section center --index 0
+omarchy bar move omarchy.weather --section centerBegin --index 0
 omarchy bar move omarchy.bluetooth --section tray  # into the tray's drawer
 omarchy bar set omarchy.clock format "HH:mm"
 omarchy bar defaults          # back to the shipped layout
@@ -101,7 +103,7 @@ omarchy bar defaults          # back to the shipped layout
 Za potpuno dodavanje ili uklanjanje widgeta koristite naredbe dodataka. `omarchy plugin list` ispisuje svaki widget koji ljuska poznaje s njegovim id-om, a zatim:
 
 ```bash
-omarchy plugin enable omarchy.media --section center
+omarchy plugin enable omarchy.media --section centerEnd
 omarchy plugin disable omarchy.weather
 ```
 
@@ -119,19 +121,20 @@ Sve je to pohranjeno u `~/.config/omarchy/shell.json`, pod ključem `bar`. Evo s
   "bar": {
     "position": "top",
     "background": "opaque",
-    "centerAnchor": "omarchy.clock",
     "layout": {
       "left": [{ "id": "omarchy.menu" }, { "id": "omarchy.workspaces" }],
+      "centerBegin": [{ "id": "omarchy.indicators" }],
       "center": [{ "id": "omarchy.clock", "format": "HH:mm" }],
+      "centerEnd": [{ "id": "omarchy.weather" }],
       "right": [{ "id": "omarchy.audio" }, { "id": "omarchy.power" }]
     }
   }
 }
 ```
 
-Svaki widget jedan je unos u jednom od tri polja rasporeda, a njegove postavke sjede u retku na tome unosu — nema zasebne datoteke postavki i nema podobjekta `config`. `format` sata, `formatAlt` (na što desni klik kruži) i `verticalFormat` svi žive točno ondje na `{ "id": "omarchy.clock" }`.
+Svaki widget jedan je unos u jednom od pet polja rasporeda, a njegove postavke sjede u retku na tome unosu — nema zasebne datoteke postavki i nema podobjekta `config`. `format` sata, `formatAlt` (na što desni klik kruži) i `verticalFormat` svi žive točno ondje na `{ "id": "omarchy.clock" }`.
 
-`centerAnchor` imenuje jedan središnji widget koji se prikvačuje na točno središte zaslona, s ostalima bočno uz njega. Tako sat ostaje točno u sredini čak i dok vrijeme i značka za ažuriranje dolaze i odlaze. Postavite ga na prazan niz i središnji popis samo se centrira kao grupa.
+`center` je okvir u sredini trake: sav sadržaj centriran je na zaslonu kao skupina. `centerBegin` i `centerEnd` nalaze se s obje strane, tako da sat ostaje točno u sredini kada vrijeme i značka ažuriranja dolaze i odlaze. Više widgeta u `center` centrira se zajedno; ako je prazan, `centerBegin` i `centerEnd` susreću se u sredini trake.
 
 Jedno pravilo koje vrijedi usvojiti: **jednom kada imate vlastiti `shell.json`, on je kanonski**. Dok ništa ne prilagodite, ljuska čita Omarchyjevu zadanu datoteku. Trenutak kada povučete widget, pokrenete `omarchy bar` ili sami uredite datoteku, vi ste vlasnik — nema dubokoga spajanja, pa se novi zadani widgeti u budućim Omarchy izdanjima neće automatski pojaviti na vašoj traci. `omarchy bar defaults` vraća isporučeni raspored kad god želite čistu ploču.
 

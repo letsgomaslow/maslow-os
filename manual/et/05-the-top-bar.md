@@ -6,7 +6,7 @@ See on ka ainus töölaua osa, mis on alati ekraanil, nii et tasub teada, mida k
 
 ## Mis sellel vaikimisi on
 
-Ribal on kolm sektsiooni. Vasakul asub Omarchy logo (menüü käivitaja) ja tööalanäidikud. Keskel saad olekunäidikud, kella, Elsewheni (maailmakella), ilma ja Omarchy uuendusmärgi. Paremal: klaviatuuripaigutus (kui rohkem kui üks on seadistatud), süsteemialus, agendid, bluetooth, võrk, heli, ekraan ja toide.
+Ribal on kolm sektsiooni. Vasakul asub Omarchy logo (menüü käivitaja) ja tööalanäidikud. Keskel saad olekunäidikud, kella, Elsewheni (maailmakella), ilma ja Omarchy uuendusmärgi. Paremal: süsteemialus, klaviatuuripaigutus (kui rohkem kui üks on seadistatud), agendid, bluetooth, võrk, heli, ekraan ja toide.
 
 Mõned neist ilmuvad ainult siis, kui neil on midagi öelda. Klaviatuuripaigutus ilmub ainult siis, kui oled seadistanud rohkem kui ühe paigutuse. Uuendusmärk ilmub ainult siis, kui Omarchy uuendus ootab. Ja agentide ikoon ilmub esimest korda, kui Omarchy masinast AI programmeerimiskasutust leiab (vt [AI](17-ai.md)).
 
@@ -73,7 +73,7 @@ Kumma teenuse eemaldamine võtab selle vidina ribalt tagasi.
 
 ## Näidikud
 
-Väike kobar keskel on näidikute vidin. Need on olekuglüüfid režiimidele, mille oled sisse lülitanud: ära sega, öövalgus, järjekorras olev [meeldetuletus](09-reminders.md), aktiivne ekraanisalvestus, püsi ärkvel ja [dikteerimine](11-text-extraction-dictation.md). Need süttivad, kui režiim on aktiivne, ja püsivad muidu eemal — hõlju kella vasakule (vertikaalsel ribal selle kohal), et passiivsetele piiluda. Näidikul klõpsamine lülitab selle režiimi. Üks veel on ainult olek: kaugseanss süttib punaselt, kui keegi on gliffi kaudu selle masinaga ühendatud.
+Väike kobar keskel on näidikute vidin. Need on olekuglüüfid režiimidele, mille oled sisse lülitanud: ära sega, öövalgus, järjekorras olev [meeldetuletus](09-reminders.md), aktiivne ekraanisalvestus, püsi ärkvel ja [dikteerimine](11-text-extraction-dictation.md). Need süttivad, kui režiim on aktiivne, ja püsivad muidu eemal — hõlju riba mis tahes kohal, et näha passiivseid näidikuid. Näidikul klõpsamine lülitab selle režiimi. Üks veel on ainult olek: kaugseanss süttib punaselt, kui keegi on gliffi kaudu selle masinaga ühendatud.
 
 Kui eelistad, et need oleksid alati nähtavad, sea vidinal `alwaysShow` väärtuseks `true`. Ja kui hoolid ainult mõnest neist, loetle need, mida soovid, `items`-is: `["Dnd", "Reminder", "NightLight"]`. Sul võib olla rohkem kui üks näidikute vidin, nii et erinevad sektsioonid saavad näidata erinevaid alamhulki.
 
@@ -81,7 +81,9 @@ Kui eelistad, et need oleksid alati nähtavad, sea vidinal `alwaysShow` väärtu
 
 Riba seadistab ennast ise. Sa ei pea asjade liigutamiseks seadistusfaili avama.
 
-Haara keske kandis tühja riba kohta ja lohista see teise ekraaniserva poole ja riba liigub sinna — vasak, parem, ülemine või alumine toimivad kõik ja iga vidin kohaneb (vertikaalsed ribad lähevad tagasi kompaktsetele ainult-ikoonidega vormidele). Klõpsa-ja-hoiab alustab sama lohistamist. Tee samal tühjal ruumil topeltvasakklõps, et riba taustal ringi läbi käia läbipaistvast klaasjani läbipaistmatuni. Ja lohista ükskõik millist vidinat, et seda ümber järjestada või teise sektsiooni visata.
+Haara keske kandis tühja riba kohta ja lohista see teise ekraaniserva poole ja riba liigub sinna — vasak, parem, ülemine või alumine toimivad kõik ja iga vidin kohaneb (vertikaalsed ribad lähevad tagasi kompaktsetele ainult-ikoonidega vormidele). Klõpsa-ja-hoiab alustab sama lohistamist. Tee samal tühjal ruumil topeltvasakklõps, et riba taustal ringi läbi käia läbipaistvast klaasjani läbipaistmatuni. Ja lohista ükskõik millist vidinat, et seda ümber järjestada või teise sektsiooni visata; teised vidinad libisevad kõrvale, et vabastada koht, kuhu selle lased.
+
+Riba keskosa on kast: selle sisu püsib ühe rühmana keskel ning naabervidinad kinnituvad servadesse. Lohistamise ajal näed kasti piirjoont, tühja kasti korral joont üle riba. Võid vidina lasta kasti sisse või kõrvale; sisse sihtides kast kasvab, et vidin mahuks.
 
 Vidina, mida soovid käepärast hoida, kuid mitte kogu aeg silme ees, võid panna aluse sahtlisse: lohista see alusele ja sahtel avaneb, et see vastu võtta. See jääb sinna rakenduste ikoonide järele, ilmub iga kord, kui sahtel avaneb, ja hoiab sahtli avatuna, kuni selle paneel on üleval. Lohista see ribale tagasi, et see oma kohale panna.
 
@@ -92,7 +94,7 @@ Samadel asjadel on käsud, mida soovid [dotfiles](31-dotfiles.md) seadistuse jao
 ```bash
 omarchy bar position bottom
 omarchy bar background glassy  # opaque, glassy, none, or cycle
-omarchy bar move omarchy.clock --section center --index 0
+omarchy bar move omarchy.weather --section centerBegin --index 0
 omarchy bar move omarchy.bluetooth --section tray  # into the tray's drawer
 omarchy bar set omarchy.clock format "HH:mm"
 omarchy bar defaults          # back to the shipped layout
@@ -101,7 +103,7 @@ omarchy bar defaults          # back to the shipped layout
 Vidina täielikuks lisamiseks või eemaldamiseks kasuta pluginakäske. `omarchy plugin list` prindib iga vidina, mida kest teab, koos selle id-ga, ja seejärel:
 
 ```bash
-omarchy plugin enable omarchy.media --section center
+omarchy plugin enable omarchy.media --section centerEnd
 omarchy plugin disable omarchy.weather
 ```
 
@@ -119,19 +121,20 @@ Kõik see on salvestatud `~/.config/omarchy/shell.json`-i, `bar` võtme alla. Si
   "bar": {
     "position": "top",
     "background": "opaque",
-    "centerAnchor": "omarchy.clock",
     "layout": {
       "left": [{ "id": "omarchy.menu" }, { "id": "omarchy.workspaces" }],
+      "centerBegin": [{ "id": "omarchy.indicators" }],
       "center": [{ "id": "omarchy.clock", "format": "HH:mm" }],
+      "centerEnd": [{ "id": "omarchy.weather" }],
       "right": [{ "id": "omarchy.audio" }, { "id": "omarchy.power" }]
     }
   }
 }
 ```
 
-Iga vidin on üks kirje ühes kolmest paigutusmassiivist ja selle seaded asuvad sellel kirjel teksti sees — pole eraldi seadetefaili ega `config` alamobjekti. Kella `format`, `formatAlt` (millele paremklõps ringi käib) ja `verticalFormat` asuvad kõik täpselt seal kirjel `{ "id": "omarchy.clock" }`.
+Iga vidin on üks kirje ühes viiest paigutusmassiivist ja selle seaded asuvad sellel kirjel teksti sees — pole eraldi seadetefaili ega `config` alamobjekti. Kella `format`, `formatAlt` (millele paremklõps ringi käib) ja `verticalFormat` asuvad kõik täpselt seal kirjel `{ "id": "omarchy.clock" }`.
 
-`centerAnchor` nimetab selle ühe keskmise vidina, mis kinnitatakse täpselt ekraani keskele, nii et ülejäänud külgnevad sellega. Nii püsib kell täpselt keskel ka siis, kui ilm ja uuendusmärk tulevad ja lähevad. Sea selleks tühi string ja keskmine loend tsentreeritakse lihtsalt rühmana.
+`center` on kast riba keskel: kogu selle sisu on ekraanil ühe rühmana tsentreeritud. `centerBegin` ja `centerEnd` paiknevad selle külgedel, nii et kell püsib täpselt keskel, kui ilm ja uuendusmärk ilmuvad või kaovad. Mitu vidinat `center`-is tsentreeritakse koos; tühja kasti korral kohtuvad `centerBegin` ja `centerEnd` riba keskel.
 
 Üks reegel, mida tasub pähe õppida: **kui sul on oma `shell.json`, on see lõplik**. Kuni sa midagi ei kohanda, loeb kest Omarchy vaikefaili. Kohe kui lohistad vidinat, käivitad `omarchy bar` või muudad faili ise, kuulub see sulle — sügavat liitmist pole, nii et tulevaste Omarchy väljaannete uued vaikevidinad ei ilmu su ribale automaatselt. `omarchy bar defaults` paneb tarnitud paigutuse tagasi, millal iganes soovid puhast lehte.
 

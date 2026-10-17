@@ -6,7 +6,7 @@ Pia ndicho kipande kimoja cha eneo-kazi kinachokuwa kwenye skrini daima, kwa hiy
 
 ## Kilichopo kwa chaguomsingi
 
-Upau una sehemu tatu. Kushoto hukaa nembo ya Omarchy (kizinduzi cha menyu) na viashiria vya nafasi ya kazi. Katikati unapata viashiria vya hali, saa, Elsewhen (saa ya dunia), hali ya hewa, na beji ya sasisho la Omarchy. Kulia: umbo la kibodi (zaidi ya moja ikisanidiwa), trei ya mfumo, maajenti, bluetooth, mtandao, sauti, skrini, na nguvu.
+Upau una sehemu tatu. Kushoto hukaa nembo ya Omarchy (kizinduzi cha menyu) na viashiria vya nafasi ya kazi. Katikati unapata viashiria vya hali, saa, Elsewhen (saa ya dunia), hali ya hewa, na beji ya sasisho la Omarchy. Kulia: trei ya mfumo, umbo la kibodi (zaidi ya moja ikisanidiwa), maajenti, bluetooth, mtandao, sauti, skrini, na nguvu.
 
 Baadhi ya hizo huonekana tu zinapokuwa na cha kusema. Umbo la kibodi huonekana tu ikiwa umesanidi zaidi ya umbo moja. Beji ya sasisho huonekana tu kuna sasisho la Omarchy linalongoja. Na aikoni ya maajenti huonekana mara ya kwanza Omarchy inapopata matumizi ya usimbaji wa AI kwenye mashine (tazama [AI](17-ai.md)).
 
@@ -73,7 +73,7 @@ Kuondoa huduma yoyote hurejesha wijeti yake kutoka kwenye upau.
 
 ## Viashiria
 
-Kundi ndogo katikati ndilo wijeti ya viashiria. Hizi ni glifu za hali kwa namna ulizowasha: usinisumbue, taa ya usiku, [kikumbusho](09-reminders.md) kilichowekwa foleni, kurekodi skrini kunakotumika, usilale, na [imla](11-text-extraction-dictation.md). Huanga wakati hali inatumika na vinginevyo hubaki mbali — elea kushoto kwa saa (juu yake kwenye upau wima) kuchungulia visivyotumika. Kubofya kiashiria hubadilisha hali hiyo. Moja zaidi ni hali tu: kipindi cha mbali huanga nyekundu wakati mtu ameunganishwa kwenye mashine hii kupitia gliff.
+Kundi ndogo katikati ndilo wijeti ya viashiria. Hizi ni glifu za hali kwa namna ulizowasha: usinisumbue, taa ya usiku, [kikumbusho](09-reminders.md) kilichowekwa foleni, kurekodi skrini kunakotumika, usilale, na [imla](11-text-extraction-dictation.md). Huanga wakati hali inatumika na vinginevyo hubaki mbali — elea popote kwenye upau ili kuona viashiria visivyotumika. Kubofya kiashiria hubadilisha hali hiyo. Moja zaidi ni hali tu: kipindi cha mbali huanga nyekundu wakati mtu ameunganishwa kwenye mashine hii kupitia gliff.
 
 Ikiwa unapendelea vionekane daima, weka `alwaysShow` kuwa `true` kwenye wijeti. Na ikiwa unajali baadhi tu, orodhesha unazotaka katika `items`: `["Dnd", "Reminder", "NightLight"]`. Unaweza kuwa na zaidi ya wijeti moja ya viashiria, hivyo sehemu tofauti zinaweza kuonyesha sehemu ndogo tofauti.
 
@@ -81,7 +81,9 @@ Ikiwa unapendelea vionekane daima, weka `alwaysShow` kuwa `true` kwenye wijeti. 
 
 Upau hujisanidi wenyewe. Huhitaji kufungua faili ya usanidi kusogeza vitu.
 
-Shika kipande tupu cha upau karibu na katikati na kuiburuta kuelekea ukingo mwingine wa skrini, na upau huenda huko — kushoto, kulia, juu, au chini yote hufanya kazi, na kila wijeti hujibadilisha (mipau wima hurudi kwenye umbo finyu la aikoni tu). Kubofya-na-kushikilia huanzisha uburutaji huo huo. Bofya mara mbili kushoto nafasi hiyo hiyo tupu kubadilisha mandhari ya upau kutoka wazi kwenda kioo kwenda isiyoangavu. Na buruta wijeti yoyote kuipanga upya au kuitupa katika sehemu nyingine.
+Shika kipande tupu cha upau karibu na katikati na kuiburuta kuelekea ukingo mwingine wa skrini, na upau huenda huko — kushoto, kulia, juu, au chini yote hufanya kazi, na kila wijeti hujibadilisha (mipau wima hurudi kwenye umbo finyu la aikoni tu). Kubofya-na-kushikilia huanzisha uburutaji huo huo. Bofya mara mbili kushoto nafasi hiyo hiyo tupu kubadilisha mandhari ya upau kutoka wazi kwenda kioo kwenda isiyoangavu. Na buruta wijeti yoyote kuipanga upya au kuitupa katika sehemu nyingine; wijeti nyingine husogea pembeni ili kutoa nafasi mahali itakapoachwa.
+
+Katikati ya upau kuna kisanduku: yaliyomo hubaki katikati kama kundi moja, na wijeti jirani hushikamana na kingo zake. Unapoburuta, mpaka wake huonekana, au mstari unaokatiza upau ikiwa ni tupu. Unaweza kuachia ndani au kando yake; ukilenga ndani, kisanduku hukua ili kupokea wijeti.
 
 Wijeti unayoitaka iwepo karibu lakini isiwe inaonekana kila wakati inaweza kwenda katika droo ya trei: iburute juu ya trei, na droo itafunguka kuipokea. Hukaa hapo baada ya aikoni za programu, huonekana kila droo inapoonekana, na huifanya droo ibaki wazi wakati paneli yake imefunguliwa. Iburute nje tena kuirudisha kwenye upau.
 
@@ -92,7 +94,7 @@ Mambo hayo hayo yana amri, ambayo ndiyo unayoitaka kwa usanidi wa [dotfiles](31-
 ```bash
 omarchy bar position bottom
 omarchy bar background glassy  # opaque, glassy, none, or cycle
-omarchy bar move omarchy.clock --section center --index 0
+omarchy bar move omarchy.weather --section centerBegin --index 0
 omarchy bar move omarchy.bluetooth --section tray  # into the tray's drawer
 omarchy bar set omarchy.clock format "HH:mm"
 omarchy bar defaults          # back to the shipped layout
@@ -101,7 +103,7 @@ omarchy bar defaults          # back to the shipped layout
 Kuongeza au kuondoa wijeti kabisa, tumia amri za programu-jalizi. `omarchy plugin list` huchapisha kila wijeti ambayo shell inajua na kitambulisho chake, na kisha:
 
 ```bash
-omarchy plugin enable omarchy.media --section center
+omarchy plugin enable omarchy.media --section centerEnd
 omarchy plugin disable omarchy.weather
 ```
 
@@ -119,19 +121,20 @@ Yote huhifadhiwa katika `~/.config/omarchy/shell.json`, chini ya ufunguo `bar`. 
   "bar": {
     "position": "top",
     "background": "opaque",
-    "centerAnchor": "omarchy.clock",
     "layout": {
       "left": [{ "id": "omarchy.menu" }, { "id": "omarchy.workspaces" }],
+      "centerBegin": [{ "id": "omarchy.indicators" }],
       "center": [{ "id": "omarchy.clock", "format": "HH:mm" }],
+      "centerEnd": [{ "id": "omarchy.weather" }],
       "right": [{ "id": "omarchy.audio" }, { "id": "omarchy.power" }]
     }
   }
 }
 ```
 
-Kila wijeti ni ingizo moja katika moja ya safu tatu za mpangilio, na mipangilio yake hukaa ndani ya mstari kwenye ingizo hilo — hakuna faili tofauti ya mipangilio na hakuna kitu kidogo cha `config`. `format` ya saa, `formatAlt` (kile ambacho kubofya kulia hubadilisha kwenda), na `verticalFormat` yote huishi pale pale kwenye `{ "id": "omarchy.clock" }`.
+Kila wijeti ni ingizo moja katika moja ya safu tano za mpangilio, na mipangilio yake hukaa ndani ya mstari kwenye ingizo hilo — hakuna faili tofauti ya mipangilio na hakuna kitu kidogo cha `config`. `format` ya saa, `formatAlt` (kile ambacho kubofya kulia hubadilisha kwenda), na `verticalFormat` yote huishi pale pale kwenye `{ "id": "omarchy.clock" }`.
 
-`centerAnchor` hutaja wijeti moja ya katikati inayobanwa kwenye katikati kamili ya skrini, na nyingine kuizunguka. Hivyo ndivyo saa inavyobaki katikati kabisa hata hali ya hewa na beji ya sasisho vinapokuja na kuondoka. Iweke kuwa mfuatano tupu na orodha ya katikati huwekwa katikati tu kama kundi badala yake.
+`center` ni kisanduku katikati ya upau: yaliyomo yote huwekwa katikati ya skrini kama kundi. `centerBegin` na `centerEnd` hukaa pande zake, hivyo saa hubaki katikati kabisa hali ya hewa na beji ya sasisho zinapoonekana au kutoweka. Wijeti kadhaa katika `center` huwekwa katikati pamoja; ikiwa ni tupu, `centerBegin` na `centerEnd` hukutana katikati ya upau.
 
 Kanuni moja inayofaa kuingiza ndani: **ukishakuwa na `shell.json` yako mwenyewe, ni rasmi**. Hadi ubinafsishe chochote, shell husoma faili chaguomsingi ya Omarchy. Wakati unapoburuta wijeti, kuendesha `omarchy bar`, au kuhariri faili mwenyewe, unakuwa mmiliki wake — hakuna uunganishaji wa kina, hivyo wijeti mpya chaguomsingi katika matoleo ya baadaye ya Omarchy hazitaonekana kwenye upau wako kiotomatiki. `omarchy bar defaults` hurejesha mpangilio uliotumwa wakati wowote unapotaka ukurasa safi.
 

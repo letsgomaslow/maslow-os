@@ -6,7 +6,7 @@ Ela também é a única parte do desktop que está sempre na tela, então vale a
 
 ## O que há nela por padrão
 
-A barra tem três seções. À esquerda ficam o logotipo do Omarchy (o iniciador do menu) e os indicadores de áreas de trabalho. No centro, você tem os indicadores de status, o relógio, o Elsewhen (um relógio mundial), o clima e um selo de atualização do Omarchy. À direita: o layout do teclado (quando mais de um está configurado), a bandeja do sistema, agentes, bluetooth, rede, áudio, tela e energia.
+A barra tem três seções. À esquerda ficam o logotipo do Omarchy (o iniciador do menu) e os indicadores de áreas de trabalho. No centro, você tem os indicadores de status, o relógio, o Elsewhen (um relógio mundial), o clima e um selo de atualização do Omarchy. À direita: a bandeja do sistema, o layout do teclado (quando mais de um está configurado), agentes, bluetooth, rede, áudio, tela e energia.
 
 Alguns deles só aparecem quando têm algo a dizer. O layout do teclado aparece somente se você configurou mais de um layout. O selo de atualização aparece somente quando há uma atualização do Omarchy esperando. E o ícone de agentes aparece na primeira vez que o Omarchy encontra uso de codificação por IA na máquina (veja [IA](17-ai.md)).
 
@@ -73,7 +73,7 @@ Remover qualquer um dos serviços tira seu widget da barra novamente.
 
 ## Indicadores
 
-O pequeno aglomerado no centro é o widget de indicadores. Esses são glifos de status para modos que você ativou: não perturbe, luz noturna, um [lembrete](09-reminders.md) na fila, uma gravação de tela ativa, manter acordado e [ditado](11-text-extraction-dictation.md). Eles acendem quando o modo está ativo e, caso contrário, ficam fora do caminho — passe o mouse à esquerda do relógio (acima dele em uma barra vertical) para espiar os inativos. Clicar em um indicador alterna aquele modo. Mais um é apenas de status: uma sessão remota acende em vermelho enquanto alguém está conectado a esta máquina pelo gliff.
+O pequeno aglomerado no centro é o widget de indicadores. Esses são glifos de status para modos que você ativou: não perturbe, luz noturna, um [lembrete](09-reminders.md) na fila, uma gravação de tela ativa, manter acordado e [ditado](11-text-extraction-dictation.md). Eles acendem quando o modo está ativo e, caso contrário, ficam fora do caminho — passe o mouse por qualquer ponto da barra para ver os indicadores inativos. Clicar em um indicador alterna aquele modo. Mais um é apenas de status: uma sessão remota acende em vermelho enquanto alguém está conectado a esta máquina pelo gliff.
 
 Se você prefere que eles estejam sempre visíveis, defina `alwaysShow` como `true` no widget. E se você só se importa com alguns deles, liste os que quer em `items`: `["Dnd", "Reminder", "NightLight"]`. Você pode ter mais de um widget de indicadores, então seções diferentes podem mostrar subconjuntos diferentes.
 
@@ -81,7 +81,9 @@ Se você prefere que eles estejam sempre visíveis, defina `alwaysShow` como `tr
 
 A barra se configura sozinha. Você não precisa abrir um arquivo de configuração para mover as coisas.
 
-Pegue um trecho vazio da barra ao redor do centro e arraste-o na direção de outra borda da tela, e a barra se move para lá — esquerda, direita, topo ou parte inferior, tudo funciona, e todos os widgets se adaptam (barras verticais recorrem a formas compactas só de ícones). Um clique pressionado inicia o mesmo arraste. Clique duas vezes com o botão esquerdo nesse mesmo espaço vazio para alternar o fundo da barra de transparente para translúcido para opaco. E arraste qualquer widget para reordená-lo ou jogá-lo em outra seção.
+Pegue um trecho vazio da barra ao redor do centro e arraste-o na direção de outra borda da tela, e a barra se move para lá — esquerda, direita, topo ou parte inferior, tudo funciona, e todos os widgets se adaptam (barras verticais recorrem a formas compactas só de ícones). Um clique pressionado inicia o mesmo arraste. Clique duas vezes com o botão esquerdo nesse mesmo espaço vazio para alternar o fundo da barra de transparente para translúcido para opaco. E arraste qualquer widget para reordená-lo ou jogá-lo em outra seção; os outros widgets se afastam para abrir espaço onde ele será solto.
+
+O meio da barra é uma caixa: seu conteúdo fica centralizado como um grupo, e os widgets vizinhos se prendem às bordas. Durante o arraste, aparece o contorno da caixa, ou uma linha cruzando a barra se ela estiver vazia. Você pode soltar dentro ou ao lado; quando o alvo fica dentro, a caixa cresce para receber o widget.
 
 Um widget que você quer por perto, mas nem sempre à vista, pode ir para a gaveta da bandeja: arraste-o para cima da bandeja e a gaveta se abre para recebê-lo. Ele fica ali depois dos ícones dos aplicativos, aparece sempre que a gaveta aparece e mantém a sua gaveta aberta enquanto seu painel estiver aberto. Arraste-o de volta para a barra para colocá-lo no lugar.
 
@@ -92,7 +94,7 @@ As mesmas coisas têm comandos, que é o que você quer para uma configuração 
 ```bash
 omarchy bar position bottom
 omarchy bar background glassy  # opaque, glassy, none, or cycle
-omarchy bar move omarchy.clock --section center --index 0
+omarchy bar move omarchy.weather --section centerBegin --index 0
 omarchy bar move omarchy.bluetooth --section tray  # into the tray's drawer
 omarchy bar set omarchy.clock format "HH:mm"
 omarchy bar defaults          # back to the shipped layout
@@ -101,7 +103,7 @@ omarchy bar defaults          # back to the shipped layout
 Para adicionar ou remover um widget por completo, use os comandos de plugin. `omarchy plugin list` imprime todos os widgets que o shell conhece com seu id, e então:
 
 ```bash
-omarchy plugin enable omarchy.media --section center
+omarchy plugin enable omarchy.media --section centerEnd
 omarchy plugin disable omarchy.weather
 ```
 
@@ -119,19 +121,20 @@ Tudo fica armazenado em `~/.config/omarchy/shell.json`, sob a chave `bar`. Aqui 
   "bar": {
     "position": "top",
     "background": "opaque",
-    "centerAnchor": "omarchy.clock",
     "layout": {
       "left": [{ "id": "omarchy.menu" }, { "id": "omarchy.workspaces" }],
+      "centerBegin": [{ "id": "omarchy.indicators" }],
       "center": [{ "id": "omarchy.clock", "format": "HH:mm" }],
+      "centerEnd": [{ "id": "omarchy.weather" }],
       "right": [{ "id": "omarchy.audio" }, { "id": "omarchy.power" }]
     }
   }
 }
 ```
 
-Todo widget é uma entrada em um dos três arrays de layout, e suas configurações ficam inline nessa entrada — não há arquivo de configurações separado nem sub-objeto `config`. O `format` do relógio, o `formatAlt` (para o qual o clique direito alterna) e o `verticalFormat` vivem todos bem ali em `{ "id": "omarchy.clock" }`.
+Todo widget é uma entrada em um dos cinco arrays de layout, e suas configurações ficam inline nessa entrada — não há arquivo de configurações separado nem sub-objeto `config`. O `format` do relógio, o `formatAlt` (para o qual o clique direito alterna) e o `verticalFormat` vivem todos bem ali em `{ "id": "omarchy.clock" }`.
 
-`centerAnchor` nomeia o único widget central que fica fixado no centro exato da tela, com os outros o flanqueando. É assim que o relógio fica bem no centro mesmo quando o clima e o selo de atualização vão e vêm. Defina-o como uma string vazia e a lista central é apenas centralizada como um grupo.
+`center` é a caixa no meio da barra: todo o conteúdo fica centralizado na tela como um grupo. `centerBegin` e `centerEnd` ficam dos dois lados, mantendo o relógio exatamente no centro quando o clima e o selo de atualização aparecem ou desaparecem. Vários widgets em `center` ficam centralizados juntos; se estiver vazio, `centerBegin` e `centerEnd` se encontram no meio da barra.
 
 Uma regra que vale internalizar: **depois que você tem seu próprio `shell.json`, ele é canônico**. Até você personalizar qualquer coisa, o shell lê o arquivo padrão do Omarchy. No momento em que você arrasta um widget, executa `omarchy bar` ou edita o arquivo, ele é seu — não há mesclagem profunda, então novos widgets padrão em versões futuras do Omarchy não aparecerão na sua barra automaticamente. `omarchy bar defaults` restaura o layout de fábrica sempre que você quiser uma lousa limpa.
 

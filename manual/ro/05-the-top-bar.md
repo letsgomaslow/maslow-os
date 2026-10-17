@@ -6,7 +6,7 @@ Este și singura bucată din desktop care este întotdeauna pe ecran, așa că m
 
 ## Ce este pe ea implicit
 
-Bara are trei secțiuni. În stânga stau logo-ul Omarchy (lansatorul meniului) și indicatorii spațiilor de lucru. În centru ai indicatorii de stare, ceasul, Elsewhen (un ceas mondial), vremea și un insignă de actualizare Omarchy. În dreapta: aranjarea tastaturii (când este configurată mai mult de una), tava de sistem, agenții, bluetooth, rețeaua, sunetul, afișajul și alimentarea.
+Bara are trei secțiuni. În stânga stau logo-ul Omarchy (lansatorul meniului) și indicatorii spațiilor de lucru. În centru ai indicatorii de stare, ceasul, Elsewhen (un ceas mondial), vremea și un insignă de actualizare Omarchy. În dreapta: tava de sistem, aranjarea tastaturii (când este configurată mai mult de una), agenții, bluetooth, rețeaua, sunetul, afișajul și alimentarea.
 
 Câteva dintre acestea apar doar când au ceva de spus. Aranjarea tastaturii apare doar dacă ai configurat mai multe aranjări. Insigna de actualizare apare doar când așteaptă o actualizare Omarchy. Iar pictograma agenților apare prima dată când Omarchy găsește utilizare de codare AI pe mașină (vezi [AI](17-ai.md)).
 
@@ -73,7 +73,7 @@ Eliminarea oricăruia dintre servicii îi ia widgetul înapoi de pe bară.
 
 ## Indicatorii
 
-Micul grup din centru este widgetul de indicatori. Acestea sunt glife de stare pentru modurile pe care le-ai activat: nu deranja, lumina de noapte, un [memento](09-reminders.md) în așteptare, o înregistrare de ecran activă, rămâi treaz și [dictarea](11-text-extraction-dictation.md). Se aprind când modul este activ și în rest stau deoparte — treci cu indicatorul în stânga ceasului (deasupra lui pe o bară verticală) ca să tragi cu ochiul la cele inactive. Clicul pe un indicator comută acel mod. Încă unul este doar de stare: o sesiune la distanță se aprinde în roșu cât timp cineva este conectat la această mașină prin gliff.
+Micul grup din centru este widgetul de indicatori. Acestea sunt glife de stare pentru modurile pe care le-ai activat: nu deranja, lumina de noapte, un [memento](09-reminders.md) în așteptare, o înregistrare de ecran activă, rămâi treaz și [dictarea](11-text-extraction-dictation.md). Se aprind când modul este activ și în rest stau deoparte — treci cu indicatorul oriunde pe bară pentru a vedea indicatorii inactivi. Clicul pe un indicator comută acel mod. Încă unul este doar de stare: o sesiune la distanță se aprinde în roșu cât timp cineva este conectat la această mașină prin gliff.
 
 Dacă preferi să fie întotdeauna vizibile, setează `alwaysShow` la `true` pe widget. Și dacă îți pasă doar de unele dintre ele, enumeră-le pe cele pe care le vrei în `items`: `["Dnd", "Reminder", "NightLight"]`. Poți avea mai multe widgeturi de indicatori, astfel încât secțiuni diferite să poată arăta subseturi diferite.
 
@@ -81,7 +81,9 @@ Dacă preferi să fie întotdeauna vizibile, setează `alwaysShow` la `true` pe 
 
 Bara se configurează singură. Nu trebuie să deschizi un fișier de configurare ca să muți lucruri.
 
-Prinde o zonă goală din bară din jurul centrului și trage-o spre altă margine a ecranului, iar bara se mută acolo — stânga, dreapta, sus sau jos funcționează toate, iar fiecare widget se adaptează (barele verticale revin la forme compacte, doar cu pictograme). Un clic menținut începe aceeași tragere. Fă dublu clic stânga pe același spațiu gol ca să parcurgi fundalul barei de la transparent la sticlos la opac. Și trage orice widget ca să-l rearanjezi sau să-l arunci în altă secțiune.
+Prinde o zonă goală din bară din jurul centrului și trage-o spre altă margine a ecranului, iar bara se mută acolo — stânga, dreapta, sus sau jos funcționează toate, iar fiecare widget se adaptează (barele verticale revin la forme compacte, doar cu pictograme). Un clic menținut începe aceeași tragere. Fă dublu clic stânga pe același spațiu gol ca să parcurgi fundalul barei de la transparent la sticlos la opac. Și trage orice widget ca să-l rearanjezi sau să-l arunci în altă secțiune; celelalte widgeturi se dau la o parte pentru a face loc unde îl lași.
+
+Mijlocul barei este o casetă: conținutul rămâne centrat ca grup, iar widgeturile vecine se prind de marginile ei. În timpul tragerii apare conturul casetei, sau o linie peste bară dacă este goală. Poți lăsa în interior sau lângă; dacă țintești interiorul, caseta crește pentru a primi widgetul.
 
 Un widget pe care îl vrei la îndemână, dar nu mereu la vedere, poate merge în sertarul tăvii: trage-l pe tavă și sertarul se deschide ca să-l primească. Stă acolo după pictogramele aplicațiilor, apare de fiecare dată când apare și sertarul și își ține sertarul deschis cât timp panoul său este deschis. Trage-l înapoi pe bară ca să-l pui la loc.
 
@@ -92,7 +94,7 @@ Aceleași lucruri au comenzi, ceea ce vrei pentru o configurare de [fișiere dot
 ```bash
 omarchy bar position bottom
 omarchy bar background glassy  # opaque, glassy, none, or cycle
-omarchy bar move omarchy.clock --section center --index 0
+omarchy bar move omarchy.weather --section centerBegin --index 0
 omarchy bar move omarchy.bluetooth --section tray  # into the tray's drawer
 omarchy bar set omarchy.clock format "HH:mm"
 omarchy bar defaults          # back to the shipped layout
@@ -101,7 +103,7 @@ omarchy bar defaults          # back to the shipped layout
 Ca să adaugi sau să elimini complet un widget, folosește comenzile de plugin. `omarchy plugin list` tipărește fiecare widget pe care îl cunoaște shellul, cu id-ul lui, și apoi:
 
 ```bash
-omarchy plugin enable omarchy.media --section center
+omarchy plugin enable omarchy.media --section centerEnd
 omarchy plugin disable omarchy.weather
 ```
 
@@ -119,19 +121,20 @@ Totul este stocat în `~/.config/omarchy/shell.json`, sub cheia `bar`. Iată o v
   "bar": {
     "position": "top",
     "background": "opaque",
-    "centerAnchor": "omarchy.clock",
     "layout": {
       "left": [{ "id": "omarchy.menu" }, { "id": "omarchy.workspaces" }],
+      "centerBegin": [{ "id": "omarchy.indicators" }],
       "center": [{ "id": "omarchy.clock", "format": "HH:mm" }],
+      "centerEnd": [{ "id": "omarchy.weather" }],
       "right": [{ "id": "omarchy.audio" }, { "id": "omarchy.power" }]
     }
   }
 }
 ```
 
-Fiecare widget este o intrare în una dintre cele trei matrice de aranjare, iar setările ei stau inline pe acea intrare — nu există un fișier de setări separat și niciun sub-obiect `config`. `format` al ceasului, `formatAlt` (ceea ce se parcurge la clic dreapta) și `verticalFormat` trăiesc toate chiar acolo, pe `{ "id": "omarchy.clock" }`.
+Fiecare widget este o intrare în una dintre cele cinci matrice de aranjare, iar setările ei stau inline pe acea intrare — nu există un fișier de setări separat și niciun sub-obiect `config`. `format` al ceasului, `formatAlt` (ceea ce se parcurge la clic dreapta) și `verticalFormat` trăiesc toate chiar acolo, pe `{ "id": "omarchy.clock" }`.
 
-`centerAnchor` numește singurul widget central care este fixat exact în centrul ecranului, cu celelalte flancându-l. Așa rămâne ceasul exact în centru chiar și atunci când vremea și insigna de actualizare vin și pleacă. Setează-l la un șir gol și lista centrală este centrată doar ca grup.
+`center` este caseta din mijlocul barei: întregul conținut este centrat pe ecran ca grup. `centerBegin` și `centerEnd` stau de o parte și de alta, păstrând ceasul exact la mijloc când vremea și insigna de actualizare apar sau dispar. Mai multe widgeturi în `center` sunt centrate împreună; dacă este gol, `centerBegin` și `centerEnd` se întâlnesc în mijlocul barei.
 
 O regulă care merită interiorizată: **odată ce ai propriul tău `shell.json`, el este canonic**. Până când personalizezi ceva, shellul citește fișierul implicit al Omarchy. În momentul în care tragi un widget, rulezi `omarchy bar` sau editezi fișierul singur, el îți aparține — nu există nicio îmbinare profundă, așa că noile widgeturi implicite din versiunile viitoare Omarchy nu vor apărea automat pe bara ta. `omarchy bar defaults` pune aranjarea livrată înapoi oricând vrei un început curat.
 

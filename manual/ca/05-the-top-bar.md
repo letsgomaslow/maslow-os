@@ -6,7 +6,7 @@ També és l'única peça de l'escriptori que sempre és a la pantalla, així qu
 
 ## Què hi ha per defecte
 
-La barra té tres seccions. A l'esquerra hi ha el logotip d'Omarchy (el llançador del menú) i els indicadors d'espais de treball. Al centre teniu els indicadors d'estat, el rellotge, Elsewhen (un rellotge mundial), el temps i un distintiu d'actualització d'Omarchy. A la dreta: la disposició del teclat (quan n'hi ha més d'una configurada), la safata del sistema, els agents, bluetooth, xarxa, àudio, pantalla i energia.
+La barra té tres seccions. A l'esquerra hi ha el logotip d'Omarchy (el llançador del menú) i els indicadors d'espais de treball. Al centre teniu els indicadors d'estat, el rellotge, Elsewhen (un rellotge mundial), el temps i un distintiu d'actualització d'Omarchy. A la dreta: la safata del sistema, la disposició del teclat (quan n'hi ha més d'una configurada), els agents, bluetooth, xarxa, àudio, pantalla i energia.
 
 Alguns només apareixen quan tenen alguna cosa a dir. La disposició del teclat només apareix si n'heu configurat més d'una. El distintiu d'actualització només apareix quan hi ha una actualització d'Omarchy esperant. I la icona dels agents apareix la primera vegada que Omarchy troba ús de codificació amb IA a la màquina (vegeu [IA](17-ai.md)).
 
@@ -73,7 +73,7 @@ Eliminar qualsevol dels dos serveis retira el seu giny de la barra.
 
 ## Indicadors
 
-El petit grup del centre és el giny d'indicadors. Són glifs d'estat per als modes que heu activat: no molesteu, llum nocturna, un [recordatori](09-reminders.md) en cua, una gravació de pantalla activa, mantenir despert i [dictat](11-text-extraction-dictation.md). S'il·luminen quan el mode és actiu i, si no, no molesten — passeu el cursor a l'esquerra del rellotge (a sobre en una barra vertical) per fer un cop d'ull als inactius. Fer clic en un indicador commuta aquest mode. Un més és només d'estat: una sessió remota s'il·lumina en vermell mentre algú està connectat a aquesta màquina mitjançant gliff.
+El petit grup del centre és el giny d'indicadors. Són glifs d'estat per als modes que heu activat: no molesteu, llum nocturna, un [recordatori](09-reminders.md) en cua, una gravació de pantalla activa, mantenir despert i [dictat](11-text-extraction-dictation.md). S'il·luminen quan el mode és actiu i, si no, no molesten — passeu el cursor per qualsevol punt de la barra per veure els inactius. Fer clic en un indicador commuta aquest mode. Un més és només d'estat: una sessió remota s'il·lumina en vermell mentre algú està connectat a aquesta màquina mitjançant gliff.
 
 Si preferiu que sempre fossin visibles, definiu `alwaysShow` a `true` al giny. I si només us importen alguns, enumereu els que voleu a `items`: `["Dnd", "Reminder", "NightLight"]`. Podeu tenir més d'un giny d'indicadors, de manera que seccions diferents poden mostrar subconjunts diferents.
 
@@ -81,7 +81,9 @@ Si preferiu que sempre fossin visibles, definiu `alwaysShow` a `true` al giny. I
 
 La barra es configura sola. No heu d'obrir un fitxer de configuració per moure coses.
 
-Agafeu un tros buit de la barra al voltant del centre i arrossegueu-lo cap a una altra vora de la pantalla, i la barra s'hi mourà — esquerra, dreta, dalt o baix, tot funciona, i cada giny s'hi adapta (les barres verticals passen a formes compactes només amb icones). Un clic mantingut inicia el mateix arrossegament. Feu doble clic esquerre en aquest mateix espai buit per fer rotar el fons de la barra de transparent a de vidre a opac. I arrossegueu qualsevol giny per reordenar-lo o llançar-lo a una altra secció.
+Agafeu un tros buit de la barra al voltant del centre i arrossegueu-lo cap a una altra vora de la pantalla, i la barra s'hi mourà — esquerra, dreta, dalt o baix, tot funciona, i cada giny s'hi adapta (les barres verticals passen a formes compactes només amb icones). Un clic mantingut inicia el mateix arrossegament. Feu doble clic esquerre en aquest mateix espai buit per fer rotar el fons de la barra de transparent a de vidre a opac. I arrossegueu qualsevol giny per reordenar-lo o llançar-lo a una altra secció; els altres ginys s'aparten per deixar lloc allà on el deixareu anar.
+
+El mig de la barra és una caixa: el contingut es manté centrat com un grup, i els ginys dels costats pengen de les vores. Mentre arrossegueu un giny, es veu el contorn de la caixa, o una línia que travessa la barra si és buida. Podeu deixar-lo dins o al costat; si ha de caure dins, la caixa s'eixampla per acollir-lo.
 
 Un giny que voleu tenir a mà però no sempre a la vista pot anar al calaix de la safata: arrossegueu-lo damunt la safata i el calaix s'obrirà per acollir-lo. S'hi queda darrere les icones de les aplicacions, apareix sempre que el calaix ho fa i manté el calaix obert mentre el seu panell és obert. Arrossegueu-lo de nou cap a la barra per tornar-lo al seu lloc.
 
@@ -92,7 +94,7 @@ Les mateixes coses tenen ordres, que és el que voleu per a una configuració de
 ```bash
 omarchy bar position bottom
 omarchy bar background glassy  # opaque, glassy, none, or cycle
-omarchy bar move omarchy.clock --section center --index 0
+omarchy bar move omarchy.weather --section centerBegin --index 0
 omarchy bar move omarchy.bluetooth --section tray  # into the tray's drawer
 omarchy bar set omarchy.clock format "HH:mm"
 omarchy bar defaults          # back to the shipped layout
@@ -101,7 +103,7 @@ omarchy bar defaults          # back to the shipped layout
 Per afegir o eliminar un giny del tot, feu servir les ordres de complement. `omarchy plugin list` imprimeix tots els ginys que el shell coneix amb el seu id, i llavors:
 
 ```bash
-omarchy plugin enable omarchy.media --section center
+omarchy plugin enable omarchy.media --section centerEnd
 omarchy plugin disable omarchy.weather
 ```
 
@@ -119,19 +121,20 @@ Tot plegat es desa a `~/.config/omarchy/shell.json`, a la clau `bar`. Aquí en t
   "bar": {
     "position": "top",
     "background": "opaque",
-    "centerAnchor": "omarchy.clock",
     "layout": {
       "left": [{ "id": "omarchy.menu" }, { "id": "omarchy.workspaces" }],
+      "centerBegin": [{ "id": "omarchy.indicators" }],
       "center": [{ "id": "omarchy.clock", "format": "HH:mm" }],
+      "centerEnd": [{ "id": "omarchy.weather" }],
       "right": [{ "id": "omarchy.audio" }, { "id": "omarchy.power" }]
     }
   }
 }
 ```
 
-Cada giny és una entrada en una de les tres matrius de disposició, i la seva configuració és dins d'aquesta entrada — no hi ha cap fitxer de configuració separat ni cap subobjecte `config`. El `format` del rellotge, el `formatAlt` (allò a què el clic dret fa rotar) i el `verticalFormat` viuen tots just aquí a `{ "id": "omarchy.clock" }`.
+Cada giny és una entrada en una de les cinc matrius de disposició, i la seva configuració és dins d'aquesta entrada — no hi ha cap fitxer de configuració separat ni cap subobjecte `config`. El `format` del rellotge, el `formatAlt` (allò a què el clic dret fa rotar) i el `verticalFormat` viuen tots just aquí a `{ "id": "omarchy.clock" }`.
 
-`centerAnchor` anomena l'únic giny del centre que es fixa al centre exacte de la pantalla, amb els altres flanquejant-lo. Així és com el rellotge es manté ben centrat fins i tot mentre el temps i el distintiu d'actualització van i venen. Definiu-lo a una cadena buida i la llista del centre simplement se centrarà com a grup.
+`center` és la caixa del mig de la barra: tot el que conté queda centrat a la pantalla com un grup. `centerBegin` i `centerEnd` pengen dels dos costats, de manera que el rellotge continua ben centrat encara que el temps i el distintiu d'actualització apareguin i desapareguin. Diversos ginys a `center` se centren junts; si és buit, `centerBegin` i `centerEnd` es troben al mig de la barra.
 
 Una regla que val la pena interioritzar: **un cop teniu el vostre propi `shell.json`, és canònic**. Fins que no personalitzeu res, el shell llegeix el fitxer per defecte d'Omarchy. En el moment que arrossegueu un giny, executeu `omarchy bar` o editeu el fitxer vosaltres mateixos, passa a ser vostre — no hi ha fusió en profunditat, de manera que els ginys nous per defecte en futures versions d'Omarchy no apareixeran automàticament a la vostra barra. `omarchy bar defaults` restableix la disposició subministrada sempre que vulgueu començar de zero.
 

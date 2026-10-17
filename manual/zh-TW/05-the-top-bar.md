@@ -6,7 +6,7 @@
 
 ## 預設上面有什麼
 
-選單列有三個區段。左邊是 Omarchy 標誌（選單啟動器）和工作區指示器。中間你會看到狀態指示、時鐘、Elsewhen（世界時鐘）、天氣，以及一個 Omarchy 更新徽章。右邊則是：鍵盤配置（當設定了不只一種時）、系統匣、代理程式、藍牙、網路、音訊、顯示和電源。
+選單列有三個區段。左邊是 Omarchy 標誌（選單啟動器）和工作區指示器。中間你會看到狀態指示、時鐘、Elsewhen（世界時鐘）、天氣，以及一個 Omarchy 更新徽章。右邊則是：系統匣、鍵盤配置（當設定了不只一種時）、代理程式、藍牙、網路、音訊、顯示和電源。
 
 其中有幾項只有在有話要說時才會出現。鍵盤配置只在你設定了不只一種配置時才出現。更新徽章只在有 Omarchy 更新在等待時才出現。而代理程式圖示則在 Omarchy 第一次在機器上發現 AI 程式設計使用量時出現（見 [AI](17-ai.md)）。
 
@@ -73,7 +73,7 @@
 
 ## 指示
 
-中間那一小簇就是列指示小工具。這些是針對你已開啟之模式的狀態字形：勿擾、夜光、一個排隊中的[提醒](09-reminders.md)、一個作用中的螢幕錄影、保持喚醒，以及[聽寫](11-text-extraction-dictation.md)。當該模式作用中時，它們會亮起來，否則就待在一邊——將指標懸停在時鐘左側（在垂直列上則是其上方），就能偷看那些未啟用的。點選一個指示會切換該模式。還有一個僅供狀態顯示：當有人透過 gliff 連線到這台機器時，遠端工作階段會亮起紅色。
+中間那一小簇就是列指示小工具。這些是針對你已開啟之模式的狀態字形：勿擾、夜光、一個排隊中的[提醒](09-reminders.md)、一個作用中的螢幕錄影、保持喚醒，以及[聽寫](11-text-extraction-dictation.md)。當該模式作用中時，它們會亮起來，否則就待在一邊— 將指標停在選單列上的任何位置，即可查看未啟用的指示器。點選一個指示會切換該模式。還有一個僅供狀態顯示：當有人透過 gliff 連線到這台機器時，遠端工作階段會亮起紅色。
 
 如果你比較希望它們永遠可見，請在該小工具上把 `alwaysShow` 設為 `true`。而如果你只在意其中某些，請在 `items` 中列出你想要的：`["Dnd", "Reminder", "NightLight"]`。你可以有不只一個指示小工具，所以不同的區段可以顯示不同的子集。
 
@@ -81,7 +81,9 @@
 
 選單列會自行設定。你不需要開啟設定檔來移動東西。
 
-抓住選單列中央附近的一塊空白區域，把它往另一個螢幕邊緣拖，選單列就會移到那裡——左、右、上、下都行，而且每一個小工具都會適應（垂直列會退回到精簡的僅圖示形式）。按住點選也能開始同樣的拖曳。雙擊左鍵那同一塊空白區域，可以把選單列背景從透明循環到玻璃再到不透明。而拖曳任何小工具則可以重新排序它，或把它丟進另一個區段。
+抓住選單列中央附近的一塊空白區域，把它往另一個螢幕邊緣拖，選單列就會移到那裡——左、右、上、下都行，而且每一個小工具都會適應（垂直列會退回到精簡的僅圖示形式）。按住點選也能開始同樣的拖曳。雙擊左鍵那同一塊空白區域，可以把選單列背景從透明循環到玻璃再到不透明。而拖曳任何小工具則可以重新排序它，或把它丟進另一個區段；其他小工具會滑開，為即將放入的位置騰出空間。
+
+選單列中部是一個框：框內內容始終作為一組置中，兩側的小工具依附於框的邊緣。拖曳時會顯示框的輪廓；空框則顯示為橫跨選單列的一條線。你可以放入框內或旁邊；當目標位於框內時，框會擴大以容納小工具。
 
 你想要留在手邊、卻不想時時看到的小工具，可以放進系統匣的抽屜裡：把它拖到系統匣上，抽屜就會開啟來接住它。它會待在應用程式圖示後面，每次抽屜出現時也跟著出現，而且當它的面板開啟時，會讓抽屜保持開啟。把它拖回選單列上，就能放回原處。
 
@@ -92,7 +94,7 @@
 ```bash
 omarchy bar position bottom
 omarchy bar background glassy  # opaque, glassy, none, or cycle
-omarchy bar move omarchy.clock --section center --index 0
+omarchy bar move omarchy.weather --section centerBegin --index 0
 omarchy bar move omarchy.bluetooth --section tray  # into the tray's drawer
 omarchy bar set omarchy.clock format "HH:mm"
 omarchy bar defaults          # back to the shipped layout
@@ -101,7 +103,7 @@ omarchy bar defaults          # back to the shipped layout
 若要完整新增或移除一個小工具，請使用外掛指令。`omarchy plugin list` 會列印 shell 知道的每一個小工具及其 id，然後：
 
 ```bash
-omarchy plugin enable omarchy.media --section center
+omarchy plugin enable omarchy.media --section centerEnd
 omarchy plugin disable omarchy.weather
 ```
 
@@ -119,19 +121,20 @@ omarchy plugin disable omarchy.weather
   "bar": {
     "position": "top",
     "background": "opaque",
-    "centerAnchor": "omarchy.clock",
     "layout": {
       "left": [{ "id": "omarchy.menu" }, { "id": "omarchy.workspaces" }],
+      "centerBegin": [{ "id": "omarchy.indicators" }],
       "center": [{ "id": "omarchy.clock", "format": "HH:mm" }],
+      "centerEnd": [{ "id": "omarchy.weather" }],
       "right": [{ "id": "omarchy.audio" }, { "id": "omarchy.power" }]
     }
   }
 }
 ```
 
-每一個小工具都是三個配置陣列其中之一的一個項目，而它的設定就內嵌在那個項目上——沒有獨立的設定檔，也沒有 `config` 子物件。時鐘的 `format`、`formatAlt`（右鍵點選循環到什麼）和 `verticalFormat` 全都直接住在 `{ "id": "omarchy.clock" }` 上。
+每一個小工具都是五個配置陣列其中之一的一個項目，而它的設定就內嵌在那個項目上——沒有獨立的設定檔，也沒有 `config` 子物件。時鐘的 `format`、`formatAlt`（右鍵點選循環到什麼）和 `verticalFormat` 全都直接住在 `{ "id": "omarchy.clock" }` 上。
 
-`centerAnchor` 指明那個會被釘選在螢幕正中央的中央小工具，其他的則在它兩側。這就是時鐘始終保持在正中央的原因，即使天氣和更新徽章來來去去。把它設為空字串，中央清單就只會作為一個整體置中。
+`center` 是選單列中部的框：其中的內容作為一組在螢幕上置中。`centerBegin` 和 `centerEnd` 依附於兩側，因此即使天氣和更新徽章出現或消失，時鐘仍準確置中。將多個小工具放入 `center` 會一起置中；留空時，`centerBegin` 和 `centerEnd` 會在選單列中點相接。
 
 有一條規則值得內化：**一旦你有了自己的 `shell.json`，它就是權威來源**。在你自訂任何東西之前，shell 讀的是 Omarchy 的預設檔案。當你拖曳了一個小工具、執行了 `omarchy bar`，或自己編輯了那個檔案的那一刻，它就歸你所有了——沒有深層合併，所以未來 Omarchy 版本中的新預設小工具，不會自動出現在你的選單列上。`omarchy bar defaults` 會在你想要一張白紙時，隨時把出貨時的配置放回來。
 

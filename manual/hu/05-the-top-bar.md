@@ -6,7 +6,7 @@ Ez az asztal egyetlen olyan része is, amely mindig a képernyőn van, ezért é
 
 ## Mi van rajta alapértelmezetten
 
-A sávnak három szakasza van. A bal oldalon ül az Omarchy logó (a menüindító) és a munkaterület-jelzők. Középen kapod meg az állapotjelzőket, az órát, az Elsewhen világórát, az időjárást és egy Omarchy-frissítési jelvényt. A jobb oldalon: a billentyűzetkiosztás (ha egynél több van beállítva), a rendszertálca, az agentek, a bluetooth, a hálózat, a hang, a kijelző és az energia.
+A sávnak három szakasza van. A bal oldalon ül az Omarchy logó (a menüindító) és a munkaterület-jelzők. Középen kapod meg az állapotjelzőket, az órát, az Elsewhen világórát, az időjárást és egy Omarchy-frissítési jelvényt. A jobb oldalon: a rendszertálca, a billentyűzetkiosztás (ha egynél több van beállítva), az agentek, a bluetooth, a hálózat, a hang, a kijelző és az energia.
 
 Néhány közülük csak akkor jelenik meg, ha van mondanivalója. A billentyűzetkiosztás csak akkor jelenik meg, ha egynél több kiosztást állítottál be. A frissítési jelvény csak akkor jelenik meg, ha egy Omarchy-frissítés vár rád. Az agentek ikonja pedig akkor jelenik meg először, amikor az Omarchy AI-kódolási használatot talál a gépen (lásd az [AI-t](17-ai.md)).
 
@@ -73,7 +73,7 @@ Bármelyik szolgáltatás eltávolítása leveszi a widgetjét a sávról.
 
 ## Jelzők
 
-A középen lévő kis fürt az indicators widget. Ezek állapotjelek olyan módokhoz, amelyeket bekapcsoltál: ne zavarjanak, éjszakai fény, egy sorban álló [emlékeztető](09-reminders.md), aktív képernyőfelvétel, ébren maradás és [diktálás](11-text-extraction-dictation.md). Kigyulladnak, amikor a mód aktív, máskülönben félreesők maradnak — vigyd az egeret az óra bal oldalához (függőleges sávon fölé), hogy beless az inaktívakba. Egy jelzőre kattintás be- és kikapcsolja azt a módot. Egy további csak állapotot mutat: egy távoli munkamenet pirosan világít, amíg valaki gliffen keresztül csatlakozik ehhez a géphez.
+A középen lévő kis fürt az indicators widget. Ezek állapotjelek olyan módokhoz, amelyeket bekapcsoltál: ne zavarjanak, éjszakai fény, egy sorban álló [emlékeztető](09-reminders.md), aktív képernyőfelvétel, ébren maradás és [diktálás](11-text-extraction-dictation.md). Kigyulladnak, amikor a mód aktív, máskülönben félreesők maradnak — vidd az egeret a sáv bármely részére az inaktív jelzők megtekintéséhez. Egy jelzőre kattintás be- és kikapcsolja azt a módot. Egy további csak állapotot mutat: egy távoli munkamenet pirosan világít, amíg valaki gliffen keresztül csatlakozik ehhez a géphez.
 
 Ha inkább mindig láthatóknak szeretnéd őket, állítsd az `alwaysShow` értékét `true`-ra a widgeten. És ha csak néhány érdekel közülük, sorold fel a kívántakat az `items` mezőben: `["Dnd", "Reminder", "NightLight"]`. Egynél több indicators widgeted is lehet, így a különböző szakaszok eltérő részhalmazokat mutathatnak.
 
@@ -81,7 +81,9 @@ Ha inkább mindig láthatóknak szeretnéd őket, állítsd az `alwaysShow` ért
 
 A sáv magától konfigurálódik. Nem kell konfigurációs fájlt nyitnod a dolgok elmozdításához.
 
-Fogj meg egy üres foltot a sávon a középpont körül, és húzd egy másik képernyőél felé, és a sáv odamegy — bal, jobb, fent vagy lent mind működik, és minden widget alkalmazkodik (a függőleges sávok kompakt, csak ikonokat mutató formákra térnek vissza). Ugyanazt a húzást egy kattintás és tartás is elindítja. Kattints duplán ugyanazon az üres helyen, hogy a sáv hátterét átlátszóról üvegesre és átlátszatlanra ciklikusan váltsd. És bármelyik widgetet húzhatod az átrendezéséhez vagy egy másik szakaszba dobásához.
+Fogj meg egy üres foltot a sávon a középpont körül, és húzd egy másik képernyőél felé, és a sáv odamegy — bal, jobb, fent vagy lent mind működik, és minden widget alkalmazkodik (a függőleges sávok kompakt, csak ikonokat mutató formákra térnek vissza). Ugyanazt a húzást egy kattintás és tartás is elindítja. Kattints duplán ugyanazon az üres helyen, hogy a sáv hátterét átlátszóról üvegesre és átlátszatlanra ciklikusan váltsd. És bármelyik widgetet húzhatod az átrendezéséhez vagy egy másik szakaszba dobásához; a többi widget félrecsúszik, hogy helyet adjon a célpontnál.
+
+A sáv közepe egy doboz: tartalma egy csoportként középen marad, a szomszédos widgetek pedig a széleihez kapcsolódnak. Húzás közben látszik a doboz körvonala, üresen pedig egy vonal a sávon keresztül. Beleejthetsz vagy mellé; ha belülre célzol, a doboz megnő, hogy befogadja a widgetet.
 
 Egy widget, amelyet kéznél tartanál, de nem szeretnél mindig szem előtt tudni, mehet a tálca fiókjába is: húzd rá a tálcára, és a fiók kinyílik, hogy átvegye. Ott ül az appikonok után, megjelenik, valahányszor a fiók megjelenik, és nyitva tartja a fiókot, amíg a panelje nyitva van. Húzd vissza a sávra, hogy visszatedd.
 
@@ -92,7 +94,7 @@ Ugyanezekhez parancsok is tartoznak, amelyeket egy [dotfiles](31-dotfiles.md) be
 ```bash
 omarchy bar position bottom
 omarchy bar background glassy  # opaque, glassy, none, or cycle
-omarchy bar move omarchy.clock --section center --index 0
+omarchy bar move omarchy.weather --section centerBegin --index 0
 omarchy bar move omarchy.bluetooth --section tray  # into the tray's drawer
 omarchy bar set omarchy.clock format "HH:mm"
 omarchy bar defaults          # back to the shipped layout
@@ -101,7 +103,7 @@ omarchy bar defaults          # back to the shipped layout
 Egy widget teljes hozzáadásához vagy eltávolításához használd a pluginparancsokat. Az `omarchy plugin list` minden widgetet kiír, amelyet a shell ismer, az azonosítójával együtt, majd:
 
 ```bash
-omarchy plugin enable omarchy.media --section center
+omarchy plugin enable omarchy.media --section centerEnd
 omarchy plugin disable omarchy.weather
 ```
 
@@ -119,19 +121,20 @@ Mindez a `~/.config/omarchy/shell.json` fájlban tárolódik, a `bar` kulcs alat
   "bar": {
     "position": "top",
     "background": "opaque",
-    "centerAnchor": "omarchy.clock",
     "layout": {
       "left": [{ "id": "omarchy.menu" }, { "id": "omarchy.workspaces" }],
+      "centerBegin": [{ "id": "omarchy.indicators" }],
       "center": [{ "id": "omarchy.clock", "format": "HH:mm" }],
+      "centerEnd": [{ "id": "omarchy.weather" }],
       "right": [{ "id": "omarchy.audio" }, { "id": "omarchy.power" }]
     }
   }
 }
 ```
 
-Minden widget egyetlen bejegyzés a három layout-tömb egyikében, és a beállításai soron belül, azon a bejegyzésen ülnek — nincs külön beállításfájl és nincs `config` alobjektum. Az óra `format`, `formatAlt` (amire a jobb kattintás ciklusban vált) és `verticalFormat` értékei mind ott élnek a `{ "id": "omarchy.clock" }` bejegyzésen.
+Minden widget egyetlen bejegyzés a öt layout-tömb egyikében, és a beállításai soron belül, azon a bejegyzésen ülnek — nincs külön beállításfájl és nincs `config` alobjektum. Az óra `format`, `formatAlt` (amire a jobb kattintás ciklusban vált) és `verticalFormat` értékei mind ott élnek a `{ "id": "omarchy.clock" }` bejegyzésen.
 
-A `centerAnchor` nevezi meg azt az egyetlen középső widgetet, amely a képernyő pontos közepére rögzül, a többi pedig körülötte. Így marad az óra halottan középen, még akkor is, amikor az időjárás és a frissítési jelvény jön és megy. Állítsd üres stringre, és a középső lista ehelyett csak csoportként középeződik.
+A `center` a sáv közepén lévő doboz: tartalma egy csoportként a képernyő közepére igazodik. A `centerBegin` és `centerEnd` kétoldalt kapcsolódik hozzá, ezért az óra pontosan középen marad az időjárás és a frissítési jelvény megjelenésekor vagy eltűnésekor is. Több widget a `center` részben együtt középre igazodik; ha üres, a `centerBegin` és `centerEnd` a sáv közepén találkozik.
 
 Egy érdemes beidegzendő szabály: **ha egyszer megvan a saját `shell.json` fájlod, az a mérvadó**. Amíg semmit sem szabtál testre, a shell az Omarchy alapértelmezett fájlját olvassa. Abban a pillanatban, amikor egy widgetet húzol, az `omarchy bar` parancsot futtatod, vagy magad szerkeszted a fájlt, a tiéd lesz — nincs mély egyesítés, így a jövőbeli Omarchy-kiadások új alapértelmezett widgetei nem jelennek meg automatikusan a sávodon. Az `omarchy bar defaults` bármikor visszaállítja a szállított kiosztást, amikor tiszta lapot szeretnél.
 

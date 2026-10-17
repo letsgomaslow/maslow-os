@@ -6,7 +6,7 @@ Nó cũng là phần duy nhất của desktop luôn hiện trên màn hình, vì
 
 ## Những gì có trên đó theo mặc định
 
-Thanh có ba phần. Ở phía trái là logo Omarchy (trình khởi chạy menu) và các chỉ báo không gian làm việc. Ở giữa bạn có các chỉ báo trạng thái, đồng hồ, Elsewhen (một đồng hồ thế giới), thời tiết và huy hiệu cập nhật Omarchy. Ở phía phải: bố cục bàn phím (khi có nhiều hơn một bố cục được cấu hình), khay hệ thống, agent, bluetooth, mạng, âm thanh, màn hình và nguồn điện.
+Thanh có ba phần. Ở phía trái là logo Omarchy (trình khởi chạy menu) và các chỉ báo không gian làm việc. Ở giữa bạn có các chỉ báo trạng thái, đồng hồ, Elsewhen (một đồng hồ thế giới), thời tiết và huy hiệu cập nhật Omarchy. Ở phía phải: khay hệ thống, bố cục bàn phím (khi có nhiều hơn một bố cục được cấu hình), agent, bluetooth, mạng, âm thanh, màn hình và nguồn điện.
 
 Một vài trong số đó chỉ xuất hiện khi chúng có điều gì đó để nói. Bố cục bàn phím chỉ xuất hiện nếu bạn đã cấu hình nhiều hơn một bố cục. Huy hiệu cập nhật chỉ xuất hiện khi có một bản cập nhật Omarchy đang chờ. Và biểu tượng agent xuất hiện lần đầu tiên Omarchy tìm thấy việc sử dụng AI coding trên máy (xem [AI](17-ai.md)).
 
@@ -73,7 +73,7 @@ Việc gỡ bỏ một trong hai dịch vụ sẽ lấy tiện ích của nó ra
 
 ## Chỉ báo
 
-Cụm nhỏ ở giữa là tiện ích chỉ báo. Đây là các ký tự trạng thái cho các chế độ bạn đã bật: không làm phiền, đèn đêm, một [lời nhắc](09-reminders.md) đã xếp hàng, một bản ghi màn hình đang hoạt động, giữ thức, và [đọc chính tả](11-text-extraction-dictation.md). Chúng sáng lên khi chế độ đang hoạt động và nếu không sẽ tránh đường — di chuột sang trái đồng hồ (phía trên nó trên một thanh dọc) để nhìn lén những chỉ báo không hoạt động. Nhấp vào một chỉ báo sẽ bật/tắt chế độ đó. Một chỉ báo nữa chỉ là trạng thái: một phiên từ xa sáng đỏ trong khi ai đó được kết nối tới máy này qua gliff.
+Cụm nhỏ ở giữa là tiện ích chỉ báo. Đây là các ký tự trạng thái cho các chế độ bạn đã bật: không làm phiền, đèn đêm, một [lời nhắc](09-reminders.md) đã xếp hàng, một bản ghi màn hình đang hoạt động, giữ thức, và [đọc chính tả](11-text-extraction-dictation.md). Chúng sáng lên khi chế độ đang hoạt động và nếu không sẽ tránh đường — di chuột lên bất kỳ đâu trên thanh để xem các chỉ báo không hoạt động. Nhấp vào một chỉ báo sẽ bật/tắt chế độ đó. Một chỉ báo nữa chỉ là trạng thái: một phiên từ xa sáng đỏ trong khi ai đó được kết nối tới máy này qua gliff.
 
 Nếu bạn muốn chúng luôn hiển thị, đặt `alwaysShow` thành `true` trên tiện ích. Và nếu bạn chỉ quan tâm đến một số trong chúng, liệt kê những cái bạn muốn trong `items`: `["Dnd", "Reminder", "NightLight"]`. Bạn có thể có nhiều hơn một tiện ích chỉ báo, vì vậy các phần khác nhau có thể hiển thị các tập hợp con khác nhau.
 
@@ -81,7 +81,9 @@ Nếu bạn muốn chúng luôn hiển thị, đặt `alwaysShow` thành `true` 
 
 Thanh tự cấu hình chính nó. Bạn không cần mở một tệp cấu hình để di chuyển mọi thứ.
 
-Lấy một khoảng trống của thanh xung quanh phần giữa và kéo nó về phía một cạnh màn hình khác, và thanh di chuyển tới đó — trái, phải, trên hoặc dưới đều hoạt động, và mọi tiện ích đều thích ứng (các thanh dọc quay lại dạng chỉ có biểu tượng nhỏ gọn). Nhấp và giữ cũng bắt đầu thao tác kéo tương tự. Nhấp đúp chuột trái vào cùng khoảng trống đó để chuyển đổi nền thanh từ trong sang kính sang đặc. Và kéo bất kỳ tiện ích nào để sắp xếp lại nó hoặc ném nó vào một phần khác.
+Lấy một khoảng trống của thanh xung quanh phần giữa và kéo nó về phía một cạnh màn hình khác, và thanh di chuyển tới đó — trái, phải, trên hoặc dưới đều hoạt động, và mọi tiện ích đều thích ứng (các thanh dọc quay lại dạng chỉ có biểu tượng nhỏ gọn). Nhấp và giữ cũng bắt đầu thao tác kéo tương tự. Nhấp đúp chuột trái vào cùng khoảng trống đó để chuyển đổi nền thanh từ trong sang kính sang đặc. Và kéo bất kỳ tiện ích nào để sắp xếp lại nó hoặc ném nó vào một phần khác; các tiện ích khác trượt sang bên để dành chỗ tại vị trí sẽ thả.
+
+Phần giữa thanh là một hộp: nội dung được giữ ở giữa như một nhóm, còn các tiện ích hai bên bám vào mép hộp. Khi kéo, đường viền hộp hiện ra, hoặc một đường ngang qua thanh nếu hộp trống. Bạn có thể thả vào trong hoặc bên cạnh; khi nhắm vào trong, hộp lớn lên để nhận tiện ích.
 
 Một tiện ích bạn muốn có sẵn nhưng không cần lúc nào cũng hiện ra có thể đi vào ngăn kéo của khay: kéo nó lên khay, và ngăn kéo mở ra để nhận nó. Nó nằm ở đó sau các biểu tượng ứng dụng, xuất hiện mỗi khi ngăn kéo xuất hiện, và giữ cho ngăn kéo luôn mở trong khi bảng của nó đang hiện. Kéo nó trở ra lên thanh để đưa nó trở lại.
 
@@ -92,7 +94,7 @@ Những điều tương tự cũng có lệnh, đó là điều bạn muốn cho
 ```bash
 omarchy bar position bottom
 omarchy bar background glassy  # opaque, glassy, none, or cycle
-omarchy bar move omarchy.clock --section center --index 0
+omarchy bar move omarchy.weather --section centerBegin --index 0
 omarchy bar move omarchy.bluetooth --section tray  # into the tray's drawer
 omarchy bar set omarchy.clock format "HH:mm"
 omarchy bar defaults          # back to the shipped layout
@@ -101,7 +103,7 @@ omarchy bar defaults          # back to the shipped layout
 Để thêm hoặc gỡ bỏ hoàn toàn một tiện ích, dùng các lệnh plugin. `omarchy plugin list` in ra mọi tiện ích mà shell biết cùng với id của nó, và sau đó:
 
 ```bash
-omarchy plugin enable omarchy.media --section center
+omarchy plugin enable omarchy.media --section centerEnd
 omarchy plugin disable omarchy.weather
 ```
 
@@ -119,19 +121,20 @@ Tất cả được lưu trữ trong `~/.config/omarchy/shell.json`, dưới kh�
   "bar": {
     "position": "top",
     "background": "opaque",
-    "centerAnchor": "omarchy.clock",
     "layout": {
       "left": [{ "id": "omarchy.menu" }, { "id": "omarchy.workspaces" }],
+      "centerBegin": [{ "id": "omarchy.indicators" }],
       "center": [{ "id": "omarchy.clock", "format": "HH:mm" }],
+      "centerEnd": [{ "id": "omarchy.weather" }],
       "right": [{ "id": "omarchy.audio" }, { "id": "omarchy.power" }]
     }
   }
 }
 ```
 
-Mỗi tiện ích là một mục trong một trong ba mảng bố cục, và các cài đặt của nó nằm trực tiếp trên mục đó — không có tệp cài đặt riêng và không có đối tượng con `config`. `format`, `formatAlt` (thứ mà nhấp chuột phải chuyển đổi tới) và `verticalFormat` của đồng hồ đều nằm ngay tại đó trên `{ "id": "omarchy.clock" }`.
+Mỗi tiện ích là một mục trong một trong năm mảng bố cục, và các cài đặt của nó nằm trực tiếp trên mục đó — không có tệp cài đặt riêng và không có đối tượng con `config`. `format`, `formatAlt` (thứ mà nhấp chuột phải chuyển đổi tới) và `verticalFormat` của đồng hồ đều nằm ngay tại đó trên `{ "id": "omarchy.clock" }`.
 
-`centerAnchor` đặt tên cho tiện ích ở giữa duy nhất được ghim vào chính giữa màn hình, với các tiện ích khác ở hai bên nó. Đó là cách đồng hồ ở chính giữa ngay cả khi thời tiết và huy hiệu cập nhật đến rồi đi. Đặt nó thành một chuỗi rỗng và danh sách ở giữa chỉ được căn giữa dưới dạng một nhóm thay vào đó.
+`center` là hộp giữa thanh: toàn bộ nội dung được căn giữa màn hình như một nhóm. `centerBegin` và `centerEnd` bám vào hai bên, giúp đồng hồ luôn đúng giữa dù thời tiết và huy hiệu cập nhật xuất hiện hay biến mất. Nhiều tiện ích trong `center` được căn giữa cùng nhau; nếu trống, `centerBegin` và `centerEnd` gặp nhau ở giữa thanh.
 
 Một quy tắc đáng ghi nhớ: **một khi bạn có `shell.json` của riêng mình, nó là chuẩn mực**. Cho đến khi bạn tùy chỉnh bất cứ thứ gì, shell đọc tệp mặc định của Omarchy. Ngay khi bạn kéo một tiện ích, chạy `omarchy bar`, hoặc tự chỉnh sửa tệp, bạn sở hữu nó — không có hợp nhất sâu, vì vậy các tiện ích mặc định mới trong các bản phát hành Omarchy trong tương lai sẽ không tự động xuất hiện trên thanh của bạn. `omarchy bar defaults` đưa bố cục đã xuất xưởng trở lại bất cứ khi nào bạn muốn một khởi đầu sạch sẽ.
 

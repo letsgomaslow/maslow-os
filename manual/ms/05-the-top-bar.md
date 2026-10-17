@@ -6,7 +6,7 @@ Ia juga satu-satunya bahagian desktop yang sentiasa berada pada skrin, jadi berb
 
 ## Apa yang ada padanya secara lalai
 
-Bar mempunyai tiga bahagian. Di sebelah kiri terletak logo Omarchy (pelancar menu) dan penunjuk ruang kerja. Di tengah anda mendapat penunjuk status, jam, Elsewhen (jam dunia), cuaca, dan lencana kemas kini Omarchy. Di sebelah kanan: susun atur papan kekunci (apabila lebih daripada satu dikonfigurasikan), dulang sistem, ejen, bluetooth, rangkaian, audio, paparan, dan kuasa.
+Bar mempunyai tiga bahagian. Di sebelah kiri terletak logo Omarchy (pelancar menu) dan penunjuk ruang kerja. Di tengah anda mendapat penunjuk status, jam, Elsewhen (jam dunia), cuaca, dan lencana kemas kini Omarchy. Di sebelah kanan: dulang sistem, susun atur papan kekunci (apabila lebih daripada satu dikonfigurasikan), ejen, bluetooth, rangkaian, audio, paparan, dan kuasa.
 
 Sebahagian daripadanya hanya muncul apabila ia mempunyai sesuatu untuk dikatakan. Susun atur papan kekunci hanya muncul jika anda telah mengkonfigurasikan lebih daripada satu susun atur. Lencana kemas kini hanya muncul apabila terdapat kemas kini Omarchy yang menunggu. Dan ikon ejen muncul pada kali pertama Omarchy menemui penggunaan pengekodan AI pada mesin (lihat [AI](17-ai.md)).
 
@@ -73,7 +73,7 @@ Membuang mana-mana perkhidmatan mengeluarkan widgetnya kembali dari bar.
 
 ## Penunjuk
 
-Gugusan kecil di tengah ialah widget penunjuk. Ini ialah glif status untuk mod yang telah anda hidupkan: jangan ganggu, cahaya malam, [peringatan](09-reminders.md) yang beratur, rakaman skrin aktif, kekal jaga, dan [pendiktean](11-text-extraction-dictation.md). Ia menyala apabila mod aktif dan sebaliknya kekal tidak menghalang — layangkan ke kiri jam (di atasnya pada bar menegak) untuk mengintai yang tidak aktif. Mengklik penunjuk menogol mod itu. Satu lagi ialah status sahaja: sesi jauh menyala merah semasa seseorang disambungkan ke mesin ini melalui gliff.
+Gugusan kecil di tengah ialah widget penunjuk. Ini ialah glif status untuk mod yang telah anda hidupkan: jangan ganggu, cahaya malam, [peringatan](09-reminders.md) yang beratur, rakaman skrin aktif, kekal jaga, dan [pendiktean](11-text-extraction-dictation.md). Ia menyala apabila mod aktif dan sebaliknya kekal tidak menghalang — layangkan penuding di mana-mana pada bar untuk melihat penunjuk yang tidak aktif. Mengklik penunjuk menogol mod itu. Satu lagi ialah status sahaja: sesi jauh menyala merah semasa seseorang disambungkan ke mesin ini melalui gliff.
 
 Jika anda lebih suka ia sentiasa kelihatan, tetapkan `alwaysShow` kepada `true` pada widget. Dan jika anda hanya mengambil berat tentang sebahagiannya, senaraikan yang anda mahukan dalam `items`: `["Dnd", "Reminder", "NightLight"]`. Anda boleh mempunyai lebih daripada satu widget penunjuk, jadi bahagian yang berbeza boleh memaparkan subset yang berbeza.
 
@@ -81,7 +81,9 @@ Jika anda lebih suka ia sentiasa kelihatan, tetapkan `alwaysShow` kepada `true` 
 
 Bar mengkonfigurasi dirinya sendiri. Anda tidak perlu membuka fail konfigurasi untuk memindahkan sesuatu.
 
-Pegang tompok kosong bar di sekeliling tengah dan seretnya ke arah tepi skrin lain, dan bar berpindah ke sana — kiri, kanan, atas, atau bawah semuanya berfungsi, dan setiap widget menyesuaikan diri (bar menegak kembali kepada bentuk ikon sahaja yang padat). Klik dan tahan memulakan seretan yang sama. Klik kiri dua kali pada ruang kosong yang sama untuk mengitar latar belakang bar dari jernih kepada kaca kepada legap. Dan seret mana-mana widget untuk menyusunnya semula atau membuangnya ke bahagian lain.
+Pegang tompok kosong bar di sekeliling tengah dan seretnya ke arah tepi skrin lain, dan bar berpindah ke sana — kiri, kanan, atas, atau bawah semuanya berfungsi, dan setiap widget menyesuaikan diri (bar menegak kembali kepada bentuk ikon sahaja yang padat). Klik dan tahan memulakan seretan yang sama. Klik kiri dua kali pada ruang kosong yang sama untuk mengitar latar belakang bar dari jernih kepada kaca kepada legap. Dan seret mana-mana widget untuk menyusunnya semula atau membuangnya ke bahagian lain; widget lain berganjak untuk menyediakan ruang di tempat ia dilepaskan.
+
+Bahagian tengah bar ialah sebuah kotak: kandungannya kekal di tengah sebagai satu kumpulan, dan widget bersebelahan melekat pada tepinya. Semasa menyeret, garis luar kotak kelihatan, atau garisan merentasi bar jika kosong. Anda boleh melepaskan di dalam atau di sebelahnya; apabila sasaran di dalam, kotak membesar untuk menerima widget.
 
 Widget yang anda mahu kekalkan tetapi tidak perlu sentiasa kelihatan boleh masuk ke dalam laci dulang: seretnya ke atas dulang, dan laci akan terbuka untuk menerimanya. Ia terletak di sana selepas ikon aplikasi, muncul setiap kali laci dipaparkan, dan memastikan laci kekal terbuka semasa panelnya sedang dibuka. Seretnya kembali keluar ke bar untuk meletakkannya semula.
 
@@ -92,7 +94,7 @@ Perkara yang sama mempunyai arahan, iaitu apa yang anda mahukan untuk persediaan
 ```bash
 omarchy bar position bottom
 omarchy bar background glassy  # opaque, glassy, none, or cycle
-omarchy bar move omarchy.clock --section center --index 0
+omarchy bar move omarchy.weather --section centerBegin --index 0
 omarchy bar move omarchy.bluetooth --section tray  # into the tray's drawer
 omarchy bar set omarchy.clock format "HH:mm"
 omarchy bar defaults          # back to the shipped layout
@@ -101,7 +103,7 @@ omarchy bar defaults          # back to the shipped layout
 Untuk menambah atau membuang widget sepenuhnya, gunakan arahan plugin. `omarchy plugin list` mencetak setiap widget yang diketahui oleh shell dengan id-nya, dan kemudian:
 
 ```bash
-omarchy plugin enable omarchy.media --section center
+omarchy plugin enable omarchy.media --section centerEnd
 omarchy plugin disable omarchy.weather
 ```
 
@@ -119,19 +121,20 @@ Kesemuanya disimpan dalam `~/.config/omarchy/shell.json`, di bawah kekunci `bar`
   "bar": {
     "position": "top",
     "background": "opaque",
-    "centerAnchor": "omarchy.clock",
     "layout": {
       "left": [{ "id": "omarchy.menu" }, { "id": "omarchy.workspaces" }],
+      "centerBegin": [{ "id": "omarchy.indicators" }],
       "center": [{ "id": "omarchy.clock", "format": "HH:mm" }],
+      "centerEnd": [{ "id": "omarchy.weather" }],
       "right": [{ "id": "omarchy.audio" }, { "id": "omarchy.power" }]
     }
   }
 }
 ```
 
-Setiap widget ialah satu entri dalam salah satu daripada tiga tatasusunan susun atur, dan tetapannya berada sebaris pada entri itu — tiada fail tetapan berasingan dan tiada sub-objek `config`. `format` jam, `formatAlt` (apa yang dikitar oleh klik kanan), dan `verticalFormat` semuanya berada betul-betul di sana pada `{ "id": "omarchy.clock" }`.
+Setiap widget ialah satu entri dalam salah satu daripada lima tatasusunan susun atur, dan tetapannya berada sebaris pada entri itu — tiada fail tetapan berasingan dan tiada sub-objek `config`. `format` jam, `formatAlt` (apa yang dikitar oleh klik kanan), dan `verticalFormat` semuanya berada betul-betul di sana pada `{ "id": "omarchy.clock" }`.
 
-`centerAnchor` menamakan satu widget tengah yang disematkan ke pusat tepat skrin, dengan yang lain mengapitnya. Begitulah cara jam kekal betul-betul di tengah walaupun cuaca dan lencana kemas kini datang dan pergi. Tetapkannya kepada rentetan kosong dan senarai tengah hanya dipusatkan sebagai kumpulan sebagai gantinya.
+`center` ialah kotak di tengah bar: semua kandungannya dipusatkan pada skrin sebagai satu kumpulan. `centerBegin` dan `centerEnd` berada di kedua-dua sisi, jadi jam kekal tepat di tengah apabila cuaca dan lencana kemas kini muncul atau hilang. Beberapa widget dalam `center` dipusatkan bersama; jika kosong, `centerBegin` dan `centerEnd` bertemu di tengah bar.
 
 Satu peraturan yang berbaloi untuk dihayati: **sebaik sahaja anda mempunyai `shell.json` anda sendiri, ia adalah berkanun**. Sehingga anda menyesuaikan apa-apa, shell membaca fail lalai Omarchy. Sebaik sahaja anda menyeret widget, menjalankan `omarchy bar`, atau menyunting fail itu sendiri, anda memilikinya — tiada gabungan mendalam, jadi widget lalai baharu dalam keluaran Omarchy masa hadapan tidak akan muncul pada bar anda secara automatik. `omarchy bar defaults` mengembalikan susun atur yang dihantar pada bila-bila masa anda mahukan permulaan yang bersih.
 

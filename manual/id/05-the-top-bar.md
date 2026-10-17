@@ -6,7 +6,7 @@ Ini juga satu-satunya bagian desktop yang selalu ada di layar, jadi penting untu
 
 ## Apa yang ada di atasnya secara bawaan
 
-Bilah memiliki tiga bagian. Di sebelah kiri terdapat logo Omarchy (peluncur menu) dan indikator ruang kerja. Di tengah Anda mendapatkan indikator status, jam, Elsewhen (jam dunia), cuaca, dan lencana pembaruan Omarchy. Di sebelah kanan: tata letak keyboard (ketika lebih dari satu dikonfigurasi), baki sistem, agen, bluetooth, jaringan, audio, tampilan, dan daya.
+Bilah memiliki tiga bagian. Di sebelah kiri terdapat logo Omarchy (peluncur menu) dan indikator ruang kerja. Di tengah Anda mendapatkan indikator status, jam, Elsewhen (jam dunia), cuaca, dan lencana pembaruan Omarchy. Di sebelah kanan: baki sistem, tata letak keyboard (ketika lebih dari satu dikonfigurasi), agen, bluetooth, jaringan, audio, tampilan, dan daya.
 
 Beberapa di antaranya hanya muncul ketika mereka memiliki sesuatu untuk dikatakan. Tata letak keyboard hanya muncul jika Anda telah mengkonfigurasi lebih dari satu tata letak. Lencana pembaruan hanya muncul ketika ada pembaruan Omarchy yang menunggu. Dan ikon agen muncul pertama kalinya Omarchy menemukan penggunaan coding AI pada mesin (lihat [AI](17-ai.md)).
 
@@ -73,7 +73,7 @@ Menghapus salah satu layanan akan menghilangkan widgetnya dari bilah.
 
 ## Indikator
 
-Gugus kecil di tengah adalah widget indikator. Ini adalah glif status untuk mode yang telah Anda aktifkan: jangan ganggu, lampu malam, [pengingat](09-reminders.md) yang mengantre, perekaman layar aktif, tetap bangun, dan [dikte](11-text-extraction-dictation.md). Mereka menyala ketika mode aktif dan sebaliknya tetap tidak mengganggu — arahkan ke sebelah kiri jam (di atasnya pada bilah vertikal) untuk mengintip yang tidak aktif. Mengklik indikator mengalihkan mode itu. Satu lagi hanya status: sesi jarak jauh menyala merah saat seseorang terhubung ke mesin ini melalui gliff.
+Gugus kecil di tengah adalah widget indikator. Ini adalah glif status untuk mode yang telah Anda aktifkan: jangan ganggu, lampu malam, [pengingat](09-reminders.md) yang mengantre, perekaman layar aktif, tetap bangun, dan [dikte](11-text-extraction-dictation.md). Mereka menyala ketika mode aktif dan sebaliknya tetap tidak mengganggu — arahkan penunjuk ke bagian mana pun pada bilah untuk melihat indikator yang tidak aktif. Mengklik indikator mengalihkan mode itu. Satu lagi hanya status: sesi jarak jauh menyala merah saat seseorang terhubung ke mesin ini melalui gliff.
 
 Jika Anda lebih suka mereka selalu terlihat, atur `alwaysShow` ke `true` pada widget. Dan jika Anda hanya peduli pada beberapa di antaranya, cantumkan yang Anda inginkan dalam `items`: `["Dnd", "Reminder", "NightLight"]`. Anda dapat memiliki lebih dari satu widget indikator, sehingga bagian yang berbeda dapat menunjukkan subset yang berbeda.
 
@@ -81,7 +81,9 @@ Jika Anda lebih suka mereka selalu terlihat, atur `alwaysShow` ke `true` pada wi
 
 Bilah mengkonfigurasi dirinya sendiri. Anda tidak harus membuka berkas konfigurasi untuk memindahkan sesuatu.
 
-Ambil tambalan kosong bilah di sekitar tengah dan seret ke arah tepi layar lain, dan bilah pindah ke sana — kiri, kanan, atas, atau bawah semuanya berfungsi, dan setiap widget beradaptasi (bilah vertikal kembali ke bentuk ikon saja yang kompak). Klik-dan-tahan memulai seretan yang sama. Klik dua kali dengan tombol kiri ruang kosong yang sama untuk menggilir latar belakang bilah dari bening ke kaca ke pekat. Dan seret widget mana pun untuk menyusun ulang atau membuangnya ke bagian lain.
+Ambil tambalan kosong bilah di sekitar tengah dan seret ke arah tepi layar lain, dan bilah pindah ke sana — kiri, kanan, atas, atau bawah semuanya berfungsi, dan setiap widget beradaptasi (bilah vertikal kembali ke bentuk ikon saja yang kompak). Klik-dan-tahan memulai seretan yang sama. Klik dua kali dengan tombol kiri ruang kosong yang sama untuk menggilir latar belakang bilah dari bening ke kaca ke pekat. Dan seret widget mana pun untuk menyusun ulang atau membuangnya ke bagian lain; widget lain bergeser agar tersedia ruang di tempat jatuhnya.
+
+Bagian tengah bilah adalah kotak: isinya tetap terpusat sebagai satu kelompok, sementara widget di samping menempel pada tepinya. Saat menyeret, garis tepi kotak terlihat, atau garis melintasi bilah jika kosong. Anda dapat melepas di dalam atau di sampingnya; ketika sasarannya di dalam, kotak membesar untuk menampung widget.
 
 Widget yang ingin Anda sediakan tetapi tidak selalu terlihat dapat masuk ke laci baki: seret ke baki, dan lacinya akan terbuka untuk menerimanya. Ia berada di sana setelah ikon-ikon aplikasi, muncul setiap kali laci muncul, dan menjaga lacinya tetap terbuka selama panelnya terbuka. Seret kembali keluar ke bilah untuk mengembalikannya.
 
@@ -92,7 +94,7 @@ Hal yang sama memiliki perintah, yang merupakan yang Anda inginkan untuk penyiap
 ```bash
 omarchy bar position bottom
 omarchy bar background glassy  # opaque, glassy, none, or cycle
-omarchy bar move omarchy.clock --section center --index 0
+omarchy bar move omarchy.weather --section centerBegin --index 0
 omarchy bar move omarchy.bluetooth --section tray  # into the tray's drawer
 omarchy bar set omarchy.clock format "HH:mm"
 omarchy bar defaults          # back to the shipped layout
@@ -101,7 +103,7 @@ omarchy bar defaults          # back to the shipped layout
 Untuk menambah atau menghapus widget sepenuhnya, gunakan perintah plugin. `omarchy plugin list` mencetak setiap widget yang diketahui shell dengan id-nya, dan kemudian:
 
 ```bash
-omarchy plugin enable omarchy.media --section center
+omarchy plugin enable omarchy.media --section centerEnd
 omarchy plugin disable omarchy.weather
 ```
 
@@ -119,19 +121,20 @@ Semua itu disimpan dalam `~/.config/omarchy/shell.json`, di bawah kunci `bar`. B
   "bar": {
     "position": "top",
     "background": "opaque",
-    "centerAnchor": "omarchy.clock",
     "layout": {
       "left": [{ "id": "omarchy.menu" }, { "id": "omarchy.workspaces" }],
+      "centerBegin": [{ "id": "omarchy.indicators" }],
       "center": [{ "id": "omarchy.clock", "format": "HH:mm" }],
+      "centerEnd": [{ "id": "omarchy.weather" }],
       "right": [{ "id": "omarchy.audio" }, { "id": "omarchy.power" }]
     }
   }
 }
 ```
 
-Setiap widget adalah satu entri dalam salah satu dari tiga larik tata letak, dan pengaturannya berada sebaris pada entri itu — tidak ada berkas pengaturan terpisah dan tidak ada subobjek `config`. `format`, `formatAlt` (yang digilir oleh klik kanan), dan `verticalFormat` jam semuanya tinggal tepat di sana pada `{ "id": "omarchy.clock" }`.
+Setiap widget adalah satu entri dalam salah satu dari lima larik tata letak, dan pengaturannya berada sebaris pada entri itu — tidak ada berkas pengaturan terpisah dan tidak ada subobjek `config`. `format`, `formatAlt` (yang digilir oleh klik kanan), dan `verticalFormat` jam semuanya tinggal tepat di sana pada `{ "id": "omarchy.clock" }`.
 
-`centerAnchor` menamai satu widget tengah yang disematkan ke pusat layar yang tepat, dengan yang lainnya mengapitnya. Begitulah jam tetap tepat di tengah bahkan saat cuaca dan lencana pembaruan datang dan pergi. Atur ke string kosong dan daftar tengah hanya dipusatkan sebagai sebuah kelompok sebagai gantinya.
+`center` adalah kotak di tengah bilah: seluruh isinya dipusatkan di layar sebagai satu kelompok. `centerBegin` dan `centerEnd` berada di kedua sisinya, sehingga jam tetap tepat di tengah saat cuaca dan lencana pembaruan datang dan pergi. Beberapa widget dalam `center` dipusatkan bersama; jika kosong, `centerBegin` dan `centerEnd` bertemu di tengah bilah.
 
 Satu aturan yang layak diingat: **setelah Anda memiliki `shell.json` sendiri, itu adalah kanonis**. Sampai Anda menyesuaikan apa pun, shell membaca berkas bawaan Omarchy. Saat Anda menyeret widget, menjalankan `omarchy bar`, atau mengedit berkas sendiri, Anda memilikinya — tidak ada penggabungan mendalam, sehingga widget bawaan baru dalam rilis Omarchy mendatang tidak akan muncul di bilah Anda secara otomatis. `omarchy bar defaults` mengembalikan tata letak bawaan kapan pun Anda menginginkan lembaran bersih.
 

@@ -6,7 +6,7 @@ Tai taip pat vienintelė darbalaukio dalis, kuri visada yra ekrane, todėl verta
 
 ## Kas joje yra pagal numatytuosius nustatymus
 
-Juosta turi tris dalis. Kairėje yra Omarchy logotipas (meniu leistuvas) ir darbo sričių indikatoriai. Centre gaunate būsenos indikatorius, laikrodį, Elsewhen (pasaulio laikrodį), orus ir Omarchy atnaujinimo ženklelį. Dešinėje: klaviatūros išdėstymas (kai sukonfigūruota daugiau nei viena), sistemos dėklas, agentai, bluetooth, tinklas, garsas, ekranas ir maitinimas.
+Juosta turi tris dalis. Kairėje yra Omarchy logotipas (meniu leistuvas) ir darbo sričių indikatoriai. Centre gaunate būsenos indikatorius, laikrodį, Elsewhen (pasaulio laikrodį), orus ir Omarchy atnaujinimo ženklelį. Dešinėje: sistemos dėklas, klaviatūros išdėstymas (kai sukonfigūruota daugiau nei viena), agentai, bluetooth, tinklas, garsas, ekranas ir maitinimas.
 
 Keletas iš jų pasirodo tik tada, kai turi ką pasakyti. Klaviatūros išdėstymas pasirodo tik jei sukonfigūravote daugiau nei vieną išdėstymą. Atnaujinimo ženklelis pasirodo tik kai laukia Omarchy atnaujinimas. O agentų piktograma pasirodo pirmą kartą, kai Omarchy randa AI programavimo naudojimą kompiuteryje (žr. [AI](17-ai.md)).
 
@@ -73,7 +73,7 @@ Pašalinus bet kurią paslaugą, jos valdiklis nuo juostos pašalinamas.
 
 ## Indikatoriai
 
-Maža grupė centre yra indikatorių valdiklis. Tai būsenos glifai režimams, kuriuos įjungėte: netrukdyti, naktinė šviesa, eilėje laukiantis [priminimas](09-reminders.md), aktyvus ekrano įrašas, nemiegoti ir [diktavimas](11-text-extraction-dictation.md). Jie užsidega, kai režimas aktyvus, o kitu atveju nesimaišo — užveskite į kairę nuo laikrodžio (virš jo vertikalioje juostoje), kad pažvelgtumėte į neaktyvius. Spustelėjus indikatorių, tas režimas perjungiamas. Dar vienas yra tik būsena: nuotolinė sesija šviečia raudonai, kol kas nors per gliff yra prisijungęs prie šio kompiuterio.
+Maža grupė centre yra indikatorių valdiklis. Tai būsenos glifai režimams, kuriuos įjungėte: netrukdyti, naktinė šviesa, eilėje laukiantis [priminimas](09-reminders.md), aktyvus ekrano įrašas, nemiegoti ir [diktavimas](11-text-extraction-dictation.md). Jie užsidega, kai režimas aktyvus, o kitu atveju nesimaišo — užveskite žymeklį bet kurioje juostos vietoje, kad pamatytumėte neaktyvius indikatorius. Spustelėjus indikatorių, tas režimas perjungiamas. Dar vienas yra tik būsena: nuotolinė sesija šviečia raudonai, kol kas nors per gliff yra prisijungęs prie šio kompiuterio.
 
 Jei mieliau norėtumėte, kad jie visada būtų matomi, valdiklyje nustatykite `alwaysShow` į `true`. O jei jums rūpi tik kai kurie iš jų, išvardykite norimus `items`: `["Dnd", "Reminder", "NightLight"]`. Galite turėti daugiau nei vieną indikatorių valdiklį, todėl skirtingos dalys gali rodyti skirtingus poaibius.
 
@@ -81,7 +81,9 @@ Jei mieliau norėtumėte, kad jie visada būtų matomi, valdiklyje nustatykite `
 
 Juosta susikonfigūruoja pati. Jums nereikia atidaryti konfigūracijos failo, kad perkeltumėte dalykus.
 
-Suimkite tuščią juostos lopinėlį aplink centrą ir vilkite jį link kito ekrano krašto, ir juosta persikels ten — kairė, dešinė, viršus ar apačia visi veikia, o kiekvienas valdiklis prisitaiko (vertikalios juostos pereina prie kompaktiškų, tik piktograminių formų). Spustelėjimas ir laikymas pradeda tą patį vilkimą. Dukart spustelėkite kairiuoju mygtuku tą pačią tuščią vietą, kad cikliškai pakeistumėte juostos foną iš skaidraus į stiklinį ir į nepermatomą. Ir vilkite bet kurį valdiklį, kad jį pertvarkytumėte arba įmestumėte į kitą dalį.
+Suimkite tuščią juostos lopinėlį aplink centrą ir vilkite jį link kito ekrano krašto, ir juosta persikels ten — kairė, dešinė, viršus ar apačia visi veikia, o kiekvienas valdiklis prisitaiko (vertikalios juostos pereina prie kompaktiškų, tik piktograminių formų). Spustelėjimas ir laikymas pradeda tą patį vilkimą. Dukart spustelėkite kairiuoju mygtuku tą pačią tuščią vietą, kad cikliškai pakeistumėte juostos foną iš skaidraus į stiklinį ir į nepermatomą. Ir vilkite bet kurį valdiklį, kad jį pertvarkytumėte arba įmestumėte į kitą dalį; kiti valdikliai pasislenka, kad atlaisvintų vietą numetimui.
+
+Juostos vidurys yra langelis: jo turinys lieka centruotas kaip viena grupė, o gretimi valdikliai laikosi prie kraštų. Vilkdami matote langelio kontūrą, arba liniją per juostą, kai jis tuščias. Galite numesti viduje arba šalia; taikantis į vidų langelis padidėja, kad priimtų valdiklį.
 
 Valdiklis, kurį norite turėti šalia, bet ne visada matyti, gali keliauti į dėklo stalčių: nutempkite jį ant dėklo, ir stalčius atsivers jį priimdamas. Ten jis būna už programų piktogramų, pasirodo kaskart, kai pasirodo stalčius, ir laiko stalčių atidarytą, kol rodomas jo skydelis. Norėdami grąžinti, nutempkite jį atgal į juostą.
 
@@ -92,7 +94,7 @@ Tie patys dalykai turi komandas, o tai yra tai, ko norite [dotfiles](31-dotfiles
 ```bash
 omarchy bar position bottom
 omarchy bar background glassy  # opaque, glassy, none, or cycle
-omarchy bar move omarchy.clock --section center --index 0
+omarchy bar move omarchy.weather --section centerBegin --index 0
 omarchy bar move omarchy.bluetooth --section tray  # into the tray's drawer
 omarchy bar set omarchy.clock format "HH:mm"
 omarchy bar defaults          # back to the shipped layout
@@ -101,7 +103,7 @@ omarchy bar defaults          # back to the shipped layout
 Norėdami visiškai pridėti arba pašalinti valdiklį, naudokite papildinių komandas. `omarchy plugin list` atspausdina kiekvieną valdiklį, kurį žino apvalkalas, su jo id, o tada:
 
 ```bash
-omarchy plugin enable omarchy.media --section center
+omarchy plugin enable omarchy.media --section centerEnd
 omarchy plugin disable omarchy.weather
 ```
 
@@ -119,19 +121,20 @@ Visa tai saugoma `~/.config/omarchy/shell.json`, po `bar` raktu. Štai apkarpyta
   "bar": {
     "position": "top",
     "background": "opaque",
-    "centerAnchor": "omarchy.clock",
     "layout": {
       "left": [{ "id": "omarchy.menu" }, { "id": "omarchy.workspaces" }],
+      "centerBegin": [{ "id": "omarchy.indicators" }],
       "center": [{ "id": "omarchy.clock", "format": "HH:mm" }],
+      "centerEnd": [{ "id": "omarchy.weather" }],
       "right": [{ "id": "omarchy.audio" }, { "id": "omarchy.power" }]
     }
   }
 }
 ```
 
-Kiekvienas valdiklis yra vienas įrašas viename iš trijų išdėstymo masyvų, o jo nuostatos yra tame įraše — nėra atskiro nuostatų failo ir nėra `config` poobjekto. Laikrodžio `format`, `formatAlt` (į ką cikliškai pereina dešinysis spustelėjimas) ir `verticalFormat` visi gyvena ten pat ant `{ "id": "omarchy.clock" }`.
+Kiekvienas valdiklis yra vienas įrašas viename iš penkių išdėstymo masyvų, o jo nuostatos yra tame įraše — nėra atskiro nuostatų failo ir nėra `config` poobjekto. Laikrodžio `format`, `formatAlt` (į ką cikliškai pereina dešinysis spustelėjimas) ir `verticalFormat` visi gyvena ten pat ant `{ "id": "omarchy.clock" }`.
 
-`centerAnchor` įvardija vieną centrinį valdiklį, kuris prisegamas prie tikslaus ekrano centro, o kiti jį supa iš šonų. Taip laikrodis lieka pačiame centre, net kai ateina ir išeina oras ir atnaujinimo ženklelis. Nustatykite jį į tuščią eilutę ir centro sąrašas tiesiog centruojamas kaip grupė.
+`center` yra langelis juostos viduryje: visas turinys centruojamas ekrane kaip grupė. `centerBegin` ir `centerEnd` yra prie abiejų kraštų, todėl laikrodis lieka tiksliai centre, net kai orai ir atnaujinimo ženklelis atsiranda ar dingsta. Keli valdikliai `center` centruojami kartu; kai jis tuščias, `centerBegin` ir `centerEnd` susitinka juostos viduryje.
 
 Viena taisyklė, kurią verta įsisavinti: **kai turite savo `shell.json`, jis yra kanoninis**. Kol nieko nepritaikote, apvalkalas skaito Omarchy numatytąjį failą. Kai tik nutempiate valdiklį, paleidžiate `omarchy bar` arba patys redaguojate failą, jis priklauso jums — nėra gilaus sujungimo, todėl nauji numatytieji valdikliai būsimuose Omarchy leidimuose jūsų juostoje automatiškai nepasirodys. `omarchy bar defaults` grąžina pristatytą išdėstymą, kai tik norite švaraus lapo.
 

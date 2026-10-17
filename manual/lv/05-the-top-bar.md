@@ -6,7 +6,7 @@ Tā ir arī vienīgā darbvirsmas daļa, kas vienmēr ir ekrānā, tāpēc ir v�
 
 ## Kas tajā ir pēc noklusējuma
 
-Joslai ir trīs sadaļas. Kreisajā pusē sēž Omarchy logo (izvēlnes palaidējs) un darbvietu rādītāji. Centrā tu iegūsti statusa rādītājus, pulksteni, Elsewhen (pasaules pulksteni), laikapstākļus un Omarchy atjauninājuma nozīmīti. Labajā pusē: tastatūras izkārtojums (kad konfigurēts vairāk nekā viens), sistēmas tekne, aģenti, bluetooth, tīkls, audio, displejs un barošana.
+Joslai ir trīs sadaļas. Kreisajā pusē sēž Omarchy logo (izvēlnes palaidējs) un darbvietu rādītāji. Centrā tu iegūsti statusa rādītājus, pulksteni, Elsewhen (pasaules pulksteni), laikapstākļus un Omarchy atjauninājuma nozīmīti. Labajā pusē: sistēmas tekne, tastatūras izkārtojums (kad konfigurēts vairāk nekā viens), aģenti, bluetooth, tīkls, audio, displejs un barošana.
 
 Daži no tiem parādās tikai tad, kad tiem ir ko teikt. Tastatūras izkārtojums parādās tikai tad, ja esi konfigurējis vairāk nekā vienu izkārtojumu. Atjauninājuma nozīmīte parādās tikai tad, kad gaida Omarchy atjauninājums. Un aģentu ikona parādās pirmo reizi, kad Omarchy iekārtā atrod AI kodēšanas lietojumu (skat. [AI](17-ai.md)).
 
@@ -73,7 +73,7 @@ Noņemot jebkuru pakalpojumu, tā logrīks tiek noņemts no joslas.
 
 ## Rādītāji
 
-Mazā kopa centrā ir rādītāju logrīks. Tās ir statusa zīmes režīmiem, ko esi ieslēdzis: netraucēt, nakts apgaismojums, rindā esošs [atgādinājums](09-reminders.md), aktīvs ekrāna ieraksts, palikt nomodā un [diktēšana](11-text-extraction-dictation.md). Tie iedegas, kad režīms ir aktīvs, un citādi netraucē — novieto kursoru pa kreisi no pulksteņa (virs tā vertikālā joslā), lai palūrētu uz neaktīvajiem. Noklikšķinot uz rādītāja, šis režīms tiek pārslēgts. Vēl viens ir tikai statusam: attālā sesija iedegas sarkana, kamēr kāds ir savienots ar šo iekārtu caur gliff.
+Mazā kopa centrā ir rādītāju logrīks. Tās ir statusa zīmes režīmiem, ko esi ieslēdzis: netraucēt, nakts apgaismojums, rindā esošs [atgādinājums](09-reminders.md), aktīvs ekrāna ieraksts, palikt nomodā un [diktēšana](11-text-extraction-dictation.md). Tie iedegas, kad režīms ir aktīvs, un citādi netraucē — novieto kursoru jebkurā joslas vietā, lai redzētu neaktīvos rādītājus. Noklikšķinot uz rādītāja, šis režīms tiek pārslēgts. Vēl viens ir tikai statusam: attālā sesija iedegas sarkana, kamēr kāds ir savienots ar šo iekārtu caur gliff.
 
 Ja tu labāk vēlētos, lai tie vienmēr būtu redzami, iestati `alwaysShow` uz `true` logrīkā. Un, ja tev rūp tikai daži no tiem, uzskaiti tos, kurus vēlies, sarakstā `items`: `["Dnd", "Reminder", "NightLight"]`. Tev var būt vairāk nekā viens rādītāju logrīks, tāpēc dažādas sadaļas var rādīt dažādas apakškopas.
 
@@ -81,7 +81,9 @@ Ja tu labāk vēlētos, lai tie vienmēr būtu redzami, iestati `alwaysShow` uz 
 
 Josla konfigurējas pati. Tev nav jāatver konfigurācijas fails, lai pārvietotu lietas.
 
-Satver tukšu joslas daļu ap centru un velc to uz citu ekrāna malu, un josla pārvietojas turp — kreisi, labi, augšā vai apakšā viss darbojas, un katrs logrīks pielāgojas (vertikālās joslas atkāpjas uz kompaktām tikai ikonu formām). Klikšķis un turēšana sāk to pašu vilkšanu. Veic dubultu kreiso klikšķi tajā pašā tukšajā vietā, lai ciklētu joslas fonu no caurspīdīga uz stikla uz necaurspīdīgu. Un velc jebkuru logrīku, lai to pārkārtotu vai iemestu citā sadaļā.
+Satver tukšu joslas daļu ap centru un velc to uz citu ekrāna malu, un josla pārvietojas turp — kreisi, labi, augšā vai apakšā viss darbojas, un katrs logrīks pielāgojas (vertikālās joslas atkāpjas uz kompaktām tikai ikonu formām). Klikšķis un turēšana sāk to pašu vilkšanu. Veic dubultu kreiso klikšķi tajā pašā tukšajā vietā, lai ciklētu joslas fonu no caurspīdīga uz stikla uz necaurspīdīgu. Un velc jebkuru logrīku, lai to pārkārtotu vai iemestu citā sadaļā; pārējie logrīki pabīdās, lai atbrīvotu vietu nomešanai.
+
+Joslas vidus ir kaste: tās saturs paliek centrēts kā viena grupa, bet blakus esošie logrīki turas pie tās malām. Vilkšanas laikā parādās kastes kontūra, vai līnija pāri joslai, ja tā ir tukša. Var nomest iekšpusē vai blakus; mērķējot iekšpusē, kaste izplešas, lai uzņemtu logrīku.
 
 Logrīku, kuru vēlies turēt pa rokai, bet ne vienmēr acu priekšā, vari likt teknes atvilktnē: velc to uz tekni, un atvilktne atvērsies, lai to uzņemtu. Tur tas sēž aiz lietotņu ikonām, parādās katru reizi, kad parādās atvilktne, un tur atvilktni vaļā, kamēr ir atvērts tā panelis. Velc to atpakaļ ārā uz joslu, lai noliktu to atpakaļ.
 
@@ -92,7 +94,7 @@ Tām pašām lietām ir komandas, kas ir tas, ko tu vēlies [dotfailu](31-dotfil
 ```bash
 omarchy bar position bottom
 omarchy bar background glassy  # opaque, glassy, none, or cycle
-omarchy bar move omarchy.clock --section center --index 0
+omarchy bar move omarchy.weather --section centerBegin --index 0
 omarchy bar move omarchy.bluetooth --section tray  # into the tray's drawer
 omarchy bar set omarchy.clock format "HH:mm"
 omarchy bar defaults          # back to the shipped layout
@@ -101,7 +103,7 @@ omarchy bar defaults          # back to the shipped layout
 Lai logrīku pievienotu vai noņemtu pilnībā, izmanto spraudņu komandas. `omarchy plugin list` izdrukā katru logrīku, ko čaula zina, ar tā id, un pēc tam:
 
 ```bash
-omarchy plugin enable omarchy.media --section center
+omarchy plugin enable omarchy.media --section centerEnd
 omarchy plugin disable omarchy.weather
 ```
 
@@ -119,19 +121,20 @@ Viss tas tiek glabāts `~/.config/omarchy/shell.json` zem atslēgas `bar`. Šeit
   "bar": {
     "position": "top",
     "background": "opaque",
-    "centerAnchor": "omarchy.clock",
     "layout": {
       "left": [{ "id": "omarchy.menu" }, { "id": "omarchy.workspaces" }],
+      "centerBegin": [{ "id": "omarchy.indicators" }],
       "center": [{ "id": "omarchy.clock", "format": "HH:mm" }],
+      "centerEnd": [{ "id": "omarchy.weather" }],
       "right": [{ "id": "omarchy.audio" }, { "id": "omarchy.power" }]
     }
   }
 }
 ```
 
-Katrs logrīks ir viens ieraksts vienā no trim izkārtojuma masīviem, un tā iestatījumi atrodas tieši šajā ierakstā — nav atsevišķa iestatījumu faila un nav `config` apakšobjekta. Pulksteņa `format`, `formatAlt` (uz ko ciklē labais klikšķis) un `verticalFormat` visi dzīvo tieši tur uz `{ "id": "omarchy.clock" }`.
+Katrs logrīks ir viens ieraksts vienā no pieciem izkārtojuma masīviem, un tā iestatījumi atrodas tieši šajā ierakstā — nav atsevišķa iestatījumu faila un nav `config` apakšobjekta. Pulksteņa `format`, `formatAlt` (uz ko ciklē labais klikšķis) un `verticalFormat` visi dzīvo tieši tur uz `{ "id": "omarchy.clock" }`.
 
-`centerAnchor` nosauc vienu centra logrīku, kas tiek piesprausts precīzā ekrāna centrā, ar pārējiem tam blakus. Tā pulkstenis paliek pašā centrā pat tad, kad laikapstākļi un atjauninājuma nozīmīte nāk un iet. Iestati to uz tukšu virkni, un centra saraksts tā vietā vienkārši tiek centrēts kā grupa.
+`center` ir kaste joslas vidū: viss tās saturs tiek centrēts ekrānā kā grupa. `centerBegin` un `centerEnd` atrodas abās malās, tāpēc pulkstenis paliek precīzi centrā, kad laikapstākļi un atjauninājuma nozīmīte parādās vai pazūd. Vairāki logrīki `center` tiek centrēti kopā; ja tas ir tukšs, `centerBegin` un `centerEnd` satiekas joslas vidū.
 
 Viens noteikums, ko ir vērts internalizēt: **kad tev ir savs `shell.json`, tas ir kanonisks**. Kamēr tu neko nepielāgo, čaula lasa Omarchy noklusējuma failu. Tiklīdz tu velc logrīku, palaiž `omarchy bar` vai rediģē failu pats, tas pieder tev — nav dziļas sapludināšanas, tāpēc jauni noklusējuma logrīki nākotnes Omarchy laidienos tavā joslā automātiski neparādīsies. `omarchy bar defaults` atjauno piegādāto izkārtojumu, kad vien vēlies tīru lapu.
 

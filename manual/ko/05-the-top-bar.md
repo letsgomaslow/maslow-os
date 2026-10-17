@@ -6,7 +6,7 @@
 
 ## 기본적으로 무엇이 들어 있나
 
-바에는 세 개의 섹션이 있습니다. 왼쪽에는 Omarchy 로고(메뉴 실행기)와 워크스페이스 표시기가 있습니다. 가운데에는 상태 표시기, 시계, Elsewhen(세계 시계), 날씨, Omarchy 업데이트 배지가 있습니다. 오른쪽에는 키보드 레이아웃(하나 이상 구성했을 때), 시스템 트레이, 에이전트, bluetooth, 네트워크, 오디오, 디스플레이, 전원이 있습니다.
+바에는 세 개의 섹션이 있습니다. 왼쪽에는 Omarchy 로고(메뉴 실행기)와 워크스페이스 표시기가 있습니다. 가운데에는 상태 표시기, 시계, Elsewhen(세계 시계), 날씨, Omarchy 업데이트 배지가 있습니다. 오른쪽에는 시스템 트레이, 키보드 레이아웃(하나 이상 구성했을 때), 에이전트, bluetooth, 네트워크, 오디오, 디스플레이, 전원이 있습니다.
 
 그중 몇 가지는 말할 것이 있을 때만 나타납니다. 키보드 레이아웃은 레이아웃을 하나 이상 구성했을 때만 나타납니다. 업데이트 배지는 Omarchy 업데이트가 대기 중일 때만 나타납니다. 그리고 에이전트 아이콘은 Omarchy가 머신에서 AI 코딩 사용량을 처음 발견했을 때 나타납니다([AI](17-ai.md) 참조).
 
@@ -73,7 +73,7 @@
 
 ## 표시기
 
-가운데의 작은 무리가 표시기 위젯입니다. 켜 둔 모드에 대한 상태 글리프입니다. 방해 금지, 야간 조명, 대기 중인 [리마인더](09-reminders.md), 활성 화면 녹화, 절전 금지, [받아쓰기](11-text-extraction-dictation.md)가 여기에 있습니다. 모드가 활성화되면 켜지고, 그렇지 않으면 눈에 띄지 않습니다 — 시계 왼쪽(수직 바에서는 위쪽)에 마우스를 올리면 비활성 항목들을 엿볼 수 있습니다. 표시기를 클릭하면 그 모드가 토글됩니다. 상태 전용인 것이 하나 더 있습니다. 원격 세션은 gliff를 통해 누군가 이 머신에 연결되어 있는 동안 빨간색으로 켜집니다.
+가운데의 작은 무리가 표시기 위젯입니다. 켜 둔 모드에 대한 상태 글리프입니다. 방해 금지, 야간 조명, 대기 중인 [리마인더](09-reminders.md), 활성 화면 녹화, 절전 금지, [받아쓰기](11-text-extraction-dictation.md)가 여기에 있습니다. 모드가 활성화되면 켜지고, 그렇지 않으면 눈에 띄지 않습니다 — 바의 어느 곳에나 마우스를 올리면 비활성 표시기를 볼 수 있습니다. 표시기를 클릭하면 그 모드가 토글됩니다. 상태 전용인 것이 하나 더 있습니다. 원격 세션은 gliff를 통해 누군가 이 머신에 연결되어 있는 동안 빨간색으로 켜집니다.
 
 항상 보이게 하고 싶다면 위젯에서 `alwaysShow`를 `true`로 설정하세요. 그리고 일부만 신경 쓴다면 원하는 항목을 `items`에 나열하세요: `["Dnd", "Reminder", "NightLight"]`. 표시기 위젯을 두 개 이상 둘 수 있으므로, 서로 다른 섹션이 서로 다른 부분집합을 보여 줄 수 있습니다.
 
@@ -81,7 +81,9 @@
 
 바는 스스로를 구성합니다. 구성 파일을 열지 않고도 항목을 이동할 수 있습니다.
 
-가운데 주변의 빈 바 부분을 잡아 다른 화면 가장자리 쪽으로 드래그하면 바가 그쪽으로 이동합니다 — 왼쪽, 오른쪽, 위쪽, 아래쪽 모두 작동하며, 모든 위젯이 적응합니다(수직 바는 간결한 아이콘 전용 형태로 대체됩니다). 클릭한 채로 길게 누르면 같은 드래그가 시작됩니다. 같은 빈 공간을 왼쪽 버튼으로 두 번 클릭하면 바 배경이 투명 → 유리질 → 불투명 순으로 순환합니다. 그리고 어느 위젯이든 드래그해 순서를 바꾸거나 다른 섹션으로 던질 수 있습니다.
+가운데 주변의 빈 바 부분을 잡아 다른 화면 가장자리 쪽으로 드래그하면 바가 그쪽으로 이동합니다 — 왼쪽, 오른쪽, 위쪽, 아래쪽 모두 작동하며, 모든 위젯이 적응합니다(수직 바는 간결한 아이콘 전용 형태로 대체됩니다). 클릭한 채로 길게 누르면 같은 드래그가 시작됩니다. 같은 빈 공간을 왼쪽 버튼으로 두 번 클릭하면 바 배경이 투명 → 유리질 → 불투명 순으로 순환합니다. 그리고 어느 위젯이든 드래그해 순서를 바꾸거나 다른 섹션으로 던질 수 있습니다; 다른 위젯들이 옆으로 이동해 놓을 자리를 만듭니다.
+
+바의 가운데는 상자입니다. 내용은 하나의 그룹으로 가운데에 유지되고 양옆 위젯은 상자 가장자리에 붙습니다. 드래그하는 동안 상자 윤곽이 보이며, 비어 있으면 바를 가로지르는 선이 됩니다. 안이나 옆에 놓을 수 있고, 안을 가리키면 위젯이 들어갈 만큼 상자가 커집니다.
 
 가까이 두고 싶지만 항상 눈에 보일 필요는 없는 위젯은 트레이의 서랍에 넣을 수 있습니다. 트레이 위로 드래그하면 서랍이 열려 위젯을 받아 줍니다. 위젯은 앱 아이콘 뒤에 자리하며, 서랍이 나타날 때마다 함께 표시되고, 자신의 패널이 떠 있는 동안에는 서랍을 열린 채로 유지합니다. 바 위로 다시 드래그해서 꺼내면 되돌릴 수 있습니다.
 
@@ -92,7 +94,7 @@
 ```bash
 omarchy bar position bottom
 omarchy bar background glassy  # opaque, glassy, none, or cycle
-omarchy bar move omarchy.clock --section center --index 0
+omarchy bar move omarchy.weather --section centerBegin --index 0
 omarchy bar move omarchy.bluetooth --section tray  # into the tray's drawer
 omarchy bar set omarchy.clock format "HH:mm"
 omarchy bar defaults          # back to the shipped layout
@@ -101,7 +103,7 @@ omarchy bar defaults          # back to the shipped layout
 위젯을 완전히 추가하거나 제거하려면 플러그인 명령을 사용하세요. `omarchy plugin list`는 셸이 아는 모든 위젯을 id와 함께 출력합니다. 그런 다음:
 
 ```bash
-omarchy plugin enable omarchy.media --section center
+omarchy plugin enable omarchy.media --section centerEnd
 omarchy plugin disable omarchy.weather
 ```
 
@@ -119,19 +121,20 @@ omarchy plugin disable omarchy.weather
   "bar": {
     "position": "top",
     "background": "opaque",
-    "centerAnchor": "omarchy.clock",
     "layout": {
       "left": [{ "id": "omarchy.menu" }, { "id": "omarchy.workspaces" }],
+      "centerBegin": [{ "id": "omarchy.indicators" }],
       "center": [{ "id": "omarchy.clock", "format": "HH:mm" }],
+      "centerEnd": [{ "id": "omarchy.weather" }],
       "right": [{ "id": "omarchy.audio" }, { "id": "omarchy.power" }]
     }
   }
 }
 ```
 
-모든 위젯은 세 개의 레이아웃 배열 중 하나의 항목이며, 그 설정은 그 항목 안에 인라인으로 들어가 있습니다 — 별도의 설정 파일도 없고 `config` 하위 객체도 없습니다. 시계의 `format`, `formatAlt`(오른쪽 클릭으로 순환), `verticalFormat`은 모두 `{ "id": "omarchy.clock" }` 바로 거기에 있습니다.
+모든 위젯은 다섯 개의 레이아웃 배열 중 하나의 항목이며, 그 설정은 그 항목 안에 인라인으로 들어가 있습니다 — 별도의 설정 파일도 없고 `config` 하위 객체도 없습니다. 시계의 `format`, `formatAlt`(오른쪽 클릭으로 순환), `verticalFormat`은 모두 `{ "id": "omarchy.clock" }` 바로 거기에 있습니다.
 
-`centerAnchor`는 화면의 정확한 가운데에 고정되는 가운데 위젯 하나를 지정하고, 나머지는 그 양옆에 있습니다. 그래서 날씨와 업데이트 배지가 오가도 시계가 정중앙에 남습니다. 빈 문자열로 설정하면 가운데 목록이 그룹으로 가운데 정렬됩니다.
+`center`는 바 가운데 상자이며 내용 전체가 하나의 그룹으로 화면 중앙에 놓입니다. `centerBegin`과 `centerEnd`는 양쪽에 붙어 있어 날씨와 업데이트 배지가 나타나거나 사라져도 시계는 정확히 중앙에 유지됩니다. `center`에 여러 위젯을 넣으면 함께 중앙에 놓이고, 비우면 `centerBegin`과 `centerEnd`가 바 중앙에서 만납니다.
 
 내면화해 둘 가치가 있는 규칙 하나: **자신의 `shell.json`을 갖는 순간, 그 파일이 정본입니다.** 아무것도 사용자 지정하지 않는 한 셸은 Omarchy의 기본 파일을 읽습니다. 위젯을 드래그하거나, `omarchy bar`를 실행하거나, 파일을 직접 편집하는 순간, 그 파일은 여러분의 것입니다 — 깊은 병합은 없으므로, 향후 Omarchy 릴리스의 새 기본 위젯은 바에 자동으로 나타나지 않습니다. 깨끗한 상태로 돌아가고 싶을 때면 언제든 `omarchy bar defaults`로 출고 시 레이아웃을 복원할 수 있습니다.
 

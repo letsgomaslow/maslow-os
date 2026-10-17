@@ -6,7 +6,7 @@ Is é an t-aon phíosa den deasc é freisin atá ar an scáileán i gcónaí, ma
 
 ## Cad atá air de réir réamhshocraithe
 
-Tá trí chuid sa bharra. Ar chlé suíonn lógó Omarchy (an seoltóir roghchláir) agus táscairí na spásanna oibre. Sa lár faigheann tú na táscairí stádais, an clog, Elsewhen (clog domhanda), an aimsir, agus suaitheantas nuashonraithe Omarchy. Ar dheis: leagan amach an mhéarchláir (nuair a bhíonn níos mó ná ceann amháin cumraithe), tráidire an chórais, gníomhairí, bluetooth, líonra, fuaim, taispeáint, agus cumhacht.
+Tá trí chuid sa bharra. Ar chlé suíonn lógó Omarchy (an seoltóir roghchláir) agus táscairí na spásanna oibre. Sa lár faigheann tú na táscairí stádais, an clog, Elsewhen (clog domhanda), an aimsir, agus suaitheantas nuashonraithe Omarchy. Ar dheis: tráidire an chórais, leagan amach an mhéarchláir (nuair a bhíonn níos mó ná ceann amháin cumraithe), gníomhairí, bluetooth, líonra, fuaim, taispeáint, agus cumhacht.
 
 Ní thaispeántar cúpla ceann díobh sin ach nuair a bhíonn rud éigin le rá acu. Ní thaispeántar leagan amach an mhéarchláir ach amháin má tá níos mó ná leagan amach amháin cumraithe agat. Ní thaispeántar an suaitheantas nuashonraithe ach nuair a bhíonn nuashonrú Omarchy ag fanacht. Agus taispeántar deilbhín na ngníomhairí an chéad uair a aimsíonn Omarchy úsáid códaithe AI ar an meaisín (féach [AI](17-ai.md)).
 
@@ -73,7 +73,7 @@ Baineann baint ceachtar seirbhíse a ngiuirléid den bharra arís.
 
 ## Táscairí
 
-Is é an braisle beag sa lár giuirléid na dtáscairí. Is glifí stádais iad seo do mhóid atá curtha air agat: ná cuir isteach, solas oíche, [meabhrúchán](09-reminders.md) ar scuaine, taifeadadh scáileáin gníomhach, fan i do dhúis, agus [deachtú](11-text-extraction-dictation.md). Soilseann siad nuair a bhíonn an mód gníomhach agus fanann siad as an mbealach murach sin — hover ar chlé den chlog (os a chionn ar bharra ingearach) chun súil a chaitheamh ar na cinn neamhghníomhacha. Scoránaíonn cliceáil ar tháscaire an mód sin. Tá ceann amháin eile ina stádas amháin: soilseann seisiún cianda dearg fad is atá duine éigin nasctha leis an meaisín seo trí gliff.
+Is é an braisle beag sa lár giuirléid na dtáscairí. Is glifí stádais iad seo do mhóid atá curtha air agat: ná cuir isteach, solas oíche, [meabhrúchán](09-reminders.md) ar scuaine, taifeadadh scáileáin gníomhach, fan i do dhúis, agus [deachtú](11-text-extraction-dictation.md). Soilseann siad nuair a bhíonn an mód gníomhach agus fanann siad as an mbealach murach sin — coinnigh an pointeoir áit ar bith ar an mbarra chun na cinn neamhghníomhacha a fheiceáil. Scoránaíonn cliceáil ar tháscaire an mód sin. Tá ceann amháin eile ina stádas amháin: soilseann seisiún cianda dearg fad is atá duine éigin nasctha leis an meaisín seo trí gliff.
 
 Más fearr leat go mbeidís le feiceáil i gcónaí, socraigh `alwaysShow` go `true` ar an ngiuirléid. Agus más cuma leat ach faoi roinnt díobh, liostaigh na cinn is mian leat in `items`: `["Dnd", "Reminder", "NightLight"]`. Is féidir níos mó ná giuirléid táscairí amháin a bheith agat, mar sin is féidir le codanna difriúla fotacar difriúla a thaispeáint.
 
@@ -81,7 +81,9 @@ Más fearr leat go mbeidís le feiceáil i gcónaí, socraigh `alwaysShow` go `t
 
 Cumraíonn an barra é féin. Ní gá duit comhad cumraíochta a oscailt chun rudaí a bhogadh.
 
-Gabh paiste folamh den bharra timpeall an láir agus tarraing i dtreo imeall scáileáin eile é, agus bogann an barra ann — oibríonn clé, deas, barr, nó bun ar fad, agus oiriúnaíonn gach giuirléid (titeann barraí ingearacha ar ais go foirmeacha dlúth deilbhín-amháin). Tosaíonn cliceáil-agus-coinnigh an tarraingt céanna. Díchliceáil ar chlé an spás folamh céanna sin chun cúlra an bharra a thimthriall ó ghlan go gloineach go teimhneach. Agus tarraing aon ghiuirléid chun í a athordú nó í a chaitheamh isteach i gcuid eile.
+Gabh paiste folamh den bharra timpeall an láir agus tarraing i dtreo imeall scáileáin eile é, agus bogann an barra ann — oibríonn clé, deas, barr, nó bun ar fad, agus oiriúnaíonn gach giuirléid (titeann barraí ingearacha ar ais go foirmeacha dlúth deilbhín-amháin). Tosaíonn cliceáil-agus-coinnigh an tarraingt céanna. Díchliceáil ar chlé an spás folamh céanna sin chun cúlra an bharra a thimthriall ó ghlan go gloineach go teimhneach. Agus tarraing aon ghiuirléid chun í a athordú nó í a chaitheamh isteach i gcuid eile; sleamhnaíonn na giuirléidí eile as a chéile chun spás a dhéanamh san áit a scaoilfear é.
+
+Is bosca é lár an bharra: fanann a bhfuil ann láraithe mar ghrúpa, agus crochtar na giuirléidí in aice leis ar a imill. Le linn tarraingthe taispeántar imlíne an bhosca, nó líne trasna an bharra má tá sé folamh. Is féidir scaoileadh isteach ann nó in aice leis; má dhíríonn tú isteach, fásann an bosca chun an ghiuirléid a ghlacadh.
 
 Is féidir le giuirléid is mian leat a bheith thart ach nach mbíonn i radharc i gcónaí dul i dtrarraiceán an tráidire: tarraing í ar an tráidire, agus osclaíonn an tarraiceán chun í a ghlacadh. Suíonn sí ann i ndiaidh deilbhíní na n-aip, taispeántar í aon uair a thaispeántar an tarraiceán, agus coinníonn sí a tarraiceán ar oscailt fad is atá a painéal ar oscailt. Tarraing ar ais amach ar an mbarra í chun í a chur ar ais.
 
@@ -92,7 +94,7 @@ Tá orduithe ag na rudaí céanna, arb é an méid is mian leat do shocrú [dotf
 ```bash
 omarchy bar position bottom
 omarchy bar background glassy  # opaque, glassy, none, or cycle
-omarchy bar move omarchy.clock --section center --index 0
+omarchy bar move omarchy.weather --section centerBegin --index 0
 omarchy bar move omarchy.bluetooth --section tray  # into the tray's drawer
 omarchy bar set omarchy.clock format "HH:mm"
 omarchy bar defaults          # back to the shipped layout
@@ -101,7 +103,7 @@ omarchy bar defaults          # back to the shipped layout
 Chun giuirléid a chur leis nó a bhaint go hiomlán, úsáid orduithe an bhreiseáin. Priontálann `omarchy plugin list` gach giuirléid atá ar eolas ag an mblaosc lena haitheantas, agus ansin:
 
 ```bash
-omarchy plugin enable omarchy.media --section center
+omarchy plugin enable omarchy.media --section centerEnd
 omarchy plugin disable omarchy.weather
 ```
 
@@ -119,19 +121,20 @@ Stóráiltear é ar fad i `~/.config/omarchy/shell.json`, faoin eochair `bar`. S
   "bar": {
     "position": "top",
     "background": "opaque",
-    "centerAnchor": "omarchy.clock",
     "layout": {
       "left": [{ "id": "omarchy.menu" }, { "id": "omarchy.workspaces" }],
+      "centerBegin": [{ "id": "omarchy.indicators" }],
       "center": [{ "id": "omarchy.clock", "format": "HH:mm" }],
+      "centerEnd": [{ "id": "omarchy.weather" }],
       "right": [{ "id": "omarchy.audio" }, { "id": "omarchy.power" }]
     }
   }
 }
 ```
 
-Is iontráil amháin i gceann de na trí eagar leagan amach gach giuirléid, agus suíonn a socruithe inlíne ar an iontráil sin — níl comhad socruithe ar leith ann agus níl fo-oibiacht `config` ann. Tá `format` an chloig, `formatAlt` (an méid a thimthriallann cliceáil dheas chuige), agus `verticalFormat` ar fad díreach ann ar `{ "id": "omarchy.clock" }`.
+Is iontráil amháin i gceann de na cúig eagar leagan amach gach giuirléid, agus suíonn a socruithe inlíne ar an iontráil sin — níl comhad socruithe ar leith ann agus níl fo-oibiacht `config` ann. Tá `format` an chloig, `formatAlt` (an méid a thimthriallann cliceáil dheas chuige), agus `verticalFormat` ar fad díreach ann ar `{ "id": "omarchy.clock" }`.
 
-Ainmníonn `centerAnchor` an giuirléid láir amháin a ghreamaítear go lár cruinn an scáileáin, leis na cinn eile ar a thaobhanna. Sin an chaoi a bhfanann an clog marbh sa lár fiú agus an aimsir agus an suaitheantas nuashonraithe ag teacht agus ag imeacht. Socraigh go téad folamh é agus tá liosta an láir láraithe mar ghrúpa ina ionad.
+Is é `center` an bosca i lár an bharra: láraítear a bhfuil ann ar an scáileán mar ghrúpa. Crochtar `centerBegin` agus `centerEnd` ar a dhá thaobh, mar sin fanann an clog go díreach sa lár nuair a thagann nó a imíonn an aimsir agus suaitheantas nuashonraithe. Láraítear roinnt giuirléidí in `center` le chéile; má tá sé folamh, tagann `centerBegin` agus `centerEnd` le chéile sa lár.
 
 Riail amháin is fiú a ionsú: **nuair a bhíonn do `shell.json` féin agat, tá sé canónta**. Go dtí go saincheapaíonn tú rud ar bith, léann an bhlaosc comhad réamhshocraithe Omarchy. An nóiméad a tharraingíonn tú giuirléid, a ritheann tú `omarchy bar`, nó a chuireann tú an comhad in eagar tú féin, is leatsa é — níl cumasc domhain ann, mar sin ní bheidh giuirléidí réamhshocraithe nua in eisiúintí Omarchy amach anseo le feiceáil ar do bharra go huathoibríoch. Cuireann `omarchy bar defaults` an leagan amach seolta ar ais aon uair is mian leat scláta glan.
 

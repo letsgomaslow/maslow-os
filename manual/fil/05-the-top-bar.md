@@ -6,7 +6,7 @@ Ito rin ang nag-iisang bahagi ng desktop na palaging nasa screen, kaya sulit na 
 
 ## Ano ang nasa ibabaw nito bilang default
 
-May tatlong seksyon ang bar. Sa kaliwa nakaupo ang logo ng Omarchy (ang launcher ng menu) at ang mga indikator ng workspace. Sa gitna, makukuha mo ang mga status indicator, ang orasan, Elsewhen (isang world clock), ang panahon, at isang badge ng update ng Omarchy. Sa kanan: ang layout ng keyboard (kapag higit sa isa ang naka-configure), ang system tray, mga agent, bluetooth, network, audio, display, at power.
+May tatlong seksyon ang bar. Sa kaliwa nakaupo ang logo ng Omarchy (ang launcher ng menu) at ang mga indikator ng workspace. Sa gitna, makukuha mo ang mga status indicator, ang orasan, Elsewhen (isang world clock), ang panahon, at isang badge ng update ng Omarchy. Sa kanan: ang system tray, ang layout ng keyboard (kapag higit sa isa ang naka-configure), mga agent, bluetooth, network, audio, display, at power.
 
 Ilan sa mga iyon ay lumalabas lang kapag mayroon silang gustong sabihin. Lumalabas lang ang layout ng keyboard kung nakapag-configure ka ng higit sa isang layout. Lumalabas lang ang badge ng update kapag may naghihintay na update ng Omarchy. At lumalabas ang icon ng mga agent sa unang pagkakataong makahanap ang Omarchy ng paggamit ng AI coding sa makina (tingnan ang [AI](17-ai.md)).
 
@@ -73,7 +73,7 @@ Ang pag-alis sa alinmang serbisyo ay muling nag-aalis ng widget nito sa bar.
 
 ## Mga indikator
 
-Ang maliit na kumpol sa gitna ay ang widget ng mga indikator. Ito ay mga status glyph para sa mga mode na na-on mo: do not disturb, ilaw-panggabi, isang nakapilang [paalala](09-reminders.md), isang aktibong pag-record ng screen, manatiling gising, at [diktasyon](11-text-extraction-dictation.md). Umiilaw ang mga ito kapag aktibo ang mode at kung hindi ay nananatiling hindi nakakaabala — i-hover sa kaliwa ng orasan (sa itaas nito sa isang patayong bar) para masilip ang mga hindi aktibo. Ang pag-click sa isang indikator ay ini-toggle ang mode na iyon. Isa pa ay status lang: umiilaw nang pula ang isang remote session habang may nakakonekta sa makinang ito sa pamamagitan ng gliff.
+Ang maliit na kumpol sa gitna ay ang widget ng mga indikator. Ito ay mga status glyph para sa mga mode na na-on mo: do not disturb, ilaw-panggabi, isang nakapilang [paalala](09-reminders.md), isang aktibong pag-record ng screen, manatiling gising, at [diktasyon](11-text-extraction-dictation.md). Umiilaw ang mga ito kapag aktibo ang mode at kung hindi ay nananatiling hindi nakakaabala — i-hover kahit saan sa bar para makita ang mga hindi aktibo. Ang pag-click sa isang indikator ay ini-toggle ang mode na iyon. Isa pa ay status lang: umiilaw nang pula ang isang remote session habang may nakakonekta sa makinang ito sa pamamagitan ng gliff.
 
 Kung mas gusto mo silang palaging nakikita, itakda ang `alwaysShow` sa `true` sa widget. At kung ilan lang sa kanila ang inaalala mo, ilista ang mga gusto mo sa `items`: `["Dnd", "Reminder", "NightLight"]`. Maaari kang magkaroon ng higit sa isang widget ng mga indikator, kaya ang iba't ibang seksyon ay maaaring magpakita ng iba't ibang subset.
 
@@ -81,7 +81,9 @@ Kung mas gusto mo silang palaging nakikita, itakda ang `alwaysShow` sa `true` sa
 
 Ang bar mismo ang nagko-configure. Hindi mo kailangang magbukas ng config file para ilipat ang mga bagay.
 
-Hawakan ang isang bakanteng bahagi ng bar sa paligid ng gitna at i-drag ito papunta sa ibang gilid ng screen, at lilipat ang bar roon — kaliwa, kanan, itaas, o ibaba ay gumagana lahat, at ang bawat widget ay umaangkop (ang mga patayong bar ay bumabalik sa mga compact na anyong icon-only). Sinisimulan ng click-and-hold ang parehong drag. I-double-left-click ang parehong bakanteng espasyong iyon para i-cycle ang background ng bar mula clear papunta sa glassy papunta sa opaque. At i-drag ang anumang widget para muling ayusin ito o ihagis ito sa ibang seksyon.
+Hawakan ang isang bakanteng bahagi ng bar sa paligid ng gitna at i-drag ito papunta sa ibang gilid ng screen, at lilipat ang bar roon — kaliwa, kanan, itaas, o ibaba ay gumagana lahat, at ang bawat widget ay umaangkop (ang mga patayong bar ay bumabalik sa mga compact na anyong icon-only). Sinisimulan ng click-and-hold ang parehong drag. I-double-left-click ang parehong bakanteng espasyong iyon para i-cycle ang background ng bar mula clear papunta sa glassy papunta sa opaque. At i-drag ang anumang widget para muling ayusin ito o ihagis ito sa ibang seksyon; dumudulas palayo ang ibang widget upang magbigay ng puwang sa pagbibitawan.
+
+Isang kahon ang gitna ng bar: nananatiling nakasentro bilang grupo ang laman nito, at nakakabit sa mga gilid ang katabing widget. Habang nagda-drag, makikita ang balangkas ng kahon, o guhit sa bar kung wala itong laman. Maaari mong ibitaw sa loob o sa tabi; lumalaki ang kahon kapag sa loob ito babagsak.
 
 Ang isang widget na gusto mong nasa paligid ngunit hindi palaging nakikita ay maaaring ilagay sa drawer ng tray: i-drag ito papunta sa tray, at bubukas ang drawer para tanggapin ito. Nakaupo ito roon pagkatapos ng mga icon ng app, lumalabas tuwing lumalabas ang drawer, at pinananatiling bukas ang drawer nito habang nakabukas ang panel nito. I-drag ito pabalik palabas papunta sa bar para ibalik ito.
 
@@ -92,7 +94,7 @@ Ang parehong mga bagay ay may mga command, na siyang gusto mo para sa isang [dot
 ```bash
 omarchy bar position bottom
 omarchy bar background glassy  # opaque, glassy, none, or cycle
-omarchy bar move omarchy.clock --section center --index 0
+omarchy bar move omarchy.weather --section centerBegin --index 0
 omarchy bar move omarchy.bluetooth --section tray  # into the tray's drawer
 omarchy bar set omarchy.clock format "HH:mm"
 omarchy bar defaults          # back to the shipped layout
@@ -101,7 +103,7 @@ omarchy bar defaults          # back to the shipped layout
 Para magdagdag o mag-alis ng isang widget nang buo, gamitin ang mga command ng plugin. Ini-print ng `omarchy plugin list` ang bawat widget na kilala ng shell kasama ang id nito, at pagkatapos:
 
 ```bash
-omarchy plugin enable omarchy.media --section center
+omarchy plugin enable omarchy.media --section centerEnd
 omarchy plugin disable omarchy.weather
 ```
 
@@ -119,19 +121,20 @@ Ang lahat ng ito ay nakaimbak sa `~/.config/omarchy/shell.json`, sa ilalim ng `b
   "bar": {
     "position": "top",
     "background": "opaque",
-    "centerAnchor": "omarchy.clock",
     "layout": {
       "left": [{ "id": "omarchy.menu" }, { "id": "omarchy.workspaces" }],
+      "centerBegin": [{ "id": "omarchy.indicators" }],
       "center": [{ "id": "omarchy.clock", "format": "HH:mm" }],
+      "centerEnd": [{ "id": "omarchy.weather" }],
       "right": [{ "id": "omarchy.audio" }, { "id": "omarchy.power" }]
     }
   }
 }
 ```
 
-Bawat widget ay isang entry sa isa sa tatlong layout array, at ang mga setting nito ay nakaupo nang inline sa entry na iyon — walang hiwalay na settings file at walang `config` na sub-object. Ang `format` ng orasan, ang `formatAlt` (kung saan nag-cycle ang right-click), at ang `verticalFormat` ay lahat nakatira roon sa `{ "id": "omarchy.clock" }`.
+Bawat widget ay isang entry sa isa sa limang layout array, at ang mga setting nito ay nakaupo nang inline sa entry na iyon — walang hiwalay na settings file at walang `config` na sub-object. Ang `format` ng orasan, ang `formatAlt` (kung saan nag-cycle ang right-click), at ang `verticalFormat` ay lahat nakatira roon sa `{ "id": "omarchy.clock" }`.
 
-Pinapangalanan ng `centerAnchor` ang nag-iisang center widget na napipinned sa eksaktong gitna ng screen, habang ang iba ay nasa gilid nito. Ganiyan nananatiling nasa pinakagitna ang orasan kahit dumarating at umaalis ang panahon at badge ng update. Itakda ito sa isang empty string at ang center list ay isesentro na lang bilang isang grupo.
+Ang `center` ang kahon sa gitna ng bar: nakasentro sa screen bilang grupo ang lahat ng laman nito. Nasa magkabilang gilid ang `centerBegin` at `centerEnd`, kaya nananatiling eksaktong nasa gitna ang orasan habang dumarating at nawawala ang panahon at update badge. Magkakasamang nakasentro ang maraming widget sa `center`; kung walang laman, nagtatagpo sa gitna ang `centerBegin` at `centerEnd`.
 
 Isang panuntunan na sulit tandaan: **kapag mayroon ka nang sarili mong `shell.json`, ito ay canonical**. Hanggang wala ka pang kino-customize, binabasa ng shell ang default file ng Omarchy. Sa sandaling mag-drag ka ng widget, magpatakbo ng `omarchy bar`, o mag-edit ng file mismo, sa iyo na ito — walang deep merge, kaya ang mga bagong default widget sa mga susunod na release ng Omarchy ay hindi awtomatikong lalabas sa iyong bar. Ibinabalik ng `omarchy bar defaults` ang shipped na layout tuwing gusto mo ng malinis na simula.
 

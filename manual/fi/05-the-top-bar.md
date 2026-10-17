@@ -6,7 +6,7 @@ Se on myös ainoa työpöydän osa, joka on aina ruudulla, joten kannattaa tiet�
 
 ## Mitä siinä on oletuksena
 
-Palkissa on kolme osaa. Vasemmalla on Omarchy-logo (valikon käynnistin) ja työtilojen ilmaisimet. Keskellä on tilailmaisimet, kello, Elsewhen (maailmankello), sää ja Omarchy-päivitysmerkki. Oikealla: näppäimistöasettelu (kun niitä on määritetty useampi kuin yksi), järjestelmärivi, agentit, bluetooth, verkko, ääni, näyttö ja virta.
+Palkissa on kolme osaa. Vasemmalla on Omarchy-logo (valikon käynnistin) ja työtilojen ilmaisimet. Keskellä on tilailmaisimet, kello, Elsewhen (maailmankello), sää ja Omarchy-päivitysmerkki. Oikealla: järjestelmärivi, näppäimistöasettelu (kun niitä on määritetty useampi kuin yksi), agentit, bluetooth, verkko, ääni, näyttö ja virta.
 
 Muutama niistä näkyy vain, kun niillä on jotain sanottavaa. Näppäimistöasettelu näkyy vain, jos olet määrittänyt useamman kuin yhden asettelun. Päivitysmerkki näkyy vain, kun Omarchy-päivitys odottaa. Ja agenttien kuvake näkyy ensimmäisellä kerralla, kun Omarchy löytää koneelta tekoälykoodauskäyttöä (katso [AI](17-ai.md)).
 
@@ -73,7 +73,7 @@ Kummankin palvelun poistaminen vie sen widgetin takaisin pois palkista.
 
 ## Ilmaisimet
 
-Keskitason pieni rypäs on ilmaisin-widget. Nämä ovat tilamerkkejä tiloille, jotka olet kytkenyt päälle: älä häiritse, yövalo, jonotettu [muistutus](09-reminders.md), aktiivinen ruuduntallennus, pysy hereillä ja [sanelu](11-text-extraction-dictation.md). Ne syttyvät, kun tila on aktiivinen, ja muuten pysyvät poissa tieltä — vie osoitin kellon vasemmalle puolelle (pystypalkissa sen yläpuolelle) vilkaistaksesi epäaktiivisia. Ilmaisimen napsauttaminen vaihtaa kyseisen tilan. Yksi lisää on vain tilaa: etäisessio syttyy punaiseksi, kun joku on yhdistetty tähän koneeseen gliffin kautta.
+Keskitason pieni rypäs on ilmaisin-widget. Nämä ovat tilamerkkejä tiloille, jotka olet kytkenyt päälle: älä häiritse, yövalo, jonotettu [muistutus](09-reminders.md), aktiivinen ruuduntallennus, pysy hereillä ja [sanelu](11-text-extraction-dictation.md). Ne syttyvät, kun tila on aktiivinen, ja muuten pysyvät poissa tieltä — vie osoitin mihin tahansa palkin kohtaan nähdäksesi epäaktiiviset ilmaisimet. Ilmaisimen napsauttaminen vaihtaa kyseisen tilan. Yksi lisää on vain tilaa: etäisessio syttyy punaiseksi, kun joku on yhdistetty tähän koneeseen gliffin kautta.
 
 Jos haluat niiden olevan aina näkyvissä, aseta widgetissä `alwaysShow` arvoon `true`. Ja jos välität vain joistakin niistä, luetteloi haluamasi kohdassa `items`: `["Dnd", "Reminder", "NightLight"]`. Sinulla voi olla useampi kuin yksi ilmaisin-widget, joten eri osat voivat näyttää erilaisia osajoukkoja.
 
@@ -81,7 +81,9 @@ Jos haluat niiden olevan aina näkyvissä, aseta widgetissä `alwaysShow` arvoon
 
 Palkki määrittää itsensä. Sinun ei tarvitse avata määritystiedostoa siirtääksesi asioita.
 
-Tartu tyhjään kohtaan palkissa keskustan tienoilla ja vedä sitä kohti toista ruudun reunaa, ja palkki siirtyy sinne — vasen, oikea, ylä- tai alaosa toimivat kaikki, ja jokainen widget mukautuu (pystypalkit palaavat kompakteihin vain kuvakkeita sisältäviin muotoihin). Napsautus ja pohjassa pitäminen käynnistää saman vedon. Kaksoisnapsauta vasemmalla painikkeella samaa tyhjää tilaa kiertääksesi palkin taustaa läpinäkyvästä lasiseen ja peittävään. Ja vedä mitä tahansa widgetiä järjestääksesi sen uudelleen tai heittääksesi sen toiseen osaan.
+Tartu tyhjään kohtaan palkissa keskustan tienoilla ja vedä sitä kohti toista ruudun reunaa, ja palkki siirtyy sinne — vasen, oikea, ylä- tai alaosa toimivat kaikki, ja jokainen widget mukautuu (pystypalkit palaavat kompakteihin vain kuvakkeita sisältäviin muotoihin). Napsautus ja pohjassa pitäminen käynnistää saman vedon. Kaksoisnapsauta vasemmalla painikkeella samaa tyhjää tilaa kiertääksesi palkin taustaa läpinäkyvästä lasiseen ja peittävään. Ja vedä mitä tahansa widgetiä järjestääksesi sen uudelleen tai heittääksesi sen toiseen osaan; muut widgetit liukuvat erilleen ja tekevät tilaa pudotuskohtaan.
+
+Palkin keskiosa on laatikko: sisältö pysyy keskitettynä yhtenä ryhmänä, ja viereiset widgetit kiinnittyvät sen reunoihin. Vedettäessä näkyy laatikon ääriviiva, tai tyhjänä viiva palkin poikki. Voit pudottaa sisään tai viereen; sisään tähdättäessä laatikko kasvaa widgetiä varten.
 
 Widget, jonka haluat pitää saatavilla mutta et aina näkyvissä, voi asua järjestelmärivin laatikossa: vedä se järjestelmärivin päälle, niin laatikko aukeaa ja ottaa sen vastaan. Se istuu siellä sovelluskuvakkeiden jälkeen, näkyy aina kun laatikko näkyy ja pitää laatikkonsa auki niin kauan kuin sen paneeli on auki. Vedä se sieltä takaisin palkkiin palauttaaksesi sen paikalleen.
 
@@ -92,7 +94,7 @@ Samoihin asioihin on komentoja, mikä on se, mitä haluat [dotfiles](31-dotfiles
 ```bash
 omarchy bar position bottom
 omarchy bar background glassy  # opaque, glassy, none, or cycle
-omarchy bar move omarchy.clock --section center --index 0
+omarchy bar move omarchy.weather --section centerBegin --index 0
 omarchy bar move omarchy.bluetooth --section tray  # into the tray's drawer
 omarchy bar set omarchy.clock format "HH:mm"
 omarchy bar defaults          # back to the shipped layout
@@ -101,7 +103,7 @@ omarchy bar defaults          # back to the shipped layout
 Lisätäksesi tai poistaaksesi widgetin kokonaan käytä lisäosakomentoja. `omarchy plugin list` tulostaa jokaisen widgetin, jonka kuori tuntee, sen tunnisteella, ja sitten:
 
 ```bash
-omarchy plugin enable omarchy.media --section center
+omarchy plugin enable omarchy.media --section centerEnd
 omarchy plugin disable omarchy.weather
 ```
 
@@ -119,19 +121,20 @@ Kaikki se on tallennettu tiedostoon `~/.config/omarchy/shell.json`, avaimen `bar
   "bar": {
     "position": "top",
     "background": "opaque",
-    "centerAnchor": "omarchy.clock",
     "layout": {
       "left": [{ "id": "omarchy.menu" }, { "id": "omarchy.workspaces" }],
+      "centerBegin": [{ "id": "omarchy.indicators" }],
       "center": [{ "id": "omarchy.clock", "format": "HH:mm" }],
+      "centerEnd": [{ "id": "omarchy.weather" }],
       "right": [{ "id": "omarchy.audio" }, { "id": "omarchy.power" }]
     }
   }
 }
 ```
 
-Jokainen widget on yksi merkintä yhdessä kolmesta asettelu-taulukosta, ja sen asetukset ovat rivissä kyseisessä merkinnässä — ei ole erillistä asetustiedostoa eikä `config`-aliobjektia. Kellon `format`, `formatAlt` (mihin oikean painikkeen napsautus kiertää) ja `verticalFormat` elävät kaikki juuri siinä kohdassa `{ "id": "omarchy.clock" }`.
+Jokainen widget on yksi merkintä yhdessä viidestä asettelu-taulukosta, ja sen asetukset ovat rivissä kyseisessä merkinnässä — ei ole erillistä asetustiedostoa eikä `config`-aliobjektia. Kellon `format`, `formatAlt` (mihin oikean painikkeen napsautus kiertää) ja `verticalFormat` elävät kaikki juuri siinä kohdassa `{ "id": "omarchy.clock" }`.
 
-`centerAnchor` nimeää sen yhden keskimmäisen widgetin, joka kiinnitetään ruudun tarkkaan keskikohtaan, muiden reunustaessa sitä. Näin kello pysyy aivan keskellä, vaikka sää ja päivitysmerkki tulevat ja menevät. Aseta se tyhjäksi merkkijonoksi, ja keskimmäinen lista vain keskitetään ryhmänä sen sijaan.
+`center` on palkin keskellä oleva laatikko: kaikki sen sisällä keskitetään näytölle yhtenä ryhmänä. `centerBegin` ja `centerEnd` ovat sen molemmin puolin, joten kello pysyy täsmälleen keskellä sään ja päivitysmerkin tullessa ja mennessä. Useat widgetit `center`-osassa keskitetään yhdessä; tyhjänä `centerBegin` ja `centerEnd` kohtaavat palkin keskellä.
 
 Yksi sääntö, joka kannattaa sisäistää: **kun sinulla on oma `shell.json`, se on määräävä**. Kunnes mukautat mitään, kuori lukee Omarchyn oletustiedostoa. Heti kun vedät widgetiä, ajat komennon `omarchy bar` tai muokkaat tiedostoa itse, omistat sen — syvää yhdistämistä ei ole, joten tulevissa Omarchy-julkaisuissa uudet oletuswidgetit eivät ilmesty palkkiisi automaattisesti. `omarchy bar defaults` palauttaa mukana toimitetun asettelun aina, kun haluat puhtaan pöydän.
 

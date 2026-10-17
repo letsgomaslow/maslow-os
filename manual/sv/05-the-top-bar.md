@@ -6,7 +6,7 @@ Det är också den enda delen av skrivbordet som alltid syns på skärmen, så d
 
 ## Vad som finns på det som standard
 
-Fältet har tre sektioner. Till vänster sitter Omarchy-logotypen (menystartaren) och arbetsyteindikatorerna. I mitten får du statusindikatorerna, klockan, Elsewhen (en världsklocka), vädret och ett Omarchy-uppdateringsmärke. Till höger: tangentbordslayouten (när mer än en är konfigurerad), systemfältet, agenter, bluetooth, nätverk, ljud, skärm och ström.
+Fältet har tre sektioner. Till vänster sitter Omarchy-logotypen (menystartaren) och arbetsyteindikatorerna. I mitten får du statusindikatorerna, klockan, Elsewhen (en världsklocka), vädret och ett Omarchy-uppdateringsmärke. Till höger: systemfältet, tangentbordslayouten (när mer än en är konfigurerad), agenter, bluetooth, nätverk, ljud, skärm och ström.
 
 Några av dem visas bara när de har något att säga. Tangentbordslayouten visas bara om du har konfigurerat mer än en layout. Uppdateringsmärket visas bara när en Omarchy-uppdatering väntar. Och agentikonen visas första gången Omarchy hittar AI-kodanvändning på maskinen (se [AI](17-ai.md)).
 
@@ -73,7 +73,7 @@ Att ta bort någon av tjänsterna tar bort dess widget från fältet.
 
 ## Indikatorer
 
-Den lilla klungan i mitten är indikatorwidgeten. Det är statussymboler för lägen du har slagit på: stör ej, nattljus, en köad [påminnelse](09-reminders.md), en aktiv skärminspelning, håll vaken och [diktering](11-text-extraction-dictation.md). De tänds när läget är aktivt och håller sig annars ur vägen — hovra till vänster om klockan (ovanför den på ett vertikalt fält) för att tjuvkika på de inaktiva. Att klicka på en indikator växlar det läget. Ytterligare en är endast status: en fjärrsession lyser rött medan någon är ansluten till den här maskinen via gliff.
+Den lilla klungan i mitten är indikatorwidgeten. Det är statussymboler för lägen du har slagit på: stör ej, nattljus, en köad [påminnelse](09-reminders.md), en aktiv skärminspelning, håll vaken och [diktering](11-text-extraction-dictation.md). De tänds när läget är aktivt och håller sig annars ur vägen — hovra var som helst på fältet för att se de inaktiva indikatorerna. Att klicka på en indikator växlar det läget. Ytterligare en är endast status: en fjärrsession lyser rött medan någon är ansluten till den här maskinen via gliff.
 
 Om du hellre vill att de alltid ska synas, ställ in `alwaysShow` till `true` på widgeten. Och om du bara bryr dig om några av dem, lista dem du vill ha i `items`: `["Dnd", "Reminder", "NightLight"]`. Du kan ha mer än en indikatorwidget, så olika sektioner kan visa olika delmängder.
 
@@ -81,7 +81,9 @@ Om du hellre vill att de alltid ska synas, ställ in `alwaysShow` till `true` p�
 
 Fältet konfigurerar sig själv. Du behöver inte öppna en konfigurationsfil för att flytta saker.
 
-Ta tag i en tom fläck av fältet runt mitten och dra den mot en annan skärmkant, så flyttar fältet dit — vänster, höger, överst eller underst fungerar alla, och varje widget anpassar sig (vertikala fält faller tillbaka till kompakta former med endast ikoner). Ett klick-och-håll startar samma drag. Dubbelvänsterklicka på samma tomma utrymme för att cykla fältbakgrunden från klar till glasig till ogenomskinlig. Och dra valfri widget för att ordna om den eller kasta den i en annan sektion.
+Ta tag i en tom fläck av fältet runt mitten och dra den mot en annan skärmkant, så flyttar fältet dit — vänster, höger, överst eller underst fungerar alla, och varje widget anpassar sig (vertikala fält faller tillbaka till kompakta former med endast ikoner). Ett klick-och-håll startar samma drag. Dubbelvänsterklicka på samma tomma utrymme för att cykla fältbakgrunden från klar till glasig till ogenomskinlig. Och dra valfri widget för att ordna om den eller kasta den i en annan sektion; de andra widgetarna glider isär för att lämna plats där den ska släppas.
+
+Fältets mitt är en ruta: innehållet förblir centrerat som en grupp och intilliggande widgetar hänger vid dess kanter. Under dragning visas rutans kontur, eller en linje över fältet om den är tom. Du kan släppa i eller bredvid; när du siktar inuti växer rutan för att ta emot widgeten.
 
 En widget du vill ha kvar men inte alltid vill se kan hamna i systemfältets låda: dra den till systemfältet, så öppnas lådan för att ta emot den. Den sitter där efter appikonerna, dyker upp när lådan gör det och håller lådan öppen medan dess panel är uppe. Dra tillbaka den ut på fältet för att sätta tillbaka den.
 
@@ -92,7 +94,7 @@ Samma saker har kommandon, vilket är vad du vill ha för en [dotfiles](31-dotfi
 ```bash
 omarchy bar position bottom
 omarchy bar background glassy  # opaque, glassy, none, or cycle
-omarchy bar move omarchy.clock --section center --index 0
+omarchy bar move omarchy.weather --section centerBegin --index 0
 omarchy bar move omarchy.bluetooth --section tray  # into the tray's drawer
 omarchy bar set omarchy.clock format "HH:mm"
 omarchy bar defaults          # back to the shipped layout
@@ -101,7 +103,7 @@ omarchy bar defaults          # back to the shipped layout
 För att lägga till eller ta bort en widget helt, använd plugin-kommandona. `omarchy plugin list` skriver ut varje widget skalet känner till med dess id, och sedan:
 
 ```bash
-omarchy plugin enable omarchy.media --section center
+omarchy plugin enable omarchy.media --section centerEnd
 omarchy plugin disable omarchy.weather
 ```
 
@@ -119,19 +121,20 @@ Allt lagras i `~/.config/omarchy/shell.json`, under nyckeln `bar`. Här är en n
   "bar": {
     "position": "top",
     "background": "opaque",
-    "centerAnchor": "omarchy.clock",
     "layout": {
       "left": [{ "id": "omarchy.menu" }, { "id": "omarchy.workspaces" }],
+      "centerBegin": [{ "id": "omarchy.indicators" }],
       "center": [{ "id": "omarchy.clock", "format": "HH:mm" }],
+      "centerEnd": [{ "id": "omarchy.weather" }],
       "right": [{ "id": "omarchy.audio" }, { "id": "omarchy.power" }]
     }
   }
 }
 ```
 
-Varje widget är en post i en av de tre layoutarrayerna, och dess inställningar sitter inline på den posten — det finns ingen separat inställningsfil och inget `config`-underobjekt. Klockans `format`, `formatAlt` (vad högerklick cyklar till) och `verticalFormat` bor alla precis där på `{ "id": "omarchy.clock" }`.
+Varje widget är en post i en av de fem layoutarrayerna, och dess inställningar sitter inline på den posten — det finns ingen separat inställningsfil och inget `config`-underobjekt. Klockans `format`, `formatAlt` (vad högerklick cyklar till) och `verticalFormat` bor alla precis där på `{ "id": "omarchy.clock" }`.
 
-`centerAnchor` namnger den enda mittwidgeten som fästs exakt i skärmens mitt, med de andra flankerande den. Det är så klockan förblir död i mitten även när vädret och uppdateringsmärket kommer och går. Ställ in den på en tom sträng så centreras mittlistan bara som en grupp i stället.
+`center` är rutan mitt i fältet: allt innehåll centreras på skärmen som en grupp. `centerBegin` och `centerEnd` hänger på var sin sida, så klockan förblir exakt i mitten när vädret och uppdateringsmärket kommer och går. Flera widgetar i `center` centreras tillsammans; om den är tom möts `centerBegin` och `centerEnd` mitt i fältet.
 
 En regel värd att internalisera: **när du väl har din egen `shell.json` är den kanonisk**. Tills du anpassar någonting läser skalet Omarchys standardfil. I samma ögonblick som du drar en widget, kör `omarchy bar` eller redigerar filen själv äger du den — det finns ingen djup sammanslagning, så nya standardwidgetar i framtida Omarchy-versioner dyker inte upp på ditt fält automatiskt. `omarchy bar defaults` sätter tillbaka den levererade layouten när du vill ha ett rent blad.
 

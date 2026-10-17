@@ -6,7 +6,7 @@ Hún er líka eini hluti skjáborðsins sem er alltaf á skjánum, svo það er 
 
 ## Hvað er á henni sjálfgefið
 
-Stikan hefur þrjá hluta. Vinstra megin situr Omarchy-merkið (valmyndaræsirinn) og vinnusvæðavísarnir. Í miðjunni færðu stöðuvísana, klukkuna, Elsewhen (heimsklukku), veðrið og Omarchy-uppfærslumerki. Hægra megin: lyklaborðsskipanina (þegar fleiri en ein er stillt), kerfisbakkan, agents, bluetooth, net, hljóð, skjá og orku.
+Stikan hefur þrjá hluta. Vinstra megin situr Omarchy-merkið (valmyndaræsirinn) og vinnusvæðavísarnir. Í miðjunni færðu stöðuvísana, klukkuna, Elsewhen (heimsklukku), veðrið og Omarchy-uppfærslumerki. Hægra megin: kerfisbakkan, lyklaborðsskipanina (þegar fleiri en ein er stillt), agents, bluetooth, net, hljóð, skjá og orku.
 
 Nokkur af þessu birtist aðeins þegar það hefur eitthvað að segja. Lyklaborðsskipanin birtist aðeins ef þú hefur stillt fleiri en eina skipan. Uppfærslumerkið birtist aðeins þegar Omarchy-uppfærsla bíður. Og agents-táknið birtist í fyrsta skipti sem Omarchy finnur notkun á gervigreindarkóðun á vélinni (sjá [AI](17-ai.md)).
 
@@ -73,7 +73,7 @@ Að fjarlægja aðra hvora þjónustuna tekur græjuna hennar aftur af stikunni.
 
 ## Vísar
 
-Litli hópurinn í miðjunni er vísagræjan. Þetta eru stöðutákn fyrir stillingar sem þú hefur kveikt á: ekki trufla, næturljós, [áminningu](09-reminders.md) í biðröð, virka skjáupptöku, halda vakandi og [upplesningu](11-text-extraction-dictation.md). Þau lýsast þegar stillingin er virk og halda sig annars til hlés — sveimðu vinstra megin við klukkuna (fyrir ofan hana á lóðréttri stiku) til að kíkja á þau óvirku. Að smella á vísi víxlar þeirri stillingu. Einn í viðbót er aðeins staða: fjartenging lýsist rauð á meðan einhver er tengdur við þessa vél í gegnum gliff.
+Litli hópurinn í miðjunni er vísagræjan. Þetta eru stöðutákn fyrir stillingar sem þú hefur kveikt á: ekki trufla, næturljós, [áminningu](09-reminders.md) í biðröð, virka skjáupptöku, halda vakandi og [upplesningu](11-text-extraction-dictation.md). Þau lýsast þegar stillingin er virk og halda sig annars til hlés — sveimðu hvar sem er yfir stikunni til að sjá óvirku vísana. Að smella á vísi víxlar þeirri stillingu. Einn í viðbót er aðeins staða: fjartenging lýsist rauð á meðan einhver er tengdur við þessa vél í gegnum gliff.
 
 Ef þú vilt frekar að þau séu alltaf sýnileg skaltu stilla `alwaysShow` á `true` á græjunni. Og ef þér er aðeins sama um sum þeirra skaltu lista þau sem þú vilt í `items`: `["Dnd", "Reminder", "NightLight"]`. Þú getur haft fleiri en eina vísagræju, svo mismunandi hlutar geta sýnt mismunandi undirmengi.
 
@@ -81,7 +81,9 @@ Ef þú vilt frekar að þau séu alltaf sýnileg skaltu stilla `alwaysShow` á 
 
 Stikan stillir sig sjálf. Þú þarft ekki að opna stillingarskrá til að færa hluti.
 
-Gríptu í tóman blett á stikunni í kringum miðjuna og dragðu hann í átt að öðrum skjájaðri, og stikan færist þangað — vinstri, hægri, efst eða neðst virkar allt, og hver græja aðlagast (lóðréttar stikur falla aftur í þéttar form með aðeins táknum). Smellur-og-halda byrjar sama drag. Tvívinstri-smelltu á sama tóma blettinn til að skipta bakgrunni stikunnar úr tærum í glerkenndan í ógegnsæjan. Og dragðu hvaða græju sem er til að endurraða henni eða kasta henni í annan hluta.
+Gríptu í tóman blett á stikunni í kringum miðjuna og dragðu hann í átt að öðrum skjájaðri, og stikan færist þangað — vinstri, hægri, efst eða neðst virkar allt, og hver græja aðlagast (lóðréttar stikur falla aftur í þéttar form með aðeins táknum). Smellur-og-halda byrjar sama drag. Tvívinstri-smelltu á sama tóma blettinn til að skipta bakgrunni stikunnar úr tærum í glerkenndan í ógegnsæjan. Og dragðu hvaða græju sem er til að endurraða henni eða kasta henni í annan hluta; hinar græjurnar renna til hliðar til að skapa pláss þar sem henni verður sleppt.
+
+Miðja stikunnar er kassi: innihaldið helst miðjað sem einn hópur og græjurnar sitt hvorum megin hanga á brúnum hans. Við drátt birtist útlína kassans, eða lína yfir stikuna ef hann er tómur. Þú getur sleppt inni í honum eða við hliðina; þegar miðað er inn í hann stækkar kassinn fyrir græjuna.
 
 Græja sem þú vilt hafa við höndina en ekki alltaf í augsýn getur farið í skúffu bakkans: dragðu hana á bakkann og skúffan opnast til að taka við henni. Hún situr þar á eftir forritatáknunum, birtist alltaf þegar skúffan gerir það og heldur skúffunni opinni á meðan spjaldið hennar er opið. Dragðu hana aftur út á stikuna til að setja hana til baka.
 
@@ -92,7 +94,7 @@ Sömu hlutir hafa skipanir, sem er það sem þú vilt fyrir [dotfiles](31-dotfi
 ```bash
 omarchy bar position bottom
 omarchy bar background glassy  # opaque, glassy, none, or cycle
-omarchy bar move omarchy.clock --section center --index 0
+omarchy bar move omarchy.weather --section centerBegin --index 0
 omarchy bar move omarchy.bluetooth --section tray  # into the tray's drawer
 omarchy bar set omarchy.clock format "HH:mm"
 omarchy bar defaults          # back to the shipped layout
@@ -101,7 +103,7 @@ omarchy bar defaults          # back to the shipped layout
 Til að bæta græju við eða fjarlægja hana alveg skaltu nota viðbótar-skipanirnar. `omarchy plugin list` prentar hverja græju sem skelin þekkir með auðkenni hennar, og síðan:
 
 ```bash
-omarchy plugin enable omarchy.media --section center
+omarchy plugin enable omarchy.media --section centerEnd
 omarchy plugin disable omarchy.weather
 ```
 
@@ -119,19 +121,20 @@ Allt þetta er geymt í `~/.config/omarchy/shell.json`, undir `bar`-lyklinum. H�
   "bar": {
     "position": "top",
     "background": "opaque",
-    "centerAnchor": "omarchy.clock",
     "layout": {
       "left": [{ "id": "omarchy.menu" }, { "id": "omarchy.workspaces" }],
+      "centerBegin": [{ "id": "omarchy.indicators" }],
       "center": [{ "id": "omarchy.clock", "format": "HH:mm" }],
+      "centerEnd": [{ "id": "omarchy.weather" }],
       "right": [{ "id": "omarchy.audio" }, { "id": "omarchy.power" }]
     }
   }
 }
 ```
 
-Hver græja er ein færsla í einu af þremur skipulagsfylkjunum, og stillingar hennar sitja innfelldar á þeirri færslu — það er engin sérstök stillingarskrá og ekkert `config`-undirhlutur. `format` klukkunnar, `formatAlt` (það sem hægrismellur skiptir yfir í) og `verticalFormat` búa öll þarna á `{ "id": "omarchy.clock" }`.
+Hver græja er ein færsla í einu af fimm skipulagsfylkjunum, og stillingar hennar sitja innfelldar á þeirri færslu — það er engin sérstök stillingarskrá og ekkert `config`-undirhlutur. `format` klukkunnar, `formatAlt` (það sem hægrismellur skiptir yfir í) og `verticalFormat` búa öll þarna á `{ "id": "omarchy.clock" }`.
 
-`centerAnchor` nefnir þá einu miðjugræju sem er fest nákvæmlega í miðju skjásins, með hinar á hliðunum. Þannig helst klukkan dauð í miðjunni jafnvel þegar veðrið og uppfærslumerkið koma og fara. Stilltu það á tóman streng og miðjulistinn er bara miðjustilltur sem hópur í staðinn.
+`center` er kassinn í miðju stikunnar: allt innihald hans miðjast á skjánum sem einn hópur. `centerBegin` og `centerEnd` hanga sitt hvorum megin, svo klukkan helst nákvæmlega í miðjunni þegar veður og uppfærslumerki birtast og hverfa. Margar græjur í `center` miðjast saman; sé hann tómur mætast `centerBegin` og `centerEnd` í miðju stikunnar.
 
 Ein regla sem er þess virði að innbyrða: **þegar þú hefur þína eigin `shell.json` er hún sú eina gilda**. Þar til þú aðlagar eitthvað les skelin sjálfgefna skrá Omarchy. Um leið og þú dregur græju, keyrir `omarchy bar` eða breytir skránni sjálfur, átt þú hana — það er engin djúp samruni, svo nýjar sjálfgefnar græjur í framtíðarútgáfum Omarchy munu ekki birtast á stikunni þinni sjálfkrafa. `omarchy bar defaults` setur afhenta skipulagið til baka hvenær sem þú vilt hreint borð.
 

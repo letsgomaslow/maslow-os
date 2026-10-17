@@ -6,7 +6,7 @@ También es la única pieza del escritorio que siempre está en pantalla, así q
 
 ## Qué trae por defecto
 
-La barra tiene tres secciones. A la izquierda está el logo de Omarchy (el lanzador del menú) y los indicadores de espacios de trabajo. En el centro están los indicadores de estado, el reloj, Elsewhen (un reloj mundial), el clima y una insignia de actualización de Omarchy. A la derecha: la distribución de teclado (cuando hay más de una configurada), la bandeja del sistema, agentes, bluetooth, red, audio, pantalla y energía.
+La barra tiene tres secciones. A la izquierda está el logo de Omarchy (el lanzador del menú) y los indicadores de espacios de trabajo. En el centro están los indicadores de estado, el reloj, Elsewhen (un reloj mundial), el clima y una insignia de actualización de Omarchy. A la derecha: la bandeja del sistema, la distribución de teclado (cuando hay más de una configurada), agentes, bluetooth, red, audio, pantalla y energía.
 
 Algunos de esos solo aparecen cuando tienen algo que decir. La distribución de teclado aparece solo si has configurado más de una distribución. La insignia de actualización aparece solo cuando hay una actualización de Omarchy en espera. Y el icono de agentes aparece la primera vez que Omarchy encuentra uso de agentes de IA para código en la máquina (consulta [IA](17-ai.md)).
 
@@ -73,7 +73,7 @@ Quitar cualquiera de los dos servicios retira su widget de la barra.
 
 ## Indicadores
 
-El grupito en el centro es el widget de indicadores. Son glifos de estado para los modos que has activado: no molestar, luz nocturna, un [recordatorio](09-reminders.md) en cola, una grabación de pantalla activa, mantenerse despierto y [dictado](11-text-extraction-dictation.md). Se encienden cuando el modo está activo y, si no, no estorban — pasa el cursor a la izquierda del reloj (encima de él en una barra vertical) para echar un vistazo a los inactivos. Al hacer clic en un indicador se activa o desactiva ese modo. Uno más es solo de estado: una sesión remota se enciende en rojo mientras alguien está conectado a esta máquina a través de gliff.
+El grupito en el centro es el widget de indicadores. Son glifos de estado para los modos que has activado: no molestar, luz nocturna, un [recordatorio](09-reminders.md) en cola, una grabación de pantalla activa, mantenerse despierto y [dictado](11-text-extraction-dictation.md). Se encienden cuando el modo está activo y, si no, no estorban — pasa el cursor por cualquier parte de la barra para ver los inactivos. Al hacer clic en un indicador se activa o desactiva ese modo. Uno más es solo de estado: una sesión remota se enciende en rojo mientras alguien está conectado a esta máquina a través de gliff.
 
 Si prefieres que siempre estén visibles, pon `alwaysShow` en `true` en el widget. Y si solo te importan algunos, enumera los que quieres en `items`: `["Dnd", "Reminder", "NightLight"]`. Puedes tener más de un widget de indicadores, para que distintas secciones muestren distintos subconjuntos.
 
@@ -81,7 +81,9 @@ Si prefieres que siempre estén visibles, pon `alwaysShow` en `true` en el widge
 
 La barra se configura sola. No tienes que abrir un archivo de configuración para mover las cosas.
 
-Agarra un pedazo vacío de la barra alrededor del centro y arrástralo hacia otro borde de la pantalla, y la barra se mueve ahí — izquierda, derecha, arriba o abajo funcionan, y cada widget se adapta (las barras verticales recurren a formas compactas de solo icono). Hacer clic y mantener inicia el mismo arrastre. Haz doble clic izquierdo en ese mismo espacio vacío para cambiar el fondo de la barra de transparente a cristalino a opaco. Y arrastra cualquier widget para reordenarlo o aventarlo a otra sección.
+Agarra un pedazo vacío de la barra alrededor del centro y arrástralo hacia otro borde de la pantalla, y la barra se mueve ahí — izquierda, derecha, arriba o abajo funcionan, y cada widget se adapta (las barras verticales recurren a formas compactas de solo icono). Hacer clic y mantener inicia el mismo arrastre. Haz doble clic izquierdo en ese mismo espacio vacío para cambiar el fondo de la barra de transparente a cristalino a opaco. Y arrastra cualquier widget para reordenarlo o aventarlo a otra sección; los demás widgets se apartan para abrir espacio donde va a caer.
+
+El centro de la barra es una caja: lo que contiene se mantiene centrado como un grupo, y los widgets de ambos lados cuelgan de sus bordes. Mientras arrastras un widget aparece el contorno de la caja, o una línea que cruza la barra si está vacía. Puedes soltarlo dentro o al lado; cuando va a caer dentro, la caja crece para recibirlo.
 
 Un widget que quieres tener a la mano pero no siempre a la vista puede ir en el cajón de la bandeja: arrástralo sobre la bandeja y el cajón se abre para recibirlo. Ahí queda, después de los iconos de las aplicaciones, aparece cada vez que aparece el cajón y lo mantiene abierto mientras su panel está visible. Arrástralo de vuelta a la barra para regresarlo a su lugar.
 
@@ -92,7 +94,7 @@ Esas mismas cosas tienen comandos, que es lo que quieres para una configuración
 ```bash
 omarchy bar position bottom
 omarchy bar background glassy  # opaque, glassy, none, or cycle
-omarchy bar move omarchy.clock --section center --index 0
+omarchy bar move omarchy.weather --section centerBegin --index 0
 omarchy bar move omarchy.bluetooth --section tray  # into the tray's drawer
 omarchy bar set omarchy.clock format "HH:mm"
 omarchy bar defaults          # back to the shipped layout
@@ -101,7 +103,7 @@ omarchy bar defaults          # back to the shipped layout
 Para agregar o quitar un widget por completo, usa los comandos de plugin. `omarchy plugin list` imprime cada widget que el shell conoce con su id, y luego:
 
 ```bash
-omarchy plugin enable omarchy.media --section center
+omarchy plugin enable omarchy.media --section centerEnd
 omarchy plugin disable omarchy.weather
 ```
 
@@ -119,19 +121,20 @@ Todo se guarda en `~/.config/omarchy/shell.json`, bajo la clave `bar`. Aquí tie
   "bar": {
     "position": "top",
     "background": "opaque",
-    "centerAnchor": "omarchy.clock",
     "layout": {
       "left": [{ "id": "omarchy.menu" }, { "id": "omarchy.workspaces" }],
+      "centerBegin": [{ "id": "omarchy.indicators" }],
       "center": [{ "id": "omarchy.clock", "format": "HH:mm" }],
+      "centerEnd": [{ "id": "omarchy.weather" }],
       "right": [{ "id": "omarchy.audio" }, { "id": "omarchy.power" }]
     }
   }
 }
 ```
 
-Cada widget es una entrada en uno de los tres arreglos de distribución, y sus ajustes viven en línea en esa entrada — no hay un archivo de ajustes aparte ni un subobjeto `config`. El `format`, el `formatAlt` (al que cambia el clic derecho) y el `verticalFormat` del reloj viven todos justo ahí en `{ "id": "omarchy.clock" }`.
+Cada widget es una entrada en uno de los cinco arreglos de distribución, y sus ajustes viven en línea en esa entrada — no hay un archivo de ajustes aparte ni un subobjeto `config`. El `format`, el `formatAlt` (al que cambia el clic derecho) y el `verticalFormat` del reloj viven todos justo ahí en `{ "id": "omarchy.clock" }`.
 
-`centerAnchor` nombra el único widget central que se fija al centro exacto de la pantalla, con los demás flanqueándolo. Así es como el reloj se queda justo al centro aunque el clima y la insignia de actualización vayan y vengan. Ponlo como cadena vacía y la lista central simplemente se centra como grupo.
+`center` es la caja del centro de la barra: todo su contenido se centra en la pantalla como un grupo. `centerBegin` y `centerEnd` quedan a sus lados, así el reloj sigue justo al centro aunque el clima y la insignia de actualización aparezcan y desaparezcan. Varios widgets en `center` se centran juntos; si está vacío, `centerBegin` y `centerEnd` se encuentran a mitad de la barra.
 
 Una regla que vale la pena interiorizar: **una vez que tienes tu propio `shell.json`, es canónico**. Hasta que personalices algo, el shell lee el archivo predeterminado de Omarchy. En el momento en que arrastras un widget, ejecutas `omarchy bar` o editas el archivo tú mismo, es tuyo — no hay fusión profunda, así que los widgets predeterminados nuevos en versiones futuras de Omarchy no aparecerán automáticamente en tu barra. `omarchy bar defaults` regresa la distribución original cuando quieras empezar de cero.
 

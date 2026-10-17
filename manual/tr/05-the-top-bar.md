@@ -6,7 +6,7 @@ Aynı zamanda masaüstünde her zaman ekranda olan tek parçadır, bu yüzden o 
 
 ## Varsayılan olarak üzerinde neler var
 
-Çubuğun üç bölümü vardır. Solda Omarchy logosu (menü başlatıcı) ve çalışma alanı göstergeleri bulunur. Merkezde durum göstergelerini, saati, Elsewhen'i (dünya saati), hava durumunu ve bir Omarchy güncelleme rozetini alırsınız. Sağda: klavye düzeni (birden fazla yapılandırıldığında), sistem tepsisi, ajanlar, bluetooth, ağ, ses, ekran ve güç.
+Çubuğun üç bölümü vardır. Solda Omarchy logosu (menü başlatıcı) ve çalışma alanı göstergeleri bulunur. Merkezde durum göstergelerini, saati, Elsewhen'i (dünya saati), hava durumunu ve bir Omarchy güncelleme rozetini alırsınız. Sağda: sistem tepsisi, klavye düzeni (birden fazla yapılandırıldığında), ajanlar, bluetooth, ağ, ses, ekran ve güç.
 
 Bunlardan birkaçı yalnızca söyleyecek bir şeyleri olduğunda ortaya çıkar. Klavye düzeni, yalnızca birden fazla düzen yapılandırdıysanız görünür. Güncelleme rozeti, yalnızca bekleyen bir Omarchy güncellemesi olduğunda görünür. Ve ajanlar simgesi, Omarchy makinede AI kodlama kullanımını ilk kez bulduğunda görünür (bkz. [AI](17-ai.md)).
 
@@ -73,7 +73,7 @@ Hizmetlerden herhangi birini kaldırmak, widget'ını çubuktan geri alır.
 
 ## Göstergeler
 
-Merkezdeki küçük küme göstergeler widget'ıdır. Bunlar açtığınız modlar için durum simgeleridir: rahatsız etme, gece ışığı, sıraya alınmış bir [hatırlatıcı](09-reminders.md), aktif bir ekran kaydı, uyanık tut ve [dikte](11-text-extraction-dictation.md). Mod aktifken yanarlar ve aksi halde yoldan uzak dururlar — aktif olmayanlara göz atmak için saatin soluna (dikey çubukta üzerine) gelin. Bir göstergeye tıklamak o modu açıp kapatır. Bir tanesi daha yalnızca durum amaçlıdır: birisi gliff üzerinden bu makineye bağlıyken uzak oturum kırmızıyla yanar.
+Merkezdeki küçük küme göstergeler widget'ıdır. Bunlar açtığınız modlar için durum simgeleridir: rahatsız etme, gece ışığı, sıraya alınmış bir [hatırlatıcı](09-reminders.md), aktif bir ekran kaydı, uyanık tut ve [dikte](11-text-extraction-dictation.md). Mod aktifken yanarlar ve aksi halde yoldan uzak dururlar — etkin olmayan göstergeleri görmek için çubuğun herhangi bir yerine gelin. Bir göstergeye tıklamak o modu açıp kapatır. Bir tanesi daha yalnızca durum amaçlıdır: birisi gliff üzerinden bu makineye bağlıyken uzak oturum kırmızıyla yanar.
 
 Her zaman görünür olmalarını tercih ederseniz, widget üzerinde `alwaysShow` seçeneğini `true` olarak ayarlayın. Ve yalnızca bazılarını önemsiyorsanız, istediklerinizi `items` içinde listeleyin: `["Dnd", "Reminder", "NightLight"]`. Birden fazla göstergeler widget'ına sahip olabilirsiniz, böylece farklı bölümler farklı alt kümeler gösterebilir.
 
@@ -81,7 +81,9 @@ Her zaman görünür olmalarını tercih ederseniz, widget üzerinde `alwaysShow
 
 Çubuk kendini yapılandırır. Bir şeyleri taşımak için bir yapılandırma dosyası açmak zorunda değilsiniz.
 
-Çubuğun merkezinin etrafındaki boş bir yeri tutun ve başka bir ekran kenarına doğru sürükleyin; çubuk oraya taşınır — sol, sağ, üst veya alt hepsi çalışır ve her widget buna uyum sağlar (dikey çubuklar kompakt yalnızca simge biçimlerine döner). T tıklayıp basılı tutmak aynı sürüklemeyi başlatır. Çubuk arka planını şeffaftan camlıya ve opaklıya döndürmek için aynı boş alana çift sol tıklayın. Ve herhangi bir widget'ı sürükleyerek yeniden sıralayın veya başka bir bölüme atın.
+Çubuğun merkezinin etrafındaki boş bir yeri tutun ve başka bir ekran kenarına doğru sürükleyin; çubuk oraya taşınır — sol, sağ, üst veya alt hepsi çalışır ve her widget buna uyum sağlar (dikey çubuklar kompakt yalnızca simge biçimlerine döner). T tıklayıp basılı tutmak aynı sürüklemeyi başlatır. Çubuk arka planını şeffaftan camlıya ve opaklıya döndürmek için aynı boş alana çift sol tıklayın. Ve herhangi bir widget'ı sürükleyerek yeniden sıralayın veya başka bir bölüme atın; diğer widget'lar bırakılacağı yerde alan açmak için kenara kayar.
+
+Çubuğun ortası bir kutudur: içindekiler tek grup olarak ortalanır, yan widget'lar kenarlarına tutunur. Sürüklerken kutunun çerçevesi görünür; boşsa çubuk boyunca bir çizgi olur. İçine veya yanına bırakabilirsiniz; içine hedeflediğinizde kutu widget'ı almak için büyür.
 
 El altında olmasını ancak her zaman görünmesini istemediğiniz bir widget tepsinin çekmecesinde durabilir: onu tepsinin üzerine sürükleyin, çekmece açılıp onu içine alır. Orada uygulama simgelerinin arkasında oturur, çekmece her açıldığında görünür ve kendi paneli açık olduğu sürece çekmeceyi de açık tutar. Geri koymak için onu çubuğun üzerine geri sürükleyin.
 
@@ -92,7 +94,7 @@ Aynı şeyler komutlara sahiptir; bu bir [dotfiles](31-dotfiles.md) kurulumu iç
 ```bash
 omarchy bar position bottom
 omarchy bar background glassy  # opaque, glassy, none, or cycle
-omarchy bar move omarchy.clock --section center --index 0
+omarchy bar move omarchy.weather --section centerBegin --index 0
 omarchy bar move omarchy.bluetooth --section tray  # into the tray's drawer
 omarchy bar set omarchy.clock format "HH:mm"
 omarchy bar defaults          # back to the shipped layout
@@ -101,7 +103,7 @@ omarchy bar defaults          # back to the shipped layout
 Bir widget'ı tamamen eklemek veya kaldırmak için eklenti komutlarını kullanın. `omarchy plugin list` kabuğun bildiği her widget'ı kimliğiyle yazar ve ardından:
 
 ```bash
-omarchy plugin enable omarchy.media --section center
+omarchy plugin enable omarchy.media --section centerEnd
 omarchy plugin disable omarchy.weather
 ```
 
@@ -119,19 +121,20 @@ Tüm bunlar `~/.config/omarchy/shell.json` içinde, `bar` anahtarının altında
   "bar": {
     "position": "top",
     "background": "opaque",
-    "centerAnchor": "omarchy.clock",
     "layout": {
       "left": [{ "id": "omarchy.menu" }, { "id": "omarchy.workspaces" }],
+      "centerBegin": [{ "id": "omarchy.indicators" }],
       "center": [{ "id": "omarchy.clock", "format": "HH:mm" }],
+      "centerEnd": [{ "id": "omarchy.weather" }],
       "right": [{ "id": "omarchy.audio" }, { "id": "omarchy.power" }]
     }
   }
 }
 ```
 
-Her widget, üç düzen dizisinden birindeki tek bir girdidir ve ayarları o girdinin üzerinde satır içinde oturur — ayrı bir ayar dosyası ve `config` alt nesnesi yoktur. Saatin `format`, `formatAlt` (sağ tıklamanın döndürdüğü şey) ve `verticalFormat` değerlerinin hepsi `{ "id": "omarchy.clock" }` üzerinde tam orada yaşar.
+Her widget, beş düzen dizisinden birindeki tek bir girdidir ve ayarları o girdinin üzerinde satır içinde oturur — ayrı bir ayar dosyası ve `config` alt nesnesi yoktur. Saatin `format`, `formatAlt` (sağ tıklamanın döndürdüğü şey) ve `verticalFormat` değerlerinin hepsi `{ "id": "omarchy.clock" }` üzerinde tam orada yaşar.
 
-`centerAnchor`, ekranın tam merkezine sabitlenecek tek merkez widget'ı adlandırır, diğerleri onun yanlarına dizilir. Saat, hava durumu ve güncelleme rozeti gelip giderken bile tam merkezde böyle kalır. Onu boş bir dizeye ayarlayın, merkez listesi bunun yerine bir grup olarak ortalanır.
+`center`, çubuğun ortasındaki kutudur: içeriği ekranda tek grup olarak ortalanır. `centerBegin` ve `centerEnd` iki yana tutunur; böylece hava durumu ve güncelleme rozeti gelip giderken saat tam ortada kalır. `center` içindeki birden fazla widget birlikte ortalanır; boşsa `centerBegin` ve `centerEnd` çubuğun ortasında buluşur.
 
 İçselleştirmeye değer bir kural: **kendi `shell.json` dosyanıza sahip olduğunuzda, o kanoniktir**. Herhangi bir şeyi özelleştirene kadar, kabuk Omarchy'nin varsayılan dosyasını okur. Bir widget'ı sürüklediğiniz, `omarchy bar` çalıştırdığınız veya dosyayı kendiniz düzenlediğiniz anda, ona sahip olursunuz — derin birleştirme yoktur, bu yüzden gelecekteki Omarchy sürümlerindeki yeni varsayılan widget'lar çubuğunuzda otomatik olarak görünmez. `omarchy bar defaults`, temiz bir sayfa istediğinizde gönderilen düzeni geri koyar.
 

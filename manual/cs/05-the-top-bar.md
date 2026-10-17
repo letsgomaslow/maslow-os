@@ -6,7 +6,7 @@ Je to také jediný kus plochy, který je vždy na obrazovce, takže stojí za t
 
 ## Co je na něm ve výchozím nastavení
 
-Panel má tři sekce. Vlevo sedí logo Omarchy (spouštěč nabídky) a ukazatele pracovních ploch. Uprostřed máte stavové ukazatele, hodiny, Elsewhen (světové hodiny), počasí a odznak aktualizace Omarchy. Vpravo: rozložení klávesnice (když je nakonfigurováno více než jedno), systémová lišta, agenti, bluetooth, síť, zvuk, displej a napájení.
+Panel má tři sekce. Vlevo sedí logo Omarchy (spouštěč nabídky) a ukazatele pracovních ploch. Uprostřed máte stavové ukazatele, hodiny, Elsewhen (světové hodiny), počasí a odznak aktualizace Omarchy. Vpravo: systémová lišta, rozložení klávesnice (když je nakonfigurováno více než jedno), agenti, bluetooth, síť, zvuk, displej a napájení.
 
 Několik z nich se objeví, jen když mají co říct. Rozložení klávesnice se objeví, jen pokud jste nakonfigurovali více než jedno rozložení. Odznak aktualizace se objeví, jen když čeká aktualizace Omarchy. A ikona agentů se objeví, když Omarchy poprvé najde na počítači používání AI pro kódování (viz [AI](17-ai.md)).
 
@@ -73,7 +73,7 @@ Odebráním kterékoli služby se její widget z panelu opět odstraní.
 
 ## Ukazatele
 
-Malý shluk uprostřed je widget ukazatelů. Jsou to stavové glyfy pro režimy, které jste zapnuli: nerušit, noční světlo, zařazená [připomínka](09-reminders.md), aktivní nahrávání obrazovky, zůstat vzhůru a [diktování](11-text-extraction-dictation.md). Rozsvítí se, když je režim aktivní, a jinak zůstávají stranou — najeďte nalevo od hodin (nad nimi na svislém panelu) a nahlédněte na neaktivní. Kliknutím na ukazatel daný režim přepnete. Ještě jeden je pouze stavový: vzdálená relace svítí červeně, zatímco je někdo připojen k tomuto počítači přes gliff.
+Malý shluk uprostřed je widget ukazatelů. Jsou to stavové glyfy pro režimy, které jste zapnuli: nerušit, noční světlo, zařazená [připomínka](09-reminders.md), aktivní nahrávání obrazovky, zůstat vzhůru a [diktování](11-text-extraction-dictation.md). Rozsvítí se, když je režim aktivní, a jinak zůstávají stranou — najeďte kamkoli na panel a zobrazte neaktivní ukazatele. Kliknutím na ukazatel daný režim přepnete. Ještě jeden je pouze stavový: vzdálená relace svítí červeně, zatímco je někdo připojen k tomuto počítači přes gliff.
 
 Pokud byste je raději měli vždy viditelné, nastavte na widgetu `alwaysShow` na `true`. A pokud vám záleží jen na některých, uveďte ty, které chcete, v `items`: `["Dnd", "Reminder", "NightLight"]`. Můžete mít více než jeden widget ukazatelů, takže různé sekce mohou zobrazovat různé podmnožiny.
 
@@ -81,7 +81,9 @@ Pokud byste je raději měli vždy viditelné, nastavte na widgetu `alwaysShow` 
 
 Panel se konfiguruje sám. Pro přesouvání věcí nemusíte otevírat konfigurační soubor.
 
-Uchopte prázdný kus panelu kolem středu a přetáhněte ho směrem k jinému okraji obrazovky a panel se tam přesune — vlevo, vpravo, nahoře i dole funguje a každý widget se přizpůsobí (svislé panely se vracejí ke kompaktním formám pouze s ikonami). Kliknutí a podržení zahájí stejné přetažení. Dvojitým levým kliknutím na totéž prázdné místo přepnete pozadí panelu z průhledného na skleněné a neprůhledné. A přetáhněte jakýkoli widget, chcete-li změnit jeho pořadí, nebo ho hoďte do jiné sekce.
+Uchopte prázdný kus panelu kolem středu a přetáhněte ho směrem k jinému okraji obrazovky a panel se tam přesune — vlevo, vpravo, nahoře i dole funguje a každý widget se přizpůsobí (svislé panely se vracejí ke kompaktním formám pouze s ikonami). Kliknutí a podržení zahájí stejné přetažení. Dvojitým levým kliknutím na totéž prázdné místo přepnete pozadí panelu z průhledného na skleněné a neprůhledné. A přetáhněte jakýkoli widget, chcete-li změnit jeho pořadí, nebo ho hoďte do jiné sekce; ostatní widgety se rozestoupí a uvolní místo pro jeho puštění.
+
+Střed panelu je rámeček: obsah zůstává vystředěný jako skupina a sousední widgety se připojují k jeho okrajům. Při tažení je vidět obrys rámečku, nebo čára přes panel, když je prázdný. Widget můžete pustit dovnitř nebo vedle; při cílení dovnitř se rámeček zvětší.
 
 Widget, který chcete mít po ruce, ale ne stále na očích, může jít do zásuvky systémové lišty: přetáhněte ho na lištu a zásuvka se otevře, aby ho přijala. Sedí tam za ikonami aplikací, objeví se pokaždé, když se objeví zásuvka, a zásuvku drží otevřenou, dokud je otevřený jeho panel. Přetáhněte ho zpět ven na panel a vrátí se zpět.
 
@@ -92,7 +94,7 @@ Tytéž věci mají příkazy, což je to, co chcete pro nastavení [dotfiles](3
 ```bash
 omarchy bar position bottom
 omarchy bar background glassy  # opaque, glassy, none, or cycle
-omarchy bar move omarchy.clock --section center --index 0
+omarchy bar move omarchy.weather --section centerBegin --index 0
 omarchy bar move omarchy.bluetooth --section tray  # into the tray's drawer
 omarchy bar set omarchy.clock format "HH:mm"
 omarchy bar defaults          # back to the shipped layout
@@ -101,7 +103,7 @@ omarchy bar defaults          # back to the shipped layout
 Chcete-li widget zcela přidat nebo odebrat, použijte příkazy pluginů. `omarchy plugin list` vypíše každý widget, který shell zná, s jeho id, a pak:
 
 ```bash
-omarchy plugin enable omarchy.media --section center
+omarchy plugin enable omarchy.media --section centerEnd
 omarchy plugin disable omarchy.weather
 ```
 
@@ -119,19 +121,20 @@ Vše je uloženo v `~/.config/omarchy/shell.json` pod klíčem `bar`. Tady je zk
   "bar": {
     "position": "top",
     "background": "opaque",
-    "centerAnchor": "omarchy.clock",
     "layout": {
       "left": [{ "id": "omarchy.menu" }, { "id": "omarchy.workspaces" }],
+      "centerBegin": [{ "id": "omarchy.indicators" }],
       "center": [{ "id": "omarchy.clock", "format": "HH:mm" }],
+      "centerEnd": [{ "id": "omarchy.weather" }],
       "right": [{ "id": "omarchy.audio" }, { "id": "omarchy.power" }]
     }
   }
 }
 ```
 
-Každý widget je jedna položka v jednom ze tří polí rozložení a jeho nastavení sedí přímo na této položce — neexistuje žádný samostatný soubor nastavení ani žádný podobjekt `config`. `format` hodin, `formatAlt` (to, na co přepne pravé kliknutí) a `verticalFormat` všechny žijí právě tam na `{ "id": "omarchy.clock" }`.
+Každý widget je jedna položka v jednom ze pěti polí rozložení a jeho nastavení sedí přímo na této položce — neexistuje žádný samostatný soubor nastavení ani žádný podobjekt `config`. `format` hodin, `formatAlt` (to, na co přepne pravé kliknutí) a `verticalFormat` všechny žijí právě tam na `{ "id": "omarchy.clock" }`.
 
-`centerAnchor` pojmenovává jeden středový widget, který se připne přesně do středu obrazovky a ostatní ho lemují. Tak zůstávají hodiny přesně uprostřed, i když počasí a odznak aktualizace přicházejí a odcházejí. Nastavte ho na prázdný řetězec a středový seznam se místo toho vycentruje jako skupina.
+`center` je rámeček uprostřed panelu: vše uvnitř se vystředí na obrazovce jako skupina. `centerBegin` a `centerEnd` jsou po jeho stranách, takže hodiny zůstávají přesně uprostřed, i když se počasí a odznak aktualizace objevují a mizí. Více widgetů v `center` se vystředí společně; je-li prázdný, `centerBegin` a `centerEnd` se setkají uprostřed panelu.
 
 Jedno pravidlo, které stojí za to si osvojit: **jakmile máte vlastní `shell.json`, je kanonický**. Dokud nic nepřizpůsobíte, shell čte výchozí soubor Omarchy. V okamžiku, kdy přetáhnete widget, spustíte `omarchy bar` nebo sami upravíte soubor, vlastníte ho — nedochází k žádnému hlubokému slučování, takže nové výchozí widgety v budoucích verzích Omarchy se na vašem panelu neobjeví automaticky. `omarchy bar defaults` vrátí dodávané rozložení, kdykoli budete chtít čistý štít.
 

@@ -59,15 +59,15 @@ hl.gesture({ fingers = 3, direction = "horizontal", action = "workspace" })
 
 ### 用中文、日文和其他语言打字
 
-当安装程序询问你的键盘时，选择日文、韩文、中文（简体，拼音）或中文（繁体，注音）。Omarchy 自动配置键盘和匹配的输入法引擎，包括在离线首次启动设置期间。日文使用 Mozc，韩文使用标准两集式 Hangul，简体中文使用拼音，繁体中文使用 Chewing 的标准注音排列。日文（US keyboard）提供 Mozc 并使用美国键盘布局。
+安装程序询问键盘时，选择日语、韩语、中文（简体、Pinyin）、台湾（Zhuyin）或香港（Cangjie）。Omarchy 会自动配置键盘和输入引擎，包括首次离线启动时。日语使用 Mozc，韩语使用标准双式 Hangul，简体中文使用 Pinyin，台湾使用 Chewing 的标准 Zhuyin 排列，香港使用带香港字形的 Cangjie。日语（US 键盘）提供 US 布局的 Mozc。即使使用 Dvorak、Colemak 或 AZERTY 输入拉丁字母，Hangul、Zhuyin 和 Cangjie 按键也保持标准位置。如果此前已添加 Hangul 或 Chewing，在 _设置 > 打字 > 输入法_ 中取消勾选后重新勾选即可迁移按键位置；Omarchy 不会擅自更改已在使用的引擎。
 
-打字从拉丁模式开始。按 `Super + I` 循环浏览已配置的输入法，按 `Super + Shift + I` 向后循环。单独轻点 `Shift` 可走出像拼音这样的输入法进入拉丁字母，再点一次可回去，就像搜狗、微软拼音和 macOS 一样；`Shift` 加一个字母仍然打出大写字母。在日语键盘上，全角/半角切换输入，変換开启它，無変換关闭它。在韩语键盘布局上，专用的 한/영 和 한자 键切换 Hangul 并转换为 Hanja。`Ctrl + Space` 仍可用于 Tmux 和 Herdr；`Shift + CapsLock` 仍是组合键。
+打字从拉丁模式开始。按 `Super + I` 循环浏览已配置的输入法，按 `Super + Shift + I` 向后循环。单独轻点 `Shift` 可走出像拼音这样的输入法进入拉丁字母，再点一次可回去，就像搜狗、微软拼音和 macOS 一样；`Shift` 加一个字母仍然打出大写字母。在日语键盘上，全角/半角切换输入，変換开启它，無変換关闭它。韩语中，한/영 切换 Hangul，한자 转换为 Hanja；无论键盘有专用键，还是像许多笔记本一样发送 Right Alt 和 Right Ctrl，都适用。因此这里的这两个键不再是普通修饰键，按住说话的听写仍使用 F9。 `Ctrl + Space` 仍可用于 Tmux 和 Herdr；`Shift + CapsLock` 仍是组合键。
 
 当你有多个键盘布局或输入法时，键盘指示器出现在栏的右侧。点击它切换输入语言；日文显示 あ 表示平假名。对于日文字选择，切换到日文，输入如 `nihongo` 这样的词，然后按两次 Space。按 Enter 接受你的选择。如果你也有多个键盘布局，右键点击指示器以循环它们。
 
 使用 _Setup > Typing > Keyboard Layouts_ 选择布局，如英语和法语，选项与安装期间提供的相同。使用 _Setup > Typing > Input Methods_ 选择哪些合成引擎处于活动状态。两个选择器都在 Omarchy 菜单内部打开，并勾选你当前的选择。点击或按 Enter 切换某个选择；每个更改立即生效。取消选择某个输入法会将其从循环中移除，但不卸载它；键盘仍然可用。
 
-运行 `omarchy setup keyboard` 或 `omarchy setup input` 打开相同的选择器。要从命令行追加一种语言，使用 `omarchy setup input mozc`、`hangul`、`pinyin` 或 `chewing`。你的自定义切换键会被保留。对于替代引擎布局或键，用 `omarchy pkg add fcitx5-configtool` 安装 `fcitx5-configtool` 并从终端启动它。选择输入语言不会更改桌面语言。
+运行 `omarchy setup keyboard` 或 `omarchy setup input` 打开相同的选择器。要从命令行追加一种语言，使用 `omarchy setup input mozc`, `hangul`, `pinyin`, `chewing`, `cangjie5`。你的自定义切换键会被保留。对于替代引擎布局或键，用 `omarchy pkg add fcitx5-configtool` 安装 `fcitx5-configtool` 并从终端启动它。选择输入语言不会更改桌面语言。 Quick、Boshiamy 和 Array 与 Cangjie 包含在同一软件包中，并显示在输入法选择器里。在 _设置 > 语言_ 中选择日语、韩语或中文时，如果还没有输入法，就会添加相应输入法。
 
 使用 `Super + I` 循环浏览输入法或键盘布局，使用 `Super + Shift + I` 向另一个方向，所以有三个配置时你可以在两个邻居之间移动。只有当配置了多个输入法或布局时，输入指示器才出现在栏的右侧。此桌面绑定与你现有的 Fcitx 切换键一起工作；你可以在 `~/.config/hypr/bindings.lua` 中覆盖它。输入法引擎和组合序列使用已经在每个会话中运行的 [Fcitx5](https://fcitx-im.org/) 服务。
 

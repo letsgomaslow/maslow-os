@@ -6,7 +6,7 @@ Den er også det eneste stykke af skrivebordet, der altid er på skærmen, så d
 
 ## Hvad der er på den som standard
 
-Linjen har tre sektioner. Til venstre sidder Omarchy-logoet (menustarteren) og arbejdsområdeindikatorerne. I midten får du statusindikatorerne, uret, Elsewhen (et verdensuret), vejret og et Omarchy-opdateringsbadge. Til højre: tastaturlayoutet (når mere end ét er konfigureret), systembakken, agenter, bluetooth, netværk, lyd, skærm og strøm.
+Linjen har tre sektioner. Til venstre sidder Omarchy-logoet (menustarteren) og arbejdsområdeindikatorerne. I midten får du statusindikatorerne, uret, Elsewhen (et verdensuret), vejret og et Omarchy-opdateringsbadge. Til højre: systembakken, tastaturlayoutet (når mere end ét er konfigureret), agenter, bluetooth, netværk, lyd, skærm og strøm.
 
 Nogle af dem vises kun, når de har noget at sige. Tastaturlayoutet vises kun, hvis du har konfigureret mere end ét layout. Opdateringsbadget vises kun, når der venter en Omarchy-opdatering. Og agentikonet vises første gang, Omarchy finder AI-kodningsforbrug på maskinen (se [AI](17-ai.md)).
 
@@ -73,7 +73,7 @@ Fjerner du en af tjenesterne, tages dens widget af linjen igen.
 
 ## Indikatorer
 
-Den lille klynge i midten er indikatorwidget'en. Det er statustegn for tilstande, du har slået til: forstyr ikke, natlys, en [påmindelse](09-reminders.md) i kø, en aktiv skærmoptagelse, hold vågen og [diktering](11-text-extraction-dictation.md). De lyser op, når tilstanden er aktiv, og holder sig ellers væk — hold musen til venstre for uret (over det på en lodret linje) for at smugkigge på de inaktive. Et klik på en indikator slår den tilstand til eller fra. Én mere er kun status: en ekstern session lyser rødt, mens nogen er forbundet til denne maskine via gliff.
+Den lille klynge i midten er indikatorwidget'en. Det er statustegn for tilstande, du har slået til: forstyr ikke, natlys, en [påmindelse](09-reminders.md) i kø, en aktiv skærmoptagelse, hold vågen og [diktering](11-text-extraction-dictation.md). De lyser op, når tilstanden er aktiv, og holder sig ellers væk — hold musen et vilkårligt sted på linjen for at se de inaktive. Et klik på en indikator slår den tilstand til eller fra. Én mere er kun status: en ekstern session lyser rødt, mens nogen er forbundet til denne maskine via gliff.
 
 Hvis du hellere vil have dem altid synlige, skal du sætte `alwaysShow` til `true` på widget'en. Og hvis du kun går op i nogle af dem, skal du liste dem, du vil have, i `items`: `["Dnd", "Reminder", "NightLight"]`. Du kan have mere end én indikatorwidget, så forskellige sektioner kan vise forskellige delsæt.
 
@@ -81,7 +81,9 @@ Hvis du hellere vil have dem altid synlige, skal du sætte `alwaysShow` til `tru
 
 Linjen konfigurerer sig selv. Du behøver ikke at åbne en konfigurationsfil for at flytte ting.
 
-Grib et tomt område på linjen omkring midten, og træk det mod en anden skærmkant, og linjen flytter derover — venstre, højre, top eller bund virker alle, og hver widget tilpasser sig (lodrette linjer falder tilbage til kompakte former kun med ikoner). Et klik-og-hold starter den samme trækning. Dobbelt-venstreklik på det samme tomme område for at bladre linjens baggrund fra klar til glasagtig til uigennemsigtig. Og træk en hvilken som helst widget for at omarrangere den eller kaste den ind i en anden sektion.
+Grib et tomt område på linjen omkring midten, og træk det mod en anden skærmkant, og linjen flytter derover — venstre, højre, top eller bund virker alle, og hver widget tilpasser sig (lodrette linjer falder tilbage til kompakte former kun med ikoner). Et klik-og-hold starter den samme trækning. Dobbelt-venstreklik på det samme tomme område for at bladre linjens baggrund fra klar til glasagtig til uigennemsigtig. Og træk en hvilken som helst widget for at omarrangere den eller kaste den ind i en anden sektion; de andre widgets glider til side for at give plads, hvor den lander.
+
+Midten af linjen er en boks: indholdet holdes centreret som én gruppe, og widgets på hver side hænger ved kanterne. Under træk vises boksens omrids, eller en linje hen over linjen, hvis boksen er tom. Du kan slippe indeni eller ved siden af; når du sigter indeni, vokser boksen for at rumme widgetten.
 
 En widget, du vil have ved hånden, men ikke altid i syne, kan ryge i bakkens skuffe: træk den hen på bakken, og skuffen åbner sig og tager imod den. Den sidder der efter appikonerne, dukker op, hver gang skuffen gør det, og holder sin skuffe åben, mens dens panel er oppe. Træk den tilbage ud på linjen for at sætte den på plads igen.
 
@@ -92,7 +94,7 @@ De samme ting har kommandoer, hvilket er det, du vil have til en [dotfiles](31-d
 ```bash
 omarchy bar position bottom
 omarchy bar background glassy  # opaque, glassy, none, or cycle
-omarchy bar move omarchy.clock --section center --index 0
+omarchy bar move omarchy.weather --section centerBegin --index 0
 omarchy bar move omarchy.bluetooth --section tray  # into the tray's drawer
 omarchy bar set omarchy.clock format "HH:mm"
 omarchy bar defaults          # back to the shipped layout
@@ -101,7 +103,7 @@ omarchy bar defaults          # back to the shipped layout
 For at tilføje eller fjerne en widget helt skal du bruge plugin-kommandoerne. `omarchy plugin list` udskriver alle widgets, shell'en kender, med deres id, og derefter:
 
 ```bash
-omarchy plugin enable omarchy.media --section center
+omarchy plugin enable omarchy.media --section centerEnd
 omarchy plugin disable omarchy.weather
 ```
 
@@ -119,19 +121,20 @@ Det hele gemmes i `~/.config/omarchy/shell.json` under nøglen `bar`. Her er en 
   "bar": {
     "position": "top",
     "background": "opaque",
-    "centerAnchor": "omarchy.clock",
     "layout": {
       "left": [{ "id": "omarchy.menu" }, { "id": "omarchy.workspaces" }],
+      "centerBegin": [{ "id": "omarchy.indicators" }],
       "center": [{ "id": "omarchy.clock", "format": "HH:mm" }],
+      "centerEnd": [{ "id": "omarchy.weather" }],
       "right": [{ "id": "omarchy.audio" }, { "id": "omarchy.power" }]
     }
   }
 }
 ```
 
-Hver widget er én post i ét af de tre layout-arrays, og dets indstillinger sidder inline på den post — der er ingen separat indstillingsfil og intet `config`-underobjekt. Urets `format`, `formatAlt` (hvad højreklik bladrer til) og `verticalFormat` bor alle lige der på `{ "id": "omarchy.clock" }`.
+Hver widget er én post i ét af de fem layout-arrays, og dets indstillinger sidder inline på den post — der er ingen separat indstillingsfil og intet `config`-underobjekt. Urets `format`, `formatAlt` (hvad højreklik bladrer til) og `verticalFormat` bor alle lige der på `{ "id": "omarchy.clock" }`.
 
-`centerAnchor` navngiver den ene midterwidget, der fastgøres til skærmens nøjagtige midte, med de andre ved dens side. Det er sådan, uret forbliver præcis i midten, selv når vejret og opdateringsbadget kommer og går. Sæt det til en tom streng, og midterlisten centreres bare som en gruppe i stedet.
+`center` er boksen midt på linjen: alt i den centreres på skærmen som én gruppe. `centerBegin` og `centerEnd` hænger på hver side, så uret bliver præcis i midten, når vejret og opdateringsbadget kommer og går. Flere widgets i `center` centreres sammen; er den tom, mødes `centerBegin` og `centerEnd` midt på linjen.
 
 Én regel, der er værd at internalisere: **når du først har din egen `shell.json`, er den kanonisk**. Indtil du tilpasser noget, læser shell'en Omarchys standardfil. I det øjeblik du trækker en widget, kører `omarchy bar` eller redigerer filen selv, ejer du den — der er ingen dyb sammenfletning, så nye standardwidgets i fremtidige Omarchy-udgivelser vises ikke automatisk på din linje. `omarchy bar defaults` sætter det leverede layout tilbage, når du vil have en ren tavle.
 

@@ -6,7 +6,7 @@
 
 ## 默认包含什么
 
-该栏有三个部分。左侧是 Omarchy 徽标（菜单启动器）和工作区指示器。中间有状态指示器、时钟、Elsewhen（世界时钟）、天气和 Omarchy 更新徽章。右侧有：键盘布局（当配置了多个时）、系统托盘、智能体、蓝牙、网络、音频、显示和电源。
+该栏有三个部分。左侧是 Omarchy 徽标（菜单启动器）和工作区指示器。中间有状态指示器、时钟、Elsewhen（世界时钟）、天气和 Omarchy 更新徽章。右侧有：系统托盘、键盘布局（当配置了多个时）、智能体、蓝牙、网络、音频、显示和电源。
 
 其中一些只在有内容要说时才出现。键盘布局仅在你配置了多个布局时出现。更新徽章仅在有 Omarchy 更新等待时出现。智能体图标在 Omarchy 首次在机器上发现 AI 编程使用情况时出现（参见 [AI](17-ai.md)）。
 
@@ -73,7 +73,7 @@
 
 ## 指示器
 
-中间那一小簇是指示器小组件。这些是你打开的模式的状态字形：勿扰、夜灯、排队的[提醒](09-reminders.md)、正在进行的录屏、保持唤醒和[听写](11-text-extraction-dictation.md)。当模式处于活动状态时它们会亮起，否则会保持不碍事——将鼠标悬停在时钟左侧（在垂直栏上是上方）可窥视非活动的那些。单击指示器可切换该模式。还有一个仅为状态：当有人通过 gliff 连接到此机器时，远程会话会亮起红色。
+中间那一小簇是指示器小组件。这些是你打开的模式的状态字形：勿扰、夜灯、排队的[提醒](09-reminders.md)、正在进行的录屏、保持唤醒和[听写](11-text-extraction-dictation.md)。当模式处于活动状态时它们会亮起，否则会保持不碍事— 将鼠标悬停在栏上的任意位置，即可查看未启用的指示器。单击指示器可切换该模式。还有一个仅为状态：当有人通过 gliff 连接到此机器时，远程会话会亮起红色。
 
 如果你希望它们始终可见，请将小组件上的 `alwaysShow` 设置为 `true`。如果你只关心其中一些，请在 `items` 中列出你想要的：`["Dnd", "Reminder", "NightLight"]`。你可以拥有多个指示器小组件，这样不同的部分就可以显示不同的子集。
 
@@ -81,7 +81,9 @@
 
 栏会自行配置。你不必打开配置文件来移动东西。
 
-抓住栏中心周围的一块空白处，将其拖向另一个屏幕边缘，栏就会移到那里——左、右、顶部或底部都可以，每个小组件都会适应（垂直栏会退回到紧凑的仅图标形式）。单击并按住也会开始同样的拖动。双击同一空白处可循环栏背景，从透明到玻璃效果再到不透明。拖动任何小组件可重新排序它或将其扔到另一部分。
+抓住栏中心周围的一块空白处，将其拖向另一个屏幕边缘，栏就会移到那里——左、右、顶部或底部都可以，每个小组件都会适应（垂直栏会退回到紧凑的仅图标形式）。单击并按住也会开始同样的拖动。双击同一空白处可循环栏背景，从透明到玻璃效果再到不透明。拖动任何小组件可重新排序它或将其扔到另一部分；其他小组件会滑开，为即将放入的位置腾出空间。
+
+栏的中部是一个框：框内内容始终作为一组居中，两侧的小组件依附于框的边缘。拖动时会显示框的轮廓；空框则显示为横贯栏的一条线。你可以放入框内或旁边；当目标位于框内时，框会扩大以容纳小组件。
 
 想保留但不想始终露在外面的小组件，可以放进托盘的抽屉里：把它拖到托盘上，抽屉就会打开接纳它。它会排在应用图标之后，抽屉展开时随之出现，而且其面板打开期间会让所在的抽屉保持展开。把它拖回栏上即可放回原处。
 
@@ -92,7 +94,7 @@
 ```bash
 omarchy bar position bottom
 omarchy bar background glassy  # opaque, glassy, none, or cycle
-omarchy bar move omarchy.clock --section center --index 0
+omarchy bar move omarchy.weather --section centerBegin --index 0
 omarchy bar move omarchy.bluetooth --section tray  # into the tray's drawer
 omarchy bar set omarchy.clock format "HH:mm"
 omarchy bar defaults          # back to the shipped layout
@@ -101,7 +103,7 @@ omarchy bar defaults          # back to the shipped layout
 要完全添加或删除小组件，请使用插件命令。`omarchy plugin list` 打印 shell 知道的所有小组件及其 ID，然后：
 
 ```bash
-omarchy plugin enable omarchy.media --section center
+omarchy plugin enable omarchy.media --section centerEnd
 omarchy plugin disable omarchy.weather
 ```
 
@@ -119,19 +121,20 @@ omarchy plugin disable omarchy.weather
   "bar": {
     "position": "top",
     "background": "opaque",
-    "centerAnchor": "omarchy.clock",
     "layout": {
       "left": [{ "id": "omarchy.menu" }, { "id": "omarchy.workspaces" }],
+      "centerBegin": [{ "id": "omarchy.indicators" }],
       "center": [{ "id": "omarchy.clock", "format": "HH:mm" }],
+      "centerEnd": [{ "id": "omarchy.weather" }],
       "right": [{ "id": "omarchy.audio" }, { "id": "omarchy.power" }]
     }
   }
 }
 ```
 
-每个小组件都是三个布局数组之一中的一个条目，其设置内联在该条目上——没有单独的设置文件，也没有 `config` 子对象。时钟的 `format`、`formatAlt`（右键单击循环到的内容）和 `verticalFormat` 都位于 `{ "id": "omarchy.clock" }` 上。
+每个小组件都是五个布局数组之一中的一个条目，其设置内联在该条目上——没有单独的设置文件，也没有 `config` 子对象。时钟的 `format`、`formatAlt`（右键单击循环到的内容）和 `verticalFormat` 都位于 `{ "id": "omarchy.clock" }` 上。
 
-`centerAnchor` 命名一个被固定到屏幕正中央的中间小组件，其他小组件位于其两侧。这就是为什么即使天气和更新徽章来来去去，时钟也能保持在正中央。将其设置为空字符串，中心列表就只会作为一个组居中。
+`center` 是栏中部的框：其中的内容作为一组在屏幕上居中。`centerBegin` 和 `centerEnd` 依附于两侧，因此即使天气和更新徽章出现或消失，时钟仍准确居中。将多个小组件放入 `center` 会一起居中；留空时，`centerBegin` 和 `centerEnd` 会在栏的中点相接。
 
 有一条规则值得内化：**一旦你有了自己的 `shell.json`，它就是规范的**。在你自定义任何东西之前，shell 读取 Omarchy 的默认文件。一旦你拖动小组件、运行 `omarchy bar` 或自己编辑文件，你就拥有它了——没有深度合并，所以未来 Omarchy 版本中的新默认小组件不会自动出现在你的栏上。`omarchy bar defaults` 可在你想要干净状态时恢复出厂布局。
 

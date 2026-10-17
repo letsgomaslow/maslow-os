@@ -6,7 +6,7 @@ Bu shuningdek har doim ekranda boʻladigan ish stolining yagona qismi, shuning u
 
 ## Standartda unda nimalar bor
 
-Panel uchta boʻlimga ega. Chapda Omarchy logotipi (menyu ishga tushirgichi) va ish maydoni koʻrsatkichlari oʻtiradi. Markazda holat koʻrsatkichlari, soat, Elsewhen (dunyo soati), ob-havo va Omarchy yangilanish belgisi. Oʻngda: klaviatura tartibi (bittadan koʻproq sozlangan boʻlsa), tizim laganda, agentlar, bluetooth, tarmoq, ovoz, displey va quvvat.
+Panel uchta boʻlimga ega. Chapda Omarchy logotipi (menyu ishga tushirgichi) va ish maydoni koʻrsatkichlari oʻtiradi. Markazda holat koʻrsatkichlari, soat, Elsewhen (dunyo soati), ob-havo va Omarchy yangilanish belgisi. Oʻngda: tizim laganda, klaviatura tartibi (bittadan koʻproq sozlangan boʻlsa), agentlar, bluetooth, tarmoq, ovoz, displey va quvvat.
 
 Ulardan bir nechtasi faqat aytadigan narsasi boʻlganda paydo boʻladi. Klaviatura tartibi faqat bittadan koʻproq tartib sozlagan boʻlsangiz paydo boʻladi. Yangilanish belgisi faqat Omarchy yangilanishi kutayotgan boʻlsa paydo boʻladi. Va agentlar ikonkasi Omarchy mashinada AI kodlash ishlatilishini birinchi topganda paydo boʻladi ([AI](17-ai.md) ga qarang).
 
@@ -73,7 +73,7 @@ Har ikkala xizmatni olib tashlash uning vidjetini paneldan olib tashlaydi.
 
 ## Koʻrsatkichlar
 
-Markazdagi kichik klaster — koʻrsatkichlar vidjeti. Bular siz yoqqan rejimlar uchun holat gliflari: bezovta qilmang, tungi yorugʻlik, navbatga qoʻyilgan [eslatma](09-reminders.md), faol ekran yozuvi, uygʻoq qolish va [diktovka](11-text-extraction-dictation.md). Ular rejim faol boʻlganda yonadi va aks holda yoʻldan chetda qoladi — faol boʻlmaganlarni koʻrib chiqish uchun soatning chap tomoniga (vertikal panelda uning ustiga) olib boring. Koʻrsatkichni bosish oʻsha rejimni almashtiradi. Yana bittasi faqat holat: masofaviy sessiya birov gliff orqali ushbu mashinaga ulangan paytda qizil yonadi.
+Markazdagi kichik klaster — koʻrsatkichlar vidjeti. Bular siz yoqqan rejimlar uchun holat gliflari: bezovta qilmang, tungi yorugʻlik, navbatga qoʻyilgan [eslatma](09-reminders.md), faol ekran yozuvi, uygʻoq qolish va [diktovka](11-text-extraction-dictation.md). Ular rejim faol boʻlganda yonadi va aks holda yoʻldan chetda qoladi — faol bo‘lmagan ko‘rsatkichlarni ko‘rish uchun panelning istalgan joyiga kursorni olib boring. Koʻrsatkichni bosish oʻsha rejimni almashtiradi. Yana bittasi faqat holat: masofaviy sessiya birov gliff orqali ushbu mashinaga ulangan paytda qizil yonadi.
 
 Agar ularning har doim koʻrinishini afzal koʻrsangiz, vidjetda `alwaysShow` ni `true` ga oʻrnating. Va agar ularning faqat baʼzilariga qiziqsangiz, xohlaganlaringizni `items` da roʻyxatlang: `["Dnd", "Reminder", "NightLight"]`. Sizda bittadan koʻproq koʻrsatkichlar vidjeti boʻlishi mumkin, shuning uchun turli boʻlimlar turli qism toʻplamlarni koʻrsatishi mumkin.
 
@@ -81,7 +81,9 @@ Agar ularning har doim koʻrinishini afzal koʻrsangiz, vidjetda `alwaysShow` ni
 
 Panel oʻzini sozlaydi. Narsalarni koʻchirish uchun konfiguratsiya faylini ochishingiz shart emas.
 
-Markaz atrofidagi panelning boʻsh joyini ushlang va uni boshqa ekran chetiga sudrab boring va panel u yerga koʻchadi — chap, oʻng, yuqori yoki past hammasi ishlaydi va har bir vidjet moslashadi (vertikal panellar ixcham faqat ikonka shakllariga qaytadi). Bosib ushlab turish xuddi shu sudrashni boshlaydi. Panel fonini shaffofdan shishasimondan shaffofmasga aylantirish uchun oʻsha boʻsh joyni ikki marta chap bosing. Va istalgan vidjetni qayta tartibga solish yoki boshqa boʻlimga tashlash uchun sudrab boring.
+Markaz atrofidagi panelning boʻsh joyini ushlang va uni boshqa ekran chetiga sudrab boring va panel u yerga koʻchadi — chap, oʻng, yuqori yoki past hammasi ishlaydi va har bir vidjet moslashadi (vertikal panellar ixcham faqat ikonka shakllariga qaytadi). Bosib ushlab turish xuddi shu sudrashni boshlaydi. Panel fonini shaffofdan shishasimondan shaffofmasga aylantirish uchun oʻsha boʻsh joyni ikki marta chap bosing. Va istalgan vidjetni qayta tartibga solish yoki boshqa boʻlimga tashlash uchun sudrab boring; boshqa vidjetlar qo‘yiladigan joyni bo‘shatish uchun chetga suriladi.
+
+Panelning o‘rtasi quti: ichidagilar bir guruh sifatida markazda qoladi, yon vidjetlar esa uning chetlariga ulanadi. Sudrash paytida qutining chegarasi, bo‘sh bo‘lsa panel bo‘ylab chiziq ko‘rinadi. Ichiga yoki yoniga tashlash mumkin; ichiga yo‘naltirilsa, quti vidjetni sig‘dirish uchun kengayadi.
 
 Qoʻl ostingizda boʻlishini, lekin har doim koʻzga tashlanishini xohlamagan vidjet lagandaning tortmasida turishi mumkin: uni lagandaga sudrab boring, tortma uni qabul qilish uchun ochiladi. U u yerda ilova ikonkalaridan keyin joylashadi, tortma qachon ochilsa paydo boʻladi va paneli ochiq boʻlganda tortmani ochiq ushlab turadi. Uni joyiga qaytarish uchun yana panelga sudrab olib chiqing.
 
@@ -92,7 +94,7 @@ Bir xil narsalarning buyruqlari bor, bu [dotfiles](31-dotfiles.md) sozlamasi uch
 ```bash
 omarchy bar position bottom
 omarchy bar background glassy  # opaque, glassy, none, or cycle
-omarchy bar move omarchy.clock --section center --index 0
+omarchy bar move omarchy.weather --section centerBegin --index 0
 omarchy bar move omarchy.bluetooth --section tray  # into the tray's drawer
 omarchy bar set omarchy.clock format "HH:mm"
 omarchy bar defaults          # back to the shipped layout
@@ -101,7 +103,7 @@ omarchy bar defaults          # back to the shipped layout
 Vidjetni butunlay qoʻshish yoki olib tashlash uchun plagin buyruqlaridan foydalaning. `omarchy plugin list` shell biladigan har bir vidjetni uning id si bilan chop etadi va keyin:
 
 ```bash
-omarchy plugin enable omarchy.media --section center
+omarchy plugin enable omarchy.media --section centerEnd
 omarchy plugin disable omarchy.weather
 ```
 
@@ -119,19 +121,20 @@ Bularning hammasi `bar` tugmasi ostida `~/.config/omarchy/shell.json` da saqlana
   "bar": {
     "position": "top",
     "background": "opaque",
-    "centerAnchor": "omarchy.clock",
     "layout": {
       "left": [{ "id": "omarchy.menu" }, { "id": "omarchy.workspaces" }],
+      "centerBegin": [{ "id": "omarchy.indicators" }],
       "center": [{ "id": "omarchy.clock", "format": "HH:mm" }],
+      "centerEnd": [{ "id": "omarchy.weather" }],
       "right": [{ "id": "omarchy.audio" }, { "id": "omarchy.power" }]
     }
   }
 }
 ```
 
-Har bir vidjet uchta tartib massivlaridan birida bitta yozuvdir va uning sozlamalari oʻsha yozuvda ichki oʻtiradi — alohida sozlamalar fayli va `config` sub-obyekti yoʻq. Soatning `format`, `formatAlt` (oʻng bosish nimaga aylantiradi) va `verticalFormat` hammasi toʻgʻridan-toʻgʻri `{ "id": "omarchy.clock" }` da yashaydi.
+Har bir vidjet beshta tartib massivlaridan birida bitta yozuvdir va uning sozlamalari oʻsha yozuvda ichki oʻtiradi — alohida sozlamalar fayli va `config` sub-obyekti yoʻq. Soatning `format`, `formatAlt` (oʻng bosish nimaga aylantiradi) va `verticalFormat` hammasi toʻgʻridan-toʻgʻri `{ "id": "omarchy.clock" }` da yashaydi.
 
-`centerAnchor` ekranning aniq markaziga mahkamlanadigan bitta markaz vidjetini nomlaydi, boshqalar uni yonlaydi. Shunday qilib ob-havo va yangilanish belgisi kelib-ketib turganda ham soat aynan markazda qoladi. Uni boʻsh satrga oʻrnatsangiz, markaz roʻyxati oʻrniga guruh sifatida shunchaki markazlashtiriladi.
+`center` panel o‘rtasidagi quti: undagi barcha narsalar ekranda bir guruh sifatida markazlanadi. `centerBegin` va `centerEnd` ikki chetga ulanadi, shuning uchun ob-havo va yangilanish belgisi paydo bo‘lib yo‘qolganda ham soat aniq markazda qoladi. `center` ichidagi bir nechta vidjet birga markazlanadi; bo‘sh bo‘lsa, `centerBegin` va `centerEnd` panel o‘rtasida uchrashadi.
 
 Ichki qabul qilishga arziydigan bitta qoida: **oʻz `shell.json` ingiz boʻlgandan keyin, u kanonikdir**. Hech narsani moslaganingizcha, shell Omarchyning standart faylini oʻqiydi. Vidjetni sudragan, `omarchy bar` ni ishga tushirgan yoki faylni oʻzingiz tahrirlagan paytingizda, siz uning egasisiz — chuqur birlashma yoʻq, shuning uchun kelajakdagi Omarchy relizlardagi yangi standart vidjetlar panelingizda avtomatik paydo boʻlmaydi. `omarchy bar defaults` toza taxta xohlaganingizda joʻnatilgan tartibni qaytaradi.
 
