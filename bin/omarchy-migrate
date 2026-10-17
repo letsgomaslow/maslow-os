@@ -100,4 +100,5 @@ done 3< <(migration_entries)
 # by running migrations some other way. Match the current localized title and
 # retain cleanup for notifications created with the legacy title.
 omarchy-notification-dismiss "$(omarchy-i18n migrate.pending)" >/dev/null 2>&1 || true
+omarchy-notification-dismiss "$(omarchy-i18n migrate.legacyPending)" >/dev/null 2>&1 || true
 omarchy-notification-dismiss "Omarchy Migrations" >/dev/null 2>&1 || true

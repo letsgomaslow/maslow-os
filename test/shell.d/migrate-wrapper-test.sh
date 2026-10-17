@@ -20,8 +20,11 @@ chmod +x "$stub_bin/omarchy-notification-dismiss"
 
 cat >"$stub_bin/omarchy-i18n" <<'SH'
 #!/bin/bash
-[[ $1 == "migrate.pending" ]] || exit 1
-printf '%s\n' "${TEST_MIGRATION_TITLE:-Pending Maslow OS Migrations}"
+case "$1" in
+  migrate.pending) printf '%s\n' "${TEST_MIGRATION_TITLE:-Pending Maslow OS Migrations}" ;;
+  migrate.legacyPending) printf '%s\n' "${TEST_LEGACY_MIGRATION_TITLE:-Pending Omarchy Migrations}" ;;
+  *) exit 1 ;;
+esac
 SH
 chmod +x "$stub_bin/omarchy-i18n"
 
@@ -45,11 +48,13 @@ pass "omarchy-migrate runs migrations without force"
 
 grep -Fx 'Pending Maslow OS Migrations' "$test_tmp/dismissals" >/dev/null || fail "omarchy-migrate dismisses current migration notifications"
 grep -Fx 'Omarchy Migrations' "$test_tmp/dismissals" >/dev/null || fail "omarchy-migrate dismisses legacy migration notifications"
+grep -Fx 'Pending Omarchy Migrations' "$test_tmp/dismissals" >/dev/null || fail "omarchy-migrate dismisses the old catalog title"
 pass "omarchy-migrate clears current and legacy completed migration notifications"
 
 : >"$test_tmp/dismissals"
-TEST_MIGRATION_TITLE="Migrations Omarchy en attente" run_migrate >"$test_tmp/localized.out"
-grep -Fx 'Migrations Omarchy en attente' "$test_tmp/dismissals" >/dev/null || fail "omarchy-migrate dismisses the localized title as one argument"
+TEST_MIGRATION_TITLE="Migrations Maslow OS en attente" TEST_LEGACY_MIGRATION_TITLE="Migrations Omarchy en attente" run_migrate >"$test_tmp/localized.out"
+grep -Fx 'Migrations Maslow OS en attente' "$test_tmp/dismissals" >/dev/null || fail "omarchy-migrate dismisses the localized title as one argument"
+grep -Fx 'Migrations Omarchy en attente' "$test_tmp/dismissals" >/dev/null || fail "omarchy-migrate dismisses the localized historical title as one argument"
 grep -Fx 'Omarchy Migrations' "$test_tmp/dismissals" >/dev/null || fail "localized cleanup retains the legacy title"
 [[ $(wc -l <"$test_tmp/calls") == 1 ]] || fail "idempotent migration cleanup reruns no completed migrations"
 pass "omarchy-migrate clears localized notifications on an idempotent run"
