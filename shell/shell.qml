@@ -280,6 +280,8 @@ ShellRoot {
   }
 
   property var _services: ({})
+  property var _backgroundServiceLoad: null
+  property int _backgroundServiceGeneration: 0
   property var _pluginShellApis: ({})
   property var _pluginShellApiDescriptors: ({})
   property var _pluginBarEntryShellApis: ({})
@@ -962,6 +964,33 @@ ShellRoot {
         && manifest.__hostCapabilities.indexOf("authentication") !== -1)
   }
 
+  function backgroundServiceLoadCurrent(claim) {
+    if (!claim || _backgroundServiceLoad !== claim
+        || claim.generation !== _backgroundServiceGeneration || pluginReloading) return false
+    var manifest = pluginRegistry && pluginRegistry.installedPlugins
+      ? pluginRegistry.installedPlugins["omarchy.background"] : null
+    return !!manifest && manifest.__isFirstParty === true
+      && Array.isArray(manifest.kinds) && manifest.kinds.indexOf("service") !== -1
+      && !!manifest.entryPoints && !!manifest.entryPoints.service
+      && pluginRegistry.isEnabled("omarchy.background")
+      && !isAuthenticationService(manifest, "omarchy.background")
+      && pluginRegistry.entryPointUrl(manifest, "service") === claim.url
+  }
+
+  function cancelBackgroundServiceLoad() {
+    var claim = _backgroundServiceLoad
+    _backgroundServiceLoad = null
+    _backgroundServiceGeneration++
+    if (!claim || !claim.component) return
+    if (claim.callback) {
+      claim.component.statusChanged.disconnect(claim.callback)
+      claim.callback = null
+    }
+    // A creation callback can synchronously invalidate its own claim. The
+    // finalizer releases that component after createObject returns instead.
+    if (!claim.creating) claim.component.destroy()
+  }
+
   function ensureService(pluginId) {
     var key = String(pluginId)
     if (_services[key]) return _services[key]
@@ -975,11 +1004,45 @@ ShellRoot {
     var authenticationService = shell.isAuthenticationService(manifest, key)
     if (authenticationService && AuthServiceStore.has(key)) return null
 
-    var comp = Qt.createComponent(url, Component.PreferSynchronous)
+    // Background compilation is expensive on a cold cache. Retain one claim
+    // until publication; rescans may otherwise start duplicate async loads.
+    // Authentication and all other services keep their existing load mode.
+    var backgroundLoad = key === "omarchy.background" && manifest.__isFirstParty === true
+      && !authenticationService
+    var claim = null
+    if (backgroundLoad) {
+      if (_backgroundServiceLoad && backgroundServiceLoadCurrent(_backgroundServiceLoad)) return null
+      cancelBackgroundServiceLoad()
+      claim = { generation: _backgroundServiceGeneration, url: url, component: null,
+        callback: null, creating: false }
+      _backgroundServiceLoad = claim
+    }
+    var comp = Qt.createComponent(url, backgroundLoad ? Component.Asynchronous : Component.PreferSynchronous)
+    if (claim) claim.component = comp
+    function release() {
+      if (!claim) return
+      if (claim.callback) {
+        comp.statusChanged.disconnect(claim.callback)
+        claim.callback = null
+      }
+      if (_backgroundServiceLoad === claim) _backgroundServiceLoad = null
+      comp.destroy()
+    }
     function finalize() {
+      if (comp.status === Component.Loading) return
+      if (claim && !backgroundServiceLoadCurrent(claim)) {
+        release()
+        return
+      }
       if (comp.status !== Component.Ready) {
         console.warn("service plugin load failed for " + key + ": " + comp.errorString())
+        release()
         return
+      }
+      if (claim) {
+        // A rescan may replace metadata while compiling the same source.
+        manifest = pluginRegistry.installedPlugins[key]
+        claim.creating = true
       }
       // Authentication services and third-party services have no visual
       // parent. Parenting either to serviceHost would let a plugin's object
@@ -987,6 +1050,8 @@ ShellRoot {
       var inst = comp.createObject(manifest.__isFirstParty && !authenticationService ? serviceHost : null)
       if (!inst) {
         console.warn("service plugin createObject returned null for", key)
+        if (claim) claim.creating = false
+        release()
         return
       }
       if ("omarchyPath" in inst) inst.omarchyPath = shell.omarchyPath
@@ -994,6 +1059,16 @@ ShellRoot {
       if ("manifest" in inst) inst.manifest = shell.publicPluginManifest(manifest)
       if ("barWidgetRegistry" in inst) inst.barWidgetRegistry = shell.pluginBarWidgetRegistryFor(manifest)
       if ("pluginRegistry" in inst) inst.pluginRegistry = shell.pluginRegistryFor(manifest)
+      if (claim) {
+        claim.creating = false
+        // Component.onCompleted/property injection may synchronously trigger a
+        // disable, source replacement or reload. Never publish that old object.
+        if (!backgroundServiceLoadCurrent(claim)) {
+          inst.destroy()
+          release()
+          return
+        }
+      }
       if (authenticationService) {
         // Never publish lock/polkit through ShellRoot._services. The private JS
         // import retains their lifetime without adding a traversable property
@@ -1007,8 +1082,10 @@ ShellRoot {
         snext[key] = inst
         _services = snext
       }
+      release()
     }
     if (comp.status === Component.Loading) {
+      if (claim) claim.callback = finalize
       comp.statusChanged.connect(finalize)
       return null
     }
@@ -1017,6 +1094,8 @@ ShellRoot {
   }
 
   function _syncServices() {
+    if (_backgroundServiceLoad && !backgroundServiceLoadCurrent(_backgroundServiceLoad))
+      cancelBackgroundServiceLoad()
     if (!pluginRegistry || !pluginRegistry.installedPlugins) return
     var plugins = pluginRegistry.installedPlugins
     for (var id in plugins) {
@@ -1099,6 +1178,7 @@ ShellRoot {
   // Destroying omarchy.lock drops the ext-session-lock client while Hyprland
   // still holds the lock, which surfaces the crashed-lockscreen fallback.
   function unloadPluginServices() {
+    cancelBackgroundServiceLoad()
     var next = ({})
     for (var existingId in _services) {
       if (serviceKeepLoaded(existingId)) {
