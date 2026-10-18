@@ -25,11 +25,14 @@ assert method, 'real shell applyTheme method not found'
 fixture = Path(sys.argv[2]).read_text()
 Path(sys.argv[3]).write_text(fixture.replace('  // APPLY_THEME_FUNCTION', method.group()))
 PY
+fixture_launch_ms=$(python3 -c 'import time; print(time.time_ns() // 1000000)')
 if output=$(HOME="$stage/home" timeout 10 quickshell -p "$stage" --no-color 2>&1); then
   fixture_exit=0
 else
   fixture_exit=$?
 fi
+fixture_exit_ms=$(python3 -c 'import time; print(time.time_ns() // 1000000)')
+printf '# QML_FIXTURE_CLOCK launch_epoch_ms=%s exit_epoch_ms=%s elapsed_ms=%s\n' "$fixture_launch_ms" "$fixture_exit_ms" "$(( fixture_exit_ms - fixture_launch_ms ))"
 qml_fixture_progress "$fixture_exit" "$output"
 (( fixture_exit == 0 )) || fail "pending theme fixture exits cleanly" "$output"
 [[ $output == *"MILESTONE pending-theme-setup-started"* && $output == *"MILESTONE pending-theme-apply-completed"* ]] || fail "theme setup completes before the retention check" "$output"
