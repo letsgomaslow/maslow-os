@@ -81,16 +81,33 @@ status_deadline() {
   printf '%s%s' "$((10#$whole + 1))" "$fraction"
 }
 
+status_monotonic_time() {
+  local uptime idle
+  read -r uptime idle 2>/dev/null </proc/uptime || return 1
+  [[ $uptime =~ ^[0-9]+[.][0-9]+$ ]] || return 1
+  printf '%s' "$uptime"
+}
+
 claude_auth_budget() {
-  # Optional authentication must leave time for package discovery, its own
-  # TERM-to-KILL grace and status JSON/cleanup inside the unchanged supervisor.
-  # Scale small configured durations too; never round a positive deadline to
-  # timeout's zero (unlimited) value. The public override validation stays shared.
-  awk -v seconds="$(probe_timeout)" 'BEGIN {
+  local now expiry=${OMARCHY_SETUP_AI_STATUS_EXPIRY_MONOTONIC:-}
+  # The public supervisor supplies its own expiry before worker setup. Measure
+  # again after package/path discovery, so optional auth cannot spend that time
+  # twice. A missing clock/invalid expiry skips auth without erasing ownership.
+  now=$(status_monotonic_time) || return 0
+  [[ $expiry =~ ^[0-9]+[.][0-9]+$ ]] || return 0
+  LC_ALL=C awk -v seconds="$(probe_timeout)" -v now="$now" -v expiry="$expiry" 'BEGIN {
     deadline = seconds * 0.6
     grace = seconds * 0.2
     if (grace > 1) grace = 1
-    if (deadline > 0 && grace > 0) printf "%.17g %.17g\n", deadline, grace
+    remaining = expiry - now
+    outer = seconds + 1
+    # Keep a quarter of the outer duration for JSON, private-file cleanup and
+    # scheduling, in addition to the complete TERM-to-KILL grace.
+    available = remaining - grace - outer / 4
+    if (deadline > available) deadline = available
+    # Underflow must skip optional auth, never emit timeout zero (unlimited).
+    if (remaining <= outer && deadline > 0 && grace > 0)
+      printf "%.17g %.17g\n", deadline, grace
   }'
 }
 
@@ -165,7 +182,15 @@ run_bounded_probe() {
 }
 
 run_status_supervisor() {
-  run_bounded_probe_with_timeout "$(status_deadline)" "$@"
+  local duration now expiry=""
+  duration=$(status_deadline)
+  if now=$(status_monotonic_time); then
+    expiry=$(LC_ALL=C awk -v now="$now" -v seconds="$duration" 'BEGIN { printf "%.9f", now + seconds }')
+  fi
+  # Always overwrite inherited private timing input, including malformed or
+  # implausibly distant caller values. The outer timeout remains authoritative.
+  run_bounded_probe_with_timeout "$duration" /usr/bin/env \
+    OMARCHY_SETUP_AI_STATUS_EXPIRY_MONOTONIC="$expiry" "$@"
 }
 
 run_direct_probe_with_budget() {

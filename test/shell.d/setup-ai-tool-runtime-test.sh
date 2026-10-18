@@ -20,6 +20,7 @@ auth_log="$tmp_dir/auth.log"
 child_pid_file="$tmp_dir/child.pid"
 timeout_log="$tmp_dir/timeout.log"
 claude_pids="$tmp_dir/claude-pids"
+claude_expiry="$tmp_dir/claude-expiry"
 probe_tmp="$tmp_dir/probes"
 mkdir "$probe_tmp"
 type_override="$tmp_dir/type-override.sh"
@@ -36,6 +37,12 @@ type() {
     return 1
   fi
   builtin type "$@"
+}
+read() {
+  if [[ ${TEST_STATUS_CLOCK_UNAVAILABLE:-false} == "true" && ${1:-} == "-r" && ${2:-} == "uptime" ]]; then
+    return 1
+  fi
+  builtin read "$@"
 }
 SH
 
@@ -105,6 +112,7 @@ SH
 cat >"$package_bin/claude" <<'SH'
 #!/bin/bash
 printf 'claude <%s>\n' "$*" >>"$AUTH_LOG"
+printf '%s' "${OMARCHY_SETUP_AI_STATUS_EXPIRY_MONOTONIC:-}" >"$CLAUDE_EXPIRY_FILE"
 case "${TEST_CLAUDE_MODE:-signed-out}" in
 signed-out) printf '%s\n' '{"loggedIn":false,"authMethod":"none","apiProvider":"firstParty","analyticsDisabled":false,"projectsDirectory":"/sanitized"}' ;;
 signed-in) printf '%s\n' '{"loggedIn":true,"authMethod":"claude.ai","apiProvider":"firstParty","analyticsDisabled":false,"projectsDirectory":"/sanitized"}' ;;
@@ -156,8 +164,9 @@ run_tool_with_path() {
   env HOME="$home_dir" OMARCHY_PATH="$omarchy_dir" TEST_PACKAGES="${TEST_PACKAGES:-$core_packages}" \
     TEST_AVAILABLE_PACKAGES="${TEST_AVAILABLE_PACKAGES:-$available_packages}" \
     TEST_PACKAGE_BIN="$package_bin" TEST_SYSTEM_BIN="$system_bin" AUTH_LOG="$auth_log" CHILD_PID_FILE="$child_pid_file" \
-    TEST_TIMEOUT_LOG="$timeout_log" TMPDIR="$probe_tmp" CLAUDE_PIDS="$claude_pids" \
+    TEST_TIMEOUT_LOG="$timeout_log" TMPDIR="$probe_tmp" CLAUDE_PIDS="$claude_pids" CLAUDE_EXPIRY_FILE="$claude_expiry" \
     TEST_CLAUDE_METADATA_DELAY="${TEST_CLAUDE_METADATA_DELAY:-0}" TEST_STATUS_JSON_DELAY="${TEST_STATUS_JSON_DELAY:-0}" \
+    TEST_STATUS_CLOCK_UNAVAILABLE="${TEST_STATUS_CLOCK_UNAVAILABLE:-false}" \
     TEST_HIDE_CODEX_FROM_PATH="${TEST_HIDE_CODEX_FROM_PATH:-false}" BASH_ENV="$type_override" \
     PATH="$path_value" OMARCHY_SETUP_AI_STATUS_TIMEOUT_SECONDS="${OMARCHY_SETUP_AI_STATUS_TIMEOUT_SECONDS:-1}" \
     TEST_CODEX_MODE="${TEST_CODEX_MODE:-signed-out}" TEST_CLAUDE_MODE="${TEST_CLAUDE_MODE:-signed-out}" TEST_HERMES_MODE="${TEST_HERMES_MODE:-ready}" \
@@ -250,6 +259,45 @@ while IFS= read -r pid; do
 done <"$claude_pids"
 [[ -z $(find "$probe_tmp" -mindepth 1 -print -quit) ]] || fail "Claude status left private probe files"
 pass "real Claude KILL grace, output overhead and descendant/file cleanup fit public supervision"
+
+# More metadata time crosses the old fixed auth+grace margin even on a native
+# host. Keep the original VM regression above unchanged and require real auth
+# execution here, rather than passing through a skipped probe.
+rm -f "$claude_pids"
+status=$(OMARCHY_SETUP_AI_STATUS_TIMEOUT_SECONDS=5 TEST_CLAUDE_MODE=term-resistant \
+  TEST_CLAUDE_METADATA_DELAY=0.25 TEST_STATUS_JSON_DELAY=0.35 run_tool status claude)
+jq -e '.installed == true and .runtimeOwner == "packaged" and .runtimeState == "ready" and .authentication == "unknown" and (has("reasonCode") | not)' <<<"$status" >/dev/null ||
+  fail "measured metadata time does not reduce the remaining Claude auth budget" "$status"
+[[ -s $claude_pids ]] || fail "measured-budget TERM-resistant fixture did not start"
+while IFS= read -r pid; do
+  assert_child_stopped "$pid" "measured Claude budget left a process running"
+done <"$claude_pids"
+[[ -z $(find "$probe_tmp" -mindepth 1 -print -quit) ]] || fail "measured Claude budget left private files"
+pass "actual metadata elapsed time bounds optional auth inside the unchanged public deadline"
+
+for injected in invalid 0.0 999999999999999999999999999999.0; do
+  status=$(OMARCHY_SETUP_AI_STATUS_EXPIRY_MONOTONIC=$injected TEST_CLAUDE_MODE=signed-out run_tool status claude)
+  jq -e '.installed == true and .authentication == "signed-out"' <<<"$status" >/dev/null ||
+    fail "inherited private expiry changes public Claude readiness" "$status"
+  read -r now idle </proc/uptime
+  awk -v actual="$(cat "$claude_expiry")" -v now="$now" 'BEGIN { exit !(actual >= now && actual <= now + 2) }' ||
+    fail "public supervisor did not replace inherited private expiry" "$(cat "$claude_expiry")"
+done
+for invalid_expiry in invalid 0.0 999999999999999999999999999999.0; do
+  : >"$auth_log"
+  status=$(OMARCHY_SETUP_AI_STATUS_WORKER=1 OMARCHY_SETUP_AI_STATUS_EXPIRY_MONOTONIC=$invalid_expiry run_tool __status claude)
+  jq -e '.installed == true and .authentication == "unknown"' <<<"$status" >/dev/null ||
+    fail "invalid private expiry erases ownership or claims auth" "$status"
+  [[ ! -s $auth_log ]] || fail "invalid private expiry runs optional auth"
+done
+pass "public timing input is reset and invalid private expiry skips optional authentication"
+
+: >"$auth_log"
+status=$(TEST_STATUS_CLOCK_UNAVAILABLE=true run_tool status claude)
+jq -e '.installed == true and .runtimeOwner == "packaged" and .runtimeState == "ready" and .authentication == "unknown" and (has("reasonCode") | not)' <<<"$status" >/dev/null ||
+  fail "unavailable monotonic clock erases independent package readiness" "$status"
+[[ ! -s $auth_log ]] || fail "unavailable monotonic clock starts optional auth"
+pass "unavailable monotonic clock preserves ownership and skips optional auth"
 
 for configured in 0.5 000.50 0 0.0 invalid 999 999h; do
   status=$(OMARCHY_SETUP_AI_STATUS_TIMEOUT_SECONDS=$configured TEST_CLAUDE_MODE=signed-out run_tool status claude)
