@@ -19,6 +19,9 @@ omarchy_dir="$tmp_dir/omarchy"
 auth_log="$tmp_dir/auth.log"
 child_pid_file="$tmp_dir/child.pid"
 timeout_log="$tmp_dir/timeout.log"
+claude_pids="$tmp_dir/claude-pids"
+probe_tmp="$tmp_dir/probes"
+mkdir "$probe_tmp"
 type_override="$tmp_dir/type-override.sh"
 mkdir -p "$mock_bin" "$package_bin" "$shadow_bin" "$system_bin" "$home_dir/.local/bin" "$omarchy_dir/install/helpers"
 touch "$auth_log"
@@ -39,7 +42,12 @@ SH
 cp "$ROOT/install/helpers/agent.sh" "$omarchy_dir/install/helpers/agent.sh"
 cat >>"$omarchy_dir/install/helpers/agent.sh" <<'SH'
 omarchy_agent_system_command_path() { printf '%s/%s' "$TEST_SYSTEM_BIN" "$1"; }
-omarchy_agent_package_path() { printf '%s/%s' "$TEST_PACKAGE_BIN" "$OMARCHY_AGENT_ID"; }
+omarchy_agent_package_path() {
+  if [[ $OMARCHY_AGENT_ID == "claude" && ${TEST_CLAUDE_METADATA_DELAY:-0} != "0" ]]; then
+    sleep "$TEST_CLAUDE_METADATA_DELAY"
+  fi
+  printf '%s/%s' "$TEST_PACKAGE_BIN" "$OMARCHY_AGENT_ID"
+}
 SH
 
 cat >"$mock_bin/omarchy-pkg-present" <<'SH'
@@ -58,6 +66,17 @@ printf '%s\n' "$*" >>"$TEST_TIMEOUT_LOG"
 exec /usr/bin/timeout "$@"
 SH
 chmod +x "$mock_bin/timeout"
+
+# Controlled JSON-emission overhead exercises the real public supervisor's
+# setup/auth/output budget, while all parsing/validation still uses real jq.
+cat >"$mock_bin/jq" <<'SH'
+#!/bin/bash
+if [[ ${OMARCHY_SETUP_AI_STATUS_WORKER:-0} == "1" && ${1:-} == "-n" && ${TEST_STATUS_JSON_DELAY:-0} != "0" ]]; then
+  sleep "$TEST_STATUS_JSON_DELAY"
+fi
+exec /usr/bin/jq "$@"
+SH
+chmod +x "$mock_bin/jq"
 
 cat >"$package_bin/codex" <<'SH'
 #!/bin/bash
@@ -94,6 +113,18 @@ malformed) printf '%s\n' '{"loggedIn":"false","token":"raw-secret"}' ;;
 extra) printf '%s\n%s\n' '{"loggedIn":true}' '{"loggedIn":false}' ;;
 stderr) printf '%s\n' '{"loggedIn":true}'; printf 'raw-secret\n' >&2 ;;
 timeout) sleep 30 ;;
+term-exit)
+  trap 'exit 0' TERM
+  printf '%s\n' '{"loggedIn":true}'
+  while :; do sleep 0.05; done
+  ;;
+term-resistant)
+  trap '' TERM
+  sleep 30 &
+  printf '%s\n' "$$" "$!" >"$CLAUDE_PIDS"
+  printf '%s\n' '{"loggedIn":true}'
+  wait
+  ;;
 overflow) head -c 20000 /dev/zero | tr '\0' x ;;
 esac
 SH
@@ -125,7 +156,8 @@ run_tool_with_path() {
   env HOME="$home_dir" OMARCHY_PATH="$omarchy_dir" TEST_PACKAGES="${TEST_PACKAGES:-$core_packages}" \
     TEST_AVAILABLE_PACKAGES="${TEST_AVAILABLE_PACKAGES:-$available_packages}" \
     TEST_PACKAGE_BIN="$package_bin" TEST_SYSTEM_BIN="$system_bin" AUTH_LOG="$auth_log" CHILD_PID_FILE="$child_pid_file" \
-    TEST_TIMEOUT_LOG="$timeout_log" \
+    TEST_TIMEOUT_LOG="$timeout_log" TMPDIR="$probe_tmp" CLAUDE_PIDS="$claude_pids" \
+    TEST_CLAUDE_METADATA_DELAY="${TEST_CLAUDE_METADATA_DELAY:-0}" TEST_STATUS_JSON_DELAY="${TEST_STATUS_JSON_DELAY:-0}" \
     TEST_HIDE_CODEX_FROM_PATH="${TEST_HIDE_CODEX_FROM_PATH:-false}" BASH_ENV="$type_override" \
     PATH="$path_value" OMARCHY_SETUP_AI_STATUS_TIMEOUT_SECONDS="${OMARCHY_SETUP_AI_STATUS_TIMEOUT_SECONDS:-1}" \
     TEST_CODEX_MODE="${TEST_CODEX_MODE:-signed-out}" TEST_CLAUDE_MODE="${TEST_CLAUDE_MODE:-signed-out}" TEST_HERMES_MODE="${TEST_HERMES_MODE:-ready}" \
@@ -195,6 +227,67 @@ for mode in malformed extra stderr timeout overflow; do
   [[ $status != *raw-secret* ]] || fail "Claude $mode status exposes raw output" "$status"
 done
 pass "Claude 2.1.252 status reads only the structured loggedIn boolean"
+
+for mode in timeout term-exit; do
+  status=$(TEST_CLAUDE_MODE=$mode run_tool status claude)
+  jq -e '.installed == true and .runtimeOwner == "packaged" and .runtimeState == "ready" and .authentication == "unknown" and (has("reasonCode") | not)' <<<"$status" >/dev/null ||
+    fail "Claude $mode retains proven readiness without trusting timed-out auth JSON" "$status"
+done
+pass "Claude optional authentication timeout retains independent packaged readiness"
+
+# Real TERM resistance consumes the kill grace and leaves a descendant behind
+# the direct timeout. Use the unchanged six-second public supervisor, plus
+# controlled metadata/JSON work; the worker must finish before it and the
+# outer process-group cleanup must stop both recorded processes/remove files.
+rm -f "$claude_pids"
+status=$(OMARCHY_SETUP_AI_STATUS_TIMEOUT_SECONDS=5 TEST_CLAUDE_MODE=term-resistant \
+  TEST_CLAUDE_METADATA_DELAY=0.15 TEST_STATUS_JSON_DELAY=0.35 run_tool status claude)
+jq -e '.installed == true and .runtimeOwner == "packaged" and .runtimeState == "ready" and .authentication == "unknown" and (has("reasonCode") | not)' <<<"$status" >/dev/null ||
+  fail "TERM-resistant Claude with setup/output overhead exhausts the public supervisor" "$status"
+[[ -s $claude_pids ]] || fail "TERM-resistant Claude fixture did not start"
+while IFS= read -r pid; do
+  assert_child_stopped "$pid" "Claude auth budget left a parent or descendant running"
+done <"$claude_pids"
+[[ -z $(find "$probe_tmp" -mindepth 1 -print -quit) ]] || fail "Claude status left private probe files"
+pass "real Claude KILL grace, output overhead and descendant/file cleanup fit public supervision"
+
+for configured in 0.5 000.50 0 0.0 invalid 999 999h; do
+  status=$(OMARCHY_SETUP_AI_STATUS_TIMEOUT_SECONDS=$configured TEST_CLAUDE_MODE=signed-out run_tool status claude)
+  jq -e '.schemaVersion == 1 and .installed == true and .authentication == "signed-out"' <<<"$status" >/dev/null ||
+    fail "Claude configured duration $configured changes status schema or bounded fast authentication" "$status"
+done
+pass "Claude fractional, zero, invalid and clamped configured durations retain the caller contract"
+
+# A valid positive duration can underflow the budget calculator. Skipping
+# optional auth is safe; emitting a zero timeout would make it unbounded.
+tiny=0.$(printf '0%.0s' {1..400})1
+: >"$auth_log"
+status=$(OMARCHY_SETUP_AI_STATUS_TIMEOUT_SECONDS=$tiny TEST_CLAUDE_MODE=term-resistant run_tool status claude)
+jq -e '.installed == true and .authentication == "unknown"' <<<"$status" >/dev/null ||
+  fail "underflowed optional Claude budget erases known readiness" "$status"
+[[ ! -s $auth_log ]] || fail "underflowed Claude budget starts an unlimited auth command"
+pass "underflowed optional auth budget never starts an unlimited timeout"
+
+cat >"$shadow_bin/claude" <<'SH'
+#!/bin/bash
+printf 'foreign Claude invoked\n' >>"$AUTH_LOG"
+SH
+chmod +x "$shadow_bin/claude"
+: >"$auth_log"
+for packages in "$core_packages" "openai-codex-bin hermes-agent"; do
+  status=$(TEST_PACKAGES="$packages" run_tool_with_path "$shadow_bin:$package_bin:$mock_bin:/usr/bin:/bin" status claude)
+  jq -e '.installed == false and .runtimeOwner == "foreign" and .authentication == "unknown"' <<<"$status" >/dev/null ||
+    fail "Claude auth budget bypasses a foreign runtime guard" "$status"
+done
+[[ ! -s $auth_log ]] || fail "Claude status executed a foreign runtime"
+mv "$package_bin/claude" "$package_bin/claude.saved"
+status=$(run_tool status claude)
+mv "$package_bin/claude.saved" "$package_bin/claude"
+jq -e '.installed == false and .authentication == "unknown"' <<<"$status" >/dev/null ||
+  fail "Claude auth budget establishes readiness without its packaged executable" "$status"
+pass "Claude optional auth preserves missing and foreign PATH runtime guards"
+
+
 
 status=$(TEST_HIDE_CODEX_FROM_PATH=true run_tool_with_path "$mock_bin:/usr/bin:/bin" status codex)
 [[ $(jq -r '.installed == false and .runtimeOwner == "packaged" and .runtimeState == "attention" and .reasonCode == "runtime-not-on-path"' <<<"$status") == true ]] ||

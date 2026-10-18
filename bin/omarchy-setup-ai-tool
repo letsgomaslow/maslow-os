@@ -81,6 +81,19 @@ status_deadline() {
   printf '%s%s' "$((10#$whole + 1))" "$fraction"
 }
 
+claude_auth_budget() {
+  # Optional authentication must leave time for package discovery, its own
+  # TERM-to-KILL grace and status JSON/cleanup inside the unchanged supervisor.
+  # Scale small configured durations too; never round a positive deadline to
+  # timeout's zero (unlimited) value. The public override validation stays shared.
+  awk -v seconds="$(probe_timeout)" 'BEGIN {
+    deadline = seconds * 0.6
+    grace = seconds * 0.2
+    if (grace > 1) grace = 1
+    if (deadline > 0 && grace > 0) printf "%.17g %.17g\n", deadline, grace
+  }'
+}
+
 terminate_probe_group() {
   local pid=$probe_pid
   [[ -n $pid ]] || return 0
@@ -116,15 +129,15 @@ cancel_probe() {
 trap cancel_probe HUP INT TERM
 trap cleanup_probe EXIT
 
-run_bounded_probe_with_timeout() {
-  local timeout_value=$1 status
-  shift
+run_bounded_probe_with_budget() {
+  local timeout_value=$1 kill_after=$2 status
+  shift 2
   cleanup_probe
   probe_dir=$(mktemp -d "${TMPDIR:-/tmp}/omarchy-ai-status.XXXXXX")
   chmod 0700 "$probe_dir"
   probe_stdout="$probe_dir/stdout"
   probe_stderr="$probe_dir/stderr"
-  setsid timeout --signal=TERM --kill-after=1 "$timeout_value" \
+  setsid timeout --signal=TERM --kill-after="$kill_after" "$timeout_value" \
     bash -c 'ulimit -f 16; exec "$@"' bash "$@" >"$probe_stdout" 2>"$probe_stderr" &
   probe_pid=$!
   if wait "$probe_pid"; then
@@ -141,6 +154,12 @@ run_bounded_probe_with_timeout() {
   fi
 }
 
+run_bounded_probe_with_timeout() {
+  local timeout_value=$1
+  shift
+  run_bounded_probe_with_budget "$timeout_value" 1 "$@"
+}
+
 run_bounded_probe() {
   run_bounded_probe_with_timeout "$(probe_timeout)" "$@"
 }
@@ -149,15 +168,16 @@ run_status_supervisor() {
   run_bounded_probe_with_timeout "$(status_deadline)" "$@"
 }
 
-run_direct_probe() {
-  local status
+run_direct_probe_with_budget() {
+  local timeout_value=$1 kill_after=$2 status
+  shift 2
   cleanup_probe
   probe_dir=$(mktemp -d "${TMPDIR:-/tmp}/omarchy-ai-status.XXXXXX")
   chmod 0700 "$probe_dir"
   probe_stdout="$probe_dir/stdout"
   probe_stderr="$probe_dir/stderr"
 
-  if /usr/bin/timeout --foreground --signal=TERM --kill-after=1 "$(probe_timeout)" "$@" >"$probe_stdout" 2>"$probe_stderr"; then
+  if { /usr/bin/timeout --foreground --signal=TERM --kill-after="$kill_after" "$timeout_value" "$@"; } >"$probe_stdout" 2>"$probe_stderr"; then
     status=0
   else
     status=$?
@@ -169,12 +189,22 @@ run_direct_probe() {
   fi
 }
 
-run_probe() {
+run_direct_probe() {
+  run_direct_probe_with_budget "$(probe_timeout)" 1 "$@"
+}
+
+run_probe_with_budget() {
+  local timeout_value=$1 kill_after=$2
+  shift 2
   if [[ ${OMARCHY_SETUP_AI_STATUS_WORKER:-0} == "1" ]]; then
-    run_direct_probe "$@"
+    run_direct_probe_with_budget "$timeout_value" "$kill_after" "$@"
   else
-    run_bounded_probe "$@"
+    run_bounded_probe_with_budget "$timeout_value" "$kill_after" "$@"
   fi
+}
+
+run_probe() {
+  run_probe_with_budget "$(probe_timeout)" 1 "$@"
 }
 
 finish_probe() {
@@ -214,10 +244,11 @@ codex_authentication() {
 }
 
 claude_authentication() {
-  local command_path
+  local command_path deadline grace
   authentication="unknown"
   command_path=$(omarchy_agent_package_path)
-  run_probe "$command_path" auth status --json
+  read -r deadline grace < <(claude_auth_budget) || return 0
+  run_probe_with_budget "$deadline" "$grace" "$command_path" auth status --json
 
   if (( probe_status == 0 )) && [[ ! -s $probe_stderr ]] &&
     jq -e -s 'length == 1 and ((.[0] | type) == "object") and ((.[0].loggedIn | type) == "boolean")' "$probe_stdout" >/dev/null 2>&1; then
