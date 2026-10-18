@@ -58,6 +58,7 @@ for _ in {1..50}; do
 done
 
 [[ -s $result ]] || {
+  qml_fixture_process_progress "$QS_PID" "$log" QS_PID
   sed -n '1,180p' "$log" >&2
   fail "plugin registry contract test timed out"
 }

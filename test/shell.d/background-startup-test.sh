@@ -29,7 +29,13 @@ fi
 SH
 chmod +x "$stage/bin/hyprctl"
 : >"$stage/cursor.log"
-output=$(HOME="$stage/home" PATH="$stage/bin:$PATH" STARTUP_CURSOR_LOG="$stage/cursor.log" timeout 6 quickshell -p "$stage" --no-color 2>&1) || fail "background startup fixture exits cleanly" "$output"
+if output=$(HOME="$stage/home" PATH="$stage/bin:$PATH" STARTUP_CURSOR_LOG="$stage/cursor.log" timeout 6 quickshell -p "$stage" --no-color 2>&1); then
+  fixture_exit=0
+else
+  fixture_exit=$?
+fi
+qml_fixture_progress "$fixture_exit" "$output"
+(( fixture_exit == 0 )) || fail "background startup fixture exits cleanly" "$output"
 [[ $output == *"RESULT pass"* ]] || fail "the wallpaper restores before background plugin loading" "$output"
 if rg -q 'RESULT fail|ReferenceError|TypeError|Error:|Unable to assign|Binding loop' <<<"$output"; then
   fail "background startup fixture has no QML errors" "$output"

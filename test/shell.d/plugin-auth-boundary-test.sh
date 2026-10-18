@@ -169,6 +169,7 @@ config_dir="$TMPDIR/plugin-auth-boundary"
 mkdir -p "$config_dir" "$TMPDIR/home"
 cp "$SHELL_TEST_DIR/fixtures/plugin-auth-boundary/"*.qml "$config_dir/"
 ln -s "$ROOT/shell/services" "$config_dir/services"
+ln -s "$ROOT/shell/Commons" "$config_dir/Commons"
 
 OMARCHY_QML_TEST_RESULT="$result" \
 HOME="$TMPDIR/home" \
@@ -188,6 +189,7 @@ for _ in {1..80}; do
 done
 
 [[ -s $result ]] || {
+  qml_fixture_process_progress "$QS_PID" "$log" QS_PID
   sed -n '1,220p' "$log" >&2
   fail "plugin authentication boundary runtime test timed out"
 }

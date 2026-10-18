@@ -30,6 +30,7 @@ wait_phase() {
     [[ -f $stage/result && $(<"$stage/result") == "$1" ]] && return 0
     sleep 0.03
   done
+  qml_fixture_process_progress "$qs_pid" "$stage/quickshell.log" qs_pid
   fail "same-path background reaches $1" "$(cat "$stage/quickshell.log")"
 }
 pixel() {

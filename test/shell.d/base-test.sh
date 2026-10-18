@@ -33,6 +33,30 @@ fail() {
   exit 1
 }
 
+# Fixed milestone projection for disposable QML fixtures. A deadline reached
+# before Configuration Loaded is not the same evidence as a failed assertion.
+qml_fixture_progress() {
+  local process_status="$1" output="$2"
+  local loaded=false passed=false failed=false
+  if [[ $output == *"Configuration Loaded"* ]]; then loaded=true; fi
+  if [[ $output == *"RESULT pass"* ]]; then passed=true; fi
+  if [[ $output == *"RESULT fail"* ]]; then failed=true; fi
+  printf '# QML_FIXTURE_PROGRESS process_status=%s configuration_loaded=%s result_pass=%s result_fail=%s\n' "$process_status" "$loaded" "$passed" "$failed"
+}
+
+qml_fixture_process_progress() {
+  local pid="$1" log="$2" owner_variable="$3" status
+  [[ $owner_variable == "QS_PID" || $owner_variable == "qs_pid" ]] || return 1
+  if kill -0 "$pid" 2>/dev/null; then
+    status="running-at-deadline"
+  else
+    if wait "$pid"; then status=0; else status=$?; fi
+    # The EXIT cleanup must not signal this already-reaped PID if it is reused.
+    printf -v "$owner_variable" '%s' ""
+  fi
+  qml_fixture_progress "$status" "$(cat "$log")"
+}
+
 # The IPC socket a shell running an OMARCHY_PATH's config on this display
 # serves, derived as omarchy-shell derives it. A test that starts the real
 # shell removes it afterwards: killing the shell leaves the file behind.

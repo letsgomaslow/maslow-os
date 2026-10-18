@@ -25,6 +25,12 @@ assert method, 'real shell applyTheme method not found'
 fixture = Path(sys.argv[2]).read_text()
 Path(sys.argv[3]).write_text(fixture.replace('  // APPLY_THEME_FUNCTION', method.group()))
 PY
-output=$(HOME="$stage/home" timeout 10 quickshell -p "$stage" --no-color 2>&1) || fail "pending theme fixture exits cleanly" "$output"
+if output=$(HOME="$stage/home" timeout 10 quickshell -p "$stage" --no-color 2>&1); then
+  fixture_exit=0
+else
+  fixture_exit=$?
+fi
+qml_fixture_progress "$fixture_exit" "$output"
+(( fixture_exit == 0 )) || fail "pending theme fixture exits cleanly" "$output"
 [[ $output == *"RESULT pass"* && $output != *"RESULT fail"* ]] || fail "the authoritative palette survives the previous background fallback timer" "$output"
 pass "a pending still transition cannot restore old colors after the current theme is applied"

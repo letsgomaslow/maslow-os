@@ -25,7 +25,13 @@ exit 0
 SH
 chmod +x "$stage/bin/omarchy-theme-bg-boot-intro"
 
-output=$(HOME="$stage/home" PATH="$stage/bin:$PATH" timeout 6 quickshell -p "$stage" --no-color 2>&1) || fail "failed background startup exits cleanly" "$output"
+if output=$(HOME="$stage/home" PATH="$stage/bin:$PATH" timeout 6 quickshell -p "$stage" --no-color 2>&1); then
+  fixture_exit=0
+else
+  fixture_exit=$?
+fi
+qml_fixture_progress "$fixture_exit" "$output"
+(( fixture_exit == 0 )) || fail "failed background startup exits cleanly" "$output"
 [[ $output == *"RESULT pass"* ]] || fail "a missing wallpaper reveals the desktop within the startup deadline" "$output"
 if rg -q 'RESULT fail|ReferenceError|TypeError|Unable to assign|Binding loop' <<<"$output"; then
   fail "failed background startup has no QML errors" "$output"

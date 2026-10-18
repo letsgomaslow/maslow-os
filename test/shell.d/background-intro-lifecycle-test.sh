@@ -29,7 +29,13 @@ else
 fi
 SH
 chmod +x "$stage/bin/owe"
-output=$(HOME="$stage/home" PATH="$stage/bin:$PATH" INTRO_TEST_LOG="$stage/starts" INTRO_TEST_COVER="$stage/cover.ppm" INTRO_TEST_FRAME_READY="$stage/video-ready" timeout 10 quickshell -p "$stage" --no-color 2>&1) || fail "background intro fixture exits cleanly" "$output"
+if output=$(HOME="$stage/home" PATH="$stage/bin:$PATH" INTRO_TEST_LOG="$stage/starts" INTRO_TEST_COVER="$stage/cover.ppm" INTRO_TEST_FRAME_READY="$stage/video-ready" timeout 10 quickshell -p "$stage" --no-color 2>&1); then
+  fixture_exit=0
+else
+  fixture_exit=$?
+fi
+qml_fixture_progress "$fixture_exit" "$output"
+(( fixture_exit == 0 )) || fail "background intro fixture exits cleanly" "$output"
 [[ $output == *"RESULT pass"* ]] || fail "background intro lifecycle assertions pass" "$output"
 if rg -q 'RESULT fail|ReferenceError|TypeError|Error:|Unable to assign|Binding loop' <<<"$output"; then
   fail "background intro fixture has no QML errors" "$output"

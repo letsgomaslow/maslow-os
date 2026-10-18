@@ -52,6 +52,7 @@ wait_phase() {
     [[ -s $stage/result.json ]] && [[ $(jq -r .phase "$stage/result.json") == "$1" ]] && return 0
     sleep 0.03
   done
+  qml_fixture_process_progress "$qs_pid" "$stage/quickshell.log" qs_pid
   fail "cloned background reaches the $1 phase" "$(cat "$stage/quickshell.log")"
 }
 capture_pixel() {
