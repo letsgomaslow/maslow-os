@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "recordedDate": "2026-10-18",
+  "mainScope": "documentation and agent entry points only",
+  "runtimeProductionPayload": "1056a7552c6bff751f2c27f79835cc8953862ee6",
+  "runtimeIsoFrozenCheckpoint": "fdce071ee92cb07d5c00a75e2e84dff5f10a6df2",
+  "isoSHA256": "48f63db841041c2eff0b755ff8cab61498ff0d9b793e615cca31db498871486e",
+  "archisoCommit": "424e78130db2af6c1ceb55b442d7914b1109ff2b",
+  "candidateAcceptance": "startup and graphical deadline failures remain open",
+  "nativeInstallation": "user-reported successful; individual native checks not yet observed",
+  "repositories": [
+    {
+      "name": "runtime",
+      "repository": "https://github.com/letsgomaslow/maslow-os",
+      "branch": "codex/omarchy-quattro-20261017",
+      "commit": "7ebe50de4c775ca1fb67b8f4d3f858a1d93fd2b2",
+      "purpose": "experimental development source; not accepted product promotion"
+    },
+    {
+      "name": "packages",
+      "repository": "https://github.com/letsgomaslow/maslow-os-pkgs",
+      "branch": "codex/iso-blockers-20261017",
+      "commit": "63f80c73d45279a7a56d6e83623efc7f82f8cb4f",
+      "purpose": "experimental development source; not accepted product promotion"
+    },
+    {
+      "name": "iso",
+      "repository": "https://github.com/letsgomaslow/maslow-os-iso",
+      "branch": "codex/iso-blockers-20261017",
+      "commit": "567cef19b70cc62365a823e696a412f29b7bf586",
+      "purpose": "experimental development source; not accepted product promotion"
+    },
+    {
+      "name": "hub",
+      "repository": "https://github.com/letsgomaslow/maslow-hub",
+      "branch": "codex/hub-private-state-20261017",
+      "commit": "6eed636526c3dd39831ce0c3a32f5a98e5e4b6c2",
+      "purpose": "experimental development source; not accepted product promotion"
+    }
+  ]
+}
