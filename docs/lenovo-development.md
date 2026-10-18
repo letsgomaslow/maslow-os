@@ -1,5 +1,7 @@
 # Maslow development on Lenovo
 
+For the October 18 experimental candidate on the 2012 Retina MacBook, use [MacBook development setup](macbook-development.md) and [the native handoff](handoffs/2026-10-18-macbook-native-development.md). The dated Lenovo branch/source examples below describe the September baseline and must not replace the MacBook candidate manifest.
+
 Updated 2026-09-16. Start with [current progress](maslow-development.md) and [the Lenovo failure handoff](handoffs/2026-09-16-lenovo-voice-development-handoff.md). This document maps source ownership and sets up clones; it does not install development code into the running desktop or claim the hardware failure is fixed.
 
 ## Repository ownership and branches
