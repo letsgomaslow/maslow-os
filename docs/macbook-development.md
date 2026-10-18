@@ -4,7 +4,7 @@ Updated October 18, 2026. The user reports successful Maslow installation on the
 
 ## Obtain the exact source from GitHub
 
-The user requested GitHub delivery so another Mac mini can pull the work, and shared agent instructions for Claude and Codex. Runtime main receives this documentation and the evidence handoffs only. Experimental runtime/Qt/installer/Hub code stays on named candidate branches because startup gates still fail. This is source backup and development continuity, not package/ISO publication or production-code promotion.
+The user requested GitHub delivery so development can continue on the installed 2012 MacBook Pro, with shared instructions for Claude and Codex. The user clarified that there is no Mac mini setup. Runtime main receives this documentation and the evidence handoffs only. Experimental runtime/Qt/installer/Hub code stays on named candidate branches because startup gates still fail. This is source backup and development continuity, not package/ISO publication or production-code promotion.
 
 Start with runtime `main` to read the handoff. For development of this installed candidate, create fresh sibling clones outside installed paths. Product branches remain runtime/Hub `main` and packages/ISO `maslow`; the branches below are deliberate experimental checkouts. GitHub access to these private repositories must already work; use your own normal GitHub authentication if needed, without copying tokens or release keys from the build Mac.
 
@@ -37,9 +37,9 @@ Cloning does not install or activate source code. Do not change `OMARCHY_PATH`, 
 
 Open the runtime source clone as the project. `AGENTS.md` is the shared entry point; root `CLAUDE.md` imports it using `@AGENTS.md` and points to this handoff, so Claude reads the same project rules. Keep one canonical rule set instead of duplicating it into a new `AGENT.md`. Each sibling repository has its own instructions; read them before editing that owner. See [Claude's documented import mechanism](https://code.claude.com/docs/en/memory#import-additional-files).
 
-## Other Mac mini as a development/build host
+## Native development target
 
-The other Mac mini's operating system and architecture have not been established. Run `uname -s` and `uname -m` there before choosing tooling. The source-clone commands above work with an available Git installation on macOS or Linux. The package/service/hardware inventory below is for the installed Linux MacBook only; do not run pacman/systemd instructions as macOS setup. On macOS, use the existing documented Docker/headless Weston and QEMU/TCG procedures after confirming available dependencies. ARM-hosted x86 emulation is not a native MacBook performance result. No dependency installation, runtime override or ISO rebuild is necessary merely to read or prepare this source workspace.
+The continuation target is the 2012 15-inch Retina MacBook Pro running the reported Maslow installation. There is no Mac mini setup. The Linux package/service/hardware inventory below runs on that MacBook. The earlier ARM-hosted x86 TCG builds and VM checks were performed on a separate build Mac; those historical results are not native MacBook performance or hardware acceptance. Source preparation does not require an OS update, another ISO build or replacement of the installed runtime.
 
 ## Establish the installed baseline before changing anything
 
