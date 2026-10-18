@@ -1,5 +1,7 @@
 # Experimental MacBook installer and USB, October 18
 
+Later follow-up: the user reports successful installation on the physical MacBook with unspecified remaining issues. See the [native development handoff](2026-10-18-macbook-native-development.md). The results below remain the original source/build/VM/USB checkpoint; they do not become itemized native passes retroactively.
+
 Status: the experimental ISO and verified SanDisk USB are ready for physical testing. Fresh installation, independent boot, first app, normal offline Broadcom compilation, settled Hub/Voice, secure lock/PAM, Claude readiness and final public health pass. Cold startup and intermittent shell responses still fail. The approved exact USB write/readback/eject pass, temporary Python Full Disk Access is restored off, main is unchanged, and macOS and the older PNY installer are preserved.
 
 The user explicitly authorized experimental physical-test media despite the retained VM startup/background failures, using frozen candidates and the latest reviewed Hub, Voice and Qt fixes. That authorization permits this build and a later separately confirmed newer-USB erase; it does not clear release gates, authorize main integration/publication, or authorize erasing macOS. Preserve the older PNY Lenovo installer.
