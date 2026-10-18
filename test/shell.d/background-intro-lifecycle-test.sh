@@ -3,6 +3,40 @@
 set -euo pipefail
 
 source "$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)/base-test.sh"
+# Exercise the actual fixture guards without a compositor. A missing phase or
+# reordered callback must not be able to produce the fixture success marker.
+run_node_test <<'JS'
+const fs = require('fs')
+const vm = require('vm')
+const source = fs.readFileSync(path.join(root, 'test/shell.d/fixtures/background-intro-lifecycle/shell.qml'), 'utf8')
+const names = ['advancePhase', 'allPhasesCompleted']
+const methods = names.map(name => {
+  const found = source.match(new RegExp('^  function ' + name + '\\([^\\n]*\\) \\{[\\s\\S]*?^  \\}', 'm'))
+  if (!found) throw new Error('missing fixture method ' + name)
+  return found[0]
+}).join('\n')
+function fixture() {
+  const ctx = { phase: 'startup', phaseHistory: 'startup', failed: false, milestones: [] }
+  ctx.console = { log: value => ctx.milestones.push(value) }
+  ctx.test = ctx
+  ctx.check = ok => { if (!ok) ctx.failed = true }
+  vm.createContext(ctx)
+  vm.runInContext(methods, ctx)
+  return ctx
+}
+let ctx = fixture()
+ctx.advancePhase('startup', 'cover')
+assert(!ctx.allPhasesCompleted(), 'an omitted intro phase cannot pass')
+ctx.advancePhase('cover', 'completion')
+assert(ctx.failed && ctx.phase === 'cover' && !ctx.allPhasesCompleted(), 'out-of-order intro phases fail without advancing')
+assertDeepEqual(ctx.milestones, ['MILESTONE intro-phase=cover'], 'invalid intro transitions cannot emit progress')
+ctx = fixture()
+for (const [from, to] of [['startup', 'cover'], ['cover', 'handoff'], ['handoff', 'completion'], ['completion', 'complete']]) ctx.advancePhase(from, to)
+assert(ctx.allPhasesCompleted(), 'all ordered intro phases admit completion')
+assertDeepEqual(ctx.milestones, ['cover', 'handoff', 'completion', 'complete'].map(phase => 'MILESTONE intro-phase=' + phase), 'progress records every admitted intro phase in order')
+ctx.failed = true
+assert(!ctx.allPhasesCompleted(), 'a prior negative invariant failure cannot pass after completion')
+JS
 require_compositor "background intro lifecycle test"
 require_command quickshell
 
