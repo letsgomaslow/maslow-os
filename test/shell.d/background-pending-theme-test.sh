@@ -32,5 +32,6 @@ else
 fi
 qml_fixture_progress "$fixture_exit" "$output"
 (( fixture_exit == 0 )) || fail "pending theme fixture exits cleanly" "$output"
+[[ $output == *"MILESTONE pending-theme-setup-started"* && $output == *"MILESTONE pending-theme-apply-completed"* ]] || fail "theme setup completes before the retention check" "$output"
 [[ $output == *"RESULT pass"* && $output != *"RESULT fail"* ]] || fail "the authoritative palette survives the previous background fallback timer" "$output"
 pass "a pending still transition cannot restore old colors after the current theme is applied"
