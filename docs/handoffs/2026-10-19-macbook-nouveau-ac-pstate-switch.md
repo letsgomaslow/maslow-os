@@ -1,10 +1,10 @@
-# MacBook AC/battery nouveau pstate switch: implemented, fixed, and live-validated — October 19, 2026
+# MacBook AC/battery nouveau pstate switch: implemented, fixed, live-validated, and merged — October 19, 2026
 
 ## Outcome
 
 Following the rejected Intel-iGPU fix and the research confirming nouveau has no true dynamic/load-based reclocking for this chip (see [the revert handoff](2026-10-18-macbook-intel-igpu-fix-reverted.md) and the "Known hardware facts" section of `docs/macbook-development.md`), a narrower, safer fallback was implemented, tested, fixed, and is now **live and working** on the 2012 15-inch Retina MacBook Pro: a udev rule that forces nouveau's GPU to a higher pstate while on real AC power and back to its lowest pstate on battery, with no continuous polling and no third-party daemon.
 
-Branch `macbook-nouveau-ac-pstate-switch`, commits `031b5161` and `e52405d1` (not yet merged to `main` — see "Status" below).
+Branch `macbook-nouveau-ac-pstate-switch`, commits `031b5161` and `e52405d1`, merged to `main` via [PR #21](https://github.com/letsgomaslow/maslow-os/pull/21) at `041bf03a` — **closed out**.
 
 ## A real bug found via live testing, and the fix
 
@@ -23,14 +23,19 @@ The full automatic path was directly end-to-end tested on real hardware, not jus
 
 ## Full round-trip confirmed with a real physical unplug/replug
 
-Both directions are now confirmed via an actual physical charger unplug and replug, not just `udevadm trigger` synthetic events: unplugging switched the active pstate to `07` (nouveau's own live-state label correctly flipped from `AC` to `DC` too, confirming it tracks real power state), and replugging switched it back to `0a`. Pushed to `origin` and opened as [PR #21](https://github.com/letsgomaslow/maslow-os/pull/21).
+Both directions are now confirmed via an actual physical charger unplug and replug, not just `udevadm trigger` synthetic events: unplugging switched the active pstate to `07` (nouveau's own live-state label correctly flipped from `AC` to `DC` too, confirming it tracks real power state), and replugging switched it back to `0a`.
 
 ## Reboot persistence confirmed
 
 After a full `systemctl reboot`, all installed files survived with correct ownership/permissions (`/usr/bin/omarchy-hw-macbookpro10-1`, `/usr/bin/omarchy-hw-macbookpro10-1-pstate-switch`, `/etc/udev/rules.d/90-omarchy-macbookpro10-1-pstate.rules`), and pstate `0a` was **already active with zero manual intervention** immediately after login — the udev rule fired on its own during normal boot-time device enumeration (the AC adapter's initial uevent at boot matched the rule the same way a live change event does, since the rule has no explicit `ACTION==` restriction). This is the best-case outcome: the feature is fully self-activating across reboots, not something that needs to be re-triggered or re-applied.
 
-## Remaining gates
+## Closed out
 
-1. PR #21 is open, not yet merged. Decide when to merge.
-2. Not tested: rapid plug/unplug flapping.
-3. If/when this is properly packaged and released upstream, the manually-placed files in this entry should be reconciled with (or simply left to be overwritten cleanly by) that real package.
+PR #21 was merged to `main` at `041bf03a` on October 19, 2026, after every item above was live-validated on the real hardware. The local merged branch and its worktree were cleaned up; the rejected `macbook-intel-igpu-display-fix` branch/worktree were deliberately left in place as a historical record, per [the revert handoff](2026-10-18-macbook-intel-igpu-fix-reverted.md).
+
+This closes the investigation this handoff and the two preceding October 18 handoffs opened: the original sluggishness is diagnosed, the wrong fix was caught and reverted before being merged, and the correct fix is merged, live, and self-activating across reboots.
+
+**Two items remain genuinely open, both low-priority**:
+
+1. Rapid plug/unplug flapping was not tested.
+2. The files manually placed at their real packaged location on this one machine (`/usr/bin/omarchy-hw-macbookpro10-1`, `/usr/bin/omarchy-hw-macbookpro10-1-pstate-switch`, the udev rule) predate any real Maslow package release of this branch. When/if this ships through a real `maslow-os-pkgs` package, reconcile or simply let the package overwrite these cleanly — no action needed on this machine before then.
