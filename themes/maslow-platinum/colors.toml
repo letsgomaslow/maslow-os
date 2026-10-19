@@ -34,6 +34,9 @@ bright_magenta = "#85255B"
 # top-left to bottom-right) in place of maslow-light's pink/teal gradient.
 # Every surface that references "hyprland.active-border" by default
 # (notifications, menu, popups, polkit, lock) inherits this automatically —
-# no shell.toml override needed.
-hyprland_active_border = "rgba(ffffffee) rgba(8c95a8ee) 135deg"
-hyprland_inactive_border = "rgba(8c95a888)"
+# no shell.toml override needed. Shadow tone is #657089, not the lighter
+# #8c95a8 border-strong token: the lighter value only hits 2.61:1 against
+# darker_background, under WCAG's 3:1 floor for UI borders; this tone clears
+# 3:1 against every surface it can appear on.
+hyprland_active_border = "rgba(ffffffee) rgba(657089ee) 135deg"
+hyprland_inactive_border = "rgba(65708988)"
