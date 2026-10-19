@@ -16,3 +16,7 @@ systemctl enable sddm.service
 # whole session down. [Install] pulls in systemd-oomd.socket via Also=, which
 # is what the user manager reports app.slice candidacy over.
 systemctl enable systemd-oomd.service
+# Weekly periodic TRIM. Safe on any filesystem: fstrim skips mountpoints that
+# don't support discard, so this is a no-op on spinning disks and a real
+# long-term SSD write-performance benefit everywhere else.
+systemctl enable fstrim.timer
