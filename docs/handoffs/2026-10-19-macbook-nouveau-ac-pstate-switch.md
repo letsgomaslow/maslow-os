@@ -21,9 +21,12 @@ Since `omarchy dev link` is disabled on this build (the same channel protection 
 
 The full automatic path was directly end-to-end tested on real hardware, not just the manual script invocation: `sudo udevadm trigger --subsystem-match=power_supply` fired the real rule, which correctly resolved the bare `omarchy-hw-macbookpro10-1` call from inside the udev-spawned process's own (non-session) environment, and correctly forced pstate `0a` — confirmed against `upower` reporting `fully-charged` (genuinely on AC) at the time. This answers an open question from the implementation: udev-spawned process PATH resolution for Omarchy commands does work correctly in practice on this system, at least for this rule.
 
+## Full round-trip confirmed with a real physical unplug/replug
+
+Both directions are now confirmed via an actual physical charger unplug and replug, not just `udevadm trigger` synthetic events: unplugging switched the active pstate to `07` (nouveau's own live-state label correctly flipped from `AC` to `DC` too, confirming it tracks real power state), and replugging switched it back to `0a`. Pushed to `origin` and opened as [PR #21](https://github.com/letsgomaslow/maslow-os/pull/21).
+
 ## Remaining gates
 
-1. This branch is not merged to `main` and not pushed to origin. Decide whether/when to do either.
-2. Not tested: unplugging the real charger to confirm the `battery`→`07` direction fires correctly through the real udev path (only manually invoked so far for that direction; the `ac`→`0a` direction has the real end-to-end confirmation).
-3. Not tested: rapid plug/unplug flapping, and behavior across a reboot (the installed udev rule and `/usr/bin` files should survive a reboot since they are normal root-owned filesystem state, not anything session-scoped, but this has not been directly observed).
-4. If/when this is properly packaged and released upstream, the manually-placed files in this entry should be reconciled with (or simply left to be overwritten cleanly by) that real package.
+1. PR #21 is open, not yet merged. Decide when to merge.
+2. Not tested: rapid plug/unplug flapping, and behavior across a reboot (the installed udev rule and `/usr/bin` files should survive a reboot since they are normal root-owned filesystem state, not anything session-scoped, but this has not been directly observed).
+3. If/when this is properly packaged and released upstream, the manually-placed files in this entry should be reconciled with (or simply left to be overwritten cleanly by) that real package.
