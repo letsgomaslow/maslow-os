@@ -1,0 +1,59 @@
+mode = "light"
+
+# True 1-bit Mac: pure black on pure white, no mid-tone surface shading at
+# all. background/dark_background/darker_background/lighter_background are
+# all the same white — a 1984 desktop had no "slightly darker panel" shading,
+# just flat white boxes separated by a 1px black border (see
+# hyprland_active_border below).
+accent = "#000000"
+# #8C8C8C, not a lighter gray: a selection fill needs >=3:1 contrast against
+# white to read as a distinct UI state at all (WCAG non-text contrast) —
+# #CCCCCC only hit 1.61:1 and was functionally invisible. #8C8C8C clears
+# 3.36:1 against white while keeping black selected-text at 6.25:1, still
+# the one deliberate non-black/white tone in this theme, for that reason.
+selection = "#8C8C8C"
+# #595959, not pure black: disabled/placeholder text needs to read as
+# visually de-emphasized against normal text, which black-on-black text
+# can't do. 7.00:1 against white — still easily AA-text-pass, just the one
+# other necessary gray.
+muted = "#595959"
+
+background = "#FFFFFF"
+dark_background = "#FFFFFF"
+darker_background = "#FFFFFF"
+lighter_background = "#FFFFFF"
+
+foreground = "#000000"
+dark_foreground = "#595959"
+light_foreground = "#000000"
+bright_foreground = "#000000"
+
+# Deliberate choice: true 1984 terminals were 1-bit and had no ANSI color at
+# all. Collapsing every ANSI slot to black is the authentic choice, but it
+# is a real usability tradeoff for daily terminal use on this machine — git
+# diff coloring, `ls` type coloring, and CLI success/error coloring all lose
+# their usual meaning under this theme. Maslow-platinum keeps full color;
+# this theme does not, on purpose, because the brief was "make it actually
+# feel retro," not "retro-tinted but still colorful."
+red = "#000000"
+yellow = "#000000"
+orange = "#000000"
+green = "#000000"
+cyan = "#000000"
+blue = "#000000"
+magenta = "#000000"
+brown = "#000000"
+
+bright_red = "#000000"
+bright_yellow = "#000000"
+bright_green = "#000000"
+bright_cyan = "#000000"
+bright_blue = "#000000"
+bright_magenta = "#000000"
+
+# Flat solid black border, no gradient — a single color token with no second
+# color/angle renders as a flat fill (see shell/Commons/Border.qml's
+# resolvedGradient: gradient.enabled only when colors.length > 1). 1984 had
+# zero 3D chrome; Platinum's two-tone bevel would be wrong here on purpose.
+hyprland_active_border = "rgba(000000ee)"
+hyprland_inactive_border = "rgba(00000055)"
