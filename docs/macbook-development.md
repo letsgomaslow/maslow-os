@@ -64,6 +64,15 @@ For each problem, record one expected behavior, the observed behavior, exact rep
 
 Capture only a short redacted log excerpt around a reproduced failure. Avoid exporting full journals, core dumps, conversation/task contents or tokens. Keep installed package source and development source separate. A clone alone does not activate source code; read the relevant source-development guide before a reversible runtime override, and establish one daemon owner and a restore procedure first.
 
+## Known hardware facts (this specific 2012 15" Retina MacBookPro10,1)
+
+Durable, directly confirmed facts about this exact machine, kept separate from the dated handoff narrative so a future session does not have to re-derive or re-discover them. See the cited handoffs for full evidence and reproduction steps.
+
+- **No internal-panel GPU mux.** This model hardwires its internal Retina panel to the discrete NVIDIA GT650M (`nouveau`) only. Intel's `i915` has zero eDP connectors on this hardware — unlike later dual-GPU MacBooks, there is no software-switchable path to Intel for the internal display. Confirmed by live-testing the standard nouveau-disable fix: it left the panel on an unaccelerated `simple-framebuffer` fallback with broken brightness control, not a working Intel-driven display. Do not re-attempt that fix; see [the revert handoff, October 18](handoffs/2026-10-18-macbook-intel-igpu-fix-reverted.md).
+- **Nouveau is the only viable display driver, and it is clock-limited by default.** Nouveau parks this GPU at roughly 13% of its available memory bandwidth (`AC` pstate) against its own maximum (`0f` pstate), which is the dominant, confirmed cause of desktop sluggishness. A live pstate override to maximum confirms this immediately but costs real fan noise, heat and battery, so it is a diagnostic/stopgap, not a shipped fix. See [the native inventory handoff, October 18](handoffs/2026-10-18-macbook-native-inventory.md).
+- **Battery is at roughly 49.5% of original design capacity** (1187 charge cycles as of October 18, 2026) — hardware wear on a 14-year-old original battery, not something software fixes.
+- Audio, trackpad (`bcm5974`), FaceTime camera, Thunderbolt, Wi-Fi (`wl`/Broadcom DKMS), and a short suspend/resume cycle all passed with no defect found as of October 18, 2026.
+
 ## Ownership and tests
 
 | Area | Source owner | Start here |
