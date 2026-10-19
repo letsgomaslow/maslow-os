@@ -120,8 +120,8 @@ pass "the switch helper forces pstate 0a on AC power"
 
 : >"$pstate_file"
 run_switch "$hw_true" battery
-[[ $(<"$pstate_file") == "AC" ]] || fail "the switch helper reverts to nouveau's default pstate on battery" "$(cat "$pstate_file")"
-pass "the switch helper reverts to nouveau's default pstate on battery"
+[[ $(<"$pstate_file") == "07" ]] || fail "the switch helper forces pstate 07 on battery" "$(cat "$pstate_file")"
+pass "the switch helper forces pstate 07 on battery"
 
 rm -f "$pstate_file"
 run_switch "$hw_false" ac

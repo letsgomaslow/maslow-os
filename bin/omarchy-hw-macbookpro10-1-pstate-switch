@@ -19,18 +19,24 @@ usage() {
 (( $# == 1 )) || usage
 
 # nouveau has no automatic/dynamic reclocking at all for this Kepler-generation
-# (GK107/GT650M) chip, and parks it at a conservative default pstate (core
-# 405MHz / memory 680MHz) that nouveau itself labels "AC" in its own pstate
-# scheme -- an unrelated coincidence with the real-world AC-adapter case below.
+# (GK107/GT650M) chip, and parks it at a conservative default pstate (core up
+# to 405MHz / memory 838MHz, pstate "07") when left alone.
 #
 # On real AC power, step up to pstate 0a (core up to 900MHz, memory 1560MHz).
 # This chip's other faster pstates, 0e and 0f, carry a documented real lockup
 # risk from aggressive memory reclocking on Kepler parts and are deliberately
-# never used here. On battery, revert to nouveau's own default "AC" preset to
-# preserve battery life and avoid unnecessary heat.
+# never used here.
+#
+# On battery, force pstate 07 explicitly to preserve battery life and avoid
+# unnecessary heat. Two tempting alternatives are both wrong, confirmed by
+# directly testing this exact interface on real hardware: writing the literal
+# row label "AC" is rejected outright ("Invalid argument") -- it is purely an
+# informational live-clock readout, not a selectable target -- and writing
+# "auto" is accepted but selects pstate 0f, the single riskiest level this
+# script exists to avoid, not a return to any conservative default.
 case "$1" in
   ac) target_pstate=0a ;;
-  battery) target_pstate=AC ;;
+  battery) target_pstate=07 ;;
   *) usage ;;
 esac
 

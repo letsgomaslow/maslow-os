@@ -6,11 +6,14 @@
 # sluggishness on this hardware.
 #
 # Install a udev rule that reacts to the real ACPI AC-adapter power_supply
-# event and forces an elevated pstate while on mains power, reverting to
-# nouveau's own default pstate on battery to preserve battery life and avoid
+# event and forces an elevated pstate while on mains power, forcing the
+# lowest pstate back on battery to preserve battery life and avoid
 # unnecessary heat. See bin/omarchy-hw-macbookpro10-1-pstate-switch for the
-# exact pstate values and why 0e/0f are deliberately never used. Runs as root
-# with no terminal, so this needs no interactive sudo/password at runtime.
+# exact pstate values, why 0e/0f are deliberately never used, and why the
+# battery target must be an explicit pstate rather than nouveau's own "AC"
+# row label or its "auto" keyword -- neither does what the name suggests on
+# this hardware. Runs as root with no terminal, so this needs no interactive
+# sudo/password at runtime.
 if omarchy-hw-macbookpro10-1; then
   sudo mkdir -p /etc/udev/rules.d
   if [[ ! -f /etc/udev/rules.d/90-omarchy-macbookpro10-1-pstate.rules ]]; then
