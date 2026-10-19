@@ -1,0 +1,2 @@
+SUBSYSTEM=="power_supply", ATTR{type}=="Mains", ATTR{online}=="1", RUN+="/usr/share/omarchy/bin/omarchy-hw-macbookpro10-1-pstate-switch ac"
+SUBSYSTEM=="power_supply", ATTR{type}=="Mains", ATTR{online}=="0", RUN+="/usr/share/omarchy/bin/omarchy-hw-macbookpro10-1-pstate-switch battery"
