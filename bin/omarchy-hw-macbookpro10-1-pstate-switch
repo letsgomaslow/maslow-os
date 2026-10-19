@@ -1,0 +1,44 @@
+#!/bin/bash
+
+# omarchy:summary=Switch the MacBookPro10,1 nouveau GPU pstate for the given real-world power source.
+# omarchy:args=<ac|battery>
+# omarchy:hidden=true
+
+# Invoked by the udev rule in default/udev/macbookpro10-1-pstate.rules on every
+# ACPI AC-adapter power_supply change, running as root with no terminal. Second
+# safety layer behind that rule's own hardware-gated install: never touch the
+# GPU pstate on anything but a MacBookPro10,1, even if this ever runs somewhere
+# the rule should not have been installed.
+omarchy-hw-macbookpro10-1 || exit 0
+
+usage() {
+  echo "Usage: omarchy-hw-macbookpro10-1-pstate-switch <ac|battery>" >&2
+  exit 1
+}
+
+(( $# == 1 )) || usage
+
+# nouveau has no automatic/dynamic reclocking at all for this Kepler-generation
+# (GK107/GT650M) chip, and parks it at a conservative default pstate (core
+# 405MHz / memory 680MHz) that nouveau itself labels "AC" in its own pstate
+# scheme -- an unrelated coincidence with the real-world AC-adapter case below.
+#
+# On real AC power, step up to pstate 0a (core up to 900MHz, memory 1560MHz).
+# This chip's other faster pstates, 0e and 0f, carry a documented real lockup
+# risk from aggressive memory reclocking on Kepler parts and are deliberately
+# never used here. On battery, revert to nouveau's own default "AC" preset to
+# preserve battery life and avoid unnecessary heat.
+case "$1" in
+  ac) target_pstate=0a ;;
+  battery) target_pstate=AC ;;
+  *) usage ;;
+esac
+
+pstate_path="${OMARCHY_MACBOOKPRO10_1_PSTATE_PATH:-/sys/kernel/debug/dri/0000:01:00.0/pstate}"
+
+# debugfs may not be mounted, or the GPU may not have come up under this exact
+# PCI address on a given boot; either way this is nothing to fail loudly about
+# from inside a udev worker.
+[[ -w $pstate_path ]] || exit 0
+
+echo "$target_pstate" > "$pstate_path"

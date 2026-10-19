@@ -1,0 +1,6 @@
+#!/bin/bash
+
+# omarchy:summary=Detect whether the computer is a 2012 15-inch Retina MacBook Pro (MacBookPro10,1).
+
+[[ $(cat /sys/class/dmi/id/sys_vendor 2>/dev/null) == Apple* ]] &&
+  omarchy-hw-match "MacBookPro10,1"
