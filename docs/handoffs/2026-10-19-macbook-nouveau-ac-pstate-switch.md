@@ -25,8 +25,12 @@ The full automatic path was directly end-to-end tested on real hardware, not jus
 
 Both directions are now confirmed via an actual physical charger unplug and replug, not just `udevadm trigger` synthetic events: unplugging switched the active pstate to `07` (nouveau's own live-state label correctly flipped from `AC` to `DC` too, confirming it tracks real power state), and replugging switched it back to `0a`. Pushed to `origin` and opened as [PR #21](https://github.com/letsgomaslow/maslow-os/pull/21).
 
+## Reboot persistence confirmed
+
+After a full `systemctl reboot`, all installed files survived with correct ownership/permissions (`/usr/bin/omarchy-hw-macbookpro10-1`, `/usr/bin/omarchy-hw-macbookpro10-1-pstate-switch`, `/etc/udev/rules.d/90-omarchy-macbookpro10-1-pstate.rules`), and pstate `0a` was **already active with zero manual intervention** immediately after login — the udev rule fired on its own during normal boot-time device enumeration (the AC adapter's initial uevent at boot matched the rule the same way a live change event does, since the rule has no explicit `ACTION==` restriction). This is the best-case outcome: the feature is fully self-activating across reboots, not something that needs to be re-triggered or re-applied.
+
 ## Remaining gates
 
 1. PR #21 is open, not yet merged. Decide when to merge.
-2. Not tested: rapid plug/unplug flapping, and behavior across a reboot (the installed udev rule and `/usr/bin` files should survive a reboot since they are normal root-owned filesystem state, not anything session-scoped, but this has not been directly observed).
+2. Not tested: rapid plug/unplug flapping.
 3. If/when this is properly packaged and released upstream, the manually-placed files in this entry should be reconciled with (or simply left to be overwritten cleanly by) that real package.
