@@ -286,7 +286,7 @@ normal-border-alpha = 0.4
 hover-cursor-color        = "#a9b1d6"
 hover-cursor-border       = "#a9b1d6"
 hover-cursor-border-width = 1
-hover-cursor-border-alpha = 0.25
+hover-cursor-border-alpha = 0.9
 ```
 
 The `*-border` keys can also be gradients:

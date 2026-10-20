@@ -80,14 +80,16 @@ QtObject {
   readonly property int focusBorderWidth: Math.max(0, Math.round(styleNum("focus-border-width", hoverBorderWidth)))
 
   readonly property real normalFillAlpha:    styleAlpha("normal-fill-alpha", 0.04)
-  readonly property real hoverFillAlpha:     styleAlpha("hover-cursor-fill-alpha", 0.08)
+  readonly property real hoverFillAlpha:     styleAlpha("hover-cursor-fill-alpha", 0.12)
   readonly property real selectedFillAlpha:  styleAlpha("selected-fill-alpha", 0.18)
   readonly property real pressedFillAlpha:   styleAlpha("pressed-fill-alpha", 0.22)
   readonly property real focusFillAlpha:     styleAlpha("focus-fill-alpha", hoverFillAlpha)
   readonly property real selectionFillAlpha: styleAlpha("selection-fill-alpha", 0.35)
 
   readonly property real normalBorderAlpha:   styleAlpha("normal-border-alpha", 0.4)
-  readonly property real hoverBorderAlpha:    styleAlpha("hover-cursor-border-alpha", 0.25)
+  // Well above normal chrome so the keyboard cursor clears WCAG's 3:1 focus
+  // contrast; at 0.25 it drew fainter than an idle border.
+  readonly property real hoverBorderAlpha:    styleAlpha("hover-cursor-border-alpha", 0.9)
   readonly property real selectedBorderAlpha: styleAlpha("selected-border-alpha", 1.0)
   readonly property real focusBorderAlpha:    styleAlpha("focus-border-alpha", hoverBorderAlpha)
 
