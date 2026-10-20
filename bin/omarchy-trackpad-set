@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # omarchy:summary=Change a trackpad setting and keep it across reloads
-# omarchy:args=<tap-to-click|natural-scroll|two-finger-right-click|ignore-while-typing|workspace-swipe|three-finger-drag|window-gestures> [on|off|toggle] | speed <-1.0..1.0> | reset
+# omarchy:args=<tap-to-click|natural-scroll|two-finger-right-click|ignore-while-typing|workspace-swipe|three-finger-drag|window-gestures|menu-swipe|voice-swipe|scratchpad-swipe|fullscreen-pinch|float-pinch|zoom-pinch> [on|off|toggle] | speed <-1.0..1.0> | reset
 # omarchy:examples=omarchy trackpad set tap-to-click off | omarchy trackpad set speed 0.3 | omarchy trackpad set reset
 
 # Choices are stored as key=value data and applied after the user's own Hyprland
@@ -11,7 +11,7 @@
 SETTINGS_FILE="$HOME/.local/state/omarchy/toggles/hypr/trackpad-settings"
 
 usage() {
-  echo "Usage: omarchy-trackpad-set <tap-to-click|natural-scroll|two-finger-right-click|ignore-while-typing|workspace-swipe|three-finger-drag|window-gestures> [on|off|toggle]" >&2
+  echo "Usage: omarchy-trackpad-set <tap-to-click|natural-scroll|two-finger-right-click|ignore-while-typing|workspace-swipe|three-finger-drag|window-gestures|menu-swipe|voice-swipe|scratchpad-swipe|fullscreen-pinch|float-pinch|zoom-pinch> [on|off|toggle]" >&2
   echo "       omarchy-trackpad-set speed <-1.0..1.0>" >&2
   echo "       omarchy-trackpad-set reset" >&2
 }
@@ -31,6 +31,9 @@ write_value() {
   mv "$tmp" "$SETTINGS_FILE"
 }
 
+# Gestures have no readable Hyprland option, so they toggle from the stored value.
+STORED_ONLY=" workspace_swipe window_gestures menu_swipe voice_swipe scratchpad_swipe fullscreen_pinch float_pinch zoom_pinch "
+
 # The live Hyprland value is the truth for toggling: it already reflects the
 # Omarchy default, the user's hypr/input.lua, and any earlier panel choice.
 live_bool() {
@@ -43,7 +46,7 @@ set_bool() {
     on) next=true ;;
     off) next=false ;;
     toggle)
-      if [[ $key == "workspace_swipe" || $key == "window_gestures" ]]; then
+      if [[ $STORED_ONLY == *" $key "* ]]; then
         current=$(read_value workspace_swipe)
       else
         current=$(live_bool "$key")
@@ -83,6 +86,12 @@ case "${1:-}" in
   workspace-swipe) set_bool workspace_swipe "${2:-toggle}" ;;
   three-finger-drag) set_bool drag_3fg "${2:-toggle}" ;;
   window-gestures) set_bool window_gestures "${2:-toggle}" ;;
+  menu-swipe) set_bool menu_swipe "${2:-toggle}" ;;
+  voice-swipe) set_bool voice_swipe "${2:-toggle}" ;;
+  scratchpad-swipe) set_bool scratchpad_swipe "${2:-toggle}" ;;
+  fullscreen-pinch) set_bool fullscreen_pinch "${2:-toggle}" ;;
+  float-pinch) set_bool float_pinch "${2:-toggle}" ;;
+  zoom-pinch) set_bool zoom_pinch "${2:-toggle}" ;;
   speed)
     if (($# < 2)); then
       usage

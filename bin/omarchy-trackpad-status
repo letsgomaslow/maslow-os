@@ -33,4 +33,8 @@ printf 'disable_while_typing\t%s\n' "$(live_bool disable_while_typing)"
 printf 'workspace_swipe\t%s\n' "$swipe"
 printf 'drag_3fg\t%s\n' "$(live_bool drag_3fg)"
 printf 'window_gestures\t%s\n' "$window_gestures"
+for key in menu_swipe voice_swipe scratchpad_swipe fullscreen_pinch float_pinch zoom_pinch; do
+  [[ $(read_value $key) == "true" ]] && value=true || value=false
+  printf '%s\t%s\n' "$key" "$value"
+done
 printf 'speed\t%s\n' "${speed:-0}"

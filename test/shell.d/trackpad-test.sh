@@ -77,6 +77,15 @@ run_cmd omarchy-trackpad-set window-gestures toggle
 [[ $(value_of window_gestures) == "true" ]] || fail "window gestures toggle on from their stored value"
 pass "window gestures are a stored setting"
 
+for setting in menu-swipe voice-swipe scratchpad-swipe fullscreen-pinch float-pinch zoom-pinch; do
+  key=${setting//-/_}
+  run_cmd omarchy-trackpad-set "$setting" toggle
+  [[ $(value_of "$key") == "true" ]] || fail "$setting toggles on from its stored value"
+  run_cmd omarchy-trackpad-set "$setting" off
+  [[ $(value_of "$key") == "false" ]] || fail "$setting turns off"
+done
+pass "every shortcut gesture is a stored on/off setting"
+
 run_cmd omarchy-trackpad-set speed 0.35
 [[ $(value_of sensitivity) == "0.35" && $(value_of device) == "bcm5974" ]] ||
   fail "speed stores the value and the device it applies to"
@@ -132,7 +141,19 @@ hl = {
     table.sort(keys)
     table.insert(out, "config " .. table.concat(keys, ","))
   end,
-  gesture = function(g) table.insert(out, "gesture " .. g.fingers .. " " .. g.direction .. " " .. g.action .. (g.mods and (" " .. g.mods) or "")) end,
+  gesture = function(g)
+    local action = g.action
+    if type(action) == "function" then
+      -- Capture the command a callback gesture runs.
+      local ran
+      hl.dispatch = function(cmd) ran = cmd end
+      hl.dsp = { exec_cmd = function(c) return "exec " .. c end }
+      action()
+      action = ran
+    end
+    local extra = (g.workspace_name and (" " .. g.workspace_name) or "") .. (g.mode and (" " .. g.mode) or "") .. (g.zoom_level and (" " .. g.zoom_level) or "")
+    table.insert(out, "gesture " .. g.fingers .. " " .. g.direction .. " " .. action .. extra .. (g.mods and (" " .. g.mods) or ""))
+  end,
   device = function(d) table.insert(out, "device " .. d.name .. " " .. tostring(d.sensitivity)) end,
 }
 require("default.hypr.trackpad-settings")
@@ -160,6 +181,20 @@ expected=$'gesture 3 swipe move SUPER\ngesture 4 swipe resize SUPER'
 [[ $actual == "$expected" ]] || fail "without drag, window gestures move on Super + three fingers" "expected: $expected"$'\n'"actual:   $actual"
 pass "without drag, window gestures move on Super + three fingers"
 
+actual=$(apply_settings $'menu_swipe=true\nvoice_swipe=true\nscratchpad_swipe=true\nfullscreen_pinch=true\nfloat_pinch=true\nzoom_pinch=true\n')
+expected=$'gesture 4 up exec omarchy-menu toggle root
+gesture 4 up exec omarchy-launch-voice start ALT
+gesture 4 down special scratchpad
+gesture 4 pinchout fullscreen fullscreen
+gesture 4 pinchin float
+gesture 4 pinch cursorZoom 2 SUPER'
+[[ $actual == "$expected" ]] || fail "shortcut gestures map to Maslow actions" "expected: $expected"$'\n'"actual:   $actual"
+pass "shortcut gestures map to Maslow actions with Alt and Super variants"
+
+actual=$(apply_settings $'menu_swipe=false\nvoice_swipe=1\n')
+[[ -z $actual ]] || fail "shortcut gestures stay off unless set to true" "$actual"
+pass "shortcut gestures stay off unless set to true"
+
 actual=$(apply_settings $'drag_3fg=false\n')
 [[ $actual == "config drag_3fg=0" ]] || fail "three-finger drag off sets drag_3fg=0" "$actual"
 pass "three-finger drag off sets drag_3fg=0"
@@ -171,6 +206,19 @@ pass "loader ignores invalid values and unknown keys"
 actual=$(apply_settings $'device=x"); os.exit(1) --\nsensitivity=0.1\n')
 [[ $actual == 'device x"); os.exit(1) -- 0.1' ]] || fail "loader passes the device name as data" "$actual"
 pass "loader passes the device name as data"
+
+# A QML syntax error makes the shell drop the widget from the bar entirely, so
+# parse the panel whenever qmllint is available.
+qmllint=$(command -v qmllint || command -v /usr/lib/qt6/bin/qmllint || true)
+if [[ -n $qmllint ]]; then
+  lint=$("$qmllint" "$ROOT/shell/plugins/panels/trackpad/Panel.qml" 2>&1 || true)
+  if grep -q '\[syntax\]' <<<"$lint"; then
+    fail "trackpad panel QML parses" "$lint"
+  fi
+  pass "trackpad panel QML parses"
+else
+  pass "qmllint unavailable; skipping trackpad panel QML parse"
+fi
 
 run_node_test <<'JS'
 const trackpad = requireFromRoot('shell/plugins/panels/trackpad/Model.js')
@@ -184,7 +232,7 @@ assertEqual(trackpad.parseStatus('speed\t9').speed, 1, 'trackpad clamps speed')
 assertEqual(trackpad.parseStatus('').present, false, 'trackpad treats empty output as absent')
 
 const rows = trackpad.settingRows(status)
-assertDeepEqual(rows.map(r => r.command), ['tap-to-click', 'two-finger-right-click', 'natural-scroll', 'three-finger-drag', 'workspace-swipe', 'window-gestures', 'ignore-while-typing'], 'trackpad lists every setting command')
+assertDeepEqual(rows.map(r => r.command), ['tap-to-click', 'two-finger-right-click', 'natural-scroll', 'three-finger-drag', 'workspace-swipe', 'window-gestures', 'ignore-while-typing', 'menu-swipe', 'voice-swipe', 'scratchpad-swipe', 'fullscreen-pinch', 'float-pinch', 'zoom-pinch'], 'trackpad lists every setting command')
 
 const dragging = Object.assign({}, status, { drag_3fg: true, workspace_swipe: true })
 const dragRows = trackpad.settingRows(dragging)
@@ -198,6 +246,14 @@ assert(windowGuide.includes('3 Hold Super, drag Move window'), 'guide shows Supe
 assert(windowGuide.includes('4 Hold Super, swipe Resize window'), 'guide shows Super + four-finger swipe resizes windows')
 const swipeMove = trackpad.guideRows(Object.assign({}, status, { window_gestures: true })).map(r => r.fingers + ' ' + r.gesture + ' ' + r.action)
 assert(swipeMove.includes('3 Hold Super, swipe Move window'), 'guide shows Super + three-finger swipe moves windows without drag')
+
+assertEqual(rows.filter(r => r.section).map(r => r.command).join(','), 'menu-swipe', 'shortcut gestures start their own section')
+const shortcuts = trackpad.guideRows(Object.assign({}, status, { menu_swipe: true, voice_swipe: true, scratchpad_swipe: true, fullscreen_pinch: true, float_pinch: true, zoom_pinch: true }))
+  .map(r => r.fingers + ' ' + r.gesture + ' ' + r.action)
+for (const line of ['4 Swipe up Maslow menu', '4 Hold Alt, swipe up Voice', '4 Swipe down Scratchpad', '4 Pinch out Full screen', '4 Pinch in Float window', '4 Hold Super, pinch Screen zoom']) {
+  assert(shortcuts.includes(line), 'guide shows ' + line)
+}
+assert(!trackpad.guideRows(status).some(r => r.action === 'Voice'), 'guide hides shortcut gestures that are off')
 assertEqual(rows[0].checked, true, 'trackpad reflects tap-to-click state')
 
 const twoFinger = trackpad.guideRows(status).map(r => r.fingers + ' ' + r.gesture + ' ' + r.action)

@@ -57,6 +57,7 @@ Panel {
     else if (row.command === "three-finger-drag") next.drag_3fg = !row.checked
     else if (row.command === "window-gestures") next.window_gestures = !row.checked
     else if (row.command === "ignore-while-typing") next.disable_while_typing = !row.checked
+    else next[row.command.replace(/-/g, "_")] = !row.checked
     root.status = next
     run([row.command, row.checked ? "off" : "on"])
   }
@@ -87,6 +88,13 @@ Panel {
   function move(dx, dy) {
     keyboardMode = true
     if (cursorIndex < 0) { cursorIndex = 0; return }
+    // The guide has no controls below the view tabs, so Up and Down scroll it
+    // there, handing back to the hero once it is scrolled to the top.
+    if (view === "guide" && cursorIndex === 1 && dy !== 0 && flick.interactive && (dy > 0 || flick.contentY > 0)) {
+      var step = Style.space(80)
+      flick.contentY = Math.max(0, Math.min(flick.contentHeight - flick.height, flick.contentY + dy * step))
+      return
+    }
     if (dy !== 0) {
       cursorIndex = Math.max(0, Math.min(cursorCount - 1, cursorIndex + dy))
     } else if (cursorIndex === 1) {
@@ -111,7 +119,7 @@ Panel {
   onCursorIndexChanged: {
     // The slider is last; scroll to the end so its cursor ring shows whole.
     if (cursorIndex === speedIndex && flick.interactive) flick.contentY = flick.contentHeight - flick.height
-    else if (cursorIndex === 0 || cursorIndex === 1) flick.contentY = 0
+    else if (cursorIndex === 0 || (cursorIndex === 1 && view === "settings")) flick.contentY = 0
   }
   onCursorCountChanged: if (cursorIndex >= cursorCount) cursorIndex = cursorCount - 1
   onPresentChanged: if (!present) close()
@@ -272,9 +280,25 @@ Panel {
 
           Repeater {
             model: root.rows
-            Toggle {
+            Column {
+              id: rowDelegate
               required property var modelData
               required property int index
+              width: parent.width
+              spacing: Style.space(8)
+
+              // A row that starts a new group carries its heading.
+              PanelSectionHeader {
+                visible: !!rowDelegate.modelData.section
+                topPadding: Style.space(10)
+                text: rowDelegate.modelData.section || ""
+                foreground: root.foreground
+                fontFamily: root.fontFamily
+              }
+
+            Toggle {
+              readonly property var modelData: rowDelegate.modelData
+              readonly property int index: rowDelegate.index
               width: parent.width
               label: modelData.label
               description: modelData.description
@@ -296,6 +320,7 @@ Panel {
               Accessible.checked: modelData.checked
               Accessible.onToggleAction: root.toggleRow(modelData)
               Accessible.onPressAction: root.toggleRow(modelData)
+            }
             }
           }
 

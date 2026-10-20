@@ -69,6 +69,38 @@ if settings.window_gestures == "true" then
   hl.gesture({ fingers = 4, direction = "swipe", mods = "SUPER", action = "resize" })
 end
 
+-- Four-finger shortcuts. Hyprland treats a held modifier as a separate gesture,
+-- so Alt and Super variants never collide with the plain ones.
+local function run(command)
+  return function()
+    hl.dispatch(hl.dsp.exec_cmd(command))
+  end
+end
+
+if settings.menu_swipe == "true" then
+  hl.gesture({ fingers = 4, direction = "up", action = run("omarchy-menu toggle root") })
+end
+
+if settings.voice_swipe == "true" then
+  hl.gesture({ fingers = 4, direction = "up", mods = "ALT", action = run("omarchy-launch-voice start") })
+end
+
+if settings.scratchpad_swipe == "true" then
+  hl.gesture({ fingers = 4, direction = "down", action = "special", workspace_name = "scratchpad" })
+end
+
+if settings.fullscreen_pinch == "true" then
+  hl.gesture({ fingers = 4, direction = "pinchout", action = "fullscreen", mode = "fullscreen" })
+end
+
+if settings.float_pinch == "true" then
+  hl.gesture({ fingers = 4, direction = "pinchin", action = "float" })
+end
+
+if settings.zoom_pinch == "true" then
+  hl.gesture({ fingers = 4, direction = "pinch", mods = "SUPER", action = "cursorZoom", zoom_level = 2 })
+end
+
 -- Three-finger drag takes over three-finger motion, so the workspace swipe
 -- moves to four fingers while it is on, as on macOS.
 if settings.workspace_swipe == "true" then
