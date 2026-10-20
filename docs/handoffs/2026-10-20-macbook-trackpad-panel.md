@@ -54,8 +54,12 @@ The user reported that three-finger drag could not move apps: Omarchy windows ha
 
 Tests: `trackpad-test.sh` 54 passing; `./test/cli` passes.
 
+## Delivery and compatibility (October 20)
+
+At the user's request the branch was delivered through [PR #29](https://github.com/letsgomaslow/maslow-os/pull/29) to `main`, with explicit authorization to merge. Before opening it, `omarchy-hw-touchpad` on `main` took upstream's udev `ID_INPUT_TOUCHPAD` fallback (the file already shipped in the installed candidate) plus a `bcm5974` name match, with upstream's `hw-touchpad-test.sh` extended by `bcm5974` and Apple SPI cases. That keeps the panel, menu Touchpad toggle and speed setting working on 2008-2015 Intel MacBooks (USB `bcm5974`), 2015-2017 Apple SPI trackpads, Apple Silicon (`apple-mtp-multi-touch`) and ordinary named touchpads. Gesture and settings code is device-agnostic; nothing is keyed to MacBookPro10,1 beyond detection. Full `./test/shell`: 249 of 253 files pass, with the four known environment-only failures.
+
 ## Remaining gates and next action
 
-The user's swipe and three-finger drag currently come from their personal config lines; once this branch is installed, move them to `omarchy trackpad set workspace-swipe on` and `omarchy trackpad set three-finger-drag on` and remove the lines so the panel switches own them. The branch is not pushed; the user chose local testing first, via the layer above. The physical-click fault is hardware-side and needs a battery/trackpad inspection, not code.
+The user's swipe and three-finger drag currently come from their personal config lines; once this branch is installed, move them to `omarchy trackpad set workspace-swipe on` and `omarchy trackpad set three-finger-drag on` and remove the lines so the panel switches own them. The local test layer stays in place until the merged source ships in a package; `uninstall.sh` then removes it. The physical-click fault is hardware-side and needs a battery/trackpad inspection, not code.
 
-Next action: collect the user's findings from testing the local layer, fix confirmed issues in the checkout and re-run `sync.sh`, then decide with the user on pull request and package delivery.
+Next action: package delivery of merged `main` is separately gated; once a package with this runtime is installed, run `~/.local/state/maslow-trackpad-test/uninstall.sh` and re-apply drag/swipe choices through the built-in panel.
