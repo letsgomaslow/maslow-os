@@ -44,6 +44,7 @@ The build flow is `maslow-os source` -> `maslow-os-pkgs package recipes` -> `mas
 
 ## Cross-Repository Release Rules
 
+- `maslow-os` is a fork of the public `omacom/omarchy` project, present as the `upstream` git remote. **Never push a branch, open a pull request, or otherwise submit changes to `omacom/omarchy` or any other upstream Omarchy repository.** Maslow AI-OS has replaced Omarchy's branding, identity, and product surface entirely (see `branding/README.md` and the Hub/Voice product work); anything submitted upstream is wrong by construction and will fail review there. All work stays within the four `letsgomaslow/*` repositories. `gh pr create` defaults to a fork's upstream parent when both remotes exist — always pass `--repo letsgomaslow/<repo>` explicitly, and check the returned URL's owner before treating a PR as correctly opened.
 - Never infer that the three repositories use the same default branch. Inspect each downstream remote before branching, opening a pull request, or merging.
 - Package recipes that fetch the released Maslow OS source must track `letsgomaslow/maslow-os` branch `main`. A local-source ISO build may use explicit feature-branch checkouts for pre-merge testing, but release evidence must record the exact commit from every checkout.
 - Validate coordinated work in dependency order: runtime source first, package recipes second, ISO assembly and end-to-end installation last.
