@@ -43,12 +43,22 @@ for key in pairs(booleans) do
   end
 end
 
+-- drag_3fg is numeric in Hyprland: 1 drags with three fingers, 0 is off.
+if settings.drag_3fg == "true" then
+  touchpad.drag_3fg = 1
+elseif settings.drag_3fg == "false" then
+  touchpad.drag_3fg = 0
+end
+
 if next(touchpad) then
   hl.config({ input = { touchpad = touchpad } })
 end
 
+-- Three-finger drag takes over three-finger motion, so the workspace swipe
+-- moves to four fingers while it is on, as on macOS.
 if settings.workspace_swipe == "true" then
-  hl.gesture({ fingers = 3, direction = "horizontal", action = "workspace" })
+  local fingers = settings.drag_3fg == "true" and 4 or 3
+  hl.gesture({ fingers = fingers, direction = "horizontal", action = "workspace" })
 end
 
 local sensitivity = tonumber(settings.sensitivity)

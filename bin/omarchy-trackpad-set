@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # omarchy:summary=Change a trackpad setting and keep it across reloads
-# omarchy:args=<tap-to-click|natural-scroll|two-finger-right-click|ignore-while-typing|workspace-swipe> [on|off|toggle] | speed <-1.0..1.0> | reset
+# omarchy:args=<tap-to-click|natural-scroll|two-finger-right-click|ignore-while-typing|workspace-swipe|three-finger-drag> [on|off|toggle] | speed <-1.0..1.0> | reset
 # omarchy:examples=omarchy trackpad set tap-to-click off | omarchy trackpad set speed 0.3 | omarchy trackpad set reset
 
 # Choices are stored as key=value data and applied after the user's own Hyprland
@@ -11,7 +11,7 @@
 SETTINGS_FILE="$HOME/.local/state/omarchy/toggles/hypr/trackpad-settings"
 
 usage() {
-  echo "Usage: omarchy-trackpad-set <tap-to-click|natural-scroll|two-finger-right-click|ignore-while-typing|workspace-swipe> [on|off|toggle]" >&2
+  echo "Usage: omarchy-trackpad-set <tap-to-click|natural-scroll|two-finger-right-click|ignore-while-typing|workspace-swipe|three-finger-drag> [on|off|toggle]" >&2
   echo "       omarchy-trackpad-set speed <-1.0..1.0>" >&2
   echo "       omarchy-trackpad-set reset" >&2
 }
@@ -34,7 +34,7 @@ write_value() {
 # The live Hyprland value is the truth for toggling: it already reflects the
 # Omarchy default, the user's hypr/input.lua, and any earlier panel choice.
 live_bool() {
-  [[ $(hyprctl getoption "input:touchpad:$1" -j | jq -r '.bool') == "true" ]] && echo true || echo false
+  [[ $(hyprctl getoption "input:touchpad:$1" -j | jq -r '(.bool // false) or (.int == 1)') == "true" ]] && echo true || echo false
 }
 
 set_bool() {
@@ -81,6 +81,7 @@ case "${1:-}" in
   two-finger-right-click) set_bool clickfinger_behavior "${2:-toggle}" ;;
   ignore-while-typing) set_bool disable_while_typing "${2:-toggle}" ;;
   workspace-swipe) set_bool workspace_swipe "${2:-toggle}" ;;
+  three-finger-drag) set_bool drag_3fg "${2:-toggle}" ;;
   speed)
     if (($# < 2)); then
       usage

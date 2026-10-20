@@ -69,6 +69,10 @@ run_cmd omarchy-trackpad-set workspace-swipe toggle
 [[ $(value_of workspace_swipe) == "false" ]] || fail "swipe toggle turns the gesture off"
 pass "workspace swipe toggles from its stored value"
 
+run_cmd omarchy-trackpad-set three-finger-drag on
+[[ $(value_of drag_3fg) == "true" ]] || fail "three-finger drag stores drag_3fg=true"
+pass "three-finger drag is a stored setting"
+
 run_cmd omarchy-trackpad-set speed 0.35
 [[ $(value_of sensitivity) == "0.35" && $(value_of device) == "bcm5974" ]] ||
   fail "speed stores the value and the device it applies to"
@@ -93,11 +97,11 @@ if run_cmd omarchy-trackpad-set natural-scroll maybe 2>/dev/null; then
 fi
 pass "unknown settings and actions are rejected"
 
-status=$(LIVE_tap_to_click=false LIVE_natural_scroll=true LIVE_clickfinger_behavior=true LIVE_disable_while_typing=true \
+status=$(LIVE_tap_to_click=false LIVE_natural_scroll=true LIVE_clickfinger_behavior=true LIVE_disable_while_typing=true LIVE_drag_3fg=true \
   run_cmd omarchy-trackpad-status)
 [[ $status == *$'present\ttrue'* && $status == *$'device\tbcm5974'* && $status == *$'enabled\ttrue'* ]] ||
   fail "status reports the device" "$status"
-[[ $status == *$'tap_to_click\tfalse'* && $status == *$'natural_scroll\ttrue'* && $status == *$'workspace_swipe\tfalse'* && $status == *$'speed\t0.35'* ]] ||
+[[ $status == *$'tap_to_click\tfalse'* && $status == *$'natural_scroll\ttrue'* && $status == *$'workspace_swipe\tfalse'* && $status == *$'drag_3fg\ttrue'* && $status == *$'speed\t0.35'* ]] ||
   fail "status reports live options and stored choices" "$status"
 pass "status reports live options and stored choices"
 
@@ -137,6 +141,15 @@ expected=$'config natural_scroll=true,tap_to_click=false\ngesture 3 horizontal w
 [[ $actual == "$expected" ]] || fail "loader applies stored choices" "expected: $expected"$'\n'"actual:   $actual"
 pass "loader applies stored choices"
 
+actual=$(apply_settings $'drag_3fg=true\nworkspace_swipe=true\n')
+expected=$'config drag_3fg=1\ngesture 4 horizontal workspace'
+[[ $actual == "$expected" ]] || fail "three-finger drag moves the workspace swipe to four fingers" "expected: $expected"$'\n'"actual:   $actual"
+pass "three-finger drag moves the workspace swipe to four fingers"
+
+actual=$(apply_settings $'drag_3fg=false\n')
+[[ $actual == "config drag_3fg=0" ]] || fail "three-finger drag off sets drag_3fg=0" "$actual"
+pass "three-finger drag off sets drag_3fg=0"
+
 actual=$(apply_settings $'natural_scroll=yes\nos.execute=true\nsensitivity=5\ndevice=bcm5974\nworkspace_swipe=1\n')
 [[ -z $actual ]] || fail "loader ignores invalid values and unknown keys" "$actual"
 pass "loader ignores invalid values and unknown keys"
@@ -157,7 +170,14 @@ assertEqual(trackpad.parseStatus('speed\t9').speed, 1, 'trackpad clamps speed')
 assertEqual(trackpad.parseStatus('').present, false, 'trackpad treats empty output as absent')
 
 const rows = trackpad.settingRows(status)
-assertDeepEqual(rows.map(r => r.command), ['tap-to-click', 'two-finger-right-click', 'natural-scroll', 'workspace-swipe', 'ignore-while-typing'], 'trackpad lists every setting command')
+assertDeepEqual(rows.map(r => r.command), ['tap-to-click', 'two-finger-right-click', 'natural-scroll', 'three-finger-drag', 'workspace-swipe', 'ignore-while-typing'], 'trackpad lists every setting command')
+
+const dragging = Object.assign({}, status, { drag_3fg: true, workspace_swipe: true })
+const dragRows = trackpad.settingRows(dragging)
+assertEqual(dragRows[4].label, 'Four-finger workspace swipe', 'swipe setting names four fingers while dragging with three')
+const dragGuide = trackpad.guideRows(dragging).map(r => r.fingers + ' ' + r.gesture + ' ' + r.action)
+assert(dragGuide.includes('3 Rest and slide Drag'), 'guide shows three-finger drag')
+assert(dragGuide.includes('4 Swipe left or right Switch workspace'), 'guide moves the swipe to four fingers while dragging')
 assertEqual(rows[0].checked, true, 'trackpad reflects tap-to-click state')
 
 const twoFinger = trackpad.guideRows(status).map(r => r.fingers + ' ' + r.gesture + ' ' + r.action)

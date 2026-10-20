@@ -15,7 +15,7 @@ read_value() {
 }
 
 live_bool() {
-  [[ $(hyprctl getoption "input:touchpad:$1" -j | jq -r '.bool') == "true" ]] && echo true || echo false
+  [[ $(hyprctl getoption "input:touchpad:$1" -j | jq -r '(.bool // false) or (.int == 1)') == "true" ]] && echo true || echo false
 }
 
 [[ -f $HOME/.local/state/omarchy/toggles/hypr/touchpad-disabled-name ]] && enabled=false || enabled=true
@@ -30,4 +30,5 @@ printf 'natural_scroll\t%s\n' "$(live_bool natural_scroll)"
 printf 'clickfinger_behavior\t%s\n' "$(live_bool clickfinger_behavior)"
 printf 'disable_while_typing\t%s\n' "$(live_bool disable_while_typing)"
 printf 'workspace_swipe\t%s\n' "$swipe"
+printf 'drag_3fg\t%s\n' "$(live_bool drag_3fg)"
 printf 'speed\t%s\n' "${speed:-0}"

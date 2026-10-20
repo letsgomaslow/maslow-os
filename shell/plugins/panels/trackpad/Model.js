@@ -9,7 +9,8 @@ var BOOLEAN_KEYS = [
   "natural_scroll",
   "clickfinger_behavior",
   "disable_while_typing",
-  "workspace_swipe"
+  "workspace_swipe",
+  "drag_3fg"
 ]
 
 function parseStatus(raw) {
@@ -57,9 +58,17 @@ function settingRows(status) {
       checked: !!s.natural_scroll
     },
     {
+      command: "three-finger-drag",
+      label: "Three-finger drag",
+      description: "Rest three fingers and slide to drag, without pressing the pad down.",
+      checked: !!s.drag_3fg
+    },
+    {
       command: "workspace-swipe",
-      label: "Three-finger workspace swipe",
-      description: "Swipe left or right with three fingers to switch workspaces.",
+      label: s.drag_3fg ? "Four-finger workspace swipe" : "Three-finger workspace swipe",
+      description: s.drag_3fg
+        ? "Swipe left or right with four fingers to switch workspaces. Four, because three fingers drag."
+        : "Swipe left or right with three fingers to switch workspaces.",
       checked: !!s.workspace_swipe
     },
     {
@@ -91,6 +100,10 @@ function guideRows(status) {
     rows.push({ fingers: "1", gesture: "Tap, then touch and slide", action: "Drag" })
   }
 
+  if (s.drag_3fg) {
+    rows.push({ fingers: "3", gesture: "Rest and slide", action: "Drag" })
+  }
+
   rows.push({
     fingers: "2",
     gesture: "Slide up or down",
@@ -98,7 +111,7 @@ function guideRows(status) {
   })
 
   if (s.workspace_swipe) {
-    rows.push({ fingers: "3", gesture: "Swipe left or right", action: "Switch workspace" })
+    rows.push({ fingers: s.drag_3fg ? "4" : "3", gesture: "Swipe left or right", action: "Switch workspace" })
   }
 
   return rows
