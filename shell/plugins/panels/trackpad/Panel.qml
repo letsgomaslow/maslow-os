@@ -13,6 +13,9 @@ Panel {
   property var status: ({ present: false })
   property string view: "settings"
   property int cursorIndex: -1
+  // Set by the arrow keys and cleared when the pointer really moves, so rows
+  // scrolling under a parked pointer cannot steal the keyboard cursor.
+  property bool keyboardMode: false
 
   readonly property bool present: status.present === true
   readonly property var rows: Model.settingRows(status)
@@ -24,6 +27,14 @@ Panel {
   // settings rows and the speed slider when the settings view is showing.
   readonly property int speedIndex: 2 + rows.length
   readonly property int cursorCount: view === "settings" ? speedIndex + 1 : 2
+
+  // Keep the keyboard cursor's control on screen when the content scrolls.
+  function ensureVisible(item) {
+    if (!item || !flick.interactive) return
+    var top = item.mapToItem(column, 0, 0).y
+    if (top < flick.contentY) flick.contentY = top
+    else if (top + item.height > flick.contentY + flick.height) flick.contentY = top + item.height - flick.height
+  }
 
   function refresh() {
     if (!statusProc.running) statusProc.running = true
@@ -68,7 +79,12 @@ Panel {
     else if (view === "settings" && index >= 2 && index < speedIndex) toggleRow(rows[index - 2])
   }
 
+  function hoverTo(index) {
+    if (!keyboardMode) cursorIndex = index
+  }
+
   function move(dx, dy) {
+    keyboardMode = true
     if (cursorIndex < 0) { cursorIndex = 0; return }
     if (dy !== 0) {
       cursorIndex = Math.max(0, Math.min(cursorCount - 1, cursorIndex + dy))
@@ -87,9 +103,15 @@ Panel {
       }
       refresh()
       cursorIndex = -1
+      keyboardMode = false
     }
   }
 
+  onCursorIndexChanged: {
+    // The slider is last; scroll to the end so its cursor ring shows whole.
+    if (cursorIndex === speedIndex && flick.interactive) flick.contentY = flick.contentHeight - flick.height
+    else if (cursorIndex === 0 || cursorIndex === 1) flick.contentY = 0
+  }
   onCursorCountChanged: if (cursorIndex >= cursorCount) cursorIndex = cursorCount - 1
   onPresentChanged: if (!present) close()
   Component.onCompleted: refresh()
@@ -144,12 +166,37 @@ Panel {
       onCloseRequested: root.close()
       onTabRequested: function(direction) { root.switchPanel(direction) }
 
+      // Scene position ignores content scrolling, so only real pointer motion
+      // hands the cursor back to the mouse.
+      HoverHandler {
+        property point last: Qt.point(-1, -1)
+        onPointChanged: {
+          var p = point.scenePosition
+          if (Math.abs(p.x - last.x) > 1 || Math.abs(p.y - last.y) > 1) {
+            if (last.x >= 0) root.keyboardMode = false
+            last = p
+          }
+        }
+      }
+
+      // Scrolls only when the content is taller than the screen allows, so
+      // nothing is cut off at large text sizes or with the off-state note.
+      Flickable {
+        id: flick
+        anchors.fill: parent
+        clip: true
+        contentWidth: width
+        contentHeight: column.implicitHeight
+        interactive: contentHeight > height
+        boundsBehavior: Flickable.StopAtBounds
+
       Column {
         id: column
-        anchors.left: parent.left
-        anchors.right: parent.right
-        anchors.top: parent.top
+        // Leave a gutter for the scroll indicator so it never covers controls.
+        width: flick.width - (flick.interactive ? Style.space(12) : 0)
         spacing: Style.space(14)
+        // Room for the slider's cursor ring, which sits outside the slider.
+        bottomPadding: Style.space(6)
 
         PanelHero {
           width: parent.width
@@ -173,7 +220,7 @@ Panel {
               hasCursor: root.cursorIndex === 0
               foreground: root.foreground
               onToggled: root.toggleEnabled()
-              onHovered: function(h) { if (h) root.cursorIndex = 0 }
+              onHovered: function(h) { if (h) root.hoverTo(0) }
               Accessible.role: Accessible.CheckBox
               Accessible.name: "Trackpad"
               Accessible.checkable: true
@@ -211,7 +258,7 @@ Panel {
           focusable: false
           cursorIndex: root.cursorIndex === 1 ? (root.view === "settings" ? 0 : 1) : -1
           onChanged: function(value) { root.view = value }
-          onHovered: function(index, isHovered) { if (isHovered) root.cursorIndex = 1 }
+          onHovered: function(index, isHovered) { if (isHovered) root.hoverTo(1) }
           Accessible.role: Accessible.PageTabList
           Accessible.name: root.view === "settings" ? "Trackpad view: Settings" : "Trackpad view: How to use"
         }
@@ -235,7 +282,8 @@ Panel {
               fontFamily: root.fontFamily
               titleSize: Style.font.body
               hasCursor: root.cursorIndex === index + 2
-              onHovered: function(h) { if (h) root.cursorIndex = index + 2 }
+              onHasCursorChanged: if (hasCursor) root.ensureVisible(this)
+              onHovered: function(h) { if (h) root.hoverTo(index + 2) }
               onClicked: {
                 root.cursorIndex = index + 2
                 root.toggleRow(modelData)
@@ -277,6 +325,7 @@ Panel {
           }
 
           PanelSlider {
+            id: speedSlider
             width: parent.width
             bar: root.bar
             minimum: -1
@@ -290,17 +339,18 @@ Panel {
             Accessible.description: Model.speedLabel(root.status.speed) + ". Use the left and right arrow keys to adjust."
 
             HoverHandler {
-              onHoveredChanged: if (hovered) root.cursorIndex = root.speedIndex
+              onHoveredChanged: if (hovered) root.hoverTo(root.speedIndex)
             }
 
-            Rectangle {
+            // Same cursor ring the switches use, so keyboard focus reads the
+            // same everywhere in the panel.
+            BorderSurface {
               anchors.fill: parent
               anchors.margins: -Style.space(4)
               visible: root.cursorIndex === root.speedIndex
               color: "transparent"
               radius: Style.cornerRadius
-              border.width: 1
-              border.color: Qt.rgba(root.foreground.r, root.foreground.g, root.foreground.b, 0.25)
+              borderSpec: Border.controlSpec("hover-cursor", root.foreground, Color.accent)
             }
           }
         }
@@ -380,6 +430,18 @@ Panel {
             wrapMode: Text.WordWrap
           }
         }
+      }
+      }
+
+      Rectangle {
+        visible: flick.interactive
+        anchors.right: parent.right
+        width: Style.space(3)
+        radius: width / 2
+        color: root.foreground
+        opacity: 0.5
+        height: Math.max(Style.space(24), flick.height * flick.height / Math.max(1, flick.contentHeight))
+        y: (flick.height - height) * (flick.contentY / Math.max(1, flick.contentHeight - flick.height))
       }
     }
   }
