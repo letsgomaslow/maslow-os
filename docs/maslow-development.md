@@ -1,5 +1,9 @@
 # Maslow AI-OS development: start here
 
+## RETRO WALLPAPERS SELECTED AND PREVIEWS UPDATED — October 20
+
+The user selected Intelligence Portal for `maslow-1984` and Silver Relief for `maslow-platinum`, then confirmed both installed wallpapers and the corrected theme-picker cards look good. The [wallpaper handoff](handoffs/2026-10-20-retro-wallpapers.md) records exact image hashes, local/source boundaries and checks. Source now includes the selected static PNGs first in each theme's background order and matching `preview.png` images; previous plain backgrounds remain available. Scope is this runtime repository only. Next action: review the scoped asset commit for downstream delivery; no package/ISO build or publication is claimed.
+
 ## RETRO THEME STUDY: TWO THEMES SHIPPED, CRITICAL VIDEO-INTRO GPU HANG FOUND AND MITIGATED — October 19-20
 
 A retro-UI exploration for the MacBook candidate (performance baseline first, then an HTML mockup comparing a 1984-style and a Mac OS 8/9 Platinum-style direction) led to two real, shipped themes and one serious, previously-unknown hardware-crash bug.
