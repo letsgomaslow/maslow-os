@@ -1,0 +1,40 @@
+#!/bin/bash
+
+# omarchy:summary=Print the trackpad's current settings as tab-separated key/value lines
+
+SETTINGS_FILE="$HOME/.local/state/omarchy/toggles/hypr/trackpad-settings"
+
+device=$(omarchy-hw-touchpad)
+if [[ -z $device ]]; then
+  printf 'present\tfalse\n'
+  exit 0
+fi
+
+read_value() {
+  [[ -f $SETTINGS_FILE ]] && sed -n "s/^$1=//p" "$SETTINGS_FILE" | tail -n 1
+}
+
+live_bool() {
+  [[ $(hyprctl getoption "input:touchpad:$1" -j | jq -r '(.bool // false) or (.int == 1)') == "true" ]] && echo true || echo false
+}
+
+[[ -f $HOME/.local/state/omarchy/toggles/hypr/touchpad-disabled-name ]] && enabled=false || enabled=true
+[[ $(read_value workspace_swipe) == "true" ]] && swipe=true || swipe=false
+[[ $(read_value window_gestures) == "true" ]] && window_gestures=true || window_gestures=false
+speed=$(read_value sensitivity)
+
+printf 'present\ttrue\n'
+printf 'device\t%s\n' "$device"
+printf 'enabled\t%s\n' "$enabled"
+printf 'tap_to_click\t%s\n' "$(live_bool tap_to_click)"
+printf 'natural_scroll\t%s\n' "$(live_bool natural_scroll)"
+printf 'clickfinger_behavior\t%s\n' "$(live_bool clickfinger_behavior)"
+printf 'disable_while_typing\t%s\n' "$(live_bool disable_while_typing)"
+printf 'workspace_swipe\t%s\n' "$swipe"
+printf 'drag_3fg\t%s\n' "$(live_bool drag_3fg)"
+printf 'window_gestures\t%s\n' "$window_gestures"
+for key in menu_swipe voice_swipe scratchpad_swipe fullscreen_pinch float_pinch zoom_pinch; do
+  [[ $(read_value $key) == "true" ]] && value=true || value=false
+  printf '%s\t%s\n' "$key" "$value"
+done
+printf 'speed\t%s\n' "${speed:-0}"

@@ -92,7 +92,7 @@ Item {
   property color selectedBackground: Color.menu.selectedBackground
   property color selectedText: Color.menu.selectedText
   property color selectedBorder: Color.menu.selectedBorder
-  property var selectedBorderSpec: Border.surfaceSpec("menu", "selected-border", selectedBorder, 0)
+  property var selectedBorderSpec: Border.surfaceSpec("menu", "selected-border", selectedBorder, 1)
   readonly property real rowReservedBorderLeft: Border.left(selectedBorderSpec)
   readonly property real rowReservedBorderRight: Border.right(selectedBorderSpec)
   readonly property int cornerRadius: Style.cornerRadius

@@ -96,9 +96,9 @@ QtObject {
     property color text: root.pick("menu.text", root.foreground)
     property color border: root.composed("menu.border", "menu.border-alpha", root.foreground, 1.0)
     property color scrim: root.composed("menu.scrim", "menu.scrim-alpha", root.background, 0.5)
-    property color selectedBackground: root.composed("menu.selected-background", "menu.selected-background-alpha", root.foreground, 0.08)
+    property color selectedBackground: root.composed("menu.selected-background", "menu.selected-background-alpha", root.foreground, 0.12)
     property color selectedText: root.pick("menu.selected-text", root.accent)
-    property color selectedBorder: root.composed("menu.selected-border", "menu.selected-border-alpha", root.foreground, 0.0)
+    property color selectedBorder: root.composed("menu.selected-border", "menu.selected-border-alpha", root.foreground, 0.9)
   }
   // polkit + lock share a single border-alpha across border / border-active /
   // border-error: the three states are mutually exclusive in time, so one

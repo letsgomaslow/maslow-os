@@ -2,6 +2,7 @@ pragma Singleton
 import QtQuick
 import Quickshell
 import Quickshell.Io
+import "Contrast.js" as Contrast
 
 // Shared structural style tokens for the shell. Color is the palette
 // singleton; Style holds everything else themes can influence — corner
@@ -80,14 +81,21 @@ QtObject {
   readonly property int focusBorderWidth: Math.max(0, Math.round(styleNum("focus-border-width", hoverBorderWidth)))
 
   readonly property real normalFillAlpha:    styleAlpha("normal-fill-alpha", 0.04)
-  readonly property real hoverFillAlpha:     styleAlpha("hover-cursor-fill-alpha", 0.08)
+  readonly property real hoverFillAlpha:     styleAlpha("hover-cursor-fill-alpha", 0.12)
   readonly property real selectedFillAlpha:  styleAlpha("selected-fill-alpha", 0.18)
   readonly property real pressedFillAlpha:   styleAlpha("pressed-fill-alpha", 0.22)
   readonly property real focusFillAlpha:     styleAlpha("focus-fill-alpha", hoverFillAlpha)
   readonly property real selectionFillAlpha: styleAlpha("selection-fill-alpha", 0.35)
 
-  readonly property real normalBorderAlpha:   styleAlpha("normal-border-alpha", 0.4)
-  readonly property real hoverBorderAlpha:    styleAlpha("hover-cursor-border-alpha", 0.25)
+  // Idle borders never drop below WCAG's 3:1 non-text contrast against the
+  // background or the control fill, whatever the theme asks for: the needed
+  // alpha depends on each palette, from about 0.37 to 0.68 in the stock themes.
+  readonly property real configuredNormalBorderAlpha: styleAlpha("normal-border-alpha", 0.4)
+  readonly property real normalBorderAlpha: Math.max(configuredNormalBorderAlpha,
+    Contrast.minimumAlpha(normalStateColor(), Color.background, normalFillAlpha, 3))
+  // Well above normal chrome so the keyboard cursor clears WCAG's 3:1 focus
+  // contrast; at 0.25 it drew fainter than an idle border.
+  readonly property real hoverBorderAlpha:    styleAlpha("hover-cursor-border-alpha", 0.9)
   readonly property real selectedBorderAlpha: styleAlpha("selected-border-alpha", 1.0)
   readonly property real focusBorderAlpha:    styleAlpha("focus-border-alpha", hoverBorderAlpha)
 

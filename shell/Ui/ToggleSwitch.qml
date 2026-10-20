@@ -15,10 +15,8 @@ import qs.Commons
 // a background refresh runs.
 //
 // The cursor is a ring drawn outside the track rather than a state on the
-// track itself: themes give normal chrome a stronger border than hover-cursor
-// (0.4 vs 0.25 by default), which is right for controls that are borderless at
-// rest but would make a bordered track go *fainter* under the cursor. On the
-// panel background the ring reads immediately. `cursorRing` follows
+// track itself, so the track keeps its on/off colors while the cursor sits on
+// it. On the panel background the ring reads immediately. `cursorRing` follows
 // `interactive` — a switch whose surrounding row owns the click owns the
 // cursor too.
 //

@@ -39,19 +39,19 @@ normal-border-alpha = 0.4
 
 # Hover-cursor: mouse hover and the panel keyboard cursor.
 hover-cursor-color        = "{{ foreground }}"
-hover-cursor-fill-alpha   = 0.08
+hover-cursor-fill-alpha   = 0.12
 hover-cursor-border       = "{{ foreground }}"
 hover-cursor-border-width = 1
-hover-cursor-border-alpha = 0.25
+hover-cursor-border-alpha = 0.9
 
 # Focus: Qt activeFocus. Mirror the hover-cursor values by default so
 # mouse hover, keyboard cursor, and tab focus all read as the same state
 # — themes that want focus to stand out override these four lines.
 focus-color        = "{{ foreground }}"
-focus-fill-alpha   = 0.08
+focus-fill-alpha   = 0.12
 focus-border       = "{{ foreground }}"
 focus-border-width = 1
-focus-border-alpha = 0.25
+focus-border-alpha = 0.9
 
 # Selected: persistent chosen/current state.
 selected-color        = "{{ foreground }}"
@@ -181,10 +181,13 @@ border-alpha              = 1.0
 scrim                     = "{{ background }}"
 scrim-alpha               = 0.5
 selected-background       = "{{ foreground }}"
-selected-background-alpha = 0.08
+selected-background-alpha = 0.12
 selected-text             = "{{ accent }}"
 selected-border           = "hyprland.active-border-foreground"
-selected-border-alpha     = 0.25
+selected-border-alpha     = 0.9
+# Outline the keyboard-selected row so it clears WCAG's 3:1 focus contrast.
+# Rows reserve this width whether or not they are selected, so text never shifts.
+selected-border-width     = 1
 
 [polkit]
 # Polkit authentication prompt (sudo/password dialogs). scrim is the
