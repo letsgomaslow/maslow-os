@@ -10,7 +10,8 @@ var BOOLEAN_KEYS = [
   "clickfinger_behavior",
   "disable_while_typing",
   "workspace_swipe",
-  "drag_3fg"
+  "drag_3fg",
+  "window_gestures"
 ]
 
 function parseStatus(raw) {
@@ -72,6 +73,14 @@ function settingRows(status) {
       checked: !!s.workspace_swipe
     },
     {
+      command: "window-gestures",
+      label: "Window gestures",
+      description: s.drag_3fg
+        ? "Hold Super and drag with three fingers to move a window. Hold Super and swipe with four fingers to resize it."
+        : "Hold Super and swipe with three fingers to move a window, or four fingers to resize it.",
+      checked: !!s.window_gestures
+    },
+    {
       command: "ignore-while-typing",
       label: "Ignore trackpad while typing",
       description: "Stops a resting palm from moving the pointer.",
@@ -109,6 +118,11 @@ function guideRows(status) {
     gesture: "Slide up or down",
     action: s.natural_scroll ? "Scroll (natural)" : "Scroll"
   })
+
+  if (s.window_gestures) {
+    rows.push({ fingers: "3", gesture: s.drag_3fg ? "Hold Super, drag" : "Hold Super, swipe", action: "Move window" })
+    rows.push({ fingers: "4", gesture: "Hold Super, swipe", action: "Resize window" })
+  }
 
   if (s.workspace_swipe) {
     rows.push({ fingers: s.drag_3fg ? "4" : "3", gesture: "Swipe left or right", action: "Switch workspace" })

@@ -20,6 +20,7 @@ live_bool() {
 
 [[ -f $HOME/.local/state/omarchy/toggles/hypr/touchpad-disabled-name ]] && enabled=false || enabled=true
 [[ $(read_value workspace_swipe) == "true" ]] && swipe=true || swipe=false
+[[ $(read_value window_gestures) == "true" ]] && window_gestures=true || window_gestures=false
 speed=$(read_value sensitivity)
 
 printf 'present\ttrue\n'
@@ -31,4 +32,5 @@ printf 'clickfinger_behavior\t%s\n' "$(live_bool clickfinger_behavior)"
 printf 'disable_while_typing\t%s\n' "$(live_bool disable_while_typing)"
 printf 'workspace_swipe\t%s\n' "$swipe"
 printf 'drag_3fg\t%s\n' "$(live_bool drag_3fg)"
+printf 'window_gestures\t%s\n' "$window_gestures"
 printf 'speed\t%s\n' "${speed:-0}"

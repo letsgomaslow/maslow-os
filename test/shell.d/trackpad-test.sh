@@ -73,6 +73,10 @@ run_cmd omarchy-trackpad-set three-finger-drag on
 [[ $(value_of drag_3fg) == "true" ]] || fail "three-finger drag stores drag_3fg=true"
 pass "three-finger drag is a stored setting"
 
+run_cmd omarchy-trackpad-set window-gestures toggle
+[[ $(value_of window_gestures) == "true" ]] || fail "window gestures toggle on from their stored value"
+pass "window gestures are a stored setting"
+
 run_cmd omarchy-trackpad-set speed 0.35
 [[ $(value_of sensitivity) == "0.35" && $(value_of device) == "bcm5974" ]] ||
   fail "speed stores the value and the device it applies to"
@@ -128,7 +132,7 @@ hl = {
     table.sort(keys)
     table.insert(out, "config " .. table.concat(keys, ","))
   end,
-  gesture = function(g) table.insert(out, "gesture " .. g.fingers .. " " .. g.direction .. " " .. g.action) end,
+  gesture = function(g) table.insert(out, "gesture " .. g.fingers .. " " .. g.direction .. " " .. g.action .. (g.mods and (" " .. g.mods) or "")) end,
   device = function(d) table.insert(out, "device " .. d.name .. " " .. tostring(d.sensitivity)) end,
 }
 require("default.hypr.trackpad-settings")
@@ -145,6 +149,16 @@ actual=$(apply_settings $'drag_3fg=true\nworkspace_swipe=true\n')
 expected=$'config drag_3fg=1\ngesture 4 horizontal workspace'
 [[ $actual == "$expected" ]] || fail "three-finger drag moves the workspace swipe to four fingers" "expected: $expected"$'\n'"actual:   $actual"
 pass "three-finger drag moves the workspace swipe to four fingers"
+
+actual=$(apply_settings $'drag_3fg=true\nwindow_gestures=true\nworkspace_swipe=true\n')
+expected=$'config drag_3fg=1\ngesture 4 swipe resize SUPER\ngesture 4 horizontal workspace'
+[[ $actual == "$expected" ]] || fail "window gestures resize on Super + four fingers before the workspace swipe" "expected: $expected"$'\n'"actual:   $actual"
+pass "window gestures resize on Super + four fingers before the workspace swipe"
+
+actual=$(apply_settings $'window_gestures=true\n')
+expected=$'gesture 3 swipe move SUPER\ngesture 4 swipe resize SUPER'
+[[ $actual == "$expected" ]] || fail "without drag, window gestures move on Super + three fingers" "expected: $expected"$'\n'"actual:   $actual"
+pass "without drag, window gestures move on Super + three fingers"
 
 actual=$(apply_settings $'drag_3fg=false\n')
 [[ $actual == "config drag_3fg=0" ]] || fail "three-finger drag off sets drag_3fg=0" "$actual"
@@ -170,7 +184,7 @@ assertEqual(trackpad.parseStatus('speed\t9').speed, 1, 'trackpad clamps speed')
 assertEqual(trackpad.parseStatus('').present, false, 'trackpad treats empty output as absent')
 
 const rows = trackpad.settingRows(status)
-assertDeepEqual(rows.map(r => r.command), ['tap-to-click', 'two-finger-right-click', 'natural-scroll', 'three-finger-drag', 'workspace-swipe', 'ignore-while-typing'], 'trackpad lists every setting command')
+assertDeepEqual(rows.map(r => r.command), ['tap-to-click', 'two-finger-right-click', 'natural-scroll', 'three-finger-drag', 'workspace-swipe', 'window-gestures', 'ignore-while-typing'], 'trackpad lists every setting command')
 
 const dragging = Object.assign({}, status, { drag_3fg: true, workspace_swipe: true })
 const dragRows = trackpad.settingRows(dragging)
@@ -178,6 +192,12 @@ assertEqual(dragRows[4].label, 'Four-finger workspace swipe', 'swipe setting nam
 const dragGuide = trackpad.guideRows(dragging).map(r => r.fingers + ' ' + r.gesture + ' ' + r.action)
 assert(dragGuide.includes('3 Rest and slide Drag'), 'guide shows three-finger drag')
 assert(dragGuide.includes('4 Swipe left or right Switch workspace'), 'guide moves the swipe to four fingers while dragging')
+
+const windowGuide = trackpad.guideRows(Object.assign({}, dragging, { window_gestures: true })).map(r => r.fingers + ' ' + r.gesture + ' ' + r.action)
+assert(windowGuide.includes('3 Hold Super, drag Move window'), 'guide shows Super + three-finger drag moves windows')
+assert(windowGuide.includes('4 Hold Super, swipe Resize window'), 'guide shows Super + four-finger swipe resizes windows')
+const swipeMove = trackpad.guideRows(Object.assign({}, status, { window_gestures: true })).map(r => r.fingers + ' ' + r.gesture + ' ' + r.action)
+assert(swipeMove.includes('3 Hold Super, swipe Move window'), 'guide shows Super + three-finger swipe moves windows without drag')
 assertEqual(rows[0].checked, true, 'trackpad reflects tap-to-click state')
 
 const twoFinger = trackpad.guideRows(status).map(r => r.fingers + ' ' + r.gesture + ' ' + r.action)

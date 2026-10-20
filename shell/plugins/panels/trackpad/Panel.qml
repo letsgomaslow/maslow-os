@@ -55,6 +55,7 @@ Panel {
     else if (row.command === "natural-scroll") next.natural_scroll = !row.checked
     else if (row.command === "workspace-swipe") next.workspace_swipe = !row.checked
     else if (row.command === "three-finger-drag") next.drag_3fg = !row.checked
+    else if (row.command === "window-gestures") next.window_gestures = !row.checked
     else if (row.command === "ignore-while-typing") next.disable_while_typing = !row.checked
     root.status = next
     run([row.command, row.checked ? "off" : "on"])

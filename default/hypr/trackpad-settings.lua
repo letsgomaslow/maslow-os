@@ -54,10 +54,25 @@ if next(touchpad) then
   hl.config({ input = { touchpad = touchpad } })
 end
 
+local dragging = settings.drag_3fg == "true"
+
+-- Omarchy moves and resizes windows with Super + mouse buttons and has no title
+-- bars to grab, so window gestures hang off Super. They are registered before
+-- the plain workspace swipe so the Super variants are matched first.
+if settings.window_gestures == "true" then
+  -- Three-finger drag holds the left button, so Super + three-finger drag
+  -- already reaches Omarchy's Super + left-drag move binding; without drag, a
+  -- Super + three-finger swipe moves the window instead.
+  if not dragging then
+    hl.gesture({ fingers = 3, direction = "swipe", mods = "SUPER", action = "move" })
+  end
+  hl.gesture({ fingers = 4, direction = "swipe", mods = "SUPER", action = "resize" })
+end
+
 -- Three-finger drag takes over three-finger motion, so the workspace swipe
 -- moves to four fingers while it is on, as on macOS.
 if settings.workspace_swipe == "true" then
-  local fingers = settings.drag_3fg == "true" and 4 or 3
+  local fingers = dragging and 4 or 3
   hl.gesture({ fingers = fingers, direction = "horizontal", action = "workspace" })
 end
 
