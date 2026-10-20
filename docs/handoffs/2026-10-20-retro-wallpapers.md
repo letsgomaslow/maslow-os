@@ -2,7 +2,7 @@
 
 ## Scope and source
 
-Runtime source baseline: `aeb84427` on `main`. This change adds only selected static artwork, matching theme-picker previews and these documentation updates to `letsgomaslow/maslow-os`. Theme palettes, Hyprland settings, shell code, Voice, Hub, packages and ISO are unchanged. No push, merge, package publication or ISO release is part of this checkpoint.
+Runtime source baseline: `aeb84427` on `main`. This change adds only selected static artwork, matching theme-picker previews and these documentation updates to `letsgomaslow/maslow-os`. Theme palettes, Hyprland settings, shell code, Voice, Hub, packages and ISO are unchanged. The initial asset checkpoint was local; the user subsequently authorized a downstream PR and merge. Package publication and ISO release remain outside scope.
 
 | Theme | Selected artwork / first default background | SHA-256 of background and matching preview |
 | --- | --- | --- |
@@ -25,3 +25,7 @@ An initial screenshot showed the terminal covering the desktop. Later screenshot
 - No new tests added for static image replacement. No unchanged full build, VM acceptance, package or ISO suites rerun.
 
 Next action: review this scoped runtime asset commit for downstream delivery. Package/release publication remains separate; this source checkpoint does not claim that another installed machine has received the artwork.
+
+## Authorized GitHub delivery
+
+[PR #28](https://github.com/letsgomaslow/maslow-os/pull/28) carries artwork commit `ae2d34d3c9618053968867cb0029912dfc6f43e6` and this delivery note to downstream `main`. The user explicitly requested both PR creation and merge. GitHub reported the branch mergeable, but both hosted checks (`brand` and `source`) failed to start: their annotations state that the account is locked due to a billing issue. These are unavailable hosted checks, not test assertion failures. The local five-check image-menu suite passed at the asset checkpoint; the unchanged full source suite was not rerun. The coordinator will verify the actual merge result through GitHub and synchronize the local checkout after this note is committed.
