@@ -41,6 +41,18 @@ The user reported on the 2012 15-inch Retina MacBook Pro (MacBookPro10,1) that t
 
 Verified: panel renders live with truthful states; `omarchy-trackpad-set natural-scroll on|off` changed live `input:touchpad:natural_scroll` and back with drag intact; `configerrors` empty. User testing is pending.
 
+## Omarchy-native gestures (October 20, later)
+
+The user reported that three-finger drag could not move apps: Omarchy windows have no title bars and move with Super + left-drag (`hl.dsp.window.drag()`) and resize with Super + right-drag. Added, each as a panel switch with guide lines and stored-only state (Hyprland exposes no readable gesture state):
+
+- Window gestures: Super + three-finger drag moves (drag holds the left button into the existing binding; without drag, a Super + three-finger swipe `move` gesture), Super + four-finger swipe `resize`. The user called the result "great"; which specific gestures they exercised was not itemised.
+- Six user-selected shortcuts: four-finger swipe up opens `omarchy-menu toggle root`; Alt + four-finger swipe up runs `omarchy-launch-voice start` (opens Voice only, same as Super + H); four-finger swipe down toggles the `scratchpad` special workspace; four-finger pinch out fullscreens; four-finger pinch in floats; Super + four-finger pinch is `cursorZoom` (zoom_level 2). "Close window" was deliberately not put on a gesture.
+- Hyprland 0.56.2 accepts `mods` on `hl.gesture` and reports shadowed gestures as errors; with all gestures enabled `configerrors` is empty. Gesture behaviour itself is user-pending (only definitions and registration are verified).
+- A QML syntax slip briefly removed the widget from the live bar; it was fixed within minutes and `trackpad-test.sh` now fails on `qmllint` `[syntax]` findings. In the guide view, Up/Down at the view tabs now scroll the overflowing guide for keyboard users.
+- Observed but not changed: the theme-wide `hover-cursor` row highlight is very faint in this light theme (row fill 235 vs 245), affecting keyboard focus visibility in every panel, not only this one.
+
+Tests: `trackpad-test.sh` 54 passing; `./test/cli` passes.
+
 ## Remaining gates and next action
 
 The user's swipe and three-finger drag currently come from their personal config lines; once this branch is installed, move them to `omarchy trackpad set workspace-swipe on` and `omarchy trackpad set three-finger-drag on` and remove the lines so the panel switches own them. The branch is not pushed; the user chose local testing first, via the layer above. The physical-click fault is hardware-side and needs a battery/trackpad inspection, not code.
