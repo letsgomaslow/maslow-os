@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "id": "omarchy.trackpad",
+  "name": "Trackpad",
+  "version": "1.0.0",
+  "author": "Maslow",
+  "description": "Trackpad gestures guide and settings",
+  "kinds": [
+    "bar-widget"
+  ],
+  "entryPoints": {
+    "barWidget": "Panel.qml"
+  },
+  "barWidget": {
+    "displayName": "Trackpad",
+    "description": "Trackpad gestures guide and settings",
+    "category": "System",
+    "allowMultiple": false
+  }
+}

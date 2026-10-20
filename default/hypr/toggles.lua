@@ -16,6 +16,11 @@ require_all.files(toggles_dir, nil, {
   },
 })
 
+-- Trackpad panel choices load after user config so its switches always win,
+-- and before the disable below so a speed setting cannot re-enable the device.
+package.loaded["default.hypr.trackpad-settings"] = nil
+require("default.hypr.trackpad-settings")
+
 local disabled_input_device = require("default.hypr.disabled-input-device")
 disabled_input_device("touchpad")
 disabled_input_device("touchscreen")

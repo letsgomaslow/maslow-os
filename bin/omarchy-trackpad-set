@@ -1,0 +1,98 @@
+#!/bin/bash
+
+# omarchy:summary=Change a trackpad setting and keep it across reloads
+# omarchy:args=<tap-to-click|natural-scroll|two-finger-right-click|ignore-while-typing|workspace-swipe> [on|off|toggle] | speed <-1.0..1.0> | reset
+# omarchy:examples=omarchy trackpad set tap-to-click off | omarchy trackpad set speed 0.3 | omarchy trackpad set reset
+
+# Choices are stored as key=value data and applied after the user's own Hyprland
+# config by default/hypr/trackpad-settings.lua. The path is hardcoded to
+# ~/.local/state like the sibling toggle tools, so it keeps working when
+# XDG_STATE_HOME diverges.
+SETTINGS_FILE="$HOME/.local/state/omarchy/toggles/hypr/trackpad-settings"
+
+usage() {
+  echo "Usage: omarchy-trackpad-set <tap-to-click|natural-scroll|two-finger-right-click|ignore-while-typing|workspace-swipe> [on|off|toggle]" >&2
+  echo "       omarchy-trackpad-set speed <-1.0..1.0>" >&2
+  echo "       omarchy-trackpad-set reset" >&2
+}
+
+read_value() {
+  [[ -f $SETTINGS_FILE ]] && sed -n "s/^$1=//p" "$SETTINGS_FILE" | tail -n 1
+}
+
+write_value() {
+  local key=$1 value=$2 tmp
+  mkdir -p "$(dirname "$SETTINGS_FILE")"
+  tmp=$(mktemp "$SETTINGS_FILE.XXXXXX")
+  if [[ -f $SETTINGS_FILE ]]; then
+    grep -v "^$key=" "$SETTINGS_FILE" >"$tmp"
+  fi
+  printf '%s=%s\n' "$key" "$value" >>"$tmp"
+  mv "$tmp" "$SETTINGS_FILE"
+}
+
+# The live Hyprland value is the truth for toggling: it already reflects the
+# Omarchy default, the user's hypr/input.lua, and any earlier panel choice.
+live_bool() {
+  [[ $(hyprctl getoption "input:touchpad:$1" -j | jq -r '.bool') == "true" ]] && echo true || echo false
+}
+
+set_bool() {
+  local key=$1 action=$2 current next
+  case $action in
+    on) next=true ;;
+    off) next=false ;;
+    toggle)
+      if [[ $key == "workspace_swipe" ]]; then
+        current=$(read_value workspace_swipe)
+      else
+        current=$(live_bool "$key")
+      fi
+      [[ $current == "true" ]] && next=false || next=true
+      ;;
+    *)
+      usage
+      exit 1
+      ;;
+  esac
+  write_value "$key" "$next"
+}
+
+set_speed() {
+  local speed=$1 device
+  if [[ ! $speed =~ ^-?(0(\.[0-9]+)?|1(\.0+)?|\.[0-9]+)$ ]]; then
+    echo "Speed must be a number from -1.0 to 1.0" >&2
+    exit 1
+  fi
+
+  device=$(omarchy-hw-touchpad)
+  if [[ -z $device || $device == *[[:cntrl:]]* ]]; then
+    echo "No touchpad device found" >&2
+    exit 1
+  fi
+
+  write_value device "$device"
+  write_value sensitivity "$speed"
+}
+
+case "${1:-}" in
+  tap-to-click) set_bool tap_to_click "${2:-toggle}" ;;
+  natural-scroll) set_bool natural_scroll "${2:-toggle}" ;;
+  two-finger-right-click) set_bool clickfinger_behavior "${2:-toggle}" ;;
+  ignore-while-typing) set_bool disable_while_typing "${2:-toggle}" ;;
+  workspace-swipe) set_bool workspace_swipe "${2:-toggle}" ;;
+  speed)
+    if (($# < 2)); then
+      usage
+      exit 1
+    fi
+    set_speed "$2"
+    ;;
+  reset) rm -f "$SETTINGS_FILE" ;;
+  *)
+    usage
+    exit 1
+    ;;
+esac
+
+hyprctl reload >/dev/null
