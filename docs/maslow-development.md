@@ -1,8 +1,8 @@
 # Maslow AI-OS development: start here
 
-## MACBOOK TRACKPAD PANEL BUILT, DETECTION DEFECT FIXED, CLICK ISSUE UNDIAGNOSED — October 20
+## MACBOOK TRACKPAD: PANEL BUILT, DETECTION FIXED, PHYSICAL CLICK FOUND UNRELIABLE IN HARDWARE — October 20
 
-The [trackpad handoff](handoffs/2026-10-20-macbook-trackpad-panel.md) records a direct input-stack diagnosis on MacBookPro10,1 (`bcm5974` buttonpad, matching libinput quirk, correct options), a user-confirmed three-finger workspace swipe enabled in the user's own config, and a fixed defect where `omarchy-hw-touchpad` did not recognise `bcm5974` (hiding the menu Touchpad toggle). Branch `feature/trackpad-panel` adds an accessible `omarchy.trackpad` bar panel (gesture guide plus switches and speed), `omarchy trackpad set|status`, a validated settings loader, a bar migration and 30 tests; it is visually checked in the real shell but not packaged or installed. The reported click problem is not yet diagnosed. Next action: the user runs the libinput capture so clicks can be diagnosed from evidence.
+The [trackpad handoff](handoffs/2026-10-20-macbook-trackpad-panel.md) records a direct input-stack diagnosis on MacBookPro10,1 and a fixed defect where `omarchy-hw-touchpad` did not recognise `bcm5974` (hiding the menu Touchpad toggle). Two user-run captures show taps fully reliable and the physical click reaching the kernel for only 2 of 8 touches, so the fault is hardware-side; a swollen battery is the likely but unproven cause. On the user's machine, three-finger drag is on and the workspace swipe moved to four fingers. Branch `feature/trackpad-panel` (not pushed) adds an accessible, scrollable `omarchy.trackpad` bar panel with a gesture guide, switches including three-finger drag and pointer speed, `omarchy trackpad set|status`, a validated settings loader, a bar migration and 36 tests; it is visually checked in the real shell but not packaged or installed. Next action: get the user's feedback on drag and their chosen installation path.
 
 ## RETRO WALLPAPERS SELECTED AND PREVIEWS UPDATED — October 20
 
