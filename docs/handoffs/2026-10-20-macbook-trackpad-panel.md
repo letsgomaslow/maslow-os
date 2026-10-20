@@ -1,0 +1,34 @@
+# MacBook trackpad diagnosis and Trackpad panel — October 20, 2026
+
+## Current state and evidence boundary
+
+The user reported on the 2012 15-inch Retina MacBook Pro (MacBookPro10,1) that the trackpad "kind of works" but right click and click are unreliable, and asked for a widget that explains the trackpad and switches features on and off. This session diagnosed the input stack directly, enabled the three-finger workspace swipe on the user's machine (user-confirmed working), fixed a touchpad-detection defect, and built a Trackpad bar panel on branch `feature/trackpad-panel`. The panel is source-tested and visually checked in the real running shell as a temporary user plugin; it is not packaged, installed or dev-linked, so its switches do not change live Hyprland behavior on the installed system yet.
+
+## Directly observed facts
+
+- The trackpad is USB `05ac:0262`, driven by `bcm5974` as a buttonpad (`INPUT_PROP_POINTER | INPUT_PROP_BUTTONPAD`, a single `BTN_LEFT`). libinput 1.32.0 ships a matching quirk for this exact device in `50-system-apple.quirks`. Kernel warnings in the boot log come from the Broadcom `wl` Wi-Fi module, not the trackpad.
+- Live Hyprland options before this work: `clickfinger_behavior=true`, `tap_to_click=true` (default), `natural_scroll=false`, `disable_while_typing=true`. Right click is therefore software-produced by two-finger press or tap.
+- Three-finger workspace swipe ships commented out in `config/hypr/input.lua`. The user's `~/.config/hypr/input.lua` line was uncommented (backup alongside); `hyprctl reload` and `hyprctl configerrors` were clean and the user confirmed the swipe works.
+- Defect: `omarchy-hw-touchpad` only matched device names containing `touchpad` or `trackpad`; this device is named `bcm5974`, so it returned nothing. That hid the existing menu Touchpad toggle and made `omarchy-toggle-touchpad` fail on this MacBook. A brief disable/re-enable check confirmed a disabled `bcm5974` stays listed in `hyprctl devices`, so the menu recovery path stays reachable.
+- The left/right click complaint is **not diagnosed**. A `libinput debug-events --verbose` capture needs `libinput-tools` and root, and the user has not run it yet. No click fix is claimed.
+
+## Source changes on `feature/trackpad-panel`
+
+- `bin/omarchy-hw-touchpad`: also matches `bcm5974`.
+- `bin/omarchy-trackpad-set` / `bin/omarchy-trackpad-status` and `GROUP_DESCRIPTIONS[trackpad]`: store tap-to-click, two-finger right click, natural scrolling, three-finger workspace swipe, ignore-while-typing and pointer speed as validated `key=value` data in `~/.local/state/omarchy/toggles/hypr/trackpad-settings`; status reports live Hyprland values so user config is reflected truthfully.
+- `default/hypr/trackpad-settings.lua`, loaded from `default/hypr/toggles.lua` after user config and before the persisted device disable: applies only whitelisted keys with validated values; the device name is passed as data.
+- `shell/plugins/panels/trackpad/` (`omarchy.trackpad` bar widget): hidden without a touchpad; Settings view with switches and a speed slider, How to use view whose gesture list follows the current settings; master on/off reuses `omarchy-toggle-touchpad`. Accessibility: every control has an accessible role/name/state, keyboard cursor covers every control (arrows, Enter, Tab between panels), helper text uses body-small size at 0.85 opacity, gesture text wraps instead of eliding, and the Off state shows keyboard recovery text (Super + Ctrl + H, then Touchpad).
+- Default bar layout adds `omarchy.trackpad` after `omarchy.audio`; migration `1792530174.sh` puts it on existing bars. `test/shell.d/agents-default-migration-test.sh` expectation updated because its fixture is the shipped layout.
+
+## Tests and verification
+
+- `test/shell.d/trackpad-test.sh`: 30 passing checks (commands with stubbed `hyprctl`, Lua loader validation including hostile values, panel model).
+- `./test/cli` passes. `./test/shell` fails only in `network-captive-portal`, `snapper` and `unowned-system-paths`, which fail identically on unchanged `main` (missing packages checkout / QML fixture environment).
+- Visual: real running shell with the panel installed temporarily as `local.trackpad-preview` (commands routed to the checkout); inspected Settings, How to use, and a simulated Off state (status output rewritten, trackpad not actually disabled). The preview was removed and `~/.config/omarchy/shell.json` restored byte-equivalent afterwards. Only the light theme active on this machine was inspected; dark themes are not visually checked.
+- Not tested: switches changing live behavior on an installed build, screen-reader (Orca) announcement, packaging, ISO.
+
+## Remaining gates and next action
+
+The user's swipe currently comes from their personal config line; once this branch is installed, move it to `omarchy trackpad set workspace-swipe on` and re-comment the line so the panel switch owns it. Click diagnosis remains open.
+
+Next action: have the user run `~/trackpad-capture.sh` (a scratchpad helper that installs `libinput-tools` and records 60 seconds of `libinput debug-events --verbose` on `/dev/input/event7`) while performing the seven-step click sequence, then diagnose from the log.

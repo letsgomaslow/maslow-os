@@ -1,5 +1,9 @@
 # Maslow AI-OS development: start here
 
+## MACBOOK TRACKPAD PANEL BUILT, DETECTION DEFECT FIXED, CLICK ISSUE UNDIAGNOSED — October 20
+
+The [trackpad handoff](handoffs/2026-10-20-macbook-trackpad-panel.md) records a direct input-stack diagnosis on MacBookPro10,1 (`bcm5974` buttonpad, matching libinput quirk, correct options), a user-confirmed three-finger workspace swipe enabled in the user's own config, and a fixed defect where `omarchy-hw-touchpad` did not recognise `bcm5974` (hiding the menu Touchpad toggle). Branch `feature/trackpad-panel` adds an accessible `omarchy.trackpad` bar panel (gesture guide plus switches and speed), `omarchy trackpad set|status`, a validated settings loader, a bar migration and 30 tests; it is visually checked in the real shell but not packaged or installed. The reported click problem is not yet diagnosed. Next action: the user runs the libinput capture so clicks can be diagnosed from evidence.
+
 ## RETRO WALLPAPERS SELECTED AND PREVIEWS UPDATED — October 20
 
 The user selected Intelligence Portal for `maslow-1984` and Silver Relief for `maslow-platinum`, then confirmed both installed wallpapers and the corrected theme-picker cards look good. The [wallpaper handoff](handoffs/2026-10-20-retro-wallpapers.md) records exact image hashes, local/source boundaries and checks. Source now includes the selected static PNGs first in each theme's background order and matching `preview.png` images; previous plain backgrounds remain available. Scope is this runtime repository only. Downstream delivery is tracked in [PR #28](https://github.com/letsgomaslow/maslow-os/pull/28), with merge explicitly authorized by the user; hosted checks could not start because of account billing. Next action: verify the merged runtime source before any separately authorized package delivery; no package/ISO build or publication is claimed.
