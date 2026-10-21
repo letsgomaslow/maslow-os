@@ -129,6 +129,8 @@ or `omarchy.power`. There is no `bar` target.
 answer on stdout with exit 0 — `ok` on success, `unknown` or an error
 string on a miss.
 
+The native Maslow screensaver (`maslow.screensaver`, a `service` plugin) registers the `screensaver` target. Every method takes no arguments and answers a string: `show` (`ok`, `classic`, `locked`, or `no-screens`), `preview` (the same, ignoring the configured style), `hide` (`ok`), `style` (`maslow` or `classic`), and `status` (JSON with `active`, `style`, `motion`, `reducedMotion`, `onBattery`, `fps`, `screens`, `shownAt`, `lastEvent` and `lastEventAt`; `fps` is 20 on AC, 10 on battery, and 0 while hidden, handing off to the lock, or holding still under Reduced Motion). `omarchy-launch-screensaver` calls `show` and opens the classic terminal screensaver for any answer other than `ok` or `locked`, including when the shell or target is unreachable; `omarchy-launch-screensaver classic` skips the shell. The plugin reports its visibility to `omarchy.idle` through `setNativeScreensaverVisible`, so a dismissal cancels a pending idle lock exactly as closing a terminal screensaver does. Its layer namespace is `maslow-screensaver`.
+
 ## shell.json
 
 ```json
@@ -137,6 +139,10 @@ string on a miss.
   "idle": {
     "screensaver": 150,
     "lock": 300
+  },
+  "screensaver": {
+    "style": "maslow",
+    "motion": "auto"
   },
   "bar": {
     "id": "omarchy.bar",
@@ -169,6 +175,8 @@ Rules:
    First-party non-bar plugins are enabled unless listed in `disabledPlugins[]`.
 6. `barWidget.allowMultiple: true` in the manifest permits multiple instances.
 7. `idle.screensaver` and `idle.lock` are seconds since user idle began.
+   `screensaver.style` is `maslow` (the native screensaver, and the value used when it is missing or unknown) or `classic` (the terminal effects); `omarchy screensaver style` sets it.
+   `screensaver.motion` is `auto` (follow the system Reduced Motion toggle; also the value used when it is missing or unknown), `full` (always animate) or `reduced` (always hold a still frame that moves every five minutes); it only affects the `maslow` style.
 8. `version: 1` is required.
 
 `config/omarchy/shell.json` describes the fresh-install state. When no

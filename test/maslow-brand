@@ -38,7 +38,12 @@ for file in \
   install/user/first-run/welcome.sh default/omarchy/omarchy-menu.jsonc etc/fastfetch/config.jsonc \
   themes/maslow-dark/colors.toml themes/maslow-dark/hyprland.lua \
   themes/maslow-light/colors.toml themes/maslow-light/hyprland.lua \
-  default/hypr/toggles/reduced-motion.lua; do
+  default/hypr/toggles/reduced-motion.lua \
+  shell/plugins/screensaver/assets/maslow-mark-gradient.svg shell/plugins/screensaver/assets/glow.png \
+  shell/plugins/screensaver/assets/aurora-deep.png shell/plugins/screensaver/assets/aurora-violet.png \
+  shell/plugins/screensaver/assets/aurora-pink.png shell/plugins/screensaver/assets/aurora-teal.png \
+  shell/plugins/screensaver/assets/aurora-amber.png shell/plugins/screensaver/assets/particle.png \
+  shell/plugins/screensaver/assets/ring.png; do
   require_file "$file"
 done
 pass "required Maslow OS sources exist"
@@ -59,6 +64,19 @@ assert_contains branding/scripts/generate-assets 'cp "$TERMINAL_SOURCE_DIR/logo.
 assert_contains branding/scripts/generate-assets 'cp "$TERMINAL_SOURCE_DIR/icon.txt" "$ROOT/icon.txt"' "asset generator installs the canonical About lockup"
 assert_contains branding/scripts/generate-assets '"$ROOT/default/plymouth/logo.png"' "asset generator writes the Plymouth lockup"
 assert_contains branding/scripts/generate-assets 'cp "$ROOT/default/plymouth/logo.png" "$ROOT/default/sddm/omarchy/logo.png"' "login and boot lockups share one generated source"
+assert_contains branding/scripts/generate-assets 'SCREENSAVER_ASSETS="$ROOT/shell/plugins/screensaver/assets"' "asset generator writes the native screensaver assets into the shipped plugin"
+assert_contains branding/scripts/generate-assets 'cp "$MARK_GRADIENT" "$SCREENSAVER_ASSETS/maslow-mark-gradient.svg"' "native screensaver ships the canonical gradient mark"
+assert_contains branding/scripts/generate-assets "gradient:'#EE7BB3'-'#A070A6'" "screensaver glow starts from the Brand OS pink and purple tokens"
+assert_contains branding/scripts/generate-assets "gradient:'#A070A6'-'#6DC4AD'" "screensaver glow ends on the Brand OS teal token"
+assert_contains branding/scripts/generate-assets 'png:exclude-chunks=date,time' "screensaver light is generated without timestamps"
+for color in "aurora-pink '#EE7BB3'" "aurora-violet '#A070A6'" "aurora-deep '#401877'" "aurora-teal '#6DC4AD'" "aurora-amber '#F2A23A'"; do
+  assert_contains branding/scripts/generate-assets "render_screensaver_falloff $color 512 \"\$aurora\"" "screensaver ${color%% *} field is generated from its brand colour"
+done
+assert_contains branding/scripts/generate-assets "render_screensaver_falloff particle white 128" "screensaver particle sprite is generated"
+assert_contains branding/scripts/generate-assets "render_screensaver_falloff ring white 512" "screensaver ripple ring sprite is generated"
+grep -qx 'render_screensaver_assets' "$ROOT/branding/scripts/generate-assets" || fail "asset generator renders the screensaver assets"
+cmp -s "$ROOT/branding/logos/maslow-mark-gradient.svg" "$ROOT/shell/plugins/screensaver/assets/maslow-mark-gradient.svg" || fail "screensaver mark differs from the canonical Gradient Bridge mark"
+pass "native screensaver uses the canonical mark and generated light sprites"
 bash -n "$ROOT/branding/scripts/generate-brand-preview" || fail "brand preview generator has invalid shell syntax"
 pass "brand preview generator has valid shell syntax"
 assert_contains branding/scripts/generate-brand-preview 'branding/logos/maslow-mark-gradient.svg' "brand preview consumes the approved Gradient Bridge mark"
@@ -225,12 +243,15 @@ def png_info(path):
     width, height, depth, color_type = struct.unpack(">IIBB", data[16:26])
     return width, height, depth, color_type
 
-def png_alpha_bounds(path):
+# Alpha rows of an 8-bit RGBA, grey+alpha or palette PNG (with tRNS).
+def png_alphas(path):
     data = path.read_bytes()
     width, height, depth, color_type = png_info(path)
-    if depth != 8 or color_type != 6:
-        return False
+    channels = {6: 4, 4: 2, 3: 1}.get(color_type)
+    if depth != 8 or channels is None:
+        fail(f"{path.relative_to(root)} is depth {depth} type {color_type}, expected 8-bit RGBA, grey+alpha or palette")
     chunks = []
+    transparency = b""
     offset = 8
     while offset < len(data):
         length = struct.unpack(">I", data[offset:offset + 4])[0]
@@ -238,28 +259,25 @@ def png_alpha_bounds(path):
         payload = data[offset + 8:offset + 8 + length]
         if kind == b"IDAT":
             chunks.append(payload)
+        elif kind == b"tRNS":
+            transparency = payload
         offset += 12 + length
         if kind == b"IEND":
             break
     raw = zlib.decompress(b"".join(chunks))
-    stride = width * 4
+    stride = width * channels
     previous = bytearray(stride)
     cursor = 0
-    has_clear = False
-    has_visible = False
-    min_x = width
-    min_y = height
-    max_x = 0
-    max_y = 0
+    rows = []
     for y in range(height):
         filter_type = raw[cursor]
         cursor += 1
         row = bytearray(raw[cursor:cursor + stride])
         cursor += stride
         for index in range(stride):
-            left = row[index - 4] if index >= 4 else 0
+            left = row[index - channels] if index >= channels else 0
             up = previous[index]
-            upper_left = previous[index - 4] if index >= 4 else 0
+            upper_left = previous[index - channels] if index >= channels else 0
             if filter_type == 1:
                 row[index] = (row[index] + left) & 0xFF
             elif filter_type == 2:
@@ -273,7 +291,24 @@ def png_alpha_bounds(path):
                 row[index] = (row[index] + predictor) & 0xFF
             elif filter_type != 0:
                 fail(f"unsupported PNG filter in {path.relative_to(root)}")
-        alphas = row[3::4]
+        if color_type == 3:
+            rows.append([transparency[i] if i < len(transparency) else 255 for i in row])
+        else:
+            rows.append(list(row[channels - 1::channels]))
+        previous = row
+    return rows
+
+def png_alpha_bounds(path):
+    rows = png_alphas(path)
+    height = len(rows)
+    width = len(rows[0]) if rows else 0
+    has_clear = False
+    has_visible = False
+    min_x = width
+    min_y = height
+    max_x = 0
+    max_y = 0
+    for y, alphas in enumerate(rows):
         has_clear = has_clear or any(alpha < 255 for alpha in alphas)
         has_visible = has_visible or any(alpha > 0 for alpha in alphas)
         for x, alpha in enumerate(alphas):
@@ -282,7 +317,6 @@ def png_alpha_bounds(path):
                 min_y = min(min_y, y)
                 max_x = max(max_x, x + 1)
                 max_y = max(max_y, y + 1)
-        previous = row
     return has_clear, has_visible, (min_x, min_y, max_x, max_y)
 
 def png_has_transparent_pixel(path):
@@ -338,6 +372,41 @@ for relative in ("icon.png", "default/plymouth/logo.png", "default/sddm/omarchy/
     if not png_has_transparent_pixel(root / relative):
         fail(f"{relative} does not contain both transparent and visible pixels")
 print("ok - visible logo PNGs carry real alpha channels")
+
+screensaver_assets = root / "shell/plugins/screensaver/assets"
+# name: (width, height, PNG colour types accepted, alpha shape)
+screensaver_pngs = {
+    "glow.png": (1024, 512, (6,), "disc"),
+    "aurora-deep.png": (512, 512, (3, 6), "disc"),
+    "aurora-violet.png": (512, 512, (3, 6), "disc"),
+    "aurora-pink.png": (512, 512, (3, 6), "disc"),
+    "aurora-teal.png": (512, 512, (3, 6), "disc"),
+    "aurora-amber.png": (512, 512, (3, 6), "disc"),
+    "particle.png": (128, 128, (4, 6), "disc"),
+    "ring.png": (512, 512, (4, 6), "ring"),
+}
+for name, (want_width, want_height, types, shape) in screensaver_pngs.items():
+    path = screensaver_assets / name
+    width, height, depth, color_type = png_info(path)
+    if (width, height, depth) != (want_width, want_height, 8) or color_type not in types:
+        fail(f"screensaver {name} is {width}x{height} depth {depth} type {color_type}, expected {want_width}x{want_height} 8-bit with alpha")
+    if any(chunk in path.read_bytes() for chunk in (b"tIME", b"tEXt", b"iTXt", b"zTXt")):
+        fail(f"screensaver {name} carries metadata chunks that break reproducible output")
+    rows = png_alphas(path)
+    has_clear, has_visible, bounds = png_alpha_bounds(path)
+    if not (has_clear and has_visible):
+        fail(f"screensaver {name} does not fade from visible to transparent")
+    if abs((bounds[0] + bounds[2]) / 2 - width / 2) > 1 or abs((bounds[1] + bounds[3]) / 2 - height / 2) > 1:
+        fail(f"screensaver {name} is not centred in its canvas")
+    if rows[0][0] != 0 or rows[-1][-1] != 0:
+        fail(f"screensaver {name} has visible corners, so its edge would show")
+    centre = rows[height // 2][width // 2]
+    rim = rows[height // 2][round(width * 0.95) - 1]
+    if shape == "disc" and not centre > rim:
+        fail(f"screensaver {name} is not brightest at its centre")
+    if shape == "ring" and not (centre == 0 and rim > 128):
+        fail(f"screensaver {name} is not a hollow ring near its edge (centre {centre}, rim {rim})")
+print("ok - screensaver light sprites are centred, metadata-free alpha falloffs")
 
 for relative in (
     "themes/maslow-dark/unlock.png",

@@ -17,3 +17,7 @@ default/themed/claude.json.tpl|Claude theme display name|Medium, upstream templa
 bin/omarchy-theme-set-obsidian|Obsidian theme metadata|Medium, compatible install path must remain unchanged|Maslow OS design systems
 etc/fastfetch/config.jsonc|About product and engine identity|Medium, upstream adds and changes modules|Maslow OS product
 manual|End-user product language|High, upstream documentation updates use Omarchy as product name|Maslow OS product
+shell/plugins/services/idle/Service.qml|Native screensaver visibility in the idle cycle|Medium, upstream rewrites idle handling; Maslow hook is one import, one function and one status field|Maslow OS product
+bin/omarchy-launch-screensaver|Native screensaver first, classic terminal fallback|High, upstream rewrites the terminal launch body; Maslow block sits before it after the toggle check|Maslow OS product
+bin/omarchy-system-lock|Native screensaver hide on lock|Low, one appended best-effort IPC line|Maslow OS product
+bin/omarchy-branding-screensaver|Custom artwork previews the classic style|Medium, upstream branding commands may change preview launch arguments|Maslow OS product

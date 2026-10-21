@@ -20,6 +20,9 @@ date -Is
 section "Idle IPC status"
 omarchy-shell idle status 2>&1 | jq . 2>/dev/null || omarchy-shell idle status 2>&1 || true
 
+section "Native screensaver IPC status"
+omarchy-shell screensaver status 2>&1 | jq . 2>/dev/null || omarchy-shell screensaver status 2>&1 || true
+
 section "Quickshell instances"
 quickshell list -p "$OMARCHY_PATH/shell" --any-display 2>&1 || true
 

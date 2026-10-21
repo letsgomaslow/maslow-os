@@ -24,3 +24,6 @@ pkill -x ttfx 2>/dev/null || true
 # ttfx handles SIGTERM asynchronously, so keep its terminal alive until it exits.
 timeout 1s pidwait -x ttfx 2>/dev/null || true
 pkill -f '[o]rg.omarchy.screensaver' 2>/dev/null || true
+# The native screensaver hands over to the lock screen on its own; ask it to
+# close too, best effort and briefly, in case the shell missed the lock.
+OMARCHY_SHELL_IPC_TIMEOUT=1s omarchy-shell -q screensaver hide >/dev/null

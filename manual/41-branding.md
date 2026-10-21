@@ -16,13 +16,15 @@ Then apply the setup with `omarchy plymouth set '#1d2021' '#ebdbb2' logo.png`, w
 
 ### Screensaver
 
-You can change the logo used for the screensaver under _Style > Screensaver_. It's an ASCII logo, so you can edit the text directly, but you can also hand it a png or svg image, and we'll convert that to ASCII. It looks pretty cool.
+The default Maslow screensaver always shows the Maslow mark. Your own logo goes on the classic screensaver style, the ASCII art that runs through text effects in a terminal. Choose _Style > Screensaver > Classic_, or run `omarchy screensaver style classic`, to use it as your screensaver; see [toggles, idle and the screensaver](13-toggles-idle-screensaver.md).
+
+You can change the logo used for the classic screensaver under _Style > Screensaver_. It's an ASCII logo, so you can edit the text directly, but you can also hand it a png or svg image, and we'll convert that to ASCII. It looks pretty cool.
 
  ![branding-screensaver](images/branding-screensaver.webp)
 
 There are three entries in that menu:
 
-- **Edit Text** opens `~/.config/omarchy/branding/screensaver.txt` in your editor. Type or paste whatever you like — ASCII art, your name, a rude word. Save and quit, and the screensaver fires up immediately so you can see it.
+- **Edit Text** opens `~/.config/omarchy/branding/screensaver.txt` in your editor. Type or paste whatever you like — ASCII art, your name, a rude word. Save and quit, and the classic screensaver fires up immediately so you can see it.
 - **Set From Image** opens a file picker for a png or svg, converts it to ASCII, and shows you the result. Logos with a clear silhouette work far better than photos.
 - **Restore Default** puts the Maslow OS mark back.
 

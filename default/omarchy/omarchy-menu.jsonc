@@ -122,6 +122,8 @@
   "style.about.text": {"icon":"","label":"Edit Text","action":"omarchy-branding-about text"},
   "style.about.image": {"icon":"","label":"Set From Image","action":"omarchy-branding-about image"},
   "style.about.default": {"icon":"","label":"Restore Default","action":"omarchy-branding-about reset"},
+  "style.screensaver.maslow": {"icon":"󱄄","label":"Maslow","action":"omarchy-screensaver-style maslow && omarchy-launch-screensaver force"},
+  "style.screensaver.classic": {"icon":"","label":"Classic","action":"omarchy-screensaver-style classic && omarchy-launch-screensaver force classic"},
   "style.screensaver.text": {"icon":"","label":"Edit Text","action":"omarchy-branding-screensaver text"},
   "style.screensaver.image": {"icon":"","label":"Set From Image","action":"omarchy-branding-screensaver image"},
   "style.screensaver.default": {"icon":"","label":"Restore Default","action":"omarchy-branding-screensaver reset"},

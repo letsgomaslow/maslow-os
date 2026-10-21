@@ -1,6 +1,7 @@
 #!/bin/bash
 
-# omarchy:summary=Launch the Omarchy screensaver in the default terminal on the system with the correct font configuration.
+# omarchy:summary=Launch the screensaver: the native Maslow style, or the classic terminal effects with the correct font configuration.
+# omarchy:args=[force] [classic]
 
 # Exit early if screensaver is already running
 pgrep -f '[o]rg.omarchy.screensaver' && exit 0
@@ -8,6 +9,14 @@ pgrep -f '[o]rg.omarchy.screensaver' && exit 0
 # Allow screensaver to be turned off but also force started
 if omarchy-toggle-enabled screensaver-off && [[ $1 != "force" ]]; then
   exit 1
+fi
+
+# Maslow AI-OS: the shell draws the native screensaver; the terminal path below
+# is the classic style and the fallback whenever the shell cannot answer.
+if [[ $1 != "classic" && $2 != "classic" ]]; then
+  case $(omarchy-shell screensaver show 2>/dev/null) in
+  ok | locked) exit 0 ;;
+  esac
 fi
 
 focused=$(omarchy-hyprland-monitor-focused)

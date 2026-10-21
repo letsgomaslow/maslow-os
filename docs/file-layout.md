@@ -78,6 +78,12 @@ install/**                     ──►  omarchy             /usr/share/omarchy
 migrations/**                  ──►  omarchy             /usr/share/omarchy/migrations/
 themes/**                      ──►  omarchy             /usr/share/omarchy/themes/
 shell/**                       ──►  omarchy             /usr/share/omarchy/shell/
+  └─ plugins/screensaver/{*.qml,*.js,assets/}           /usr/share/omarchy/shell/plugins/screensaver/
+                                                          (native Maslow screensaver; branding/ itself is not shipped)
+       assets/maslow-mark-gradient.svg                      copy of branding/logos/maslow-mark-gradient.svg
+       assets/glow.png                                      halo behind the mark
+       assets/aurora-{deep,violet,pink,teal,amber}.png      drifting background light fields
+       assets/particle.png, assets/ring.png                 light crossing the bridges, circle ripples
 version                        ──►  omarchy             /usr/share/omarchy/version
                                                         + /etc/skel/.local/state/omarchy/migrations/*
 
@@ -138,6 +144,8 @@ logo.{txt,svg}, icon.{txt,png}  ──► omarchy-settings    /usr/share/omarchy
                                                         /usr/share/icons/hicolor/256x256/apps/omarchy.png
                                                         /etc/skel/.config/omarchy/branding/{about,screensaver}.txt
 ```
+
+`screensaver.txt` is the artwork of the classic terminal screensaver style. The default Maslow screensaver draws its mark, halo, aurora fields, particle and ripple ring from `shell/plugins/screensaver/assets/`, which `branding/scripts/generate-assets` writes and the repository checks in.
 
 ### Why `etc-overrides/` exists
 

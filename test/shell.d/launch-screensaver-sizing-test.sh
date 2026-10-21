@@ -17,6 +17,14 @@ cat >"$mock_bin/pgrep" <<'SH'
 exit 1
 SH
 
+# The native screensaver is not running here, so the launcher falls through to
+# the classic terminal path whose sizing this test measures.
+cat >"$mock_bin/omarchy-shell" <<'SH'
+#!/bin/bash
+echo "omarchy-shell is not running" >&2
+exit 1
+SH
+
 cat >"$mock_bin/omarchy-toggle-enabled" <<'SH'
 #!/bin/bash
 exit 1
