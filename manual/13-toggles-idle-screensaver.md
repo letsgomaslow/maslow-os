@@ -86,13 +86,48 @@ This is about locking and the screensaver, not power. Suspend and hibernation ha
 
 ### The screensaver
 
-The Maslow OS screensaver is ASCII art running through random text effects, one instance per monitor. Any key or mouse movement exits it.
+The default screensaver is the Maslow screensaver. The Maslow mark sits in the middle of a dark navy screen, slowly breathing, with soft fields of brand-coloured light (pink, violet, teal and a touch of amber) drifting behind it. Small points of light flow through the mark's two bridges, from each lower circle up to the upper one, and gentle ripples spread out from the two standalone circles in turn. Under the mark are the MASLOW | AI-OS wordmark, a large clock showing hours and minutes, and a quiet "Press any key" hint, all lined up on one centre line. The whole picture wanders a little across the screen all the time, so nothing stays in exactly one place on your display. With more than one monitor, each one gets its own copy, and the light on each starts at a different point so neighbouring screens don't mirror each other.
+
+Any key, mouse movement, click, or scroll dismisses it. Small bumps of the desk don't count — the mouse has to actually move a little before the screensaver goes away.
+
+On battery it draws fewer frames, so it costs less power.
+
+#### Motion
+
+By default the screensaver follows the system Reduced Motion setting (_Trigger > Toggle > Reduced Motion_). With Reduced Motion on, it shows a still picture: no drifting light, no breathing, no flowing points or ripples, and no frames redrawn at all. Every five minutes the picture jumps to a slightly different spot, so a still screensaver still doesn't hold the same pixels for hours.
+
+If you want the screensaver to behave differently from the rest of the system, set `screensaver.motion` in `~/.config/omarchy/shell.json`:
+
+```json
+"screensaver": {
+  "style": "maslow",
+  "motion": "full"
+}
+```
+
+- `"auto"` (the default, also used when the value is missing or not recognised) follows the system Reduced Motion setting.
+- `"full"` always animates the screensaver, even with Reduced Motion on everywhere else.
+- `"reduced"` always shows the still picture, even with Reduced Motion off.
+
+The shell picks up the change when you save the file.
 
 You can start it on demand from _System > Screensaver_ (`Super + Esc`), which forces it up even if you've turned the idle screensaver off. There's no hotkey bound to it by default.
 
-`omarchy toggle screensaver` is what turns the idle one off, if you'd rather go straight from working to locked. It needs a terminal it knows how to configure — Alacritty, Foot, Ghostty, or Kitty — and will tell you so if your default terminal is something else.
+`omarchy toggle screensaver` is what turns the idle one off, if you'd rather go straight from working to locked.
 
-The logo it draws is yours to change, under _Style > Screensaver_. Upload a png or svg and Omarchy converts it to ASCII. See [branding](41-branding.md).
+### The classic screensaver
+
+The classic style is ASCII art running through random text effects in a terminal, one instance per monitor. To switch to it, choose _Style > Screensaver > Classic_, or run:
+
+```bash
+omarchy screensaver style classic
+```
+
+`omarchy screensaver style maslow` switches back, and `omarchy screensaver style status` prints the style in use. The choice is saved as `"screensaver": { "style": "classic" }` in `~/.config/omarchy/shell.json`.
+
+The classic style needs a terminal it knows how to configure — Alacritty, Foot, Ghostty, or Kitty — and will tell you so if your default terminal is something else. It is also what runs if the Maslow screensaver can't start, so you always get a screensaver.
+
+Custom artwork applies to the classic style. Under _Style > Screensaver_ you can edit the text, or upload a png or svg and have it converted to ASCII. See [branding](41-branding.md).
 
 ### The lock screen
 

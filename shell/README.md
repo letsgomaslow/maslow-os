@@ -39,6 +39,7 @@ shell/
       idle/
     osd/
     polkit/
+    screensaver/         native Maslow screensaver (maslow.screensaver service)
 ```
 
 The plugin discovery path is documented in [plugins/README.md](plugins/README.md).
@@ -234,6 +235,10 @@ becomes the authoritative file — we do **not** deep-merge defaults back in.
     "screensaver": 150,
     "lock": 300
   },
+  "screensaver": {
+    "style": "maslow",
+    "motion": "auto"
+  },
   "bar": {
     "id": "omarchy.bar",
     "position": "top",
@@ -277,6 +282,8 @@ becomes the authoritative file — we do **not** deep-merge defaults back in.
 7. **Idle timings are top-level.** `idle.screensaver` and `idle.lock`
    are seconds since user idle began, so the default lock fires at 300s
    even if the 150s screensaver starts first.
+   `screensaver.style` picks the screensaver the idle path shows: `maslow` (the default, also used when the value is missing or unknown) or `classic` for the terminal effects.
+   `screensaver.motion` sets how the `maslow` style moves: `auto` (the default, also used when the value is missing or unknown) follows the system Reduced Motion toggle, `full` always animates, and `reduced` always holds a still frame. `omarchy-shell screensaver status` reports both values with `reducedMotion`, `fps` and the rest of its state.
 8. **`version: 1` is required** at the top level. The shell will fall back
    to defaults rather than load an unknown version.
 
