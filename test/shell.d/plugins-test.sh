@@ -110,7 +110,7 @@ for (const manifestPath of manifests) {
   }
 
   check(
-    String(manifest.id).startsWith('omarchy.') || manifest.id === 'maslow.ai-setup',
+    String(manifest.id).startsWith('omarchy.') || ['maslow.ai-setup', 'maslow.screensaver'].includes(manifest.id),
     `${manifest.id} must use a reviewed first-party namespace`
   )
   check(!String(manifest.id).includes('/') && !String(manifest.id).includes('..'), `${manifest.id} must be safe as a plugin id`)

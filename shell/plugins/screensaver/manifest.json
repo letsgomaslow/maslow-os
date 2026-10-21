@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "id": "maslow.screensaver",
+  "name": "Maslow Screensaver",
+  "version": "1.0.0",
+  "author": "Maslow AI",
+  "description": "Native Gradient Bridge screensaver drawn by the shell; the terminal screensaver remains the classic fallback.",
+  "kinds": [
+    "service"
+  ],
+  "keepLoaded": true,
+  "entryPoints": {
+    "service": "Service.qml"
+  }
+}

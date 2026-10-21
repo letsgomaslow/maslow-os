@@ -12,6 +12,7 @@ WALLPAPER_COLLAGE="$ROOT/branding/wallpapers/maslow-wallpaper-collage.png"
 WALLPAPER_SOURCE_DIR="$ROOT/branding/wallpapers"
 TERMINAL_ART_DIR=$(mktemp -d)
 TERMINAL_SOURCE_DIR="$ROOT/branding/terminal"
+SCREENSAVER_ASSETS="$ROOT/shell/plugins/screensaver/assets"
 render_wallpaper_assets=false
 
 if [[ ${1:-} == "--wallpapers" ]]; then
@@ -138,6 +139,43 @@ render_lockup() {
     -extent "${canvas_width}x${canvas_height}" -depth 8 "$output"
 }
 
+# A square, metadata-free PNG of one colour under a radial alpha falloff.
+# dd is the distance from the centre as a share of the radius.
+render_screensaver_falloff() {
+  local name=$1 color=$2 size=$3 falloff=$4
+  "$MAGICK" -size "${size}x${size}" xc:"$color" \
+    \( -size "${size}x${size}" xc:black -fx "dd=hypot(i-w/2+0.5,j-h/2+0.5)/(w/2); $falloff" \) \
+    -alpha off -compose CopyOpacity -composite \
+    -strip -define png:exclude-chunks=date,time -depth 8 "$SCREENSAVER_ASSETS/$name.png"
+}
+
+# The native screensaver ships its own copy of the mark (branding/ is not
+# installed) and pre-blurred light, so the shell never blurs at runtime: the
+# halo is the brand gradient under an elliptical falloff, the aurora fields are
+# soft discs of the brand colours, and the particle and ripple ring are white
+# sprites the scene tints by opacity. Fixed chunks and no metadata keep every
+# PNG byte-identical between runs.
+render_screensaver_assets() {
+  local aurora='dd<1 ? exp(-3.2*dd*dd)*(1-pow(dd,8)) : 0'
+
+  mkdir -p "$SCREENSAVER_ASSETS"
+  cp "$MARK_GRADIENT" "$SCREENSAVER_ASSETS/maslow-mark-gradient.svg"
+  "$MAGICK" \
+    \( -size 512x512 gradient:'#EE7BB3'-'#A070A6' -rotate -90 \) \
+    \( -size 512x512 gradient:'#A070A6'-'#6DC4AD' -rotate -90 \) +append \
+    \( -size 1024x512 xc:black \
+      -fx 'xx=(i+0.5)/w*2-1; yy=(j+0.5)/h*2-1; rr=xx*xx+yy*yy; rr<1 ? 0.55*pow(1-rr,1.6) : 0' \) \
+    -alpha off -compose CopyOpacity -composite \
+    -strip -define png:exclude-chunks=date,time -depth 8 "$SCREENSAVER_ASSETS/glow.png"
+  render_screensaver_falloff aurora-pink '#EE7BB3' 512 "$aurora"
+  render_screensaver_falloff aurora-violet '#A070A6' 512 "$aurora"
+  render_screensaver_falloff aurora-deep '#401877' 512 "$aurora"
+  render_screensaver_falloff aurora-teal '#6DC4AD' 512 "$aurora"
+  render_screensaver_falloff aurora-amber '#F2A23A' 512 "$aurora"
+  render_screensaver_falloff particle white 128 'dd<1 ? exp(-9*dd*dd)*0.8+exp(-70*dd*dd)*0.2 : 0'
+  render_screensaver_falloff ring white 512 'exp(-pow((dd-0.9)/0.035,2))'
+}
+
 render_terminal_logo() {
   cp "$TERMINAL_SOURCE_DIR/logo.txt" "$ROOT/logo.txt"
 }
@@ -156,6 +194,7 @@ render_lockup "#FFFFFF" "$ROOT/default/plymouth/logo.png" 150
 cp "$ROOT/default/plymouth/logo.png" "$ROOT/default/sddm/omarchy/logo.png"
 render_terminal_logo
 render_terminal_icon
+render_screensaver_assets
 
 "$MAGICK" -size 1200x675 xc:"#121D35" "$ROOT/themes/maslow-dark/unlock.png" -gravity center -composite -depth 8 "$ROOT/themes/maslow-dark/preview-unlock.png"
 "$MAGICK" -size 1200x675 xc:"#FFFFFF" "$ROOT/themes/maslow-light/unlock.png" -gravity center -composite -depth 8 "$ROOT/themes/maslow-light/preview-unlock.png"
