@@ -33,6 +33,37 @@ assertDeepEqual(
   { windows: { a: true }, count: 1 },
   'idle leaves screensaver windows unchanged without an address'
 )
+
+const fs = require('fs')
+const native = requireFromRoot('shell/plugins/services/idle/NativeScreensaver.js')
+const service = fs.readFileSync(root + '/shell/plugins/services/idle/Service.qml', 'utf8')
+
+assert(
+  typeof native.address === 'string' && native.address.length > 0 && !/^(0x)?[0-9a-f]+$/i.test(native.address),
+  'native screensaver key can never match a Hyprland window address'
+)
+assertDeepEqual(
+  idle.screensaverWindowsAfter({ '0xabc': true }, native.address, true),
+  { windows: { '0xabc': true, [native.address]: true }, count: 2 },
+  'native screensaver counts alongside classic screensaver windows'
+)
+assertDeepEqual(
+  idle.screensaverWindowsAfter({ '0xabc': true, [native.address]: true }, native.address, false),
+  { windows: { '0xabc': true }, count: 1 },
+  'native screensaver closing leaves classic windows counted'
+)
+assert(
+  /import "NativeScreensaver\.js" as NativeScreensaver/.test(service),
+  'idle service imports the native screensaver key'
+)
+assert(
+  /function setNativeScreensaverVisible\(visible\) \{\s*var key = NativeScreensaver\.address\s*if \(visible\) root\.handleScreensaverWindowOpened\(key\)\s*else if \(root\.screensaverWindows\[key\]\) root\.handleScreensaverWindowClosed\(key\)/.test(service),
+  'idle service routes native screensaver visibility through the window open and close handlers'
+)
+assert(
+  /nativeScreensaver: !!root\.screensaverWindows\[NativeScreensaver\.address\]/.test(service),
+  'idle status reports whether the native screensaver is up'
+)
 JS
 
 test_tmp=$(mktemp -d)

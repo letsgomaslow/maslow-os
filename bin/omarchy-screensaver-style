@@ -1,0 +1,40 @@
+#!/bin/bash
+
+# omarchy:summary=Choose the Maslow screensaver or the classic terminal effects
+# omarchy:args=[maslow|classic|status]
+# omarchy:examples=omarchy screensaver style classic | omarchy screensaver style maslow | omarchy screensaver style status
+
+set -euo pipefail
+
+source omarchy-shell-config
+
+usage() {
+  cat <<USAGE
+Usage: omarchy screensaver style [maslow|classic|status]
+
+  maslow    Use the native Maslow screensaver (the default)
+  classic   Use the classic terminal effects with your screensaver artwork
+  status    Print the style in use
+USAGE
+}
+
+case "${1:-status}" in
+maslow | classic)
+  commit '.screensaver = ((.screensaver | if type == "object" then . else {} end) + {style: $style})' --arg style "$1"
+  ;;
+status)
+  style=$(jq -r '(.screensaver | objects | .style) // "maslow"' "$(source_file)")
+  if [[ $style == "classic" ]]; then
+    echo classic
+  else
+    echo maslow
+  fi
+  ;;
+-h | --help)
+  usage
+  ;;
+*)
+  usage >&2
+  exit 2
+  ;;
+esac

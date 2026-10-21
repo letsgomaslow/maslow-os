@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# omarchy:summary=Edit, set, or reset screensaver branding
+# omarchy:summary=Edit, set, or reset the artwork of the classic screensaver style
 # omarchy:group=branding
 # omarchy:name=screensaver
 # omarchy:args=<image|text|reset>
@@ -12,17 +12,18 @@ case "${1:-}" in
 image)
   image=$(omarchy-file-select --title "Pick PNG or SVG for screensaver" --extensions "png svg")
   if omarchy-transcode-ascii "$image" ~/.config/omarchy/branding/screensaver.txt; then
-    omarchy-launch-screensaver force >/dev/null 2>&1
+    omarchy-launch-screensaver force classic >/dev/null 2>&1
   fi
   ;;
 text)
-  omarchy-launch-editor ~/.config/omarchy/branding/screensaver.txt >/dev/null 2>&1 && omarchy-launch-screensaver force >/dev/null 2>&1
+  omarchy-launch-editor ~/.config/omarchy/branding/screensaver.txt >/dev/null 2>&1 && omarchy-launch-screensaver force classic >/dev/null 2>&1
   ;;
 reset)
-  cp "$OMARCHY_PATH/logo.txt" ~/.config/omarchy/branding/screensaver.txt && omarchy-launch-screensaver force >/dev/null 2>&1
+  cp "$OMARCHY_PATH/logo.txt" ~/.config/omarchy/branding/screensaver.txt && omarchy-launch-screensaver force classic >/dev/null 2>&1
   ;;
 *)
   echo "Usage: omarchy-branding-screensaver <image|text|reset>" >&2
+  echo "Sets the artwork of the classic screensaver style; see omarchy screensaver style." >&2
   exit 1
   ;;
 esac

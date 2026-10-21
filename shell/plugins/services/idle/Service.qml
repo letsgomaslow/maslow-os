@@ -4,6 +4,7 @@ import Quickshell.Hyprland
 import Quickshell.Io
 import Quickshell.Wayland
 import "IdleModel.js" as IdleModel
+import "NativeScreensaver.js" as NativeScreensaver
 
 Item {
   id: root
@@ -138,6 +139,14 @@ Item {
     root.cancelIdleCycle("screensaver-dismissed")
   }
 
+  // Maslow: maslow.screensaver reports itself as one pseudo window so the
+  // window count, launch grace and dismiss-cancels-lock logic cover both renderers.
+  function setNativeScreensaverVisible(visible) {
+    var key = NativeScreensaver.address
+    if (visible) root.handleScreensaverWindowOpened(key)
+    else if (root.screensaverWindows[key]) root.handleScreensaverWindowClosed(key)
+  }
+
   function eventParts(event, count) {
     return IdleModel.eventParts(event, count)
   }
@@ -191,6 +200,7 @@ Item {
       screensaverDelay: root.screensaverDelaySeconds,
       lockDelay: root.lockDelaySeconds,
       screensaverWindows: root.screensaverWindowCount,
+      nativeScreensaver: !!root.screensaverWindows[NativeScreensaver.address],
       timers: {
         screensaver: screensaverTimer.running,
         lock: lockTimer.running,

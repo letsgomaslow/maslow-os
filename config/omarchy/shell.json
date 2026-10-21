@@ -4,6 +4,9 @@
     "screensaver": 150,
     "lock": 300
   },
+  "screensaver": {
+    "style": "maslow"
+  },
   "bar": {
     "position": "top",
     "transparent": false,
